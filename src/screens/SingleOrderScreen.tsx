@@ -19,10 +19,11 @@ import { getStorage, setStorage } from '../storage/store';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { AlertWithOptions } from '../core/utils';
 import ItemDetails from './ItemDetails';
+import { colors } from '../core/theme';
 const SingleOrderScreen = ({ route }: any) => {
   const { tableName } = route.params;
-  const [items, setItems]: any = useState([]);
-  const [categories, setCategories]: any = useState([]);
+  const [items, setItems] = useState<Item[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const navigation = useNavigation();
 
   /**
@@ -75,12 +76,24 @@ const SingleOrderScreen = ({ route }: any) => {
     setIsModalVisible(false);
   };
 
+  const groupItemsByCategory = (items: Item[]) => {
+    return items.reduce((acc, item) => {
+      const categoryTitle = item.category.title;
+      if (!acc[categoryTitle]) {
+        acc[categoryTitle] = [];
+      }
+      acc[categoryTitle].push(item);
+      return acc;
+    }, {} as any);
+  };
+
   const fetchItems = async () => {
-    const fetchItems = await Requests.getRequest('/items');
-    const categories = Array.from(new Set(fetchItems.map((e: any) => e.category.title)));
+    const fetchItems: Item[] = await Requests.getRequest('/items');
+    const groupedItems = groupItemsByCategory(fetchItems);
+    const categories = Array.from(new Set(fetchItems.map((e) => e.category.title)));
 
     setCategories(categories);
-    setItems(fetchItems);
+    setItems(groupedItems);
   };
 
   useEffect(() => {
@@ -116,18 +129,59 @@ const SingleOrderScreen = ({ route }: any) => {
     navigation.navigate('singleOrder', { tableName: table });
   };
 
-  const renderItem = ({ item }: any) => (
-    <View style={{ marginBottom: 4 }}>
-      <CatalogItem item={item} type="Use" />
-      <Divider style={{ marginTop: 4 }} />
-    </View>
-  );
+  const renderItem = ({ item, index, length }: { item: Item; index: number; length: number }) => {
+    return (
+      <View style={{ marginBottom: 4 }}>
+        <CatalogItem item={item} type="Use" />
+        {index !== length - 1 && <Divider style={{ marginTop: 4 }} />}
+      </View>
+    );
+  };
 
-  const renderCategoryItem = ({ item }: any) => {
+  const renderCategoryScroll = ({ item }: any) => {
     return (
       <TouchableOpacity style={styles.categoryItem}>
         <Text style={styles.categoryText}>{item}</Text>
       </TouchableOpacity>
+    );
+  };
+
+  const renderCategoryItems = ({ item, items }: any) => {
+    const categoryItems = items[item];
+    return (
+      <View>
+        <View
+          style={{
+            marginBottom: 10,
+            backgroundColor: colors.darkGrey,
+            paddingVertical: 10,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 26,
+              fontWeight: 'bold',
+              marginLeft: 16,
+            }}
+          >
+            {item}
+          </Text>
+        </View>
+        <View style={{ paddingHorizontal: 16 }}>
+          <FlatList
+            data={categoryItems}
+            keyExtractor={(subItem) => subItem.id.toString()}
+            renderItem={({ item, index }) =>
+              renderItem({
+                item,
+                index,
+                length: categoryItems.length,
+              })
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      </View>
     );
   };
 
@@ -139,23 +193,23 @@ const SingleOrderScreen = ({ route }: any) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={renderCategoryItem}
+          renderItem={renderCategoryScroll}
           contentContainerStyle={styles.categoriesList}
           style={styles.categoriesFlatList}
         />
       </View>
 
       <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
+        data={Object.keys(items)}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => renderCategoryItems({ item, items: items })}
       />
 
-      <TouchableOpacity style={styles.fixedButton} onPress={handleOpenModal}>
-        <Text style={styles.buttonText}>{tableName}</Text>
-      </TouchableOpacity>
+      <View style={styles.tableButtonContainer}>
+        <TouchableOpacity style={styles.tableButton} onPress={handleOpenModal}>
+          <Text style={styles.buttonText}>{tableName}</Text>
+        </TouchableOpacity>
+      </View>
       <BottomHalfSheet
         showModal={isModalVisible}
         closeModal={handleCloseModal}
@@ -169,7 +223,7 @@ const SingleOrderScreen = ({ route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingTop: 6,
     backgroundColor: '#2F2F2F',
   },
   categoriesContainer: {
@@ -196,12 +250,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     margin: 0,
   },
-  fixedButton: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
-    width: 80,
-    height: 80,
+  tableButtonContainer: {
+    alignItems: 'flex-end',
+    paddingVertical: 2,
+    backgroundColor: colors.darkerGrey,
+  },
+  tableButton: {
+    // position: 'absolute',
+    // right: 20,
+    // bottom: 20,
+    marginRight: 20,
+    width: 60,
+    height: 60,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'blue',
