@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,8 @@ import { HeaderBackButton } from '@react-navigation/elements';
 import { AlertWithOptions } from '../core/utils';
 import ItemDetails from './ItemDetails';
 import { colors } from '../core/theme';
+
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const SingleOrderScreen = ({ route }: any) => {
   const { tableName } = route.params;
   const [items, setItems] = useState<Item[]>([]);
@@ -129,6 +131,14 @@ const SingleOrderScreen = ({ route }: any) => {
     navigation.navigate('singleOrder', { tableName: table });
   };
 
+  const renderCategoryScroll = ({ item, index }: any) => {
+    return (
+      <TouchableOpacity style={styles.categoryItem} onPress={() => handleScrollToCategory(index)}>
+        <Text style={styles.categoryText}>{item}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   const renderItem = ({ item, index, length }: { item: Item; index: number; length: number }) => {
     return (
       <View style={{ marginBottom: 4 }}>
@@ -138,12 +148,11 @@ const SingleOrderScreen = ({ route }: any) => {
     );
   };
 
-  const renderCategoryScroll = ({ item }: any) => {
-    return (
-      <TouchableOpacity style={styles.categoryItem}>
-        <Text style={styles.categoryText}>{item}</Text>
-      </TouchableOpacity>
-    );
+  const flatListRef = useRef(null);
+
+  const handleScrollToCategory = (index: number) => {
+    //@ts-ignore
+    flatListRef.current?.scrollToIndex({ index, animated: true });
   };
 
   const renderCategoryItems = ({ item, items }: any) => {
@@ -153,19 +162,20 @@ const SingleOrderScreen = ({ route }: any) => {
         <View
           style={{
             marginBottom: 10,
-            backgroundColor: colors.darkGrey,
+            backgroundColor: colors.darkerGrey,
             paddingVertical: 10,
           }}
         >
-          <Text
+          <View
             style={{
-              fontSize: 26,
-              fontWeight: 'bold',
               marginLeft: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
-            {item}
-          </Text>
+            <Icon name={'chevron-double-right'} size={20} color="#fff" />
+            <Text style={{ fontSize: 26, fontWeight: 'bold', color: 'white' }}>{item}</Text>
+          </View>
         </View>
         <View style={{ paddingHorizontal: 16 }}>
           <FlatList
@@ -185,6 +195,62 @@ const SingleOrderScreen = ({ route }: any) => {
     );
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: 6,
+      backgroundColor: '#2F2F2F',
+    },
+    categoriesContainer: {
+      // height: 50, // Set a fixed height for the container of the FlatList
+      // backgroundColor: 'red',
+      marginBottom: 16,
+      marginHorizontal: 8,
+    },
+    categoriesFlatList: {
+      flexGrow: 0, // Prevent FlatList from growing beyond the items it contains
+    },
+    categoriesList: {
+      alignItems: 'center',
+      paddingRight: 16, // Adds padding to the end of the list for better scrolling experience
+    },
+    categoryItem: {
+      backgroundColor: 'grey',
+      borderRadius: 2,
+      paddingVertical: 12,
+      paddingHorizontal: categories.length > 3 ? 16 : 36,
+      marginHorizontal: 2,
+    },
+    categoryText: {
+      color: 'white',
+      fontWeight: 'bold',
+      margin: 0,
+    },
+    tableButtonContainer: {
+      alignItems: 'flex-end',
+      paddingVertical: 2,
+      backgroundColor: colors.darkerGrey,
+    },
+    tableButton: {
+      // position: 'absolute',
+      // right: 20,
+      // bottom: 20,
+      marginRight: 20,
+      width: 60,
+      height: 60,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'blue',
+      padding: 4,
+      borderRadius: 6,
+    },
+    buttonText: {
+      color: 'white',
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.categoriesContainer}>
@@ -193,13 +259,15 @@ const SingleOrderScreen = ({ route }: any) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={renderCategoryScroll}
+          renderItem={({ item, index }) => renderCategoryScroll({ item, index })}
           contentContainerStyle={styles.categoriesList}
           style={styles.categoriesFlatList}
+          overScrollMode="never"
         />
       </View>
 
       <FlatList
+        ref={flatListRef}
         data={Object.keys(items)}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => renderCategoryItems({ item, items: items })}
@@ -219,60 +287,5 @@ const SingleOrderScreen = ({ route }: any) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 6,
-    backgroundColor: '#2F2F2F',
-  },
-  categoriesContainer: {
-    // height: 50, // Set a fixed height for the container of the FlatList
-    // backgroundColor: 'red',
-    marginBottom: 16,
-  },
-  categoriesFlatList: {
-    flexGrow: 0, // Prevent FlatList from growing beyond the items it contains
-  },
-  categoriesList: {
-    alignItems: 'center',
-    paddingRight: 16, // Adds padding to the end of the list for better scrolling experience
-  },
-  categoryItem: {
-    backgroundColor: 'grey',
-    borderRadius: 4,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    marginHorizontal: 2,
-  },
-  categoryText: {
-    color: 'white',
-    fontWeight: 'bold',
-    margin: 0,
-  },
-  tableButtonContainer: {
-    alignItems: 'flex-end',
-    paddingVertical: 2,
-    backgroundColor: colors.darkerGrey,
-  },
-  tableButton: {
-    // position: 'absolute',
-    // right: 20,
-    // bottom: 20,
-    marginRight: 20,
-    width: 60,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'blue',
-    padding: 4,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-});
 
 export default SingleOrderScreen;
