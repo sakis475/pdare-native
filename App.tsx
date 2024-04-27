@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, PaperProvider} from 'react-native-paper';
-import {NavigationContainer} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, PaperProvider } from 'react-native-paper';
+import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 
 import Toast from 'react-native-toast-message';
-import {setLocalizedStrings} from './src/core/strings';
+import { setLocalizedStrings } from './src/core/strings';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -23,12 +25,16 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <PaperProvider>
-        <AppNavigator />
-        <Toast />
-      </PaperProvider>
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetModalProvider>
+        <NavigationContainer>
+          <PaperProvider>
+            <AppNavigator />
+            <Toast />
+          </PaperProvider>
+        </NavigationContainer>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 };
 

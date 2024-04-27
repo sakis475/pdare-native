@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 import {
   View,
@@ -19,6 +19,8 @@ import SingleOrderScreen from './SingleOrderScreen';
 import { HeaderBar } from '../components/HeaderBar';
 import { BottomHalfSheet } from '../components/BottomHalfSheet';
 import { SelectTable } from '../components/tableSelect/SelectTable';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+import { colors } from '../core/theme';
 const TablesScreen = () => {
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
@@ -61,17 +63,15 @@ const TablesScreen = () => {
     { id: 5, tableName: 'B2', occupiedByOrder: 'order5' },
   ]);
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => [300, 300], []);
 
   const handleOpenModal = () => {
-    // const bearer = await getBearer();
-    console.log('handleCloseModal');
-    setIsModalVisible(true);
+    bottomSheetRef.current?.expand();
   };
   const handleCloseModal = () => {
-    setIsModalVisible(false);
+    bottomSheetRef.current?.close();
   };
-
   const handleSelectTable = (table: any) => {
     //@ts-ignore
     navigation.navigate('singleOrder', { tableName: table });
@@ -111,16 +111,39 @@ const TablesScreen = () => {
             </View>
           </ScrollView>
         </View>
-        <View>
-          <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
-            <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{strings.NewOrderBtn}</Text>
-          </TouchableOpacity>
-          <BottomHalfSheet
-            showModal={isModalVisible}
-            closeModal={handleCloseModal}
-            component={SelectTableComponent}
-          ></BottomHalfSheet>
-        </View>
+
+        <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
+          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{strings.NewOrderBtn}</Text>
+        </TouchableOpacity>
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          // onChange={handleSheetChanges}
+          enablePanDownToClose={true}
+          enableOverDrag={true}
+          enableContentPanningGesture={false}
+          backdropComponent={(backdropProps) => (
+            <BottomSheetBackdrop
+              {...backdropProps}
+              enableTouchThrough={false}
+              opacity={0.7}
+              onPress={handleCloseModal}
+            />
+          )}
+          handleIndicatorStyle={{ backgroundColor: '#fff' }}
+          backgroundStyle={{ backgroundColor: colors.darkGrey }}
+        >
+          <BottomSheetView style={styles.tableChangeContainer}>
+            <SelectTable
+              allTables={allTables}
+              onTableSelect={(table: any) => {
+                handleCloseModal();
+                handleSelectTable(table);
+              }}
+            ></SelectTable>
+          </BottomSheetView>
+        </BottomSheet>
       </View>
     </SafeAreaView>
   );
@@ -129,7 +152,7 @@ const TablesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
     backgroundColor: '#2F2F2F',
   },
   scrollableTableContainer: {
@@ -151,6 +174,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     alignItems: 'center',
+  },
+  tableChangeContainer: {
+    paddingTop: 20,
+    paddingHorizontal: 2,
+  },
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // Adjust color and opacity as needed
   },
 });
 

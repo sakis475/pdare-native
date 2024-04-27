@@ -73,7 +73,7 @@ export async function getRequest(url: string) {
     const options = {
       headers: {
         // Authorization: `Bearer ${auth}`,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxMzU2NzE1NiwiZXhwIjoxNzE0MTcxOTU2fQ.bxOpkOgK19J2g_HoALmZp_s4kvsYodKwkGX2jR1CNBg`,
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNDE3MjE4OSwiZXhwIjoxNzE0Nzc2OTg5fQ.RtCPrSid9ppTJaF83jgPWdqYPX_wNcp-CrFGMt09ZDM`,
       },
     };
 
