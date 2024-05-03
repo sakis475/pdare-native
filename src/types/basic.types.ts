@@ -28,3 +28,10 @@ interface Item {
   category: Category;
   itemPropertiesGrouped: ItemPropertiesGrouped;
 }
+
+interface Table {
+  id: number;
+  isEnabled: boolean;
+  tableName: string;
+  tableOrder: number;
+}

@@ -7,22 +7,33 @@ import {
   FlatList,
   Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { strings } from '../../core/strings';
 import { sortNumberAndStrings } from '../../core/utils';
+import { colors } from '../../core/theme';
 
 const boxSize = 80;
 
-const TableSelectHorizontalContainer = ({ tables, searchWord, onTableSelect }: any) => {
+const TableSelectHorizontalContainer = ({
+  tables,
+  searchWord,
+  onTableSelect,
+}: {
+  tables: Table[];
+  searchWord: string;
+  onTableSelect: any;
+}) => {
   //TODO: pass search key, filter allTables by search key, sort by name
-  const [allTables, setAllTables] = useState(
-    tables.sort((a: any, b: any) => sortNumberAndStrings(a.text, b.text))
-  );
+  const [allTables, setAllTables] = useState(tables);
+
+  useEffect(() => {
+    filterTable(searchWord);
+  }, [searchWord]);
 
   useEffect(() => {
     setAllTables(tables);
-    filterTable(searchWord);
-  }, [searchWord]);
+  }, [tables]);
 
   const handleTableSelect = (table: any) => {
     onTableSelect(table);
@@ -31,21 +42,25 @@ const TableSelectHorizontalContainer = ({ tables, searchWord, onTableSelect }: a
   // Function to remove an item from allTables
   const filterTable = (searchWord: string) => {
     if (searchWord) {
-      setAllTables((prevTables: any) => {
-        return prevTables.filter((item: any) => item.text.includes(searchWord));
+      setAllTables((prevTables: Table[]) => {
+        const tablesExist = prevTables.filter((table) => table.tableName.includes(searchWord));
+
+        return tablesExist;
       });
+    } else {
+      setAllTables(tables);
     }
   };
 
-  const TableBox = ({ item, newBox = false }: any) => {
+  const TableBox = ({ table, newBox }: any) => {
     let customStyle = styles.box;
     if (newBox) {
       customStyle = { ...styles.box, backgroundColor: 'orange' };
     }
     return (
-      <TouchableOpacity activeOpacity={0.7} onPress={() => handleTableSelect(item.text)}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => handleTableSelect(table.item.tableName)}>
         <View style={customStyle}>
-          <Text style={styles.boxText}>{item.text}</Text>
+          <Text style={styles.boxText}>{table.item.tableName}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -55,36 +70,43 @@ const TableSelectHorizontalContainer = ({ tables, searchWord, onTableSelect }: a
   const numColumns = Math.ceil(allTables.length / 2);
   const contentWidth = (numColumns + 1) * boxSize; // Assuming each box has a width of 30 and margin of 5
 
-  const flatList = (
-    <FlatList
-      key={`flatList${numColumns}`}
-      numColumns={numColumns}
-      showsVerticalScrollIndicator={false}
-      showsHorizontalScrollIndicator={false}
-      data={allTables}
-      renderItem={TableBox}
-    />
-  );
-
-  if (allTables.length === 0 && searchWord) {
-    return (
-      <>
-        <Text style={{ color: 'grey', marginLeft: 5 }}>{strings.TempTable}</Text>
-        <TableBox item={{ text: searchWord }} newBox={true} />
-      </>
-    );
-  }
-  return contentWidth > screenWidth ? (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      directionalLockEnabled={true}
-      alwaysBounceVertical={false}
-    >
-      {flatList}
-    </ScrollView>
-  ) : (
-    flatList
+  return (
+    <>
+      {searchWord?.length ? (
+        <TableBox table={{ item: { tableName: searchWord } }} newBox={true}></TableBox>
+      ) : allTables?.length ? (
+        contentWidth > screenWidth ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            directionalLockEnabled={true}
+            alwaysBounceVertical={false}
+          >
+            <FlatList
+              key={`flatList${numColumns}`}
+              numColumns={numColumns}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              data={allTables}
+              renderItem={(table) => TableBox({ table, newBox: false })}
+            />
+          </ScrollView>
+        ) : (
+          <FlatList
+            key={`flatList${numColumns}`}
+            numColumns={numColumns}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            data={allTables}
+            renderItem={(table) => TableBox({ table, newBox: true })}
+          />
+        )
+      ) : (
+        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        </View>
+      )}
+    </>
   );
 };
 

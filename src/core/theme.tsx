@@ -16,5 +16,7 @@ export const colors = {
   darkerGrey: '#252525',
 
   primary: '#5851ff',
-  danger: '#f58775',
+  danger: '#f68775',
+
+  success: '#b7ffcc',
 };

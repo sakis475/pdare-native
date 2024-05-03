@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { AlertWithOptions } from '../core/utils';
+import { AlertWithOptions, toast } from '../core/utils';
 import { colors } from '../core/theme';
+import * as Requests from '../helpers/requests';
 
 const EditDeleteButtons = ({ item }: { item: Item }) => {
   const handleEdit = () => {
@@ -14,7 +15,9 @@ const EditDeleteButtons = ({ item }: { item: Item }) => {
     return AlertWithOptions(
       'Permanent Delete',
       `Are you sure you want to permanently delete item: \n\n *${item.title}*`,
-      () => console.log('Handle Delete'),
+      () => {
+        deleteItem(item);
+      },
       () => null,
       'Delete'
     );
@@ -36,6 +39,17 @@ const EditDeleteButtons = ({ item }: { item: Item }) => {
       </TouchableOpacity>
     </View>
   );
+};
+
+const deleteItem = async (item: Item) => {
+  try {
+    await Requests.deleteRequest('/items/disableMany', {
+      itemIds: [item.id],
+    });
+    toast('success', 'Item Succesfully Deleted', undefined, 2000);
+  } catch (error) {
+    toast('error', 'Could not delete item');
+  }
 };
 
 const styles = StyleSheet.create({

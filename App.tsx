@@ -7,6 +7,8 @@ import Toast from 'react-native-toast-message';
 import { setLocalizedStrings } from './src/core/strings';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { PortalProvider } from '@gorhom/portal';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -25,16 +27,20 @@ const App = () => {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <NavigationContainer>
-          <PaperProvider>
-            <AppNavigator />
-            <Toast />
-          </PaperProvider>
-        </NavigationContainer>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <NavigationContainer>
+            <PaperProvider>
+              <PortalProvider>
+                <AppNavigator />
+              </PortalProvider>
+              <Toast />
+            </PaperProvider>
+          </NavigationContainer>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 };
 

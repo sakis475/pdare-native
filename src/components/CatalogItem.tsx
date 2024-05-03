@@ -9,28 +9,49 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import QuantitySelector from './QuantitySelector'; // Make sure the path is correct
-import EditDeleteButtons from './EditDeleteButtons';
+import { AlertWithOptions, toast } from '../core/utils';
+import * as Requests from '../helpers/requests';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { colors } from '../core/theme';
 
-export function CatalogItem({ item, type }: { item: any; type: 'Use' | 'Manage' }) {
+export function CatalogItem({
+  item,
+  type,
+  onAction,
+}: {
+  item: any;
+  type: 'Use' | 'Manage' | 'Deleted';
+  onAction: any;
+}) {
   const navigation = useNavigation();
 
+  const [isPressedIn, setIsPressedIn] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
 
   const handlePressIn = () => {
-    setIsPressed(true);
+    setIsPressedIn(true);
   };
 
   const handlePressOut = () => {
-    setIsPressed(false);
+    setIsPressedIn(false);
   };
 
   // Function to handle item press
   const handlePress = () => {
+    setIsPressed(true);
     if (type === 'Use') {
       //@ts-ignore
       navigation.navigate('itemDetails', { item });
     } else if (type === 'Manage') {
+      //@ts-ignore
+      navigation.navigate('editItemDetails', { item });
     }
+  };
+
+  const handleEdit = () => {
+    console.log('Edit action triggered');
+    // Add your edit functionality here
   };
 
   return (
@@ -38,18 +59,51 @@ export function CatalogItem({ item, type }: { item: any; type: 'Use' | 'Manage' 
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      disabled={type === 'Deleted'}
     >
       <View style={styles.container}>
         <View style={styles.textContainer}>
-          <Text style={[styles.itemTitle, isPressed ? styles.textPressed : null]}>
+          <Text
+            style={[
+              styles.itemTitle,
+              isPressedIn ? styles.textPressed : null,
+              type === 'Deleted'
+                ? { color: colors.danger, textDecorationLine: 'line-through' }
+                : {},
+            ]}
+          >
             {item.title}
           </Text>
         </View>
         {type === 'Use' ? (
           <QuantitySelector initialQuantity={1} />
-        ) : (
-          <EditDeleteButtons item={item} />
-        )}
+        ) : type === 'Manage' ? (
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleEdit} activeOpacity={0.6}>
+              <Icon name="edit" size={24} color={'#c8c6ff'} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => onAction('delete')}
+              activeOpacity={0.6}
+            >
+              <Icon name="delete" size={24} color={'#ffc4c4'} />
+            </TouchableOpacity>
+          </View>
+        ) : type === 'Deleted' ? (
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                console.log('undelete pressed');
+                onAction('undelete');
+              }}
+              activeOpacity={0.6}
+            >
+              <FontAwesome5 name="undo" size={18} color={'white'} />
+            </TouchableOpacity>
+          </View>
+        ) : null}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -75,5 +129,21 @@ const styles = StyleSheet.create({
   },
   textPressed: {
     opacity: 0.5, // Apply opacity when pressed
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333', // Dark background for the container
+    borderRadius: 5, // Rounded corners for the container
+    padding: 4,
+  },
+  button: {
+    width: 40, // Width of the button
+    height: 40, // Height of the button
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#555', // Slightly lighter color for buttons
+    borderRadius: 6, // Rounded corners for the buttons
+    marginHorizontal: 4, // Space between buttons
   },
 });

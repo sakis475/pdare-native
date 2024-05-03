@@ -12,12 +12,13 @@ import { colors } from '../core/theme';
 import ItemDetails from '../screens/ItemDetails';
 import RestaurantSettingsScreen from '../screens/adminScreens/restaurantSettings';
 import EditItemsScreen from '../screens/adminScreens/editItems';
+import EditItemDetails from '../screens/adminScreens/editItemDetails';
 
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerTitleAlign: 'center' }}>
+    <Stack.Navigator screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}>
       <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
       <Stack.Screen
         name="singleOrder"
@@ -72,6 +73,19 @@ const AppNavigator = () => {
       <Stack.Screen
         name="itemDetails"
         component={ItemDetails}
+        options={({ route }: any) => ({
+          presentation: 'modal',
+          animation: 'fade_from_bottom',
+          headerStyle: {
+            backgroundColor: colors.grey, // Change the header background color
+          },
+          headerTintColor: 'white', // Change the text color in the header
+          title: route.params?.item?.title || 'Λεπτομέριες',
+        })}
+      />
+      <Stack.Screen
+        name="editItemDetails"
+        component={EditItemDetails}
         options={({ route }: any) => ({
           presentation: 'modal',
           animation: 'fade_from_bottom',

@@ -37,13 +37,14 @@ export function convertDateToLocal(date: Dayjs | Date) {
   return date;
 }
 
-export function toast(type: ToastType, title: string, text: string = '') {
+export function toast(type: ToastType, title: string, text: string = '', visibilityTime = 4000) {
   Toast.show({
     type,
     text1: title,
     text2: text,
     position: 'bottom',
     bottomOffset: 60,
+    visibilityTime,
   });
 }
 /**

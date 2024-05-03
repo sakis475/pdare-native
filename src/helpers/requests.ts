@@ -1,5 +1,5 @@
 import axios, { isAxiosError } from 'axios';
-import { BASE_URL } from '../storage/env';
+import { BASE_URL, REQ_TIMEOUT } from '../storage/env';
 
 import { SessionBearer } from '../types/requests.types';
 import { getStorage, setStorage } from '../storage/store';
@@ -73,8 +73,9 @@ export async function getRequest(url: string) {
     const options = {
       headers: {
         // Authorization: `Bearer ${auth}`,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNDE3MjE4OSwiZXhwIjoxNzE0Nzc2OTg5fQ.RtCPrSid9ppTJaF83jgPWdqYPX_wNcp-CrFGMt09ZDM`,
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNDIyOTk5NywiZXhwIjoxNzE0ODM0Nzk3fQ.Aix2c9a0dOK-f1qFZ6JnKRQfqcfWsgZNnpMahz_HpiY`,
       },
+      timeout: REQ_TIMEOUT,
     };
 
     console.log(BASE_URL + url);
@@ -98,6 +99,7 @@ export async function postRequest(url: string, body?: any) {
           headers: {
             Authorization: `Bearer ${bearer.token}`,
           },
+          timeout: REQ_TIMEOUT,
         };
       }
     }
@@ -106,5 +108,29 @@ export async function postRequest(url: string, body?: any) {
     return response.data;
   } catch (error) {
     toast('error', 'Something bad happened...');
+  }
+}
+
+export async function updateIsEnabled(url: string, body?: any) {
+  try {
+    let config = {
+      headers: {
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNDIyOTk5NywiZXhwIjoxNzE0ODM0Nzk3fQ.Aix2c9a0dOK-f1qFZ6JnKRQfqcfWsgZNnpMahz_HpiY`,
+      },
+      data: body, // Data to be sent in the body of the request
+      timeout: REQ_TIMEOUT,
+    };
+
+    // if (url !== '/login' && url !== '/login/session') {
+    //   const bearer = await getBearer();
+    //   if (bearer) {
+    //     config.headers['Authorization'] = `Bearer ${bearer.token}`;
+    //   }
+    // }
+
+    const response = await axios.delete(BASE_URL + url, config);
+    return response.data;
+  } catch (error) {
+    console.error(error); // It's a good practice to log the error for debugging purposes
   }
 }

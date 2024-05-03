@@ -21,6 +21,7 @@ import {
   Platform,
   Dimensions,
   ActivityIndicator,
+  Keyboard,
 } from 'react-native';
 import { CatalogItem } from '../components/CatalogItem';
 import { BottomHalfSheet } from '../components/BottomHalfSheet';
@@ -43,20 +44,26 @@ const SingleOrderScreen = ({ route }: any) => {
   const [categories, setCategories] = useState<string[]>([]);
   const [categorySet, setCategorySet] = useState<any>();
   const navigation = useNavigation();
-
+  const [availableTables, setAvailableTables] = useState([]);
   const [focusedCategoryIndex, setFocusedCategoryIndex] = useState(0);
 
   /**
    * Show Dialog to cancel new order
    */
-
   function handleBackPress(navigation: NavigationProp<ReactNavigation.RootParamList>) {
-    return AlertWithOptions(
-      'Confirm Exit',
-      'Are you sure you want to leave this screen?',
-      () => navigation.goBack(),
-      () => null
-    );
+    const navigationState = navigation.getState();
+
+    if (
+      navigationState?.routes?.length &&
+      navigationState.routes.slice(-1)[0]?.name === 'singleOrder'
+    ) {
+      return AlertWithOptions(
+        'Confirm Exit',
+        'Are you sure you want to leave this screen?',
+        () => navigation.goBack(),
+        () => null
+      );
+    }
   }
 
   useEffect(() => {
@@ -79,12 +86,13 @@ const SingleOrderScreen = ({ route }: any) => {
         />
       ),
     });
-  }, [navigation]);
+  }, [navigation, availableTables]);
 
   /* END show dialog to cancel new order END */
 
   //mixed array of items and category headers
   function organizeItemsByCategory(items: any) {
+    console.log(items);
     const itemsMix = [];
     let currentCategory = null;
     const categoryIndex: any = {};
@@ -102,13 +110,13 @@ const SingleOrderScreen = ({ route }: any) => {
 
   const fetchItems = async () => {
     const fetchItems: Item[] = await Requests.getRequest('/items');
-
     const [groupedItems, categoriesIndexed] = organizeItemsByCategory(fetchItems);
-    // await setStorage('items', groupedItems);
-    // await setStorage('categorySet', categorySet);
 
-    // const groupedItems: any = await getStorage('items');
-    // const categorySet: any = await getStorage('categorySet');
+    // await setStorage('groupedItems', groupedItems);
+    // await setStorage('categoriesIndexed', categoriesIndexed);
+
+    // const groupedItems: any = await getStorage('groupedItems');
+    // const categoriesIndexed: any = await getStorage('categoriesIndexed');
     const categories = groupedItems.map((e: any) => e.categoryTitle).filter((e: any) => e); //Object.keys(['cat1', 'cat2', 'cat3']);
 
     setCategorySet(categoriesIndexed);
@@ -120,19 +128,6 @@ const SingleOrderScreen = ({ route }: any) => {
   useEffect(() => {
     fetchItems();
   }, []);
-
-  const [allTables, setAllTables]: any = useState([
-    { key: '2', text: '2', occupiedBy: null },
-    { key: '1', text: '1', occupiedBy: null },
-    { key: '7', text: '7', occupiedBy: null },
-    { key: '8', text: '8', occupiedBy: 1 },
-    { key: '3', text: '3', occupiedBy: 4 },
-    { key: '6', text: '6', occupiedBy: null },
-    { key: '9', text: '9', occupiedBy: null },
-    { key: '4', text: '4', occupiedBy: null },
-    { key: '5', text: '5', occupiedBy: null },
-    { key: '10', text: '10', occupiedBy: null },
-  ]);
 
   const handleSelectTable = (table: any) => {
     setTableName(table);
@@ -201,7 +196,7 @@ const SingleOrderScreen = ({ route }: any) => {
     if (item.title) {
       return (
         <View style={{ marginBottom: 4, paddingHorizontal: 6 }}>
-          <CatalogItem item={item} type="Use" />
+          <CatalogItem item={item} type="Use" onAction={() => {}} />
           {placeDivider ? <Divider style={{ marginTop: 4 }} /> : null}
         </View>
       );
@@ -213,11 +208,17 @@ const SingleOrderScreen = ({ route }: any) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => [300, 300], []);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = async () => {
     bottomSheetRef.current?.expand();
+    const fetchAvailableTables = await Requests.getRequest('/tables?availableOnly=true');
+    console.log('fetchTables');
+    setAvailableTables(fetchAvailableTables);
   };
+
   const handleCloseModal = () => {
     bottomSheetRef.current?.close();
+    Keyboard.dismiss();
+    setAvailableTables([]);
   };
 
   const handleSheetChanges = (index: number) => {
@@ -300,7 +301,7 @@ const SingleOrderScreen = ({ route }: any) => {
           >
             <BottomSheetView style={styles.tableChangeContainer}>
               <SelectTable
-                allTables={allTables}
+                allTables={availableTables}
                 onTableSelect={(table: any) => {
                   handleCloseModal();
                   handleSelectTable(table);
@@ -376,6 +377,8 @@ const styles = StyleSheet.create({
   tableChangeContainer: {
     paddingTop: 20,
     paddingHorizontal: 2,
+    justifyContent: 'center',
+    height: 300,
   },
   backdrop: {
     flex: 1,
