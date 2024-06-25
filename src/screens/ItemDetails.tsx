@@ -58,7 +58,7 @@ const UnifiedSelect = ({ itemPropertiesGrouped }: { itemPropertiesGrouped: ItemP
 };
 
 const ItemDetails = ({ route }: any) => {
-  const [itemDetails, setItemDetails]: Item[] = useState(route.params.item);
+  const [itemDetails, setItemDetails]: ItemReq[] = useState(route.params.item);
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, paddingTop: 16 }}>
@@ -66,9 +66,9 @@ const ItemDetails = ({ route }: any) => {
           {Object.keys(itemDetails.itemPropertiesGrouped).map((propertyName, index, array) => (
             <View key={propertyName}>
               <Text style={styles.header}>{propertyName}</Text>
-              <UnifiedSelect
-                itemPropertiesGrouped={itemDetails.itemPropertiesGrouped[propertyName]}
-              ></UnifiedSelect>
+              {/* <UnifiedSelect
+                // itemPropertiesGrouped={itemDetails.itemPropertiesGrouped[propertyName]}
+              ></UnifiedSelect> */}
 
               {index !== array.length - 1 && <Divider style={{ marginVertical: 8 }} />}
             </View>

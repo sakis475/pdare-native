@@ -8,6 +8,8 @@ import { toast } from '../core/utils';
 
 export async function getBearer() {
   try {
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxODk4ODg1OCwiZXhwIjoxNzE5NTkzNjU4fQ.SAx4YA5hmUz2nVoj4lgCe3KsARJR0FZ9Q_D0cN1c90I';
+
     const bearer: SessionBearer = await getStorage('session_bearer');
     if (!bearer) {
       //go to login page
@@ -69,11 +71,10 @@ export async function login(username: string, password: string) {
 
 export async function getRequest(url: string) {
   try {
-    // const auth = await getBearer();
+    const auth = await getBearer();
     const options = {
       headers: {
-        // Authorization: `Bearer ${auth}`,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNDIyOTk5NywiZXhwIjoxNzE0ODM0Nzk3fQ.Aix2c9a0dOK-f1qFZ6JnKRQfqcfWsgZNnpMahz_HpiY`,
+        Authorization: `Bearer ${auth}`,
       },
       timeout: REQ_TIMEOUT,
     };
@@ -92,12 +93,12 @@ export async function postRequest(url: string, body?: any) {
     let options = {};
 
     if (url !== '/login' && url !== '/login/session') {
-      const bearer = await getBearer();
+      const auth = await getBearer();
 
-      if (bearer) {
+      if (auth) {
         options = {
           headers: {
-            Authorization: `Bearer ${bearer.token}`,
+            Authorization: `Bearer ${auth}`,
           },
           timeout: REQ_TIMEOUT,
         };
@@ -115,7 +116,7 @@ export async function updateIsEnabled(url: string, body?: any) {
   try {
     let config = {
       headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNDIyOTk5NywiZXhwIjoxNzE0ODM0Nzk3fQ.Aix2c9a0dOK-f1qFZ6JnKRQfqcfWsgZNnpMahz_HpiY`,
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNTEwOTk2MSwiZXhwIjoxNzE1NzE0NzYxfQ.uewporfS8qeuRGioLzQQ5RzsY2FP6pJ-hpvtfotQUdo`,
       },
       data: body, // Data to be sent in the body of the request
       timeout: REQ_TIMEOUT,

@@ -22,6 +22,9 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
 import { Portal, PortalHost } from '@gorhom/portal';
+import { createNewOrder, reqFetchItems, reqFetchTables } from '../helpers/newOrder';
+import TableSelectBottomSheet from '../components/tableSelect/TableSelectBottomSheet';
+import { ScreenNames, navigate } from '../navigation/AppNavigator';
 
 const TablesScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -45,19 +48,6 @@ const TablesScreen = () => {
     fetchData(); // Call the fetchData function
   }, []);
 
-  // const [allTables, setAllTables]: any = useState([
-  //   { key: '2', text: '2', occupiedBy: null },
-  //   { key: '1', text: '1', occupiedBy: null },
-  //   { key: '7', text: '7', occupiedBy: null },
-  //   { key: '8', text: '8', occupiedBy: 1 },
-  //   { key: '3', text: '3', occupiedBy: 4 },
-  //   { key: '6', text: '6', occupiedBy: null },
-  //   { key: '9', text: '9', occupiedBy: null },
-  //   { key: '4', text: '4', occupiedBy: null },
-  //   { key: '5', text: '5', occupiedBy: null },
-  //   { key: '10', text: '10', occupiedBy: null },
-  // ]);
-
   const [selectedTable, setSelectedTable] = useState(null);
   const [activeTables, setActiveTables] = useState([
     { id: 1, tableName: 'Μπαλκόνι 24 ΕΞΟ', occupiedByOrder: 'order1' },
@@ -67,23 +57,23 @@ const TablesScreen = () => {
     { id: 5, tableName: 'B2', occupiedByOrder: 'order5' },
   ]);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => [300, 300], []);
+  //START TABLE MODAL LOGIC
+  const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
-  const handleOpenModal = async () => {
-    bottomSheetRef.current?.expand();
-    const fetchAvailableTables = await Requests.getRequest('/tables?availableOnly=true');
-    console.log('fetchTables');
-    setAvailableTables(fetchAvailableTables);
+  const handleOpenModal = () => {
+    bottomSheetRef.current?.openModal();
   };
+
   const handleCloseModal = () => {
-    bottomSheetRef.current?.close();
+    bottomSheetRef.current?.closeModal();
     Keyboard.dismiss();
-    setAvailableTables([]);
   };
-  const handleSelectTable = (table: any) => {
-    //@ts-ignore
-    navigation.navigate('singleOrder', { tableName: table });
+
+  //END TABLE MODAL LOGIC
+
+  const handleSelectTable = async (table: any) => {
+    await createNewOrder({ id: 1, isEnabled: true, tableName: 'A1A', tableOrder: 1 });
+    navigate(ScreenNames.NewOrderScreen, { tableName: table });
   };
 
   return (
@@ -98,10 +88,7 @@ const TablesScreen = () => {
                   <TableBox
                     table={table}
                     onPress={() => {
-                      //@ts-ignore
-                      // navigation.navigate('singleOrder');
-                      navigation.navigate('singleOrder', { propName: 'A' });
-                      // console.log(navigation);
+                      navigate(ScreenNames.NewOrderScreen, { propName: 'A' });
                     }}
                   ></TableBox>
                 </View>
@@ -114,36 +101,7 @@ const TablesScreen = () => {
           <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{strings.NewOrderBtn}</Text>
         </TouchableOpacity>
         <Portal>
-          <BottomSheet
-            ref={bottomSheetRef}
-            index={-1}
-            snapPoints={snapPoints}
-            // onChange={handleSheetChanges}
-            enablePanDownToClose={true}
-            enableOverDrag={true}
-            enableContentPanningGesture={false}
-            backdropComponent={(backdropProps) => (
-              <BottomSheetBackdrop
-                {...backdropProps}
-                enableTouchThrough={false}
-                opacity={0.7}
-                onPress={handleCloseModal}
-              />
-            )}
-            handleIndicatorStyle={{ backgroundColor: '#fff' }}
-            backgroundStyle={{ backgroundColor: colors.darkGrey }}
-          >
-            <BottomSheetView style={styles.tableChangeContainer}>
-              <SelectTable
-                allTables={availableTables}
-                onTableSelect={(table: any) => {
-                  console.log(table);
-                  handleCloseModal();
-                  handleSelectTable(table);
-                }}
-              ></SelectTable>
-            </BottomSheetView>
-          </BottomSheet>
+          <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
         </Portal>
         <PortalHost name="table_select_1" />
       </View>

@@ -13,13 +13,79 @@ import ItemDetails from '../screens/ItemDetails';
 import RestaurantSettingsScreen from '../screens/adminScreens/restaurantSettings';
 import EditItemsScreen from '../screens/adminScreens/editItems';
 import EditItemDetails from '../screens/adminScreens/editItemDetails';
+import { EditItemsScreen2 } from '../screens/adminScreens/editItems2';
+import NewOrderScreen from '../screens/orderScreens/newOrderScreen';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
+import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
+import ItemListScreen from '../screens/orderScreens/ItemListScreen';
+import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
 
 const Stack = createNativeStackNavigator();
+
+export const navigationRef = React.createRef<NavigationContainerRef<any>>();
+
+export function navigate(name: ScreenNames, params?: {}) {
+  if (navigationRef.current) {
+    navigationRef.current.navigate(name, params);
+  }
+}
+
+export function navigateBack() {
+  if (navigationRef.current) {
+    navigationRef.current.goBack();
+  }
+}
 
 const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}>
       <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+
+      <Stack.Screen
+        name={ScreenNames.NewOrderScreen}
+        component={NewOrderScreen}
+        options={({ route }: any) => ({
+          title: strings.NewOrder,
+          presentation: 'modal',
+          animation: 'slide_from_right',
+          // title: route.params?.orderTitle || 'Order',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+        })}
+      />
+
+      <Stack.Screen
+        name={ScreenNames.ItemListScreen}
+        component={ItemListScreen}
+        options={({ route }: any) => ({
+          title: strings.NewOrder,
+          presentation: 'modal',
+          animation: 'none',
+          // title: route.params?.orderTitle || 'Order',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+        })}
+      />
+
+      <Stack.Screen
+        name={ScreenNames.TempOrderScreen}
+        component={TempOrderScreen}
+        options={({ route }: any) => ({
+          title: strings.DraftOrder,
+          presentation: 'modal',
+          animation: 'none',
+          // title: route.params?.orderTitle || 'Order',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+        })}
+      />
+
       <Stack.Screen
         name="singleOrder"
         component={SingleOrderScreen}
@@ -34,8 +100,9 @@ const AppNavigator = () => {
           headerTintColor: 'white',
         })}
       />
+
       <Stack.Screen
-        name="profile"
+        name={ScreenNames.ProfileScreen}
         component={ProfileScreen}
         options={{
           presentation: 'modal',
@@ -60,7 +127,7 @@ const AppNavigator = () => {
       />
       <Stack.Screen
         name="editItems"
-        component={EditItemsScreen}
+        component={EditItemsScreen2}
         options={{
           presentation: 'modal',
           animation: 'slide_from_right',
@@ -71,8 +138,8 @@ const AppNavigator = () => {
         }}
       />
       <Stack.Screen
-        name="itemDetails"
-        component={ItemDetails}
+        name={ScreenNames.ItemDetailsScreen}
+        component={ItemDetailsScreen}
         options={({ route }: any) => ({
           presentation: 'modal',
           animation: 'fade_from_bottom',
@@ -84,7 +151,7 @@ const AppNavigator = () => {
         })}
       />
       <Stack.Screen
-        name="editItemDetails"
+        name={'editItemDetails'}
         component={EditItemDetails}
         options={({ route }: any) => ({
           presentation: 'modal',
@@ -131,4 +198,11 @@ const MainTabs = () => {
   );
 };
 
+export enum ScreenNames {
+  NewOrderScreen = 'newOrderScreen',
+  ItemListScreen = 'itemListScreen',
+  TempOrderScreen = 'tempOrderScreen',
+  ProfileScreen = 'profileScreen',
+  ItemDetailsScreen = 'itemDetailsScreen',
+}
 export default AppNavigator;

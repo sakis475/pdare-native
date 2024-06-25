@@ -1,23 +1,38 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TouchableHighlight } from 'react-native';
+import { colors } from '../core/theme';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const QuantitySelector = (props: any) => {
-  const [quantity, setQuantity] = useState(props.initialQuantity || 1); // Assuming the initial quantity is 2 as in the image
-
+  console.log(props);
+  const [quantity, setQuantity] = useState(props.quantity || 1); // Assuming the initial quantity is 2 as in the image
+  const [showDeleteBtn, setShowDeleteBtn] = useState(false);
   const handleIncrement = () => {
-    setQuantity((prevQuantity: number) => prevQuantity + 1);
+    if (showDeleteBtn) {
+      setShowDeleteBtn(false);
+    } else {
+      props.quantityChange(quantity + 1);
+      setQuantity((prevQuantity: number) => prevQuantity + 1);
+    }
   };
 
   const handleDecrement = () => {
     if (quantity > 1) {
+      props.quantityChange(quantity - 1);
       setQuantity((prevQuantity: number) => prevQuantity - 1);
+    } else if (quantity === 1) {
+      setShowDeleteBtn(true);
     }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={handleDecrement} activeOpacity={0.6}>
-        <Text style={styles.buttonText}>-</Text>
+        {showDeleteBtn ? (
+          <Icon name="trash-can-outline" size={27} color={colors.danger} />
+        ) : (
+          <Text style={styles.buttonText}>-</Text>
+        )}
       </TouchableOpacity>
       <View style={styles.quantityContainer}>
         <Text style={styles.quantityText}>{quantity}</Text>
@@ -33,14 +48,14 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#222222', // Dark background
+    backgroundColor: colors.darkGrey, // Dark background
     borderRadius: 5, // Rounded corners for the entire container
     // marginTop: 5,
-    padding: 4,
+    paddingHorizontal: 8,
   },
   button: {
-    width: 40, // Width of the button, adjust as needed
-    height: 40, // Height of the button, adjust as needed
+    width: 45, // Width of the button, adjust as needed
+    height: 45, // Height of the button, adjust as needed
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#555', // Slightly lighter color for buttons
@@ -52,17 +67,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', // Bold font weight
   },
   quantityContainer: {
-    // paddingHorizontal: 12, // Space on the sides of the quantity text
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: '#444', // Slightly different background color for quantity text
-    // marginHorizontal: 4, // Margin between the text and buttons
     borderRadius: 10, // Rounded corners for the quantity text background
     minWidth: 32,
   },
   quantityText: {
     color: '#fff', // White text color
-    fontSize: 16, // Adjusted font size for quantity text
+    fontSize: 18, // Adjusted font size for quantity text
   },
 });
 

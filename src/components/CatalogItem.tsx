@@ -12,17 +12,24 @@ import QuantitySelector from './QuantitySelector'; // Make sure the path is corr
 import { AlertWithOptions, toast } from '../core/utils';
 import * as Requests from '../helpers/requests';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { colors } from '../core/theme';
+import { CurrencyFormat } from './CurrencyFormat';
+import { SortButtons } from './SortButtons';
 
 export function CatalogItem({
   item,
   type,
   onAction,
+  disableDown,
+  disableUp,
 }: {
   item: any;
-  type: 'Use' | 'Manage' | 'Deleted';
+  type: 'Use' | 'Manage' | 'Deleted' | 'Sort';
   onAction: any;
+  disableDown?: boolean;
+  disableUp?: boolean;
 }) {
   const navigation = useNavigation();
 
@@ -51,61 +58,75 @@ export function CatalogItem({
 
   const handleEdit = () => {
     console.log('Edit action triggered');
+    handlePress();
     // Add your edit functionality here
   };
 
+  const handleSort = (direction: 'up' | 'down') => {
+    if (direction === 'down') {
+      onAction('sortDown');
+    } else {
+      onAction('sortUp');
+    }
+  };
+
   return (
-    <TouchableWithoutFeedback
-      onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      disabled={type === 'Deleted'}
-    >
-      <View style={styles.container}>
-        <View style={styles.textContainer}>
-          <Text
-            style={[
-              styles.itemTitle,
-              isPressedIn ? styles.textPressed : null,
-              type === 'Deleted'
-                ? { color: colors.danger, textDecorationLine: 'line-through' }
-                : {},
-            ]}
-          >
-            {item.title}
-          </Text>
-        </View>
-        {type === 'Use' ? (
-          <QuantitySelector initialQuantity={1} />
-        ) : type === 'Manage' ? (
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleEdit} activeOpacity={0.6}>
-              <Icon name="edit" size={24} color={'#c8c6ff'} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => onAction('delete')}
-              activeOpacity={0.6}
-            >
-              <Icon name="delete" size={24} color={'#ffc4c4'} />
-            </TouchableOpacity>
-          </View>
-        ) : type === 'Deleted' ? (
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                console.log('undelete pressed');
-                onAction('undelete');
-              }}
-              activeOpacity={0.6}
-            >
-              <FontAwesome5 name="undo" size={18} color={'white'} />
-            </TouchableOpacity>
-          </View>
-        ) : null}
+    // <TouchableWithoutFeedback
+    //   onPress={handlePress}
+    //   onPressIn={handlePressIn}
+    //   onPressOut={handlePressOut}
+    //   disabled={type === 'Deleted'}
+    // >
+    <View style={styles.container}>
+      <View style={styles.textContainer}>
+        <Text
+          style={[
+            styles.itemTitle,
+            isPressedIn ? styles.textPressed : null,
+            type === 'Deleted' ? { color: colors.danger, textDecorationLine: 'line-through' } : {},
+          ]}
+        >
+          {item.title}
+        </Text>
+        <CurrencyFormat value={item.cost} currency={'€'}></CurrencyFormat>
       </View>
-    </TouchableWithoutFeedback>
+      {type === 'Use' ? (
+        <QuantitySelector initialQuantity={0} />
+      ) : type === 'Manage' ? (
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleEdit} activeOpacity={0.6}>
+            <Icon name="edit" size={24} color={'#c8c6ff'} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => onAction('delete')}
+            activeOpacity={0.6}
+          >
+            <Icon name="delete" size={24} color={'#ffc4c4'} />
+          </TouchableOpacity>
+        </View>
+      ) : type === 'Deleted' ? (
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              console.log('undelete pressed');
+              onAction('undelete');
+            }}
+            activeOpacity={0.6}
+          >
+            <FontAwesome5 name="undo" size={18} color={'white'} />
+          </TouchableOpacity>
+        </View>
+      ) : type === 'Sort' ? (
+        <SortButtons
+          handleSort={handleSort}
+          disableUp={disableUp}
+          disableDown={disableDown}
+        ></SortButtons>
+      ) : null}
+    </View>
+    // </TouchableWithoutFeedback>
   );
 }
 const styles = StyleSheet.create({

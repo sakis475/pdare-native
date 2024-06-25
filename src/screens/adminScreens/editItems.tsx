@@ -41,26 +41,48 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
+import { SortButtons } from '../../components/SortButtons';
 const EditItemsScreen = ({ route }: any) => {
   const [items, setItems] = useState<Item[]>([]);
+  const [reOrderItems, setReOrderItems] = useState([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [categorySet, setCategorySet] = useState<any>();
   const navigation = useNavigation();
-  const [availableTables, setAvailableTables] = useState([]);
   const [focusedCategoryIndex, setFocusedCategoryIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [sorting, setSorting] = useState(true);
+  const [rerenderItemList, setRerenderItemList] = useState(false);
+
   //mixed array of items and category headers
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  /**
+   * {<categoryTitle>: [item1,item2], ...}
+   */
   function organizeItemsByCategory(items: any) {
     const itemsMix = [];
     let currentCategory = null;
     const categoryIndex: any = {};
+
+    let categoryIdIncremental = 0;
+    let tempOrder = 0;
     for (const item of items) {
       if (currentCategory !== item.category.title) {
         currentCategory = item.category.title;
-        itemsMix.push({ categoryTitle: currentCategory });
+        itemsMix.push({
+          categoryTitle: currentCategory,
+          categoryCurrentId: categoryIdIncremental,
+          tempOrder,
+        });
+        categoryIdIncremental += 1;
         categoryIndex[currentCategory] = itemsMix.length - 1; //   . { categoryTitle: currentCategory, index: itemsMix.length - 1 };
+        tempOrder += 1;
       }
-      itemsMix.push(item);
+      itemsMix.push({ ...item, tempOrder });
+      tempOrder += 1;
     }
 
     return [itemsMix, categoryIndex];
@@ -68,8 +90,8 @@ const EditItemsScreen = ({ route }: any) => {
 
   const fetchItems = async () => {
     const fetchItems: Item[] = await Requests.getRequest('/items');
+
     const [groupedItems, categoriesIndexed] = organizeItemsByCategory(fetchItems);
-    console.log(groupedItems, 'grouped');
     // await setStorage('groupedItems', groupedItems);
     // await setStorage('categoriesIndexed', categoriesIndexed);
 
@@ -81,12 +103,12 @@ const EditItemsScreen = ({ route }: any) => {
     setCategories(categories);
     setItems(groupedItems);
   };
-  //
-  useEffect(() => {
-    fetchItems();
-  }, []);
 
-  const renderCategoryScroll = ({ item, index }: any) => {
+  const triggerItemsListRerender = () => {
+    setRerenderItemList(!rerenderItemList);
+  };
+
+  const renderCategoryMenu = ({ item, index }: any) => {
     return (
       <TouchableOpacity
         style={[
@@ -100,34 +122,34 @@ const EditItemsScreen = ({ route }: any) => {
     );
   };
 
-  const flatListRef = useRef(null);
-  const categoryScrollRef = useRef(null);
+  const itemsListRef = useRef<any>(null);
+  const categoryMenuRef = useRef<any>(null);
 
   const handleScrollToCategory = (categoryTitle: any) => {
-    //@ts-ignore
-    flatListRef.current?.scrollToIndex({ index: categorySet[categoryTitle], animated: true });
+    itemsListRef?.current?.scrollToIndex({ index: categorySet[categoryTitle], animated: true });
   };
 
   const handleScrollOfCategoryScroll = (index: number) => {
-    //@ts-ignore
-    categoryScrollRef.current?.scrollToIndex({
+    categoryMenuRef?.current?.scrollToIndex({
       index,
       animated: true,
-      viewPosition: 0.5,
+      viewPosition: 0.5, //focus to middle
     });
-    // }
   };
 
   useEffect(() => {
     handleScrollOfCategoryScroll(focusedCategoryIndex);
   }, [focusedCategoryIndex]);
 
-  const CategoryHeader = memo(({ title }: any) => (
+  const CategoryHeader = ({ category, sorting }: any) => (
     <View
       style={{
         marginBottom: 10,
         backgroundColor: colors.darkerGrey,
-        paddingVertical: 10,
+        paddingVertical: 16,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
       }}
     >
       <View
@@ -138,10 +160,23 @@ const EditItemsScreen = ({ route }: any) => {
         }}
       >
         <Icon name={'chevron-double-right'} size={20} color="#fff" />
-        <Text style={{ fontSize: 26, fontWeight: 'bold', color: 'white' }}>{title}</Text>
+        <Text style={{ fontSize: 26, fontWeight: 'bold', color: 'white' }}>
+          {category.categoryTitle}
+        </Text>
       </View>
+      {sorting ? (
+        <View style={{ marginRight: 5 }}>
+          <SortButtons
+            handleSort={(direction: sortDirection) => {
+              handleSortDirection(category, direction, true);
+            }}
+            disableUp={loading}
+            disableDown={loading}
+          ></SortButtons>
+        </View>
+      ) : null}
     </View>
-  ));
+  );
 
   const deleteItem = async (item: Item) => {
     try {
@@ -153,11 +188,10 @@ const EditItemsScreen = ({ route }: any) => {
 
       const deletingItemIndex = items.findIndex((e) => e.id === item.id);
       if (deletingItemIndex) {
-        console.log(deletingItemIndex, 'deletingItemIndex');
         const newItems = items;
         newItems[deletingItemIndex].isEnabled = false;
         setItems(newItems);
-        setExtraData(!extraData);
+        triggerItemsListRerender();
         toast('success', `Deleted ${item.title}`, undefined, 2000);
       }
 
@@ -178,11 +212,10 @@ const EditItemsScreen = ({ route }: any) => {
 
       const undeletingItemIndex = items.findIndex((e) => e.id === item.id);
       if (undeletingItemIndex) {
-        console.log(undeletingItemIndex, 'deletingItemIndex');
         const newItems = items;
         newItems[undeletingItemIndex].isEnabled = true;
         setItems(newItems);
-        setExtraData(!extraData);
+        triggerItemsListRerender();
         toast('success', `Un-deleted ${item.title}`, undefined, 2000);
       }
 
@@ -220,7 +253,7 @@ const EditItemsScreen = ({ route }: any) => {
           <CatalogItem
             item={item}
             type="Manage"
-            onAction={(action: 'delete' | 'edit' | 'undelete') => {
+            onAction={(action: onActionType) => {
               if (action === 'delete') {
                 handleDelete(item);
               }
@@ -230,7 +263,7 @@ const EditItemsScreen = ({ route }: any) => {
         </View>
       );
     } else {
-      return <CategoryHeader title={item.categoryTitle} />;
+      return <CategoryHeader category={item} />;
     }
   };
 
@@ -245,11 +278,10 @@ const EditItemsScreen = ({ route }: any) => {
         <CatalogItem
           item={item}
           type="Deleted"
-          onAction={(action: 'delete' | 'edit' | 'undelete') => {
+          onAction={(action: onActionType) => {
             if (action === 'delete') {
               handleDelete(item);
             } else if (action === 'undelete') {
-              console.log('undelete pressed');
               handleUndelete(item);
             }
           }}
@@ -257,6 +289,53 @@ const EditItemsScreen = ({ route }: any) => {
         {placeDivider ? <Divider style={{ marginTop: 4 }} /> : null}
       </View>
     );
+  };
+
+  const renderSortingItem = ({ item, placeDivider, disableUp, disableDown }: any) => {
+    return (
+      <View
+        style={{
+          marginBottom: 4,
+          paddingHorizontal: 6,
+        }}
+      >
+        <CatalogItem
+          item={item}
+          type="Sort"
+          onAction={(action: onActionType) => {
+            if (action === 'sortDown') {
+              handleSortDirection(item, 'sortDown');
+            } else if (action === 'sortUp') {
+              handleSortDirection(item, 'sortUp');
+            }
+          }}
+        />
+        {placeDivider ? <Divider style={{ marginTop: 4 }} /> : null}
+      </View>
+    );
+  };
+
+  const renderItemsList = ({ item, index }: any) => {
+    if (item.isEnabled === false) {
+      return renderDeletedCategoryItem({
+        item,
+        placeDivider: !Object.values(categorySet).includes(index + 1),
+      });
+    } else if (sorting === true) {
+      if (item.title) {
+        return renderSortingItem({
+          item,
+          placeDivider: !Object.values(categorySet).includes(index + 1),
+        });
+      } else {
+        return <CategoryHeader category={item} sorting={true} />;
+      }
+    } else {
+      return renderCategoryItems({
+        item,
+        placeDivider: !Object.values(categorySet).includes(index + 1),
+      });
+    }
   };
 
   const handleViewableItemsChanged = ({ viewableItems }: any) => {
@@ -271,12 +350,73 @@ const EditItemsScreen = ({ route }: any) => {
   };
 
   const viewabilityConfig = {
-    itemVisiblePercentThreshold: 10, // Item needs to be 50% visible
+    itemVisiblePercentThreshold: 10,
   };
 
   const handleDeleteItem = (item: Item) => {};
 
-  const [extraData, setExtraData] = useState(false);
+  const handleSortBtn = () => {
+    setLoading(true);
+    setSorting(!sorting);
+    triggerItemsListRerender();
+    if (sorting) {
+    } else {
+    }
+    setTimeout(() => {
+      //give the illusion of entering sort mode
+      setLoading(false);
+    }, 500);
+  };
+
+  const handleReOrderList = (item: any, direction: sortDirection, isCategory?: boolean) => {
+    console.log(JSON.stringify(items));
+    const currentCategoryIndex = items.findIndex(
+      (thisItem: any) => thisItem.categoryCurrentId === item.categoryCurrentId
+    );
+
+    let nextCategoryIndex = items.findIndex(
+      (thisItem: any) =>
+        thisItem.categoryCurrentId === item.categoryCurrentId + (direction === 'sortDown' ? 1 : -1)
+    );
+
+    let nextNextCategoryIndex = null;
+    if (nextCategoryIndex !== -1) {
+      nextNextCategoryIndex = items.findIndex(
+        (thisItem: any) =>
+          thisItem.categoryCurrentId ===
+          item.categoryCurrentId + (direction === 'sortDown' ? 2 : -2)
+      );
+    }
+
+    if (nextCategoryIndex === -1) {
+      direction === 'sortDown' ? Infinity : -Infinity;
+    }
+
+    const itemsFirstPart = items.slice(currentCategoryIndex);
+
+    triggerItemsListRerender();
+  };
+
+  const handleSortDirection = async (item: any, direction: sortDirection, isCategory?: boolean) => {
+    // setLoading(true);
+
+    // const updatedItems = await Requests.postRequest('/items/updateOrder', {
+    //   itemId: item.id,
+    //   sortDirection: direction,
+    // });
+
+    // console.log(updatedItems, 'updatedItems');
+
+    // console.log(JSON.stringify(items));
+    // items[item.category];
+    // setItems()
+    if (isCategory) {
+    } else {
+      console.log('isitem', direction);
+    }
+    handleReOrderList(item, direction, isCategory);
+    // setLoading(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -285,13 +425,13 @@ const EditItemsScreen = ({ route }: any) => {
           <View style={{ flex: 1 }}>
             <View style={styles.categoriesContainer}>
               <FlatList
-                ref={categoryScrollRef}
+                ref={categoryMenuRef}
                 data={categories}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 overScrollMode="never"
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => renderCategoryScroll({ item, index })}
+                renderItem={({ item, index }) => renderCategoryMenu({ item, index })}
                 contentContainerStyle={styles.categoriesList}
                 style={styles.categoriesFlatList}
                 snapToAlignment={'center'}
@@ -300,43 +440,44 @@ const EditItemsScreen = ({ route }: any) => {
 
             {loading && (
               <TouchableWithoutFeedback>
-                {/* <View style={styles.overlay} /> */}
                 <View style={styles.overlay}>
                   <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
                 </View>
               </TouchableWithoutFeedback>
             )}
             <FlashList
-              ref={flatListRef}
+              ref={itemsListRef}
               data={items}
-              renderItem={({ item, index }) => {
-                if (item.isEnabled === false) {
-                  return renderDeletedCategoryItem({
-                    item,
-                    placeDivider: !Object.values(categorySet).includes(index + 1),
-                  });
-                } else {
-                  return renderCategoryItems({
-                    item,
-                    placeDivider: !Object.values(categorySet).includes(index + 1),
-                  });
-                }
-              }}
-              extraData={extraData}
+              renderItem={({ item, index }) => renderItemsList({ item, index })}
+              extraData={rerenderItemList}
               estimatedItemSize={200}
               onViewableItemsChanged={handleViewableItemsChanged}
               viewabilityConfig={viewabilityConfig}
             />
 
             <View style={styles.tableButtonContainer}>
-              <TouchableOpacity
-                style={styles.tableButton}
-                onPress={() => {
-                  console.log('Handle New Item');
-                }}
-              >
-                <Ionicons name={'add-circle-outline'} size={45} color="#fff" />
-              </TouchableOpacity>
+              <View>
+                <TouchableOpacity
+                  style={[
+                    styles.tableButton,
+                    { backgroundColor: !sorting ? colors.grey : colors.primary },
+                  ]}
+                  onPress={handleSortBtn}
+                >
+                  <Icon name={'sort'} size={45} color="#fff" />
+                </TouchableOpacity>
+              </View>
+
+              <View>
+                <TouchableOpacity
+                  style={styles.tableButton}
+                  onPress={() => {
+                    console.log('Handle New Item');
+                  }}
+                >
+                  <Ionicons name={'add-circle-outline'} size={45} color="#fff" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </>
@@ -360,6 +501,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignContent: 'center',
     zIndex: 2, // Makes sure the overlay is on top
+    pointerEvents: 'auto',
   },
   categoriesContainer: {
     // height: 50, // Set a fixed height for the container of the FlatList
@@ -389,15 +531,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tableButtonContainer: {
-    alignItems: 'flex-end',
+    justifyContent: 'space-between',
     paddingVertical: 2,
+    paddingHorizontal: 10,
     backgroundColor: colors.darkerGrey,
+    flexDirection: 'row',
   },
   tableButton: {
     // position: 'absolute',
     // right: 20,
     // bottom: 20,
-    marginRight: 20,
+
     width: 60,
     height: 60,
     justifyContent: 'center',
@@ -423,4 +567,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)', // Adjust color and opacity as needed
   },
 });
+
+type onActionType = 'delete' | 'edit' | 'undelete' | sortDirection;
+type sortDirection = 'sortDown' | 'sortUp';
+
 export default EditItemsScreen;

@@ -1,49 +1,40 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
-import { BottomHalfSheet } from '../components/BottomHalfSheet';
-import { FlashList } from '@shopify/flash-list';
+import React, { useRef } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  PanResponder,
+  PanResponderInstance,
+  Animated,
+} from 'react-native';
+
+const SOUND_OF_SILENCE = ['hello', 'darkness', 'my', 'old', 'friend'];
+
 const OrderScreen = () => {
-  const [viewableItems, setViewableItems] = useState([]);
-  const [something, setSomething] = useState<any>();
-  const handleViewableItemsChanged = useCallback(({ viewableItems }: any) => {
-    console.log('Visible items:', viewableItems);
-    setViewableItems(viewableItems.map((item: any) => item.item));
-  }, []);
+  // const pan = useRef(new Animated.ValueXY()).current;
 
-  const viewabilityConfig = {
-    itemVisiblePercentThreshold: 50, // Item needs to be 50% visible
-  };
-
-  const x = { Καφές: 1, Κρέπες: 6, Σάντουϊτς: 10 };
-
-  useEffect(() => {
-    setSomething(x);
-  }, []);
+  // const panResponder = useRef(
+  //   PanResponder.create({
+  //     onMoveShouldSetPanResponder: () => true,
+  //     onPanResponderMove: Animated.event([null, { dx: pan.x, dy: pan.y }]),
+  //     onPanResponderRelease: () => {
+  //       pan.extractOffset();
+  //     },
+  //   })
+  // ).current;
 
   return (
     <View style={styles.container}>
-      <View style={{ height: 600, width: Dimensions.get('screen').width }}>
-        <FlashList
-          data={[...Array(20).keys()].map((i) => ({ key: `Item-${i}` }))}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                height: 150,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderWidth: 1,
-              }}
-            >
-              <Text>{item.key}</Text>
-            </View>
-          )}
-          onViewableItemsChanged={handleViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-          estimatedItemSize={20}
-        />
-      </View>
-
-      <Text>{something?.Κρέπες}</Text>
+      <Text style={styles.titleText}>Drag this box!</Text>
+      {/* <Animated.View
+        style={{
+          transform: [{ translateX: pan.x }, { translateY: pan.y }],
+        }}
+        {...panResponder.panHandlers}
+      >
+        <View style={styles.box} />
+      </Animated.View> */}
     </View>
   );
 };
@@ -51,18 +42,18 @@ const OrderScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  openButton: {
-    padding: 10,
+  titleText: {
+    fontSize: 14,
+    lineHeight: 24,
+    fontWeight: 'bold',
+  },
+  box: {
+    height: 150,
+    width: 150,
     backgroundColor: 'blue',
-    borderRadius: 5,
-  },
-  tableButton: {
-    marginTop: 10,
-    backgroundColor: 'lightgrey',
-    padding: 10,
     borderRadius: 5,
   },
 });
