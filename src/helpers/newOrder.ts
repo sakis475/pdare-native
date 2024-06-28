@@ -59,33 +59,19 @@ export const getTempOrder = async (): Promise<NewOrder> => {
 export const addNewItemToTemp = async (item: ItemReq) => {
   const tempOrder: NewOrder = await getStorage('newOrder');
 
-  const existingItemIndex = tempOrder.items.findIndex((i) => {
+  const existingItemIndex = tempOrder.items?.findIndex((i) => {
     return i.id === item.id && _.isEqual(i.itemPropertiesGrouped, item.itemPropertiesGrouped);
   });
-  if (existingItemIndex !== -1) {
+  if (existingItemIndex >= 0) {
     //handle already existing item
     tempOrder.items[existingItemIndex].quantity =
       (tempOrder.items[existingItemIndex].quantity || 1) + 1;
   } else {
-    const newItemId = tempOrder.items.length + 1;
+    const newItemId = tempOrder.items?.length ?? 1 + 1;
     tempOrder.items.push({ ...item, quantity: 1, newItemId });
   }
   await setStorage('newOrder', tempOrder);
 };
-
-// export const updateItemOfTemp = async (item: ItemReq) => {
-//   const tempOrder: NewOrder = await getStorage('newOrder');
-
-//   const itemIndex = tempOrder.items.findIndex((i) => i.id === item.id);
-//   if (itemIndex !== -1) {
-//     tempOrder.items[itemIndex] = item;
-//     // console.log('+++++++++++++++');
-//     // console.log(JSON.stringify(tempOrder, null, 2));
-//     await setStorage('newOrder', tempOrder);
-//   } else {
-//     throw new Error('Item not found');
-//   }
-// };
 
 export const updateQuantityOfTempItem = async (quantity: number, newItemId: number) => {
   if (!quantity) return;
@@ -94,20 +80,31 @@ export const updateQuantityOfTempItem = async (quantity: number, newItemId: numb
 
   if (itemIndex !== -1) {
     tempOrder.items[itemIndex].quantity = quantity;
-
-    console.log(itemIndex, 'tempOrdertempOrder');
     await setStorage('newOrder', tempOrder);
   }
 };
 
-export const removeItemOfTemp = async (item: ItemReq) => {
+export const updateItemOfTempItem = async (item: ItemReq, newItemId: number) => {
+  console.dir(item, { depth: null });
+
+  const tempOrder: NewOrder = await getStorage('newOrder');
+  const itemIndex = tempOrder.items.findIndex((e) => e.newItemId === newItemId);
+
+  if (itemIndex !== -1) {
+    tempOrder.items[itemIndex] = item;
+    await setStorage('newOrder', tempOrder);
+  }
+};
+
+export const removeItemOfTemp = async (newItemId: number) => {
   const tempOrder: NewOrder = await getStorage('newOrder');
 
-  const itemIndex = tempOrder.items.findIndex((i) => i.id === item.id);
+  const itemIndex = tempOrder.items.findIndex((i) => i.newItemId === newItemId);
 
   if (itemIndex !== -1) {
     tempOrder.items.splice(itemIndex, 1);
     await setStorage('newOrder', tempOrder);
+    return tempOrder;
   } else {
     throw new Error('Item not found');
   }

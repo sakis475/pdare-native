@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TouchableHighlight } from 'react-native';
 import { colors } from '../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AlertWithOptions } from '../core/utils';
 
 const QuantitySelector = (props: any) => {
-  console.log(props);
   const [quantity, setQuantity] = useState(props.quantity || 1); // Assuming the initial quantity is 2 as in the image
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
+
+  let trashIconTimer: NodeJS.Timeout;
+
   const handleIncrement = () => {
     if (showDeleteBtn) {
       setShowDeleteBtn(false);
@@ -20,10 +23,33 @@ const QuantitySelector = (props: any) => {
     if (quantity > 1) {
       props.quantityChange(quantity - 1);
       setQuantity((prevQuantity: number) => prevQuantity - 1);
+    } else if (showDeleteBtn) {
+      clearTimeout(trashIconTimer);
+
+      AlertWithOptions(
+        'Remove',
+        'Remove Item From List?',
+        () => {
+          props.removeItem();
+          setShowDeleteBtn(false);
+        },
+        () => {
+          setShowDeleteBtn(false);
+        }
+      );
     } else if (quantity === 1) {
       setShowDeleteBtn(true);
     }
   };
+
+  useEffect(() => {
+    if (showDeleteBtn) {
+      trashIconTimer = setTimeout(() => {
+        setShowDeleteBtn(false);
+      }, 3000);
+    }
+    return () => clearTimeout(trashIconTimer); // Cleanup the timer when the component unmounts or showDeleteBtn changes
+  }, [showDeleteBtn]);
 
   return (
     <View style={styles.container}>
@@ -51,7 +77,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkGrey, // Dark background
     borderRadius: 5, // Rounded corners for the entire container
     // marginTop: 5,
-    paddingHorizontal: 8,
+    padding: 8,
   },
   button: {
     width: 45, // Width of the button, adjust as needed

@@ -10,16 +10,18 @@ import {
 } from 'react-native';
 import { Checkbox, Divider, RadioButton } from 'react-native-paper';
 import { colors } from '../../core/theme';
-import { addNewItemToTemp } from '../../helpers/newOrder';
+import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/newOrder';
 import { navigateBack } from '../../navigation/AppNavigator';
 import { useFocusEffect } from '@react-navigation/native';
 
 const UnifiedSelect = ({
   itemPropertiesGrouped,
   onSelectChange,
+  isUpdate,
 }: {
   itemPropertiesGrouped: ItemProperty[];
   onSelectChange: (updatedProperty: ItemProperty) => void;
+  isUpdate: Boolean;
 }) => {
   const styles = StyleSheet.create({
     container: {
@@ -32,6 +34,24 @@ const UnifiedSelect = ({
 
   const [selectedId, setSelectedId] = useState<number | null>(null); // For radio buttons
   const [checkedStates, setCheckedStates] = useState<{ [key: number]: boolean }>({}); // For checkboxes
+
+  useEffect(() => {
+    if (isUpdate) {
+      const multiCheckedStates: any = {};
+      for (const itemProperty of itemPropertiesGrouped) {
+        if (itemProperty.propertyType === 'singleselect') {
+          if (itemProperty.selected) {
+            setSelectedId(itemProperty.id);
+          }
+        } else if (itemProperty.propertyType === 'multiselect') {
+          if (itemProperty.selected) {
+            multiCheckedStates[itemProperty.id] = true;
+          }
+        }
+      }
+      setCheckedStates(multiCheckedStates);
+    }
+  }, []);
 
   const handleRadioSelectChange = (property: ItemProperty) => {
     let isSelectedNow: boolean;
@@ -103,11 +123,13 @@ const UnifiedSelect = ({
 
 const ItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
+  const isUpdate = Boolean(route.params.isUpdate);
 
   useEffect(() => {
     //reset item everytime screen mounts
 
     const deepCopy = JSON.parse(JSON.stringify(route.params.item));
+
     setItem(deepCopy);
   }, [route.params.item]);
 
@@ -150,6 +172,7 @@ const ItemDetailsScreen = ({ route }: any) => {
                     (item.itemPropertiesGrouped as ItemPropertiesGrouped)[propertyName]
                   }
                   onSelectChange={handleSelectChange}
+                  isUpdate={isUpdate}
                 ></UnifiedSelect>
 
                 {index !== array.length - 1 && <Divider style={{ marginVertical: 8 }} />}
@@ -159,12 +182,19 @@ const ItemDetailsScreen = ({ route }: any) => {
           <View style={styles.addItemContainer}>
             <TouchableOpacity
               style={styles.addItemBtn}
-              onPress={() => {
-                addNewItemToTemp(item);
-                navigateBack();
+              onPress={async () => {
+                if (isUpdate) {
+                  await updateItemOfTempItem(item, item.newItemId!);
+                  navigateBack();
+                } else {
+                  await addNewItemToTemp(item);
+                  navigateBack();
+                }
               }}
             >
-              <Text style={{ fontWeight: 'bold', fontSize: 16 }}>Προσθήκη</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+                {isUpdate ? 'Ενημέρωση' : 'Προσθήκη'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

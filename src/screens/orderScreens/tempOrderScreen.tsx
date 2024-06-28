@@ -26,7 +26,7 @@ import {
 import { CatalogItem } from '../../components/CatalogItem';
 import { BottomHalfSheet } from '../../components/BottomHalfSheet';
 import { SelectTable } from '../../components/tableSelect/SelectTable';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import * as Requests from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
@@ -43,10 +43,12 @@ import TableSelectBottomSheet from '../../components/tableSelect/TableSelectBott
 import { getTempOrder } from '../../helpers/newOrder';
 import OrderBottomOptions from '../../components/OrderBottomOptions';
 import { CatalogItemAdded } from '../../components/itemListOptionsBtns/CatalogItemAdded';
+import TempBottomOptions from '../../components/TempBottomOptions';
 const TempOrderScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState('');
   const [items, setItems] = useState<ItemReq[]>();
-  const navigation = useNavigation();
+  const [refreshList, setRefreshList] = useState(false);
+  const isFocused = useIsFocused();
 
   const fetchItems = async () => {
     const tempOrder: NewOrder = await getTempOrder();
@@ -59,12 +61,18 @@ const TempOrderScreen = ({ route }: any) => {
     fetchItems();
   }, []);
 
+  useEffect(() => {
+    if (isFocused) {
+      fetchItems();
+    }
+  }, [isFocused]);
+
   const handleSelectTable = (table: any) => {
     setTableName(table);
   };
 
   const handleTempOrderPress = () => {
-    navigate(ScreenNames.TempOrderScreen, {});
+    navigate(ScreenNames.NewOrderScreen, {});
   };
 
   //START TABLE MODAL LOGIC
@@ -79,6 +87,9 @@ const TempOrderScreen = ({ route }: any) => {
     Keyboard.dismiss();
   };
 
+  const refreshTempList = async (updatedItems?: ItemReq[]) => {
+    await fetchItems();
+  };
   //END TABLE MODAL LOGIC
 
   const handleItemPress = (screenName: ScreenNames, props: any = null) => {
@@ -87,35 +98,48 @@ const TempOrderScreen = ({ route }: any) => {
 
   const renderItems = (item: ItemReq) => {
     return (
-      <View style={{ marginVertical: 5, paddingHorizontal: 0 }}>
+      <View>
         {/* TODO: Create another component for showing added items, remove button, increment, on press open editItems etc.. */}
-        <CatalogItemAdded item={item} />
-        <Divider style={{ marginTop: 8 }} />
+        <CatalogItemAdded item={item} itemRemoved={refreshTempList} />
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      {items ? (
+      {items && items.length > 0 ? (
         <>
           <View style={styles.categoriesContainer}>
             <FlashList
+              // key={refreshList ? 'refresh-true' : 'refresh-false'}
               data={items}
+              keyExtractor={(item) => item.newItemId!.toString()}
               renderItem={({ item }) => renderItems(item)}
               estimatedItemSize={50}
               contentContainerStyle={styles.categoryFlashListContainer}
               showsVerticalScrollIndicator={true}
               persistentScrollbar={true}
+              // extraData={refreshList}
             />
           </View>
-          <OrderBottomOptions
+          <TempBottomOptions
             tableName="Table 1"
             handleOpenModal={handleOpenModal}
             handleTempOrderPress={handleTempOrderPress}
           />
 
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
+        </>
+      ) : items ? (
+        <>
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            <Text style={{ textAlign: 'center' }}>Δεν έχετε προσθέσει προιόντα.</Text>
+          </View>
+          <TempBottomOptions
+            tableName="Table 1"
+            handleOpenModal={handleOpenModal}
+            handleTempOrderPress={handleTempOrderPress}
+          />
         </>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
@@ -130,6 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2F2F2F',
     justifyContent: 'center',
     alignContent: 'center',
+    paddingHorizontal: 0,
   },
   categoriesContainer: {
     // height: 50, // Set a fixed height for the container of the FlatList
@@ -198,6 +223,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  categoryFlashListContainer: { paddingHorizontal: 20 },
+  categoryFlashListContainer: { paddingHorizontal: 0 },
 });
 export default TempOrderScreen;

@@ -45,7 +45,7 @@ const AppNavigator = () => {
         name={ScreenNames.NewOrderScreen}
         component={NewOrderScreen}
         options={({ route }: any) => ({
-          title: strings.NewOrder,
+          title: strings.Categories,
           presentation: 'modal',
           animation: 'slide_from_right',
           // title: route.params?.orderTitle || 'Order',
@@ -60,7 +60,7 @@ const AppNavigator = () => {
         name={ScreenNames.ItemListScreen}
         component={ItemListScreen}
         options={({ route }: any) => ({
-          title: strings.NewOrder,
+          title: strings.AddItems,
           presentation: 'modal',
           animation: 'none',
           // title: route.params?.orderTitle || 'Order',
@@ -173,8 +173,8 @@ const MainTabs = () => {
   const routes = [
     { key: strings.Tables, title: strings.Tables, focusedIcon: 'apps' },
     {
-      key: strings.Orders,
-      title: strings.Orders,
+      key: strings.Draft,
+      title: strings.Draft,
       focusedIcon: 'clipboard-outline',
     },
     { key: strings.Login, title: strings.Login, focusedIcon: 'heart-outline' },
@@ -182,7 +182,7 @@ const MainTabs = () => {
 
   const renderScene = BottomNavigation.SceneMap({
     [strings.Tables]: TablesScreen,
-    [strings.Orders]: OrderScreen,
+    [strings.Draft]: TempOrderScreen,
     [strings.Login]: LoginScreen,
   });
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors } from '../core/theme';
+import { strings } from '../core/strings';
 
 interface OrderBottomOptionsProps {
   tableName: string;
@@ -19,7 +20,7 @@ const OrderBottomOptions: React.FC<OrderBottomOptionsProps> = ({
         style={[styles.button, styles.tempOrderButton]}
         onPress={handleTempOrderPress}
       >
-        <Text style={styles.buttonText}>Temp Order</Text>
+        <Text style={styles.buttonText}>{strings.DraftOrder}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.button, styles.tableButton]} onPress={handleOpenModal}>
         <Text style={styles.buttonText}>{tableName}</Text>
