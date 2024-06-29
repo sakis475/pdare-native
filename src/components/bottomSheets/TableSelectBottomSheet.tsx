@@ -11,8 +11,9 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 
 import * as Requests from '../../helpers/requests';
 import { colors } from '../../core/theme';
-import { SelectTable } from './SelectTable';
+import { SelectTable } from '../tableSelect/SelectTable';
 import { getStorage } from '../../storage/store';
+import { Portal } from '@gorhom/portal';
 
 interface TableSelectBottomSheetProps {
   handleSelectTable: (table: any) => void;
@@ -50,35 +51,37 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
     }));
 
     return (
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}
-        enablePanDownToClose={true}
-        enableOverDrag={true}
-        enableContentPanningGesture={false}
-        backdropComponent={(backdropProps) => (
-          <BottomSheetBackdrop
-            {...backdropProps}
-            enableTouchThrough={false}
-            opacity={0.7}
-            onPress={handleCloseModal}
-          />
-        )}
-        handleIndicatorStyle={{ backgroundColor: '#fff' }}
-        backgroundStyle={{ backgroundColor: colors.darkGrey }}
-      >
-        <BottomSheetView style={styles.tableChangeContainer}>
-          <SelectTable
-            allTables={availableTables}
-            onTableSelect={(table: any) => {
-              handleCloseModal();
-              handleSelectTable(table);
-            }}
-          />
-        </BottomSheetView>
-      </BottomSheet>
+      <Portal>
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          onChange={handleSheetChanges}
+          enablePanDownToClose={true}
+          enableOverDrag={true}
+          enableContentPanningGesture={false}
+          backdropComponent={(backdropProps) => (
+            <BottomSheetBackdrop
+              {...backdropProps}
+              enableTouchThrough={false}
+              opacity={0.7}
+              onPress={handleCloseModal}
+            />
+          )}
+          handleIndicatorStyle={{ backgroundColor: '#fff' }}
+          backgroundStyle={{ backgroundColor: colors.darkGrey }}
+        >
+          <BottomSheetView style={styles.tableChangeContainer}>
+            <SelectTable
+              allTables={availableTables}
+              onTableSelect={(table: any) => {
+                handleCloseModal();
+                handleSelectTable(table);
+              }}
+            />
+          </BottomSheetView>
+        </BottomSheet>
+      </Portal>
     );
   }
 );

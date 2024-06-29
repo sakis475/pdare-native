@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Checkbox, Divider, RadioButton } from 'react-native-paper';
 import { colors } from '../../core/theme';
-import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/newOrder';
+import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/orderStorage';
 import { navigateBack } from '../../navigation/AppNavigator';
 import { useFocusEffect } from '@react-navigation/native';
 

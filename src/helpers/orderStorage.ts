@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import * as Requests from '../helpers/requests';
+import * as Requests from './requests';
 import { getStorage, setStorage } from '../storage/store';
 
 export const reqFetchItems = async () => {

@@ -1,14 +1,15 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { colors } from '../core/theme';
+import { colors } from '../../core/theme';
+import { strings } from '../../core/strings';
 
-interface TempBottomOptionsProps {
+interface OrderBottomOptionsProps {
   tableName: string;
   handleOpenModal: () => void;
   handleTempOrderPress: () => void;
 }
 
-const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
+const OrderBottomOptions: React.FC<OrderBottomOptionsProps> = ({
   tableName,
   handleOpenModal,
   handleTempOrderPress,
@@ -19,7 +20,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
         style={[styles.button, styles.tempOrderButton]}
         onPress={handleTempOrderPress}
       >
-        <Text style={styles.buttonText}>Προσθήκη</Text>
+        <Text style={styles.buttonText}>{strings.DraftOrder}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.button, styles.tableButton]} onPress={handleOpenModal}>
         <Text style={styles.buttonText}>{tableName}</Text>
@@ -57,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TempBottomOptions;
+export default OrderBottomOptions;

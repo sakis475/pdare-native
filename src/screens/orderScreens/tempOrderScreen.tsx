@@ -22,12 +22,12 @@ import {
   Dimensions,
   ActivityIndicator,
   Keyboard,
+  SafeAreaView,
 } from 'react-native';
 import { CatalogItem } from '../../components/CatalogItem';
-import { BottomHalfSheet } from '../../components/BottomHalfSheet';
 import { SelectTable } from '../../components/tableSelect/SelectTable';
 import { NavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
-import { Divider } from 'react-native-paper';
+import { Divider, Portal } from 'react-native-paper';
 import * as Requests from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
 import { HeaderBackButton } from '@react-navigation/elements';
@@ -38,12 +38,13 @@ import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate } from '../../navigation/AppNavigator';
-import TableSelectBottomSheet from '../../components/tableSelect/TableSelectBottomSheet';
-import { getTempOrder } from '../../helpers/newOrder';
-import OrderBottomOptions from '../../components/OrderBottomOptions';
-import { CatalogItemAdded } from '../../components/itemListOptionsBtns/CatalogItemAdded';
-import TempBottomOptions from '../../components/TempBottomOptions';
+import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
+import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
+import { getTempOrder } from '../../helpers/orderStorage';
+import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
+import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdded';
+import TempBottomOptions from '../../components/helpers/TempBottomOptions';
+import { PortalHost } from '@gorhom/portal';
 const TempOrderScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState('');
   const [items, setItems] = useState<ItemReq[]>();
@@ -59,13 +60,7 @@ const TempOrderScreen = ({ route }: any) => {
 
   useEffect(() => {
     fetchItems();
-  }, []);
-
-  useEffect(() => {
-    if (isFocused) {
-      fetchItems();
-    }
-  }, [isFocused]);
+  }, [route, isFocused]);
 
   const handleSelectTable = (table: any) => {
     setTableName(table);
@@ -79,6 +74,7 @@ const TempOrderScreen = ({ route }: any) => {
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
   const handleOpenModal = () => {
+    console.log('handleOpenModal temp');
     bottomSheetRef.current?.openModal();
   };
 
@@ -106,45 +102,51 @@ const TempOrderScreen = ({ route }: any) => {
   };
 
   return (
-    <View style={styles.container}>
-      {items && items.length > 0 ? (
-        <>
-          <View style={styles.categoriesContainer}>
-            <FlashList
-              // key={refreshList ? 'refresh-true' : 'refresh-false'}
-              data={items}
-              keyExtractor={(item) => item.newItemId!.toString()}
-              renderItem={({ item }) => renderItems(item)}
-              estimatedItemSize={50}
-              contentContainerStyle={styles.categoryFlashListContainer}
-              showsVerticalScrollIndicator={true}
-              persistentScrollbar={true}
-              // extraData={refreshList}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        {items && items.length > 0 ? (
+          <>
+            <View style={styles.categoriesContainer}>
+              <FlashList
+                // key={refreshList ? 'refresh-true' : 'refresh-false'}
+                data={items}
+                keyExtractor={(item) => item.newItemId!.toString()}
+                renderItem={({ item }) => renderItems(item)}
+                estimatedItemSize={50}
+                contentContainerStyle={styles.categoryFlashListContainer}
+                showsVerticalScrollIndicator={true}
+                persistentScrollbar={true}
+                // extraData={refreshList}
+              />
+            </View>
+            <TempBottomOptions
+              tableName="Table 1"
+              handleOpenModal={handleOpenModal}
+              handleTempOrderPress={handleTempOrderPress}
             />
-          </View>
-          <TempBottomOptions
-            tableName="Table 1"
-            handleOpenModal={handleOpenModal}
-            handleTempOrderPress={handleTempOrderPress}
-          />
-
-          <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
-        </>
-      ) : items ? (
-        <>
-          <View style={{ flex: 1, justifyContent: 'center' }}>
-            <Text style={{ textAlign: 'center' }}>Δεν έχετε προσθέσει προιόντα.</Text>
-          </View>
-          <TempBottomOptions
-            tableName="Table 1"
-            handleOpenModal={handleOpenModal}
-            handleTempOrderPress={handleTempOrderPress}
-          />
-        </>
-      ) : (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-      )}
-    </View>
+            <Portal>
+              <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
+            </Portal>
+          </>
+        ) : items ? (
+          <>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <Text style={{ textAlign: 'center' }}>Δεν έχετε προσθέσει προιόντα.</Text>
+            </View>
+            <TempBottomOptions
+              tableName="Table 1"
+              handleOpenModal={handleOpenModal}
+              handleTempOrderPress={handleTempOrderPress}
+            />
+            <Portal>
+              <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
+            </Portal>
+          </>
+        ) : (
+          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

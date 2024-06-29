@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { colors } from '../core/theme';
+import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const CategoryHeader = ({ title }: any) => (

@@ -24,7 +24,6 @@ import {
   Keyboard,
 } from 'react-native';
 import { CatalogItem } from '../../components/CatalogItem';
-import { BottomHalfSheet } from '../../components/BottomHalfSheet';
 import { SelectTable } from '../../components/tableSelect/SelectTable';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
@@ -38,10 +37,10 @@ import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate } from '../../navigation/AppNavigator';
-import TableSelectBottomSheet from '../../components/tableSelect/TableSelectBottomSheet';
-import OrderBottomOptions from '../../components/OrderBottomOptions';
-import { reqFetchItems } from '../../helpers/newOrder';
+import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
+import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
+import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
+import { reqFetchItems } from '../../helpers/orderStorage';
 const NewOrderScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params?.tableName);
   const [items, setItems] = useState<catGroupedItems>();
@@ -84,7 +83,8 @@ const NewOrderScreen = ({ route }: any) => {
   };
 
   const handleTempOrderPress = () => {
-    navigate(ScreenNames.TempOrderScreen, {});
+    // navigate(ScreenNames.TempOrderScreen, {});
+    navigateToDraft();
   };
 
   const renderCategories = (categoryTitle: string) => {

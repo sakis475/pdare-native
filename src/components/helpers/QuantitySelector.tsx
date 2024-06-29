@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TouchableHighlight } from 'react-native';
-import { colors } from '../core/theme';
+import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { AlertWithOptions } from '../core/utils';
+import { AlertWithOptions } from '../../core/utils';
 
 const QuantitySelector = (props: any) => {
   const [quantity, setQuantity] = useState(props.quantity || 1); // Assuming the initial quantity is 2 as in the image

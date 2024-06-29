@@ -8,10 +8,10 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { CurrencyFormat } from '../CurrencyFormat';
+import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
-import QuantitySelector from '../QuantitySelector';
-import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/newOrder';
+import QuantitySelector from '../helpers/QuantitySelector';
+import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/orderStorage';
 import { ScrollView } from 'react-native';
 import { Divider } from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';

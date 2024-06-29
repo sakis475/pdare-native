@@ -11,6 +11,7 @@ export const theme = {
 };
 
 export const colors = {
+  lightGrey: '#424242',
   grey: '#2F2F2F',
   darkGrey: '#2B2B2B',
   darkerGrey: '#252525',

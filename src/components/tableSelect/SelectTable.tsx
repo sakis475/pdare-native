@@ -3,6 +3,7 @@ import { TextInput } from 'react-native-paper';
 import { strings } from '../../core/strings';
 import TableSelectHorizontalContainer from './TableSelectHorizontalContainer';
 import { StyleSheet, View } from 'react-native';
+import { colors } from '../../core/theme';
 
 export function SelectTable({ allTables, onTableSelect }: any) {
   const [text, setText] = useState('');
@@ -34,6 +35,8 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 10,
+    backgroundColor: colors.lightGrey,
+    borderRadius: 0,
     // Additional styles for your TextInput if needed
   },
 });

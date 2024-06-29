@@ -15,16 +15,15 @@ import { TableBox } from '../components/tableSelect/TableBox';
 
 import { strings } from '../core/strings';
 import SingleOrderScreen from './SingleOrderScreen';
-import { HeaderBar } from '../components/HeaderBar';
-import { BottomHalfSheet } from '../components/BottomHalfSheet';
+import { HeaderBar } from '../components/helpers/HeaderBar';
 import { SelectTable } from '../components/tableSelect/SelectTable';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
 import { Portal, PortalHost } from '@gorhom/portal';
-import { createNewOrder, reqFetchItems, reqFetchTables } from '../helpers/newOrder';
-import TableSelectBottomSheet from '../components/tableSelect/TableSelectBottomSheet';
-import { ScreenNames, navigate } from '../navigation/AppNavigator';
+import { createNewOrder, reqFetchItems, reqFetchTables } from '../helpers/orderStorage';
+import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
+import { ScreenNames, navigate, navigateToDraft } from '../navigation/AppNavigator';
 
 const TablesScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -73,7 +72,8 @@ const TablesScreen = () => {
 
   const handleSelectTable = async (table: any) => {
     await createNewOrder({ id: 1, isEnabled: true, tableName: 'A1A', tableOrder: 1 });
-    navigate(ScreenNames.NewOrderScreen, { tableName: table });
+    // navigate(ScreenNames.NewOrderScreen, { tableName: table });
+    navigate(ScreenNames.NewOrderScreen);
   };
 
   return (
@@ -85,12 +85,7 @@ const TablesScreen = () => {
             <View style={styles.tableContainer}>
               {activeTables.map((table) => (
                 <View style={styles.tableItem} key={table.id}>
-                  <TableBox
-                    table={table}
-                    onPress={() => {
-                      navigate(ScreenNames.NewOrderScreen, { propName: 'A' });
-                    }}
-                  ></TableBox>
+                  <TableBox table={table} onPress={() => {}}></TableBox>
                 </View>
               ))}
             </View>
@@ -103,7 +98,6 @@ const TablesScreen = () => {
         <Portal>
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
         </Portal>
-        <PortalHost name="table_select_1" />
       </View>
     </SafeAreaView>
   );

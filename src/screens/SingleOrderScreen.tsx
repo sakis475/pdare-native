@@ -24,7 +24,6 @@ import {
   Keyboard,
 } from 'react-native';
 import { CatalogItem } from '../components/CatalogItem';
-import { BottomHalfSheet } from '../components/BottomHalfSheet';
 import { SelectTable } from '../components/tableSelect/SelectTable';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';

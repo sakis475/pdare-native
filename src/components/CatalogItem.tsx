@@ -8,14 +8,14 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import QuantitySelector from './QuantitySelector'; // Make sure the path is correct
+import QuantitySelector from './helpers/QuantitySelector'; // Make sure the path is correct
 import { AlertWithOptions, toast } from '../core/utils';
 import * as Requests from '../helpers/requests';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { colors } from '../core/theme';
-import { CurrencyFormat } from './CurrencyFormat';
+import { CurrencyFormat } from './helpers/CurrencyFormat';
 import { SortButtons } from './SortButtons';
 
 export function CatalogItem({

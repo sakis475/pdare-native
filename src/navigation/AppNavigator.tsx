@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BottomNavigation, Text } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -15,7 +15,11 @@ import EditItemsScreen from '../screens/adminScreens/editItems';
 import EditItemDetails from '../screens/adminScreens/editItemDetails';
 import { EditItemsScreen2 } from '../screens/adminScreens/editItems2';
 import NewOrderScreen from '../screens/orderScreens/newOrderScreen';
-import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  NavigationContainerRef,
+  useFocusEffect,
+} from '@react-navigation/native';
 import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
@@ -36,6 +40,17 @@ export function navigateBack() {
   }
 }
 
+// Function to navigate to MainTabs and switch to Draft tab
+export function navigateToDraft() {
+  if (navigationRef.current) {
+    console.log('navigateToDraft entered');
+
+    navigationRef.current.navigate('MainTabs', {
+      screenIndex: 1,
+    });
+  }
+}
+
 const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}>
@@ -48,7 +63,6 @@ const AppNavigator = () => {
           title: strings.Categories,
           presentation: 'modal',
           animation: 'slide_from_right',
-          // title: route.params?.orderTitle || 'Order',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -63,7 +77,6 @@ const AppNavigator = () => {
           title: strings.AddItems,
           presentation: 'modal',
           animation: 'none',
-          // title: route.params?.orderTitle || 'Order',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -78,7 +91,6 @@ const AppNavigator = () => {
           title: strings.DraftOrder,
           presentation: 'modal',
           animation: 'none',
-          // title: route.params?.orderTitle || 'Order',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -93,7 +105,6 @@ const AppNavigator = () => {
           title: strings.NewOrder,
           presentation: 'modal',
           animation: 'slide_from_right',
-          // title: route.params?.orderTitle || 'Order',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -108,9 +119,9 @@ const AppNavigator = () => {
           presentation: 'modal',
           animation: 'simple_push',
           headerStyle: {
-            backgroundColor: colors.grey, // Change the header background color
+            backgroundColor: colors.grey,
           },
-          headerTintColor: 'white', // Change the text color in the header
+          headerTintColor: 'white',
         }}
       />
       <Stack.Screen
@@ -120,9 +131,9 @@ const AppNavigator = () => {
           presentation: 'modal',
           animation: 'slide_from_right',
           headerStyle: {
-            backgroundColor: colors.grey, // Change the header background color
+            backgroundColor: colors.grey,
           },
-          headerTintColor: 'white', // Change the text color in the header
+          headerTintColor: 'white',
         }}
       />
       <Stack.Screen
@@ -132,9 +143,9 @@ const AppNavigator = () => {
           presentation: 'modal',
           animation: 'slide_from_right',
           headerStyle: {
-            backgroundColor: colors.grey, // Change the header background color
+            backgroundColor: colors.grey,
           },
-          headerTintColor: 'white', // Change the text color in the header
+          headerTintColor: 'white',
         }}
       />
       <Stack.Screen
@@ -144,9 +155,9 @@ const AppNavigator = () => {
           presentation: 'modal',
           animation: 'fade_from_bottom',
           headerStyle: {
-            backgroundColor: colors.grey, // Change the header background color
+            backgroundColor: colors.grey,
           },
-          headerTintColor: 'white', // Change the text color in the header
+          headerTintColor: 'white',
           title: route.params?.item?.title || 'Λεπτομέριες',
         })}
       />
@@ -157,9 +168,9 @@ const AppNavigator = () => {
           presentation: 'modal',
           animation: 'fade_from_bottom',
           headerStyle: {
-            backgroundColor: colors.grey, // Change the header background color
+            backgroundColor: colors.grey,
           },
-          headerTintColor: 'white', // Change the text color in the header
+          headerTintColor: 'white',
           title: route.params?.item?.title || 'Λεπτομέριες',
         })}
       />
@@ -167,8 +178,26 @@ const AppNavigator = () => {
   );
 };
 
-const MainTabs = () => {
-  const [index, setIndex] = React.useState(0);
+const MainTabs = ({ route }: any) => {
+  const [index, setIndex] = useState(0);
+
+  // useEffect(
+  //   useCallback(() => {
+  //     if (route.params?.screenIndex !== undefined) {
+  //       setIndex(route.params.screenIndex);
+  //     }
+
+  //     console.log(index, 'index');
+  //     console.log(route.params?.screenIndex, 'route.params?.screenIndex');
+  //   }, [route.params?.screenIndex])
+  // );
+
+  useEffect(() => {
+    console.log(route, 'route');
+    if (route.params?.screenIndex !== undefined) {
+      setIndex(route.params.screenIndex);
+    }
+  }, [route]);
 
   const routes = [
     { key: strings.Tables, title: strings.Tables, focusedIcon: 'apps' },
@@ -194,6 +223,7 @@ const MainTabs = () => {
       barStyle={{ backgroundColor: colors.darkerGrey }}
       activeColor="#147eb8"
       inactiveColor="#FFFFFF"
+      sceneAnimationEnabled={true}
     />
   );
 };
