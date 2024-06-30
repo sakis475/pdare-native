@@ -11,17 +11,16 @@ import {
   Keyboard,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { TableBox } from '../components/tableSelect/TableBox';
+import { TableBox } from '../components/helpers/TableBox';
 
 import { strings } from '../core/strings';
-import SingleOrderScreen from './SingleOrderScreen';
 import { HeaderBar } from '../components/helpers/HeaderBar';
 import { SelectTable } from '../components/tableSelect/SelectTable';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
 import { Portal, PortalHost } from '@gorhom/portal';
-import { createNewOrder, reqFetchItems, reqFetchTables } from '../helpers/orderStorage';
+import { createNewOrder, reqFetchItems } from '../helpers/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
 import { ScreenNames, navigate, navigateToDraft } from '../navigation/AppNavigator';
 
@@ -49,7 +48,7 @@ const TablesScreen = () => {
 
   const [selectedTable, setSelectedTable] = useState(null);
   const [activeTables, setActiveTables] = useState([
-    { id: 1, tableName: 'Μπαλκόνι 24 ΕΞΟ', occupiedByOrder: 'order1' },
+    { id: 1, tableName: 'TEST', occupiedByOrder: 'order1' },
     { id: 2, tableName: 'A4', occupiedByOrder: 'order2' },
     { id: 3, tableName: 'B1', occupiedByOrder: 'order3' },
     { id: 4, tableName: 'B2', occupiedByOrder: 'order4' },
@@ -70,10 +69,10 @@ const TablesScreen = () => {
 
   //END TABLE MODAL LOGIC
 
-  const handleSelectTable = async (table: any) => {
+  const handleSelectTable = async (table: Table) => {
     await createNewOrder({ id: 1, isEnabled: true, tableName: 'A1A', tableOrder: 1 });
     // navigate(ScreenNames.NewOrderScreen, { tableName: table });
-    navigate(ScreenNames.NewOrderScreen);
+    navigate(ScreenNames.NewOrderScreen, { tableName: table.tableName });
   };
 
   return (

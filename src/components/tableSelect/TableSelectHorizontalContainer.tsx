@@ -25,7 +25,7 @@ const TableSelectHorizontalContainer = ({
   onTableSelect: any;
 }) => {
   //TODO: pass search key, filter allTables by search key, sort by name
-  const [allTables, setAllTables] = useState(tables);
+  const [allTables, setAllTables] = useState<Table[]>(tables);
 
   useEffect(() => {
     filterTable(searchWord);
@@ -35,7 +35,7 @@ const TableSelectHorizontalContainer = ({
     setAllTables(tables);
   }, [tables]);
 
-  const handleTableSelect = (table: any) => {
+  const handleTableSelect = (table: Table) => {
     onTableSelect(table);
   };
 
@@ -43,8 +43,7 @@ const TableSelectHorizontalContainer = ({
   const filterTable = (searchWord: string) => {
     if (searchWord) {
       setAllTables((prevTables: Table[]) => {
-        const tablesExist = prevTables.filter((table) => table.tableName.includes(searchWord));
-
+        const tablesExist = tables.filter((table) => table.tableName.includes(searchWord));
         return tablesExist;
       });
     } else {
@@ -52,15 +51,15 @@ const TableSelectHorizontalContainer = ({
     }
   };
 
-  const TableBox = ({ table, newBox }: any) => {
+  const TableBox = ({ table, newBox }: { table: Table; newBox: boolean }) => {
     let customStyle = styles.box;
     if (newBox) {
       customStyle = { ...styles.box, backgroundColor: 'orange' };
     }
     return (
-      <TouchableOpacity activeOpacity={0.7} onPress={() => handleTableSelect(table.item.tableName)}>
+      <TouchableOpacity activeOpacity={0.7} onPress={() => handleTableSelect(table)}>
         <View style={customStyle}>
-          <Text style={styles.boxText}>{table.item.tableName}</Text>
+          <Text style={styles.boxText}>{table.tableName}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -72,8 +71,14 @@ const TableSelectHorizontalContainer = ({
 
   return (
     <>
-      {searchWord?.length ? (
-        <TableBox table={{ item: { tableName: searchWord } }} newBox={true}></TableBox>
+      {searchWord?.length && allTables.length === 0 ? (
+        <View>
+          <Text>Δεν βρέθηκε τραπέζι, δημιουργία καινούργιου.</Text>
+          <TableBox
+            table={{ id: -1, isEnabled: false, tableOrder: -1, tableName: searchWord }}
+            newBox={true}
+          ></TableBox>
+        </View>
       ) : allTables?.length ? (
         contentWidth > screenWidth ? (
           <ScrollView
@@ -88,7 +93,7 @@ const TableSelectHorizontalContainer = ({
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               data={allTables}
-              renderItem={(table) => TableBox({ table, newBox: false })}
+              renderItem={({ item }) => <TableBox table={item} newBox={false} />}
             />
           </ScrollView>
         ) : (
@@ -98,7 +103,7 @@ const TableSelectHorizontalContainer = ({
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             data={allTables}
-            renderItem={(table) => TableBox({ table, newBox: true })}
+            renderItem={({ item }) => <TableBox table={item} newBox={false} />}
           />
         )
       ) : (

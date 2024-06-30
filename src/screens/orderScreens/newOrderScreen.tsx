@@ -40,7 +40,7 @@ import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
-import { reqFetchItems } from '../../helpers/orderStorage';
+import { getTableTempOrder, reqFetchItems, setTableTempOrder } from '../../helpers/orderStorage';
 const NewOrderScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params?.tableName);
   const [items, setItems] = useState<catGroupedItems>();
@@ -52,6 +52,11 @@ const NewOrderScreen = ({ route }: any) => {
     const newOrder = await reqFetchItems();
     setItems(newOrder);
 
+    if (!tableName) {
+      const fetchTempTable = await getTableTempOrder();
+      setTableName(fetchTempTable?.tableName);
+    }
+
     const categories = Object.keys(newOrder);
     setCategories(categories);
   };
@@ -62,6 +67,7 @@ const NewOrderScreen = ({ route }: any) => {
 
   const handleSelectTable = (table: Table) => {
     setTableName(table.tableName);
+    setTableTempOrder(table);
   };
 
   //START TABLE MODAL LOGIC
@@ -92,7 +98,7 @@ const NewOrderScreen = ({ route }: any) => {
       <TouchableOpacity
         style={styles.categoryBox}
         onPress={() => {
-          handleCategoryPress(ScreenNames.ItemListScreen, categoryTitle);
+          handleCategoryPress(ScreenNames.ItemListScreen, { tableName, categoryTitle });
         }}
       >
         <Text>{categoryTitle}</Text>
@@ -115,7 +121,7 @@ const NewOrderScreen = ({ route }: any) => {
           </View>
 
           <OrderBottomOptions
-            tableName="Table 1"
+            tableName={tableName}
             handleOpenModal={handleOpenModal}
             handleTempOrderPress={handleTempOrderPress}
           />

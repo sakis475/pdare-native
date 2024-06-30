@@ -14,22 +14,22 @@ import { colors } from '../../core/theme';
 import { SelectTable } from '../tableSelect/SelectTable';
 import { getStorage } from '../../storage/store';
 import { Portal } from '@gorhom/portal';
+import { reqFetchTables } from '../../helpers/tablesStorage';
 
 interface TableSelectBottomSheetProps {
-  handleSelectTable: (table: any) => void;
+  handleSelectTable: (table: Table) => void;
 }
 
 const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
   ({ handleSelectTable }, ref) => {
-    const [availableTables, setAvailableTables] = useState<any>([]);
+    const [availableTables, setAvailableTables] = useState<Table[]>([]);
 
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => [300, 300], []);
 
     const handleOpenModal = useCallback(async () => {
       bottomSheetRef.current?.expand();
-      const availableTables = await getStorage('availableTables'); //await Requests.getRequest('/tables?availableOnly=true');
-
+      const availableTables = await reqFetchTables();
       setAvailableTables(availableTables);
     }, [setAvailableTables]);
 
@@ -74,7 +74,7 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
           <BottomSheetView style={styles.tableChangeContainer}>
             <SelectTable
               allTables={availableTables}
-              onTableSelect={(table: any) => {
+              onTableSelect={(table: Table) => {
                 handleCloseModal();
                 handleSelectTable(table);
               }}

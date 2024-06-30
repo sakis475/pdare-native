@@ -40,11 +40,12 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
-import { getTempOrder } from '../../helpers/orderStorage';
+import { getTempOrder, setTableTempOrder } from '../../helpers/orderStorage';
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdded';
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
-import { PortalHost } from '@gorhom/portal';
+import { HeaderBar } from '../../components/helpers/HeaderBar';
+import { strings } from '../../core/strings';
 const TempOrderScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState('');
   const [items, setItems] = useState<ItemReq[]>();
@@ -53,7 +54,6 @@ const TempOrderScreen = ({ route }: any) => {
 
   const fetchItems = async () => {
     const tempOrder: NewOrder = await getTempOrder();
-    console.log('tempOrders', tempOrder, 'tempOrders');
     setTableName(tempOrder?.table?.tableName);
     setItems(tempOrder?.items);
   };
@@ -62,12 +62,13 @@ const TempOrderScreen = ({ route }: any) => {
     fetchItems();
   }, [route, isFocused]);
 
-  const handleSelectTable = (table: any) => {
-    setTableName(table);
+  const handleSelectTable = (table: Table) => {
+    setTableName(table.tableName);
+    setTableTempOrder(table);
   };
 
   const handleTempOrderPress = () => {
-    navigate(ScreenNames.NewOrderScreen, {});
+    navigate(ScreenNames.NewOrderScreen, { tableName: tableName });
   };
 
   //START TABLE MODAL LOGIC
@@ -103,12 +104,12 @@ const TempOrderScreen = ({ route }: any) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <HeaderBar headerTitle={strings.NewOrder}></HeaderBar>
       <View style={styles.container}>
         {items && items.length > 0 ? (
           <>
             <View style={styles.categoriesContainer}>
               <FlashList
-                // key={refreshList ? 'refresh-true' : 'refresh-false'}
                 data={items}
                 keyExtractor={(item) => item.newItemId!.toString()}
                 renderItem={({ item }) => renderItems(item)}
@@ -116,11 +117,10 @@ const TempOrderScreen = ({ route }: any) => {
                 contentContainerStyle={styles.categoryFlashListContainer}
                 showsVerticalScrollIndicator={true}
                 persistentScrollbar={true}
-                // extraData={refreshList}
               />
             </View>
             <TempBottomOptions
-              tableName="Table 1"
+              tableName={tableName}
               handleOpenModal={handleOpenModal}
               handleTempOrderPress={handleTempOrderPress}
             />
@@ -131,10 +131,11 @@ const TempOrderScreen = ({ route }: any) => {
         ) : items ? (
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={{ textAlign: 'center' }}>Δεν έχετε προσθέσει προιόντα.</Text>
+              <Text style={{ textAlign: 'center' }}>Πατήστε το κουμπί «Προσθήκη»</Text>
+              <Text style={{ textAlign: 'center' }}>για να προσθέσετε καινούργια προϊόντα.</Text>
             </View>
             <TempBottomOptions
-              tableName="Table 1"
+              tableName={tableName}
               handleOpenModal={handleOpenModal}
               handleTempOrderPress={handleTempOrderPress}
             />

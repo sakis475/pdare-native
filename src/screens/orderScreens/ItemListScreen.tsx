@@ -42,12 +42,11 @@ import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBot
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
 import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
+import { setTableTempOrder } from '../../helpers/orderStorage';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
+  const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>([]);
-  const [categoryTitle, setCategoryTitle] = useState(route.params);
-  const navigation = useNavigation();
-  const [availableTables, setAvailableTables] = useState([]);
 
   const fetchItems = async () => {
     const fetchItems: catGroupedItems = await getStorage('groupedItems');
@@ -61,8 +60,9 @@ const ItemListScreen = ({ route }: any) => {
     fetchItems();
   }, []);
 
-  const handleSelectTable = (table: any) => {
-    setTableName(table);
+  const handleSelectTable = (table: Table) => {
+    setTableName(table.tableName);
+    setTableTempOrder(table);
   };
 
   const handleTempOrderPress = () => {
@@ -126,7 +126,7 @@ const ItemListScreen = ({ route }: any) => {
             />
           </View>
           <OrderBottomOptions
-            tableName="Table 1"
+            tableName={tableName}
             handleOpenModal={handleOpenModal}
             handleTempOrderPress={handleTempOrderPress}
           />

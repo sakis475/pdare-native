@@ -6,7 +6,6 @@ import TablesScreen from '../screens/TablesScreen';
 import OrderScreen from '../screens/OrderScreen';
 import LoginScreen from '../screens/LoginScreen';
 import { setLocalizedStrings, strings } from '../core/strings';
-import SingleOrderScreen from '../screens/SingleOrderScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
 import ItemDetails from '../screens/ItemDetails';
@@ -14,13 +13,13 @@ import RestaurantSettingsScreen from '../screens/adminScreens/restaurantSettings
 import EditItemsScreen from '../screens/adminScreens/editItems';
 import EditItemDetails from '../screens/adminScreens/editItemDetails';
 import { EditItemsScreen2 } from '../screens/adminScreens/editItems2';
-import NewOrderScreen from '../screens/orderScreens/newOrderScreen';
+import NewOrderScreen from '../screens/orderScreens/NewOrderScreen';
 import {
   NavigationContainer,
   NavigationContainerRef,
   useFocusEffect,
 } from '@react-navigation/native';
-import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
+import TempOrderScreen from '../screens/orderScreens/TempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
 
@@ -91,20 +90,6 @@ const AppNavigator = () => {
           title: strings.DraftOrder,
           presentation: 'modal',
           animation: 'none',
-          headerStyle: {
-            backgroundColor: colors.darkerGrey,
-          },
-          headerTintColor: 'white',
-        })}
-      />
-
-      <Stack.Screen
-        name="singleOrder"
-        component={SingleOrderScreen}
-        options={({ route }: any) => ({
-          title: strings.NewOrder,
-          presentation: 'modal',
-          animation: 'slide_from_right',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },

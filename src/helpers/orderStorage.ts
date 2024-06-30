@@ -23,18 +23,22 @@ export const getGroupedItems = async () => {
   return groupedByCategory;
 };
 
-export const reqFetchTables = async () => {
-  const fetchAvailableTables = await Requests.getRequest('/tables?availableOnly=true');
-  await setStorage('availableTables', fetchAvailableTables);
-  return fetchAvailableTables;
-};
-
 //+++++++ New Order Storage ++++++++//
-export const setTable = async (table: Table) => {
+export const setTableTempOrder = async (table: Table) => {
   const order: NewOrder = await getStorage('newOrder');
   order.table = table;
   await setStorage('newOrder', order);
   return order;
+};
+
+export const getTableTempOrder = async () => {
+  const order: NewOrder = await getStorage('newOrder');
+
+  if (order?.table) {
+    return order.table;
+  } else {
+    return null;
+  }
 };
 
 export const createNewOrder = async (table: Table): Promise<NewOrder> => {

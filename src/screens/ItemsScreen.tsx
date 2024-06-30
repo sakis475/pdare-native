@@ -38,6 +38,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate } from '../navigation/AppNavigator';
+import { setTableTempOrder } from '../helpers/orderStorage';
 const ItemsScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [items, setItems] = useState<Item[]>([]);
@@ -70,8 +71,9 @@ const ItemsScreen = ({ route }: any) => {
     fetchItems();
   }, []);
 
-  const handleSelectTable = (table: any) => {
+  const handleSelectTable = (table: Table) => {
     setTableName(table);
+    setTableTempOrder(table);
   };
 
   const bottomSheetRef = useRef<BottomSheet>(null);

@@ -10,7 +10,14 @@ export function SelectTable({ allTables, onTableSelect }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <TextInput placeholder="Search" value={text} onChangeText={setText} style={styles.input} />
+        <TextInput
+          placeholder="Search/New Table"
+          placeholderTextColor="#fff"
+          textColor="#fff"
+          value={text}
+          onChangeText={setText}
+          style={styles.input}
+        />
       </View>
       <View style={styles.tableContainer}>
         <TableSelectHorizontalContainer
@@ -32,6 +39,7 @@ const styles = StyleSheet.create({
   },
   tableContainer: {
     flex: 1, // This makes the container expand to fill all remaining space
+    color: 'white',
   },
   input: {
     fontSize: 10,
