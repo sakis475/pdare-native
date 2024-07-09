@@ -18,6 +18,7 @@ interface Category {
   id: number;
   title: string;
   orderCategory: number;
+  isEnabled?: boolean;
 }
 
 interface Restaurant {

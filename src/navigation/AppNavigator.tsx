@@ -9,10 +9,7 @@ import { setLocalizedStrings, strings } from '../core/strings';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
 import ItemDetails from '../screens/ItemDetails';
-import RestaurantSettingsScreen from '../screens/adminScreens/restaurantSettings';
-import EditItemsScreen from '../screens/adminScreens/editItems';
-import EditItemDetails from '../screens/adminScreens/editItemDetails';
-import { EditItemsScreen2 } from '../screens/adminScreens/editItems2';
+import RestaurantSettingsScreen from '../screens/adminScreens/RestaurantSettingsScreen';
 import NewOrderScreen from '../screens/orderScreens/NewOrderScreen';
 import {
   NavigationContainer,
@@ -22,6 +19,7 @@ import {
 import TempOrderScreen from '../screens/orderScreens/TempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
+import ManageProductsScreen from '../screens/adminScreens/ManageProductsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -110,7 +108,7 @@ const AppNavigator = () => {
         }}
       />
       <Stack.Screen
-        name="restaurantSettings"
+        name={ScreenNames.RestaurantSettingsScreen}
         component={RestaurantSettingsScreen}
         options={{
           presentation: 'modal',
@@ -122,8 +120,8 @@ const AppNavigator = () => {
         }}
       />
       <Stack.Screen
-        name="editItems"
-        component={EditItemsScreen2}
+        name={ScreenNames.ManageProductsScreen}
+        component={ManageProductsScreen}
         options={{
           presentation: 'modal',
           animation: 'slide_from_right',
@@ -136,19 +134,6 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
         component={ItemDetailsScreen}
-        options={({ route }: any) => ({
-          presentation: 'modal',
-          animation: 'fade_from_bottom',
-          headerStyle: {
-            backgroundColor: colors.grey,
-          },
-          headerTintColor: 'white',
-          title: route.params?.item?.title || 'Λεπτομέριες',
-        })}
-      />
-      <Stack.Screen
-        name={'editItemDetails'}
-        component={EditItemDetails}
         options={({ route }: any) => ({
           presentation: 'modal',
           animation: 'fade_from_bottom',
@@ -219,5 +204,7 @@ export enum ScreenNames {
   TempOrderScreen = 'tempOrderScreen',
   ProfileScreen = 'profileScreen',
   ItemDetailsScreen = 'itemDetailsScreen',
+  RestaurantSettingsScreen = 'restaurantSettingsScreen',
+  ManageProductsScreen = 'manageProductsScreen',
 }
 export default AppNavigator;

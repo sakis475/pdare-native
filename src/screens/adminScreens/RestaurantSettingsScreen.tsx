@@ -2,13 +2,34 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 
 const RestaurantSettingsScreen = ({ route }: any) => {
   const options = [
-    { id: '1', title: 'Manage Products', icon: 'food-fork-drink', screen: 'editItems' },
-    { id: '2', title: 'Manage Categories', icon: 'shape-outline', screen: 'ManageCategories' },
-    { id: '3', title: 'Manage Users', icon: 'account-group', screen: 'ManageUsers' },
-    { id: '4', title: 'Statistics', icon: 'chart-bar', screen: 'Statistics' },
+    {
+      id: '1',
+      title: 'Manage Products',
+      icon: 'food-fork-drink',
+      screen: ScreenNames.ManageProductsScreen,
+    },
+    {
+      id: '2',
+      title: 'Manage Categories',
+      icon: 'shape-outline',
+      screen: ScreenNames.ManageProductsScreen,
+    },
+    {
+      id: '3',
+      title: 'Manage Users',
+      icon: 'account-group',
+      screen: ScreenNames.ManageProductsScreen,
+    },
+    {
+      id: '4',
+      title: 'Statistics',
+      icon: 'chart-bar',
+      screen: ScreenNames.ManageProductsScreen,
+    },
   ];
 
   const navigation = useNavigation();
@@ -16,10 +37,7 @@ const RestaurantSettingsScreen = ({ route }: any) => {
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
       style={styles.option}
-      onPress={() =>
-        //@ts-ignore
-        navigation.navigate(item.screen)
-      }
+      onPress={() => navigate(item.screen)}
       activeOpacity={0.7}
     >
       <Icon name={item.icon} size={30} color="#fff" />

@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../core/theme';
+import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 
 export function HeaderBar({ headerTitle }: { headerTitle?: string }) {
   const navigation = useNavigation();
@@ -13,12 +14,7 @@ export function HeaderBar({ headerTitle }: { headerTitle?: string }) {
         <Text style={styles.headerTitle}>{headerTitle}</Text>
       </View>
       <View style={styles.profileButton}>
-        <ProfileButton
-          handlePress={() =>
-            //@ts-ignore
-            navigation.navigate('profile')
-          }
-        ></ProfileButton>
+        <ProfileButton handlePress={() => navigate(ScreenNames.ProfileScreen)}></ProfileButton>
       </View>
     </View>
   );

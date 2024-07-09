@@ -2,25 +2,23 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Divider } from 'react-native-paper';
+import { ScreenNames, navigate } from '../navigation/AppNavigator';
 
 const ProfileOptionsScreen = ({ route }: any) => {
   const navigation = useNavigation();
 
   // List of profile options
   const options = [
-    { id: '1', title: 'Edit Profile', onPress: () => handlePress('EditProfile') },
-    { id: '2', title: 'Change Password', onPress: () => handlePress('ChangePassword') },
-    { id: '3', title: 'Notifications', onPress: () => handlePress('Notifications') },
-    { id: '4', title: 'Privacy Settings', onPress: () => handlePress('PrivacySettings') },
-    { id: '5', title: 'Log Out', onPress: () => handlePress('Logout') },
-    { id: '6', title: 'Restaurant Settings', onPress: () => handlePress('restaurantSettings') },
+    {
+      id: '1',
+      title: 'Restaurant Settings',
+      onPress: () => handlePress(ScreenNames.RestaurantSettingsScreen),
+    },
   ];
 
   // Handler for press events
-  const handlePress = (screen: string) => {
-    console.log(`Navigating to ${screen}`);
-    //@ts-ignore
-    navigation.navigate(screen);
+  const handlePress = (screen: ScreenNames) => {
+    navigate(screen);
   };
 
   return (
