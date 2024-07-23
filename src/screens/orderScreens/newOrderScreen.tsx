@@ -25,7 +25,7 @@ import {
 } from 'react-native';
 import { CatalogItem } from '../../components/CatalogItem';
 import { SelectTable } from '../../components/tableSelect/SelectTable';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import * as Requests from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
@@ -41,6 +41,7 @@ import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavi
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { getTableTempOrder, reqFetchItems, setTableTempOrder } from '../../helpers/orderStorage';
+
 const NewOrderScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params?.tableName);
   const [items, setItems] = useState<catGroupedItems>();
@@ -101,7 +102,7 @@ const NewOrderScreen = ({ route }: any) => {
           handleCategoryPress(ScreenNames.ItemListScreen, { tableName, categoryTitle });
         }}
       >
-        <Text>{categoryTitle}</Text>
+        <Text style={{ color: '#ffffff' }}>{categoryTitle}</Text>
       </TouchableOpacity>
     );
   };
@@ -176,10 +177,13 @@ const styles = StyleSheet.create({
   categoryBox: {
     width: 100,
     height: 100,
-    borderColor: 'fff',
+    borderColor: '#fff',
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    color: '#ffffff',
   },
   categoryFlashListContainer: { paddingHorizontal: 20 },
 });

@@ -46,7 +46,12 @@ import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdd
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
 import { HeaderBar } from '../../components/helpers/HeaderBar';
 import { strings } from '../../core/strings';
-const TempOrderScreen = ({ route }: any) => {
+const TempOrderScreen = ({
+  route,
+  bottomSheetMode = false,
+  isSheetOpen,
+  onItemPress = () => {},
+}: any) => {
   const [tableName, setTableName] = useState('');
   const [items, setItems] = useState<ItemReq[]>();
   const [refreshList, setRefreshList] = useState(false);
@@ -54,13 +59,14 @@ const TempOrderScreen = ({ route }: any) => {
 
   const fetchItems = async () => {
     const tempOrder: NewOrder = await getTempOrder();
+    console.log('tempOrder');
     setTableName(tempOrder?.table?.tableName);
     setItems(tempOrder?.items);
   };
 
   useEffect(() => {
     fetchItems();
-  }, [route, isFocused]);
+  }, [route, isFocused, isSheetOpen]);
 
   const handleSelectTable = (table: Table) => {
     setTableName(table.tableName);
@@ -97,14 +103,19 @@ const TempOrderScreen = ({ route }: any) => {
     return (
       <View>
         {/* TODO: Create another component for showing added items, remove button, increment, on press open editItems etc.. */}
-        <CatalogItemAdded item={item} itemRemoved={refreshTempList} />
+        <CatalogItemAdded
+          item={item}
+          refreshList={refreshTempList}
+          onItemPress={() => onItemPress(item)}
+        />
       </View>
     );
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <HeaderBar headerTitle={strings.NewOrder}></HeaderBar>
+      {!bottomSheetMode ? <HeaderBar headerTitle={strings.NewOrder}></HeaderBar> : null}
+
       <View style={styles.container}>
         {items && items.length > 0 ? (
           <>
@@ -119,21 +130,23 @@ const TempOrderScreen = ({ route }: any) => {
                 persistentScrollbar={true}
               />
             </View>
-            <TempBottomOptions
-              tableName={tableName}
-              handleOpenModal={handleOpenModal}
-              handleTempOrderPress={handleTempOrderPress}
-            />
-            <Portal>
-              <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
-            </Portal>
           </>
         ) : items ? (
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={{ textAlign: 'center' }}>Πατήστε το κουμπί «Προσθήκη»</Text>
-              <Text style={{ textAlign: 'center' }}>για να προσθέσετε καινούργια προϊόντα.</Text>
+              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
+                Πατήστε το κουμπί «Προσθήκη»
+              </Text>
+              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
+                για να προσθέσετε καινούργια προϊόντα.
+              </Text>
             </View>
+          </>
+        ) : (
+          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        )}
+        {!bottomSheetMode ? (
+          <View>
             <TempBottomOptions
               tableName={tableName}
               handleOpenModal={handleOpenModal}
@@ -142,10 +155,8 @@ const TempOrderScreen = ({ route }: any) => {
             <Portal>
               <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
             </Portal>
-          </>
-        ) : (
-          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-        )}
+          </View>
+        ) : null}
       </View>
     </SafeAreaView>
   );

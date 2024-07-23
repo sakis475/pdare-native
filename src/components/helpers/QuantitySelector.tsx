@@ -55,7 +55,7 @@ const QuantitySelector = (props: any) => {
     <View style={styles.container}>
       <TouchableOpacity style={styles.button} onPress={handleDecrement} activeOpacity={0.6}>
         {showDeleteBtn ? (
-          <Icon name="trash-can-outline" size={27} color={colors.danger} />
+          <Icon name="trash-can-outline" size={22} color={colors.danger} />
         ) : (
           <Text style={styles.buttonText}>-</Text>
         )}
@@ -77,11 +77,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkGrey, // Dark background
     borderRadius: 5, // Rounded corners for the entire container
     // marginTop: 5,
-    padding: 8,
+    paddingHorizontal: 8,
   },
   button: {
-    width: 45, // Width of the button, adjust as needed
-    height: 45, // Height of the button, adjust as needed
+    width: 33, // Width of the button, adjust as needed
+    height: 33, // Height of the button, adjust as needed
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#555', // Slightly lighter color for buttons
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff', // White text color
-    fontSize: 24, // Larger font size for the text in the buttons
+    fontSize: 20, // Larger font size for the text in the buttons
     fontWeight: 'bold', // Bold font weight
   },
   quantityContainer: {
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   quantityText: {
     color: '#fff', // White text color
-    fontSize: 18, // Adjusted font size for quantity text
+    fontSize: 14, // Adjusted font size for quantity text
   },
 });
 

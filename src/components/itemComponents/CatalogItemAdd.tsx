@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: {
-    color: '#fff', // White text color for the title
-    fontWeight: 'bold', // Bold font weight for the title
-    fontSize: 18, // Adjust the font size as necessary
-    marginBottom: 4, // Space between the title and the subtitle
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginBottom: 4,
   },
   itemDetails: {
-    color: '#aaa', // Lighter grey color for the subtitle, adjust as needed
-    fontSize: 14, // Adjust the font size as necessary
+    color: '#aaa',
+    fontSize: 12,
   },
   textPressed: {
     opacity: 0.5, // Apply opacity when pressed
@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   button: {
-    width: 45, // Width of the button
-    height: 45, // Height of the button
+    width: 33, // Width of the button
+    height: 33, // Height of the button
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#555', // Slightly lighter color for buttons

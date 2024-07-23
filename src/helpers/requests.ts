@@ -8,7 +8,7 @@ import { toast } from '../core/utils';
 
 export async function getBearer() {
   try {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxODk4ODg1OCwiZXhwIjoxNzE5NTkzNjU4fQ.SAx4YA5hmUz2nVoj4lgCe3KsARJR0FZ9Q_D0cN1c90I';
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcyMTUxNDg0MSwiZXhwIjoxNzIyMTE5NjQxfQ.VXL0S12xOwHGJyXoH2Tj05SZ9KJQHimdEb7ZB_-elhc';
 
     const bearer: SessionBearer = await getStorage('session_bearer');
     if (!bearer) {

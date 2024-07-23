@@ -43,6 +43,7 @@ interface ItemReq {
   id: number;
   category: Category;
   cost: number;
+  description: string;
   isEnabled: boolean;
   itemPropertiesGrouped: ItemPropertiesGrouped | ItemProperty[];
   orderItem: number;
@@ -74,4 +75,9 @@ interface SendOrderItem {
   itemProperties: number[];
   quantity: number;
   comment?: string;
+}
+
+interface OrderNavigationState {
+  screenName: any;
+  params: any;
 }

@@ -102,6 +102,7 @@ const UnifiedSelect = ({
               value={property.propertyValue}
               status={selectedId === property.id ? 'checked' : 'unchecked'}
               color={'#6495ED'}
+              uncheckedColor={'#ffffff'}
               onPress={() => {
                 setSelectedId(property.id);
                 handleRadioSelectChange(property);
@@ -111,10 +112,11 @@ const UnifiedSelect = ({
             <Checkbox
               status={checkedStates[property.id] ? 'checked' : 'unchecked'}
               color={'#6495ED'}
+              uncheckedColor={'#ffffff'}
               onPress={() => handleMultiSelectChange(property)}
             />
           )}
-          <Text>{property.propertyValue}</Text>
+          <Text style={{ color: '#ffffff' }}>{property.propertyValue}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -192,7 +194,7 @@ const ItemDetailsScreen = ({ route }: any) => {
                 }
               }}
             >
-              <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#ffffff' }}>
                 {isUpdate ? 'Ενημέρωση' : 'Προσθήκη'}
               </Text>
             </TouchableOpacity>
@@ -218,6 +220,7 @@ const styles = StyleSheet.create({
     fontSize: 20, // Increased font size for more prominence
     fontWeight: 'bold',
     marginBottom: 20, // Optional: add space below the header
+    color: '#ffffff',
   },
   checkboxContainer: {
     flexDirection: 'row',

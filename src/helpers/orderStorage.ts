@@ -63,17 +63,17 @@ export const getTempOrder = async (): Promise<NewOrder> => {
 export const addNewItemToTemp = async (item: ItemReq) => {
   const tempOrder: NewOrder = await getStorage('newOrder');
 
-  const existingItemIndex = tempOrder.items?.findIndex((i) => {
-    return i.id === item.id && _.isEqual(i.itemPropertiesGrouped, item.itemPropertiesGrouped);
-  });
-  if (existingItemIndex >= 0) {
-    //handle already existing item
-    tempOrder.items[existingItemIndex].quantity =
-      (tempOrder.items[existingItemIndex].quantity || 1) + 1;
-  } else {
-    const newItemId = tempOrder.items?.length ?? 1 + 1;
-    tempOrder.items.push({ ...item, quantity: 1, newItemId });
-  }
+  // const existingItemIndex = tempOrder.items?.findIndex((i) => {
+  //   return i.id === item.id && _.isEqual(i.itemPropertiesGrouped, item.itemPropertiesGrouped);
+  // });
+  // if (existingItemIndex >= 0) {
+  //   //handle already existing item
+  //   tempOrder.items[existingItemIndex].quantity =
+  //     (tempOrder.items[existingItemIndex].quantity || 1) + 1;
+  // } else {
+  const newItemId = tempOrder.items?.length ?? 1 + 1;
+  tempOrder.items.push({ ...item, quantity: 1, newItemId });
+  // }
   await setStorage('newOrder', tempOrder);
 };
 

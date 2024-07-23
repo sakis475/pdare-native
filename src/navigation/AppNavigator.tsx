@@ -10,16 +10,19 @@ import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
 import ItemDetails from '../screens/ItemDetails';
 import RestaurantSettingsScreen from '../screens/adminScreens/RestaurantSettingsScreen';
-import NewOrderScreen from '../screens/orderScreens/NewOrderScreen';
+import NewOrderScreen from '../screens/orderScreens/newOrderScreen';
 import {
   NavigationContainer,
   NavigationContainerRef,
   useFocusEffect,
 } from '@react-navigation/native';
-import TempOrderScreen from '../screens/orderScreens/TempOrderScreen';
+import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
 import ManageProductsScreen from '../screens/adminScreens/ManageProductsScreen';
+import Tooltip from 'rn-tooltip';
+import { SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const Stack = createNativeStackNavigator();
 
@@ -142,6 +145,27 @@ const AppNavigator = () => {
           },
           headerTintColor: 'white',
           title: route.params?.item?.title || 'Λεπτομέριες',
+          headerRight: () => (
+            <View>
+              {route.params.item.description ? (
+                <View>
+                  <Tooltip
+                    popover={
+                      <Text style={{ color: '#fff' }}>
+                        Περιγραφή: {route.params.item.description}
+                      </Text>
+                    }
+                    backgroundColor={colors.darkGrey}
+                    height="auto"
+                    width="80%"
+                    actionType="press"
+                  >
+                    <Icon name={'information-circle-outline'} size={24} color={'#fff'}></Icon>
+                  </Tooltip>
+                </View>
+              ) : null}
+            </View>
+          ),
         })}
       />
     </Stack.Navigator>
@@ -163,7 +187,6 @@ const MainTabs = ({ route }: any) => {
   // );
 
   useEffect(() => {
-    console.log(route, 'route');
     if (route.params?.screenIndex !== undefined) {
       setIndex(route.params.screenIndex);
     }
@@ -176,7 +199,7 @@ const MainTabs = ({ route }: any) => {
       title: strings.Draft,
       focusedIcon: 'clipboard-outline',
     },
-    { key: strings.Login, title: strings.Login, focusedIcon: 'heart-outline' },
+    // { key: strings.Login, title: strings.Login, focusedIcon: 'heart-outline' },
   ];
 
   const renderScene = BottomNavigation.SceneMap({

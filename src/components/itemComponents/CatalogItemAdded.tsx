@@ -1,29 +1,52 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Text,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Animated,
-  LayoutChangeEvent,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import QuantitySelector from '../helpers/QuantitySelector';
 import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/orderStorage';
-import { ScrollView } from 'react-native';
 import { Divider } from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-export function CatalogItemAdded({ item, itemRemoved }: { item: ItemReq; itemRemoved: any }) {
+export function CatalogItemAdded({
+  item,
+  refreshList,
+  onItemPress,
+}: {
+  item: ItemReq;
+  refreshList: any;
+  onItemPress: any;
+}) {
   const [showDivider, setShowDivider] = useState(true);
-  const height = useRef(new Animated.Value(90)).current;
+  const animatedHeight = useRef(new Animated.Value(0)).current;
+  const [measuredHeight, setMeasuredHeight] = useState(0);
+
   const [isTap, setIsTap] = useState(false);
+
+  if (!item.quantity) {
+    item.quantity = 1;
+  }
+
+  const [totalCost, setTotalCost] = useState(item.cost * item.quantity);
 
   const handleItemDetailsUpdate = () => {
     navigate(ScreenNames.ItemDetailsScreen, { item, isUpdate: true });
   };
+
+  const onLayout = (event: any) => {
+    const { height: layoutHeight } = event.nativeEvent.layout;
+    if (measuredHeight === 0) {
+      setMeasuredHeight(layoutHeight);
+      Animated.timing(animatedHeight, {
+        toValue: layoutHeight,
+        duration: 250,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+
+  useEffect(() => {
+    setMeasuredHeight(0);
+  }, [item]);
 
   let allProperties: ItemProperty[] = [];
   for (const propertyName of Object.keys(item.itemPropertiesGrouped)) {
@@ -34,24 +57,32 @@ export function CatalogItemAdded({ item, itemRemoved }: { item: ItemReq; itemRem
   }
 
   const handleQuantityUpdate = (newQuantity: number) => {
+    setTotalCost(item.cost * newQuantity);
     updateQuantityOfTempItem(newQuantity, item.newItemId as number);
   };
 
   const handleRemoveItem = async () => {
     setShowDivider(false);
-    Animated.timing(height, {
+    Animated.timing(animatedHeight, {
       toValue: 0,
       duration: 250,
       useNativeDriver: false,
     }).start(async () => {
       await removeItemOfTemp(item.newItemId as number);
-      itemRemoved();
+      refreshList();
     });
   };
 
   return (
     <View>
-      <Animated.View style={[styles.container, { height, opacity: isTap ? 0.5 : 1 }]}>
+      <Animated.View
+        key={item.newItemId} // Add key to force re-render
+        style={[
+          styles.container,
+          { height: measuredHeight === 0 ? 'auto' : animatedHeight, opacity: isTap ? 0.5 : 1 },
+        ]}
+        onLayout={onLayout}
+      >
         <View style={styles.textContainer}>
           <TouchableOpacity
             onPress={() => {
@@ -60,29 +91,24 @@ export function CatalogItemAdded({ item, itemRemoved }: { item: ItemReq; itemRem
                 setIsTap(false);
                 handleItemDetailsUpdate();
               }, 100);
+              onItemPress();
             }}
             activeOpacity={1}
           >
             <Text style={styles.itemTitle}>
-              <MaterialIcons name="edit" size={15} color={'#fff'} /> {item.title}
+              <MaterialIcons name="edit" size={14} color={'#fff'} /> {item.title}
             </Text>
           </TouchableOpacity>
-          <ScrollView
-            showsVerticalScrollIndicator={showDivider}
-            persistentScrollbar={showDivider}
-            contentContainerStyle={{ justifyContent: 'center' }}
-            style={{ flexGrow: 0, zIndex: 100 }}
-          >
+          <View>
             <Animated.View style={{ justifyContent: 'center' }}>
               {allProperties.length > 0 ? (
                 <Text style={styles.itemDetails}>
                   {allProperties.map((e) => e.propertyValue).join(', ')}
                 </Text>
               ) : null}
-
-              <CurrencyFormat value={item.cost} currency={'€'}></CurrencyFormat>
+              <CurrencyFormat value={totalCost} currency={'€'} fontSize={12}></CurrencyFormat>
             </Animated.View>
-          </ScrollView>
+          </View>
         </View>
 
         <QuantitySelector
@@ -110,13 +136,13 @@ const styles = StyleSheet.create({
   itemTitle: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 17,
+    fontSize: 14,
     marginBottom: 4,
-    maxHeight: 40,
+    paddingVertical: 1,
   },
   itemDetails: {
     color: '#aaa',
-    fontSize: 14,
+    fontSize: 12,
   },
   buttonsContainer: {
     flexDirection: 'row',

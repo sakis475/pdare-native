@@ -25,17 +25,11 @@ import {
 } from 'react-native';
 import { CatalogItem } from '../../components/CatalogItem';
 import { SelectTable } from '../../components/tableSelect/SelectTable';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import * as Requests from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
-import { HeaderBackButton } from '@react-navigation/elements';
-import { AlertWithOptions } from '../../core/utils';
-import ItemDetails from '../ItemDetails';
 import { colors } from '../../core/theme';
-
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
@@ -66,7 +60,6 @@ const ItemListScreen = ({ route }: any) => {
   };
 
   const handleTempOrderPress = () => {
-    // navigate(ScreenNames.TempOrderScreen, {});
     navigateToDraft();
   };
 
@@ -94,17 +87,9 @@ const ItemListScreen = ({ route }: any) => {
     navigate(screenName, props);
   };
 
-  const renderItems = (item: ItemReq) => {
+  const renderItems = (item: ItemReq, index: number) => {
     return (
-      // <TouchableOpacity
-      //   style={styles.categoryBox}
-      //   onPress={() => {
-      //     handleItemPress('profile');
-      //   }}
-      // >
-      //   <Text>{item.title}</Text>
-      // </TouchableOpacity>
-      <View style={{ marginVertical: 5, paddingHorizontal: 0 }}>
+      <View style={{ marginVertical: 5, paddingHorizontal: 0 }} key={index}>
         <CatalogItemAdd item={item} />
         <Divider style={{ marginTop: 8 }} />
       </View>
@@ -120,7 +105,7 @@ const ItemListScreen = ({ route }: any) => {
           <View style={styles.categoriesContainer}>
             <FlashList
               data={items}
-              renderItem={({ item }) => renderItems(item)}
+              renderItem={({ item, index }) => renderItems(item, index)}
               estimatedItemSize={50}
               contentContainerStyle={styles.categoryFlashListContainer}
             />

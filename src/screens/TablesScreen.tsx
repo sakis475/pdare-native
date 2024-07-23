@@ -92,7 +92,9 @@ const TablesScreen = () => {
         </View>
 
         <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{strings.NewOrderBtn}</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#ffffff' }}>
+            {strings.NewOrderBtn}
+          </Text>
         </TouchableOpacity>
         <Portal>
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />

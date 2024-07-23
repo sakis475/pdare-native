@@ -18,7 +18,7 @@ export const CategoryHeader = ({ title }: any) => (
       }}
     >
       <Icon name={'chevron-double-right'} size={20} color="#fff" />
-      <Text style={{ fontSize: 26, fontWeight: 'bold', color: 'white' }}>{title}</Text>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>{title}</Text>
     </View>
   </View>
 );

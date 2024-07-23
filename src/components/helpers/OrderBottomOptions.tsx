@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Keyboard } from 'react-native';
 import { colors } from '../../core/theme';
 import { strings } from '../../core/strings';
+import TempOrderBottomSheet from '../../components/bottomSheets/TempOrderBottomSheet';
+import { Portal } from '@gorhom/portal';
 
 interface OrderBottomOptionsProps {
   tableName: string;
@@ -14,17 +16,33 @@ const OrderBottomOptions: React.FC<OrderBottomOptionsProps> = ({
   handleOpenModal,
   handleTempOrderPress,
 }) => {
+  //START TEMP ORDER MODAL LOGIC
+  const bottomTempOrderSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
+
+  const handleTempOrderOpenModal = () => {
+    bottomTempOrderSheetRef.current?.openModal();
+  };
+
+  const handleTempOrderCloseModal = () => {
+    bottomTempOrderSheetRef.current?.closeModal();
+    Keyboard.dismiss();
+  };
+  //END TEMP ORDER MODAL LOGIC
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={[styles.button, styles.tempOrderButton]}
-        onPress={handleTempOrderPress}
+        onPress={handleTempOrderOpenModal}
       >
         <Text style={styles.buttonText}>{strings.DraftOrder}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.button, styles.tableButton]} onPress={handleOpenModal}>
         <Text style={styles.buttonText}>{tableName}</Text>
       </TouchableOpacity>
+      <Portal>
+        <TempOrderBottomSheet ref={bottomTempOrderSheetRef} />
+      </Portal>
     </View>
   );
 };
