@@ -59,7 +59,6 @@ const TempOrderScreen = ({
 
   const fetchItems = async () => {
     const tempOrder: NewOrder = await getTempOrder();
-    console.log('tempOrder');
     setTableName(tempOrder?.table?.tableName);
     setItems(tempOrder?.items);
   };
@@ -81,7 +80,6 @@ const TempOrderScreen = ({
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
   const handleOpenModal = () => {
-    console.log('handleOpenModal temp');
     bottomSheetRef.current?.openModal();
   };
 
@@ -131,7 +129,7 @@ const TempOrderScreen = ({
               />
             </View>
           </>
-        ) : items ? (
+        ) : items?.length === 0  ? (
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#ffffff' }}>
