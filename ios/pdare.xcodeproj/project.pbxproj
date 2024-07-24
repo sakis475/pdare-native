@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* pdareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* pdareTests.m */; };
-		05165E90FB248864A9A8ADC4 /* libPods-pdare-pdareTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D0F6233322D1162EB3BAF401 /* libPods-pdare-pdareTests.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		15CFDBEBAF3ECB05A0937BE9 /* libPods-pdare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B8E5977B8AB699E55D93D80 /* libPods-pdare.a */; };
+		4D9F60A169F21CFD4AA5EECA /* libPods-pdare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C96089605639F6061FCC7DE /* libPods-pdare.a */; };
+		50A67514549167B09E79F248 /* libPods-pdare-pdareTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6299F1903EB6860BC42E3D02 /* libPods-pdare-pdareTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -30,19 +30,38 @@
 		00E356EE1AD99517003FC87E /* pdareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pdareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* pdareTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = pdareTests.m; sourceTree = "<group>"; };
+		079E704BAEDB1CD7AC56EC91 /* Pods-pdare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare.release.xcconfig"; path = "Target Support Files/Pods-pdare/Pods-pdare.release.xcconfig"; sourceTree = "<group>"; };
+		0C96089605639F6061FCC7DE /* libPods-pdare.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pdare.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* pdare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pdare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = pdare/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = pdare/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = pdare/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = pdare/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = pdare/main.m; sourceTree = "<group>"; };
-		3B8E5977B8AB699E55D93D80 /* libPods-pdare.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pdare.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		55DBCFD02B5F44838A581C54 /* Pods-pdare-pdareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare-pdareTests.release.xcconfig"; path = "Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests.release.xcconfig"; sourceTree = "<group>"; };
-		7D9B92876137D88D077FCB11 /* Pods-pdare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare.release.xcconfig"; path = "Target Support Files/Pods-pdare/Pods-pdare.release.xcconfig"; sourceTree = "<group>"; };
+		2D549DE4A28F489BF9EBEB4E /* Pods-pdare.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare.debug.xcconfig"; path = "Target Support Files/Pods-pdare/Pods-pdare.debug.xcconfig"; sourceTree = "<group>"; };
+		5CFD398A2C51B016009C4F04 /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
+		5CFD398B2C51B016009C4F04 /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
+		5CFD398C2C51B016009C4F04 /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
+		5CFD398D2C51B016009C4F04 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
+		5CFD398E2C51B016009C4F04 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.ttf; sourceTree = "<group>"; };
+		5CFD398F2C51B016009C4F04 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Brands.ttf; sourceTree = "<group>"; };
+		5CFD39902C51B016009C4F04 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Regular.ttf; sourceTree = "<group>"; };
+		5CFD39912C51B016009C4F04 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
+		5CFD39922C51B016009C4F04 /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Brands.ttf; sourceTree = "<group>"; };
+		5CFD39932C51B016009C4F04 /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Regular.ttf; sourceTree = "<group>"; };
+		5CFD39942C51B016009C4F04 /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Solid.ttf; sourceTree = "<group>"; };
+		5CFD39952C51B016009C4F04 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
+		5CFD39962C51B016009C4F04 /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Foundation.ttf; sourceTree = "<group>"; };
+		5CFD39972C51B016009C4F04 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
+		5CFD39982C51B016009C4F04 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
+		5CFD39992C51B016009C4F04 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
+		5CFD399A2C51B016009C4F04 /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
+		5CFD399B2C51B016009C4F04 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
+		5CFD399C2C51B016009C4F04 /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Zocial.ttf; sourceTree = "<group>"; };
+		6299F1903EB6860BC42E3D02 /* libPods-pdare-pdareTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pdare-pdareTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = pdare/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		96744D8C9B43365F718F1C67 /* Pods-pdare.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare.debug.xcconfig"; path = "Target Support Files/Pods-pdare/Pods-pdare.debug.xcconfig"; sourceTree = "<group>"; };
-		C4E5C649A749CCC727E38CC9 /* Pods-pdare-pdareTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare-pdareTests.debug.xcconfig"; path = "Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests.debug.xcconfig"; sourceTree = "<group>"; };
-		D0F6233322D1162EB3BAF401 /* libPods-pdare-pdareTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pdare-pdareTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9DF6E1F318FCEDEC2266A111 /* Pods-pdare-pdareTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare-pdareTests.debug.xcconfig"; path = "Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests.debug.xcconfig"; sourceTree = "<group>"; };
+		AE3C65E400914F343ECF155C /* Pods-pdare-pdareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare-pdareTests.release.xcconfig"; path = "Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -51,7 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				05165E90FB248864A9A8ADC4 /* libPods-pdare-pdareTests.a in Frameworks */,
+				50A67514549167B09E79F248 /* libPods-pdare-pdareTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,7 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				15CFDBEBAF3ECB05A0937BE9 /* libPods-pdare.a in Frameworks */,
+				4D9F60A169F21CFD4AA5EECA /* libPods-pdare.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +105,7 @@
 		13B07FAE1A68108700A75B9A /* pdare */ = {
 			isa = PBXGroup;
 			children = (
+				5CFD399D2C51B016009C4F04 /* Fonts */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -100,10 +120,37 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				3B8E5977B8AB699E55D93D80 /* libPods-pdare.a */,
-				D0F6233322D1162EB3BAF401 /* libPods-pdare-pdareTests.a */,
+				0C96089605639F6061FCC7DE /* libPods-pdare.a */,
+				6299F1903EB6860BC42E3D02 /* libPods-pdare-pdareTests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5CFD399D2C51B016009C4F04 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				5CFD398A2C51B016009C4F04 /* AntDesign.ttf */,
+				5CFD398B2C51B016009C4F04 /* Entypo.ttf */,
+				5CFD398C2C51B016009C4F04 /* EvilIcons.ttf */,
+				5CFD398D2C51B016009C4F04 /* Feather.ttf */,
+				5CFD398E2C51B016009C4F04 /* FontAwesome.ttf */,
+				5CFD398F2C51B016009C4F04 /* FontAwesome5_Brands.ttf */,
+				5CFD39902C51B016009C4F04 /* FontAwesome5_Regular.ttf */,
+				5CFD39912C51B016009C4F04 /* FontAwesome5_Solid.ttf */,
+				5CFD39922C51B016009C4F04 /* FontAwesome6_Brands.ttf */,
+				5CFD39932C51B016009C4F04 /* FontAwesome6_Regular.ttf */,
+				5CFD39942C51B016009C4F04 /* FontAwesome6_Solid.ttf */,
+				5CFD39952C51B016009C4F04 /* Fontisto.ttf */,
+				5CFD39962C51B016009C4F04 /* Foundation.ttf */,
+				5CFD39972C51B016009C4F04 /* Ionicons.ttf */,
+				5CFD39982C51B016009C4F04 /* MaterialCommunityIcons.ttf */,
+				5CFD39992C51B016009C4F04 /* MaterialIcons.ttf */,
+				5CFD399A2C51B016009C4F04 /* Octicons.ttf */,
+				5CFD399B2C51B016009C4F04 /* SimpleLineIcons.ttf */,
+				5CFD399C2C51B016009C4F04 /* Zocial.ttf */,
+			);
+			name = Fonts;
+			path = "../node_modules/react-native-vector-icons/Fonts";
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -140,10 +187,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				96744D8C9B43365F718F1C67 /* Pods-pdare.debug.xcconfig */,
-				7D9B92876137D88D077FCB11 /* Pods-pdare.release.xcconfig */,
-				C4E5C649A749CCC727E38CC9 /* Pods-pdare-pdareTests.debug.xcconfig */,
-				55DBCFD02B5F44838A581C54 /* Pods-pdare-pdareTests.release.xcconfig */,
+				2D549DE4A28F489BF9EBEB4E /* Pods-pdare.debug.xcconfig */,
+				079E704BAEDB1CD7AC56EC91 /* Pods-pdare.release.xcconfig */,
+				9DF6E1F318FCEDEC2266A111 /* Pods-pdare-pdareTests.debug.xcconfig */,
+				AE3C65E400914F343ECF155C /* Pods-pdare-pdareTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -155,12 +202,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "pdareTests" */;
 			buildPhases = (
-				BF35921C90B94E5AE862CE7C /* [CP] Check Pods Manifest.lock */,
+				1D86B6E47F4F36B716EDE4E4 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				7443122AFE0A067295142342 /* [CP] Embed Pods Frameworks */,
-				FBA522871E2F87C64D5EBDAB /* [CP] Copy Pods Resources */,
+				98B04FCADAF58B1883B2B366 /* [CP] Embed Pods Frameworks */,
+				E94CD51CB4059311F75D1EAA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -176,13 +223,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "pdare" */;
 			buildPhases = (
-				BEFCE3CEF2C870974EF60143 /* [CP] Check Pods Manifest.lock */,
+				762977F8A9189CD082315DD4 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				C8420C0195B3CE5886E249A7 /* [CP] Embed Pods Frameworks */,
-				85F4F6B53FA859C420E6F365 /* [CP] Copy Pods Resources */,
+				DEBAB68142D0733ECA4D9DC7 /* [CP] Embed Pods Frameworks */,
+				609198F1DE674FBE2556E6D9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -265,63 +312,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		7443122AFE0A067295142342 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		85F4F6B53FA859C420E6F365 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BEFCE3CEF2C870974EF60143 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-pdare-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BF35921C90B94E5AE862CE7C /* [CP] Check Pods Manifest.lock */ = {
+		1D86B6E47F4F36B716EDE4E4 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -343,7 +334,63 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C8420C0195B3CE5886E249A7 /* [CP] Embed Pods Frameworks */ = {
+		609198F1DE674FBE2556E6D9 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		762977F8A9189CD082315DD4 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-pdare-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		98B04FCADAF58B1883B2B366 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DEBAB68142D0733ECA4D9DC7 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,7 +407,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FBA522871E2F87C64D5EBDAB /* [CP] Copy Pods Resources */ = {
+		E94CD51CB4059311F75D1EAA /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -410,7 +457,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C4E5C649A749CCC727E38CC9 /* Pods-pdare-pdareTests.debug.xcconfig */;
+			baseConfigurationReference = 9DF6E1F318FCEDEC2266A111 /* Pods-pdare-pdareTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -437,7 +484,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 55DBCFD02B5F44838A581C54 /* Pods-pdare-pdareTests.release.xcconfig */;
+			baseConfigurationReference = AE3C65E400914F343ECF155C /* Pods-pdare-pdareTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -461,7 +508,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 96744D8C9B43365F718F1C67 /* Pods-pdare.debug.xcconfig */;
+			baseConfigurationReference = 2D549DE4A28F489BF9EBEB4E /* Pods-pdare.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -488,7 +535,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7D9B92876137D88D077FCB11 /* Pods-pdare.release.xcconfig */;
+			baseConfigurationReference = 079E704BAEDB1CD7AC56EC91 /* Pods-pdare.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -580,10 +627,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -651,10 +695,7 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
