@@ -98,7 +98,7 @@ const UnifiedSelect = ({
           activeOpacity={0.8}
         >
           {property.propertyType === 'singleselect' ? (
-            <RadioButton
+            <RadioButton.Android
               value={property.propertyValue}
               status={selectedId === property.id ? 'checked' : 'unchecked'}
               color={'#6495ED'}
@@ -109,7 +109,7 @@ const UnifiedSelect = ({
               }}
             />
           ) : (
-            <Checkbox
+            <Checkbox.Android
               status={checkedStates[property.id] ? 'checked' : 'unchecked'}
               color={'#6495ED'}
               uncheckedColor={'#ffffff'}
