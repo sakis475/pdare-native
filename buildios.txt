@@ -1,0 +1,14 @@
+1. clean project
+open pdare.xcworkspace
+-> shift cmd K
+
+build project
+2. xcodebuild -workspace pdare.xcworkspace -scheme pdare -configuration Debug -sdk iphonesimulator -derivedDataPath build
+
+3.
+
+pod repo update
+rm -rf Podfile.lock Pods
+pod install --repo-update
+pod update SocketRocket
+pod install
