@@ -23,6 +23,7 @@ import ManageProductsScreen from '../screens/adminScreens/ManageProductsScreen';
 import Tooltip from 'rn-tooltip';
 import { SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 
 const Stack = createNativeStackNavigator();
 
@@ -66,7 +67,8 @@ const AppNavigator = () => {
             backgroundColor: colors.darkerGrey,
           },
           headerTintColor: 'white',
-          headerLeft: navigateBackBtn
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
         })}
       />
 
@@ -79,7 +81,9 @@ const AppNavigator = () => {
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
-          headerTintColor: 'white',headerLeft: navigateBackBtn
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
         })}
       />
 
@@ -92,7 +96,9 @@ const AppNavigator = () => {
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
-          headerTintColor: 'white',headerLeft: navigateBackBtn
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
         })}
       />
 
@@ -104,7 +110,9 @@ const AppNavigator = () => {
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerTintColor: 'white',headerLeft: navigateBackBtn
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
         }}
       />
       <Stack.Screen
@@ -115,7 +123,9 @@ const AppNavigator = () => {
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerTintColor: 'white',headerLeft: navigateBackBtn
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
         }}
       />
       <Stack.Screen
@@ -126,7 +136,9 @@ const AppNavigator = () => {
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerTintColor: 'white',headerLeft: navigateBackBtn
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
         }}
       />
       <Stack.Screen
@@ -134,11 +146,14 @@ const AppNavigator = () => {
         component={ItemDetailsScreen}
         options={({ route }: any) => ({
           animation: 'fade_from_bottom',
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={route.params?.item?.title}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerTintColor: 'white',
-          title: route.params?.item?.title || 'Λεπτομέριες',
           headerRight: () => (
             <View>
               {route.params.item.description ? (
@@ -159,7 +174,9 @@ const AppNavigator = () => {
                 </View>
               ) : null}
             </View>
-          ),headerLeft: navigateBackBtn
+          ),
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
         })}
       />
     </Stack.Navigator>
@@ -216,9 +233,11 @@ const MainTabs = ({ route }: any) => {
 };
 
 function navigateBackBtn() {
-  return (<TouchableOpacity onPress={() => navigateBack()} style={{ paddingLeft: 10 }}>
+  return (
+    <TouchableOpacity onPress={() => navigateBack()}>
       <Icon name="arrow-back" size={30} color="white" />
-    </TouchableOpacity>)
+    </TouchableOpacity>
+  );
 }
 
 export enum ScreenNames {
