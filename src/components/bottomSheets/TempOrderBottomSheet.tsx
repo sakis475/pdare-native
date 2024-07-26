@@ -44,7 +44,7 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
 
   const handleItemPress = (item: ItemReq) => {
     // Handle the item press event
-    // console.log('Item pressed:', item);
+    console.log('Item pressed:', item);
     setTimeout(() => {
       handleCloseModal();
     }, 200);
@@ -76,22 +76,13 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
             bottomSheetMode={true}
             isSheetOpen={isSheetOpen}
             onItemPress={handleItemPress}
-          ></TempOrderScreen>
-          <View
-            style={{
-              marginTop: 3,
-            }}
-          >
+          />
+          <View style={{ marginTop: 3 }}>
             <TouchableOpacity
               style={{ padding: 20, backgroundColor: 'rgba(0,0,0,0.5)' }}
               onPress={handleCloseModal}
             >
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: '#fff',
-                }}
-              >
+              <Text style={{ textAlign: 'center', color: '#fff' }}>
                 Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color="#fff" />
               </Text>
             </TouchableOpacity>

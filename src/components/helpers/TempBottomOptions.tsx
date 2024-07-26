@@ -10,20 +10,28 @@ interface TempBottomOptionsProps {
 
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   tableName,
-  handleOpenModal,
-  handleTempOrderPress,
+  handleOpenModal, //opens table modal
+  handleTempOrderPress, //opens additems screen
 }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.button, styles.tempOrderButton]}
+        style={[styles.button, styles.sendOrderButton]}
         onPress={handleTempOrderPress}
       >
-        <Text style={styles.buttonText}>Προσθήκη</Text>
+        <Text style={[styles.buttonText]}>Αποστολή</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, styles.tableButton]} onPress={handleOpenModal}>
-        <Text style={styles.buttonText}>{tableName}</Text>
-      </TouchableOpacity>
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity style={[styles.button, styles.tableButton]} onPress={handleOpenModal}>
+          <Text style={styles.buttonText}>{tableName}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.tempOrderButton]}
+          onPress={handleTempOrderPress}
+        >
+          <Text style={styles.buttonText}>Προσθήκη</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -31,24 +39,40 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    gap: 10,
     paddingVertical: 4,
-    backgroundColor: colors.darkerGrey,
+    backgroundColor: colors.grey,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   button: {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 4,
     borderRadius: 6,
-    marginHorizontal: 20,
     height: 60,
     width: 60,
   },
-  tempOrderButton: {
-    flex: 2,
+  sendOrderButton: {
+    width: 100,
     backgroundColor: 'green',
   },
-  tableButton: {
+
+  actionsContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    gap: 10,
+    alignItems: 'center',
+  },
+  tempOrderButton: {
+    flex: 1,
     backgroundColor: 'blue',
+    borderRadius: 50,
+  },
+  tableButton: {
+    flex: 1,
+    backgroundColor: colors.lightGrey,
   },
   buttonText: {
     color: 'white',

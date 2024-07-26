@@ -8,24 +8,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-  Alert,
-  BackHandler,
-  KeyboardAvoidingView,
-  Platform,
-  Dimensions,
-  ActivityIndicator,
-  Keyboard,
-} from 'react-native';
-import { CatalogItem } from '../../components/CatalogItem';
-import { SelectTable } from '../../components/tableSelect/SelectTable';
-import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import * as Requests from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
@@ -37,10 +21,27 @@ import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
 import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
 import { setTableTempOrder } from '../../helpers/orderStorage';
+import { getHelperStorage } from '../../helpers/helpersStorage';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>([]);
+
+  const isFocused = useIsFocused();
+
+  const comingFromPreviewEditItemDetail = async () => {
+    const helperStorage = await getHelperStorage();
+
+    if (helperStorage.isBackFromPreview) {
+      console.log('is back from preview');
+    } else {
+      console.log('is not back from preview call true setForceOpenTempOrderModal');
+    }
+  };
+
+  useEffect(() => {
+    comingFromPreviewEditItemDetail();
+  }, [isFocused]);
 
   const fetchItems = async () => {
     const fetchItems: catGroupedItems = await getStorage('groupedItems');
