@@ -61,12 +61,12 @@ const AppNavigator = () => {
         component={NewOrderScreen}
         options={({ route }: any) => ({
           title: strings.Categories,
-          presentation: 'modal',
           animation: 'slide_from_right',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
           headerTintColor: 'white',
+          headerLeft: navigateBackBtn
         })}
       />
 
@@ -75,12 +75,11 @@ const AppNavigator = () => {
         component={ItemListScreen}
         options={({ route }: any) => ({
           title: strings.AddItems,
-          presentation: 'modal',
           animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
-          headerTintColor: 'white',
+          headerTintColor: 'white',headerLeft: navigateBackBtn
         })}
       />
 
@@ -89,12 +88,11 @@ const AppNavigator = () => {
         component={TempOrderScreen}
         options={({ route }: any) => ({
           title: strings.DraftOrder,
-          presentation: 'modal',
           animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
-          headerTintColor: 'white',
+          headerTintColor: 'white',headerLeft: navigateBackBtn
         })}
       />
 
@@ -102,43 +100,39 @@ const AppNavigator = () => {
         name={ScreenNames.ProfileScreen}
         component={ProfileScreen}
         options={{
-          presentation: 'modal',
           animation: 'simple_push',
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerTintColor: 'white',
+          headerTintColor: 'white',headerLeft: navigateBackBtn
         }}
       />
       <Stack.Screen
         name={ScreenNames.RestaurantSettingsScreen}
         component={RestaurantSettingsScreen}
         options={{
-          presentation: 'modal',
           animation: 'slide_from_right',
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerTintColor: 'white',
+          headerTintColor: 'white',headerLeft: navigateBackBtn
         }}
       />
       <Stack.Screen
         name={ScreenNames.ManageProductsScreen}
         component={ManageProductsScreen}
         options={{
-          presentation: 'modal',
           animation: 'slide_from_right',
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerTintColor: 'white',
+          headerTintColor: 'white',headerLeft: navigateBackBtn
         }}
       />
       <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
         component={ItemDetailsScreen}
         options={({ route }: any) => ({
-          presentation: 'modal',
           animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.grey,
@@ -165,7 +159,7 @@ const AppNavigator = () => {
                 </View>
               ) : null}
             </View>
-          ),
+          ),headerLeft: navigateBackBtn
         })}
       />
     </Stack.Navigator>
@@ -220,6 +214,12 @@ const MainTabs = ({ route }: any) => {
     />
   );
 };
+
+function navigateBackBtn() {
+  return (<TouchableOpacity onPress={() => navigateBack()} style={{ paddingLeft: 10 }}>
+      <Icon name="arrow-back" size={30} color="white" />
+    </TouchableOpacity>)
+}
 
 export enum ScreenNames {
   NewOrderScreen = 'newOrderScreen',
