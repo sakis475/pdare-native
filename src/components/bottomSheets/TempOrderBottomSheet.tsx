@@ -83,7 +83,7 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
             }}
           >
             <TouchableOpacity
-              style={{ padding: 10, borderWidth: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
+              style={{ padding: 20, backgroundColor: 'rgba(0,0,0,0.5)' }}
               onPress={handleCloseModal}
             >
               <Text
@@ -105,7 +105,6 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
 const styles = StyleSheet.create({
   tableChangeContainer: {
     paddingTop: 20,
-    paddingHorizontal: 2,
     justifyContent: 'center',
     height: '100%',
   },
