@@ -50,7 +50,7 @@ interface ItemReq {
   restaurant: Restaurant;
   title: string;
   quantity?: number;
-  newItemId?: number;
+  newItemId?: string;
 }
 
 interface catGroupedItems {

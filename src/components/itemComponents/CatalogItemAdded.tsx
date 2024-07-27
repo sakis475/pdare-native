@@ -17,8 +17,7 @@ export function CatalogItemAdded({
   onItemPress: any;
 }) {
   const [showDivider, setShowDivider] = useState(true);
-  const animatedHeight = useRef(new Animated.Value(0)).current;
-  const [measuredHeight, setMeasuredHeight] = useState(0);
+  const animatedOpacity = useRef(new Animated.Value(1)).current;
 
   const [isTap, setIsTap] = useState(false);
 
@@ -32,22 +31,6 @@ export function CatalogItemAdded({
     navigate(ScreenNames.ItemDetailsScreen, { item, isUpdate: true });
   };
 
-  const onLayout = (event: any) => {
-    const { height: layoutHeight } = event.nativeEvent.layout;
-    if (measuredHeight === 0) {
-      setMeasuredHeight(layoutHeight);
-      Animated.timing(animatedHeight, {
-        toValue: layoutHeight,
-        duration: 250,
-        useNativeDriver: false,
-      }).start();
-    }
-  };
-
-  useEffect(() => {
-    setMeasuredHeight(0);
-  }, [item]);
-
   let allProperties: ItemProperty[] = [];
   for (const propertyName of Object.keys(item.itemPropertiesGrouped)) {
     const propertyGroupSelected = (item.itemPropertiesGrouped as ItemPropertiesGrouped)[
@@ -58,17 +41,17 @@ export function CatalogItemAdded({
 
   const handleQuantityUpdate = (newQuantity: number) => {
     setTotalCost(item.cost * newQuantity);
-    updateQuantityOfTempItem(newQuantity, item.newItemId as number);
+    updateQuantityOfTempItem(newQuantity, item.newItemId as string);
   };
 
   const handleRemoveItem = async () => {
     setShowDivider(false);
-    Animated.timing(animatedHeight, {
+    Animated.timing(animatedOpacity, {
       toValue: 0,
       duration: 250,
       useNativeDriver: false,
     }).start(async () => {
-      await removeItemOfTemp(item.newItemId as number);
+      await removeItemOfTemp(item.newItemId as string);
       refreshList();
     });
   };
@@ -77,11 +60,7 @@ export function CatalogItemAdded({
     <View>
       <Animated.View
         key={item.newItemId} // Add key to force re-render
-        style={[
-          styles.container,
-          { height: measuredHeight === 0 ? 'auto' : animatedHeight, opacity: isTap ? 0.5 : 1 },
-        ]}
-        onLayout={onLayout}
+        style={[styles.container, { opacity: isTap ? 0.5 : animatedOpacity }]}
       >
         <View style={styles.textContainer}>
           <TouchableOpacity

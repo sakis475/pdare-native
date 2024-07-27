@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as Requests from './requests';
 import { getStorage, setStorage } from '../storage/store';
+import uuid from 'react-native-uuid';
 
 export const reqFetchItems = async () => {
   const fetchItems: ItemReq[] = await Requests.getRequest('/items');
@@ -71,13 +72,13 @@ export const addNewItemToTemp = async (item: ItemReq) => {
   //   tempOrder.items[existingItemIndex].quantity =
   //     (tempOrder.items[existingItemIndex].quantity || 1) + 1;
   // } else {
-  const newItemId = tempOrder.items?.length ?? 1 + 1;
+  const newItemId: string = uuid.v4() as string;
   tempOrder.items.push({ ...item, quantity: 1, newItemId });
   // }
   await setStorage('newOrder', tempOrder);
 };
 
-export const updateQuantityOfTempItem = async (quantity: number, newItemId: number) => {
+export const updateQuantityOfTempItem = async (quantity: number, newItemId: string) => {
   if (!quantity) return;
   const tempOrder: NewOrder = await getStorage('newOrder');
   const itemIndex = tempOrder.items.findIndex((e) => e.newItemId === newItemId);
@@ -88,7 +89,7 @@ export const updateQuantityOfTempItem = async (quantity: number, newItemId: numb
   }
 };
 
-export const updateItemOfTempItem = async (item: ItemReq, newItemId: number) => {
+export const updateItemOfTempItem = async (item: ItemReq, newItemId: string) => {
   console.dir(item, { depth: null });
 
   const tempOrder: NewOrder = await getStorage('newOrder');
@@ -100,7 +101,7 @@ export const updateItemOfTempItem = async (item: ItemReq, newItemId: number) => 
   }
 };
 
-export const removeItemOfTemp = async (newItemId: number) => {
+export const removeItemOfTemp = async (newItemId: string) => {
   const tempOrder: NewOrder = await getStorage('newOrder');
 
   const itemIndex = tempOrder.items.findIndex((i) => i.newItemId === newItemId);
@@ -110,7 +111,7 @@ export const removeItemOfTemp = async (newItemId: number) => {
     await setStorage('newOrder', tempOrder);
     return tempOrder;
   } else {
-    throw new Error('Item not found');
+    console.log('Item not found');
   }
 };
 //--------- New Order Storage ------//

@@ -120,7 +120,10 @@ const TempOrderScreen = ({
             <View style={styles.categoriesContainer}>
               <FlashList
                 data={items}
-                keyExtractor={(item) => item.newItemId!.toString()}
+                keyExtractor={(item) => {
+                  const uniqueId = item.newItemId!;
+                  return uniqueId;
+                }}
                 renderItem={({ item }) => renderItems(item)}
                 estimatedItemSize={50}
                 contentContainerStyle={styles.categoryFlashListContainer}
@@ -129,7 +132,7 @@ const TempOrderScreen = ({
               />
             </View>
           </>
-        ) : items?.length === 0  ? (
+        ) : items?.length === 0 ? (
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#ffffff' }}>
