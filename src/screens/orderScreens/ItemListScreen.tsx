@@ -90,9 +90,8 @@ const ItemListScreen = ({ route }: any) => {
 
   const renderItems = (item: ItemReq, index: number) => {
     return (
-      <View style={{ marginVertical: 5, paddingHorizontal: 0 }} key={index}>
+      <View style={{ marginVertical: 8, paddingHorizontal: 0 }} key={index}>
         <CatalogItemAdd item={item} />
-        <Divider style={{ marginTop: 8 }} />
       </View>
     );
   };
@@ -109,6 +108,7 @@ const ItemListScreen = ({ route }: any) => {
               renderItem={({ item, index }) => renderItems(item, index)}
               estimatedItemSize={50}
               contentContainerStyle={styles.categoryFlashListContainer}
+              ItemSeparatorComponent={Divider}
             />
           </View>
           <OrderBottomOptions

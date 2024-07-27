@@ -31,7 +31,6 @@ import * as Requests from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
 import { HeaderBackButton } from '@react-navigation/elements';
 import { AlertWithOptions } from '../../core/utils';
-import ItemDetails from '../ItemDetails';
 import { colors } from '../../core/theme';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';

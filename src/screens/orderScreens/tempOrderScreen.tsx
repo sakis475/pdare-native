@@ -98,7 +98,7 @@ const TempOrderScreen = ({
 
   const renderItems = (item: ItemReq) => {
     return (
-      <View>
+      <View style={{ marginVertical: 10 }}>
         {/* TODO: Create another component for showing added items, remove button, increment, on press open editItems etc.. */}
         <CatalogItemAdded
           item={item}
@@ -128,6 +128,7 @@ const TempOrderScreen = ({
                 contentContainerStyle={styles.categoryFlashListContainer}
                 showsVerticalScrollIndicator={true}
                 persistentScrollbar={true}
+                ItemSeparatorComponent={Divider}
               />
             </View>
           </>

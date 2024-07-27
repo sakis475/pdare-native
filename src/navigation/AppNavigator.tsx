@@ -152,7 +152,6 @@ const AppNavigator = () => {
             backgroundColor: colors.grey,
           },
           headerRight: () => {
-            console.log(route.params.item.category);
             return (
               <View>
                 <Tooltip

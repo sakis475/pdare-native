@@ -4,7 +4,6 @@ import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import QuantitySelector from '../helpers/QuantitySelector';
 import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/orderStorage';
-import { Divider } from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../../core/theme';
 
@@ -17,7 +16,6 @@ export function CatalogItemAdded({
   refreshList: any;
   onItemPress: any;
 }) {
-  const [showDivider, setShowDivider] = useState(true);
   const animatedOpacity = useRef(new Animated.Value(1)).current;
 
   const [isTap, setIsTap] = useState(false);
@@ -46,7 +44,6 @@ export function CatalogItemAdded({
   };
 
   const handleRemoveItem = async () => {
-    setShowDivider(false);
     Animated.timing(animatedOpacity, {
       toValue: 0,
       duration: 250,
@@ -100,7 +97,6 @@ export function CatalogItemAdded({
           removeItem={handleRemoveItem}
         ></QuantitySelector>
       </Animated.View>
-      {showDivider ? <Divider style={{ marginVertical: 8 }}></Divider> : null}
     </View>
   );
 }

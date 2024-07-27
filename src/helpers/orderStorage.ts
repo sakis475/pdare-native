@@ -90,8 +90,6 @@ export const updateQuantityOfTempItem = async (quantity: number, newItemId: stri
 };
 
 export const updateItemOfTempItem = async (item: ItemReq, newItemId: string) => {
-  console.dir(item, { depth: null });
-
   const tempOrder: NewOrder = await getStorage('newOrder');
   const itemIndex = tempOrder.items.findIndex((e) => e.newItemId === newItemId);
 
