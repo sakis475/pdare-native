@@ -3,12 +3,10 @@ import { BottomNavigation, Text } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import TablesScreen from '../screens/TablesScreen';
-import OrderScreen from '../screens/OrderScreen';
 import LoginScreen from '../screens/LoginScreen';
 import { setLocalizedStrings, strings } from '../core/strings';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
-import ItemDetails from '../screens/ItemDetails';
 import RestaurantSettingsScreen from '../screens/adminScreens/RestaurantSettingsScreen';
 import NewOrderScreen from '../screens/orderScreens/newOrderScreen';
 import {
@@ -21,7 +19,7 @@ import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
 import ManageProductsScreen from '../screens/adminScreens/ManageProductsScreen';
 import Tooltip from 'rn-tooltip';
-import { SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 const Stack = createNativeStackNavigator();
@@ -162,28 +160,23 @@ const AppNavigator = () => {
                     <View
                       style={{ alignItems: 'flex-start', justifyContent: 'flex-start', gap: 10 }}
                     >
-                      <Text style={{ color: '#fff', fontSize: 16 }}>
+                      <Text style={styles.toolTipText}>
                         {route.params?.item?.category?.title
                           ? `Κατηγορία: ${route.params.item.category.title}`
                           : null}
                       </Text>
-                      <Text
-                        style={{
-                          color: '#fff',
-                          fontSize: 16,
-                        }}
-                      >
+                      <Text style={styles.toolTipText}>
                         {route.params?.item?.cost
                           ? `Κόστος: ${route.params?.item?.cost.toFixed(2)}`
                           : null}
                       </Text>
-                      <Text style={{ color: '#fff', fontSize: 16 }}>
+                      <Text style={styles.toolTipText}>
                         {route.params?.item?.description
                           ? `Περιγραφή: ${route.params.item.description}`
                           : null}
                       </Text>
                       {/* Make tooltip content go to flex-start */}
-                      <Text style={{ color: '#fff', fontSize: 16 }}>{' '.repeat(100)}</Text>
+                      <Text style={styles.toolTipText}>{' '.repeat(100)}</Text>
                     </View>
                   }
                   backgroundColor={colors.darkGrey}
@@ -261,6 +254,10 @@ function navigateBackBtn() {
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  toolTipText: { color: colors.white, fontSize: 16 },
+});
 
 export enum ScreenNames {
   NewOrderScreen = 'newOrderScreen',

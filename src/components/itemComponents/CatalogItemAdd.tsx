@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
+import { colors } from '../../core/theme';
 
 export function CatalogItemAdd({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);
@@ -36,14 +37,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: {
-    color: '#fff',
+    color: colors.white,
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 4,
-  },
-  itemDetails: {
-    color: '#aaa',
-    fontSize: 12,
   },
   textPressed: {
     opacity: 0.5, // Apply opacity when pressed
@@ -51,7 +48,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333', // Dark background for the container
+    backgroundColor: colors.lightBlack, // Dark background for the container
     borderRadius: 5, // Rounded corners for the container
     padding: 4,
   },
@@ -60,12 +57,12 @@ const styles = StyleSheet.create({
     height: 33, // Height of the button
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#555', // Slightly lighter color for buttons
+    backgroundColor: colors.lightGrey, // Slightly lighter color for buttons
     borderRadius: 6, // Rounded corners for the buttons
     marginHorizontal: 4, // Space between buttons
   },
   buttonText: {
-    color: '#fff', // White text color
+    color: colors.white, // White text color
     fontSize: 24, // Larger font size for the text in the buttons
     fontWeight: 'bold', // Bold font weight
   },

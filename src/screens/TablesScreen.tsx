@@ -92,9 +92,7 @@ const TablesScreen = () => {
         </View>
 
         <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#ffffff' }}>
-            {strings.NewOrderBtn}
-          </Text>
+          <Text style={styles.selectTableBtnText}>{strings.NewOrderBtn}</Text>
         </TouchableOpacity>
         <Portal>
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
@@ -129,6 +127,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     alignItems: 'center',
+  },
+  selectTableBtnText: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: colors.white,
   },
   tableChangeContainer: {
     paddingTop: 20,

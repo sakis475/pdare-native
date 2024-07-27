@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import { colors } from '../../core/theme';
 
 export function TableBox({ table, onPress }: any) {
   return (
@@ -9,7 +10,7 @@ export function TableBox({ table, onPress }: any) {
         <Text style={styles.tableName}>{table.tableName}</Text>
         <Text style={styles.elapsedTime}>95'</Text>
         <View style={[styles.personsCount, { flexDirection: 'row' }]}>
-          <Text style={{ fontSize: 16, color: 'white' }}>x5</Text>
+          <Text style={{ fontSize: 16, color: colors.white }}>x5</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 8,
-    backgroundColor: '#3058E9',
+    backgroundColor: colors.blue,
     paddingVertical: 4,
     paddingHorizontal: 6,
   },
@@ -31,16 +32,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tableName: {
-    color: 'white',
+    color: colors.white,
     fontSize: 16,
   },
   elapsedTime: {
     position: 'absolute',
     top: 0,
     left: 0,
-    color: 'white',
+    color: colors.white,
     fontSize: 14,
-    backgroundColor: '#06090D',
+    backgroundColor: colors.black,
     padding: 4,
     borderRadius: 4,
   },

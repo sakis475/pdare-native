@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGrey,
   },
   buttonText: {
-    color: 'white',
+    color: colors.white,
     fontWeight: 'bold',
     textAlign: 'center',
   },

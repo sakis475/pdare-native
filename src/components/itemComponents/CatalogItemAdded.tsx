@@ -6,6 +6,7 @@ import QuantitySelector from '../helpers/QuantitySelector';
 import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/orderStorage';
 import { Divider } from 'react-native-paper';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { colors } from '../../core/theme';
 
 export function CatalogItemAdded({
   item,
@@ -113,20 +114,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: {
-    color: '#fff',
+    color: colors.white,
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 4,
     paddingVertical: 1,
   },
   itemDetails: {
-    color: '#aaa',
+    color: colors.lighterGrey,
     fontSize: 12,
   },
   buttonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
+    backgroundColor: colors.lightGrey,
     borderRadius: 5,
     padding: 4,
   },
@@ -135,12 +136,12 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#555',
+    backgroundColor: colors.slightlyLighterGrey,
     borderRadius: 6,
     marginHorizontal: 4,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 24,
     fontWeight: 'bold',
   },

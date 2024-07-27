@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   sendOrderButton: {
     width: 100,
-    backgroundColor: 'green',
+    backgroundColor: colors.green,
   },
 
   actionsContainer: {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   tempOrderButton: {
     flex: 1,
-    backgroundColor: 'blue',
+    backgroundColor: colors.blue,
     borderRadius: 50,
   },
   tableButton: {
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGrey,
   },
   buttonText: {
-    color: 'white',
+    color: colors.white,
     fontWeight: 'bold',
     textAlign: 'center',
   },

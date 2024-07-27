@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderRadius: 6, // Rounded corners for the buttons
   },
   buttonText: {
-    color: '#fff', // White text color
+    color: colors.white, // White text color
     fontSize: 20, // Larger font size for the text in the buttons
     fontWeight: 'bold', // Bold font weight
   },
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     minWidth: 32,
   },
   quantityText: {
-    color: '#fff', // White text color
+    color: colors.white, // White text color
     fontSize: 14, // Adjusted font size for quantity text
   },
 });

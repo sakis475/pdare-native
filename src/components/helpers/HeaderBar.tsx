@@ -23,7 +23,7 @@ export function HeaderBar({ headerTitle }: { headerTitle?: string }) {
 function ProfileButton({ handlePress }: any) {
   return (
     <TouchableOpacity onPress={handlePress}>
-      <Text style={{ color: '#e3e1e1' }}>
+      <Text style={{ color: colors.veryLighterGrey }}>
         <IoniconsIcons name="person-circle-outline" size={40}></IoniconsIcons>
       </Text>
     </TouchableOpacity>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     right: 10,
   },
   headerTitle: {
-    color: '#e3e1e1',
+    color: colors.veryLighterGrey,
     fontWeight: '700',
     fontSize: 20,
     alignSelf: 'center',

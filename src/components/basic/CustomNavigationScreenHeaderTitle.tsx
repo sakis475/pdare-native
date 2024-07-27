@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
+import { colors } from '../../core/theme';
 
 const CustomNavigationScreenHeaderTitle = ({ title }: any) => {
   const { width } = useWindowDimensions(); // Get the width of the screen
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, // Add some padding to the left and right
   },
   headerTitle: {
-    color: 'white',
+    color: colors.white,
     fontSize: 18,
     textAlign: 'center',
   },

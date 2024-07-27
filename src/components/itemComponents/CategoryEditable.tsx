@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
+import { colors } from '../../core/theme';
 
 export function CategoryEditable({ category }: { category: Category }) {
   const [isPressedIn, setIsPressedIn] = useState(false);
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: {
-    color: '#fff', // White text color for the title
+    color: colors.white, // White text color for the title
     fontWeight: 'bold', // Bold font weight for the title
     fontSize: 18, // Adjust the font size as necessary
     marginBottom: 4, // Space between the title and the subtitle
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333', // Dark background for the container
+    backgroundColor: colors.lightBlack, // Dark background for the container
     borderRadius: 5, // Rounded corners for the container
     padding: 4,
   },
@@ -59,12 +60,12 @@ const styles = StyleSheet.create({
     height: 45, // Height of the button
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#555', // Slightly lighter color for buttons
+    backgroundColor: colors.slightlyLighterGrey, // Slightly lighter color for buttons
     borderRadius: 6, // Rounded corners for the buttons
     marginHorizontal: 4, // Space between buttons
   },
   buttonText: {
-    color: '#fff', // White text color
+    color: colors.white, // White text color
     fontSize: 24, // Larger font size for the text in the buttons
     fontWeight: 'bold', // Bold font weight
   },

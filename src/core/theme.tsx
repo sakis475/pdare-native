@@ -11,6 +11,9 @@ export const theme = {
 };
 
 export const colors = {
+  veryLighterGrey: '#e3e1e1',
+  lighterGrey: '#aaaaaa',
+  slightlyLighterGrey: '#555555',
   lightGrey: '#424242',
   grey: '#2F2F2F',
   darkGrey: '#2B2B2B',
@@ -20,4 +23,15 @@ export const colors = {
   danger: '#f68775',
 
   success: '#b7ffcc',
+
+  white: '#fff',
+
+  blue: '#3058E9',
+
+  lightBlack: '#333',
+  black: '#06090D',
+
+  green: '#2ba331',
+
+  orange: '#e77e18',
 };

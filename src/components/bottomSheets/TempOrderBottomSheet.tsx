@@ -83,7 +83,7 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
               style={{ padding: 20, backgroundColor: 'rgba(0,0,0,0.5)' }}
               onPress={handleCloseModal}
             >
-              <Text style={{ textAlign: 'center', color: '#fff' }}>
+              <Text style={{ textAlign: 'center', color: colors.white }}>
                 Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color="#fff" />
               </Text>
             </TouchableOpacity>

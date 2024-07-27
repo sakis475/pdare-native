@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: {
-    color: '#fff', // White text color for the title
+    color: colors.white, // White text color for the title
     fontWeight: 'bold', // Bold font weight for the title
     fontSize: 18, // Adjust the font size as necessary
     marginBottom: 4, // Space between the title and the subtitle

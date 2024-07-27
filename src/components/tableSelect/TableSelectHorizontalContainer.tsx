@@ -54,7 +54,7 @@ const TableSelectHorizontalContainer = ({
   const TableBox = ({ table, newBox }: { table: Table; newBox: boolean }) => {
     let customStyle = styles.box;
     if (newBox) {
-      customStyle = { ...styles.box, backgroundColor: 'orange' };
+      customStyle = { ...styles.box, backgroundColor: colors.orange };
     }
     return (
       <TouchableOpacity activeOpacity={0.7} onPress={() => handleTableSelect(table)}>
@@ -70,15 +70,19 @@ const TableSelectHorizontalContainer = ({
   const contentWidth = (numColumns + 1) * boxSize; // Assuming each box has a width of 30 and margin of 5
 
   return (
-    <>
+    <View style={{ marginTop: 5 }}>
       {searchWord?.length && allTables.length === 0 ? (
         <View>
-          <Text>Δεν βρέθηκε τραπέζι, δημιουργία καινούργιου.</Text>
+          <Text style={styles.boxText}>
+            Δεν βρέθηκε τραπέζι με αυτό το όνομα, δημιουργία καινούργιου.
+          </Text>
           <TableBox
             table={{ id: -1, isEnabled: false, tableOrder: -1, tableName: searchWord }}
             newBox={true}
           ></TableBox>
         </View>
+      ) : allTables.length === 0 ? (
+        <Text style={styles.boxText}>Όλα τα τραπέζια είναι κατειλημμένα.</Text>
       ) : allTables?.length ? (
         contentWidth > screenWidth ? (
           <ScrollView
@@ -111,7 +115,7 @@ const TableSelectHorizontalContainer = ({
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
         </View>
       )}
-    </>
+    </View>
   );
 };
 
@@ -119,20 +123,20 @@ const styles = StyleSheet.create({
   box: {
     width: boxSize,
     height: boxSize,
-    backgroundColor: 'blue',
+    backgroundColor: colors.blue,
     margin: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },
   boxText: {
-    color: 'white',
+    color: colors.white,
     fontSize: 12,
   },
 
   newBox: {
     width: boxSize,
     height: boxSize,
-    backgroundColor: 'orange',
+    backgroundColor: colors.orange,
     margin: 5,
     justifyContent: 'center',
     alignItems: 'center',

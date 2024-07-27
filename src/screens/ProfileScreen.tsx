@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { ScreenNames, navigate } from '../navigation/AppNavigator';
+import { colors } from '../core/theme';
 
 const ProfileOptionsScreen = ({ route }: any) => {
   const navigation = useNavigation();
@@ -46,6 +47,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   text: {
+    color: colors.white,
     fontSize: 18,
   },
 });

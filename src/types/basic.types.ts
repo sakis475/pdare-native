@@ -81,3 +81,15 @@ interface OrderNavigationState {
   screenName: any;
   params: any;
 }
+
+interface CreateNewOrderRequest {
+  table: number;
+  comment: string;
+  items: NewOrderRequestItem[];
+}
+interface NewOrderRequestItem {
+  id: number;
+  itemProperties: number[];
+  quantity: number;
+  comment: string;
+}

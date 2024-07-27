@@ -4,6 +4,7 @@ import { getStorage, setStorage } from '../storage/store';
 
 export const reqFetchTables = async () => {
   const fetchTables: Table[] = await Requests.getRequest('/tables?availableOnly=true');
+
   return fetchTables;
 };
 
