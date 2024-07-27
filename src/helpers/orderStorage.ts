@@ -115,3 +115,40 @@ export const removeItemOfTemp = async (newItemId: string) => {
   }
 };
 //--------- New Order Storage ------//
+export const isItemPropertiesGrouped = (value: any): value is ItemPropertiesGrouped => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+};
+
+export const convertNewOrderToRequestObject = (newOrder: NewOrder): CreateNewOrderRequest => {
+  const newOrderRequestItems = newOrder.items.map((item) => {
+    const newOrderRequestItem: NewOrderRequestItem = {
+      id: item.id,
+      itemProperties: [],
+      quantity: item.quantity ? item.quantity : 1,
+      comment: '',
+    };
+
+    if (
+      isItemPropertiesGrouped(item.itemPropertiesGrouped) &&
+      Object.keys(item.itemPropertiesGrouped).length > 0
+    ) {
+      for (const itemPropertyGroup of Object.keys(item.itemPropertiesGrouped)) {
+        const group: ItemProperty[] = item.itemPropertiesGrouped[itemPropertyGroup];
+
+        for (const itemProperty of group) {
+          if (itemProperty.selected) {
+            newOrderRequestItem.itemProperties.push(itemProperty.id);
+          }
+        }
+      }
+    }
+
+    return newOrderRequestItem;
+  });
+
+  return {
+    table: newOrder.table.id,
+    comment: newOrder.comment ? newOrder.comment : '',
+    items: newOrderRequestItems,
+  };
+};

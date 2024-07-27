@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors } from '../../core/theme';
+import { convertNewOrderToRequestObject, getTempOrder } from '../../helpers/orderStorage';
 
 interface TempBottomOptionsProps {
   tableName: string;
@@ -13,12 +14,17 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   handleOpenModal, //opens table modal
   handleTempOrderPress, //opens additems screen
 }) => {
+  const handleOrderSend = async () => {
+    const newOrder = await getTempOrder();
+
+    const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
+
+    console.log(JSON.stringify(convertedServerOrder, null, 2));
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[styles.button, styles.sendOrderButton]}
-        onPress={handleTempOrderPress}
-      >
+      <TouchableOpacity style={[styles.button, styles.sendOrderButton]} onPress={handleOrderSend}>
         <Text style={[styles.buttonText]}>Αποστολή</Text>
       </TouchableOpacity>
       <View style={styles.actionsContainer}>
