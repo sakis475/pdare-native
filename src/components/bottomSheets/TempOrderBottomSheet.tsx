@@ -13,10 +13,11 @@ import { Portal } from '@gorhom/portal';
 import TempOrderScreen from '../../screens/orderScreens/tempOrderScreen';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import { colors } from '../../core/theme';
 
 const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['90%', '90%'], []);
+  const snapPoints = useMemo(() => ['85%', '85%'], []);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
@@ -69,7 +70,7 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
           />
         )}
         handleIndicatorStyle={{ backgroundColor: '#fff' }}
-        backgroundStyle={{ backgroundColor: '#2F2F2F' }}
+        backgroundStyle={{ backgroundColor: colors.darkGrey }}
       >
         <BottomSheetView style={styles.tableChangeContainer}>
           <TempOrderScreen
