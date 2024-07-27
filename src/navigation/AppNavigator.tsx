@@ -24,7 +24,6 @@ import Tooltip from 'rn-tooltip';
 import { SafeAreaView, ScrollView, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
-
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -154,27 +153,50 @@ const AppNavigator = () => {
           headerStyle: {
             backgroundColor: colors.grey,
           },
-          headerRight: () => (
-            <View>
-              {route.params.item.description ? (
-                <View>
-                  <Tooltip
-                    popover={
-                      <Text style={{ color: '#fff' }}>
-                        Περιγραφή: {route.params.item.description}
+          headerRight: () => {
+            console.log(route.params.item.category);
+            return (
+              <View>
+                <Tooltip
+                  popover={
+                    <View
+                      style={{ alignItems: 'flex-start', justifyContent: 'flex-start', gap: 10 }}
+                    >
+                      <Text style={{ color: '#fff', fontSize: 16 }}>
+                        {route.params?.item?.category?.title
+                          ? `Κατηγορία: ${route.params.item.category.title}`
+                          : null}
                       </Text>
-                    }
-                    backgroundColor={colors.darkGrey}
-                    height="auto"
-                    width="80%"
-                    actionType="press"
-                  >
-                    <Icon name={'information-circle-outline'} size={24} color={'#fff'}></Icon>
-                  </Tooltip>
-                </View>
-              ) : null}
-            </View>
-          ),
+                      <Text
+                        style={{
+                          color: '#fff',
+                          fontSize: 16,
+                        }}
+                      >
+                        {route.params?.item?.cost
+                          ? `Κόστος: ${route.params?.item?.cost.toFixed(2)}`
+                          : null}
+                      </Text>
+                      <Text style={{ color: '#fff', fontSize: 16 }}>
+                        {route.params?.item?.description
+                          ? `Περιγραφή: ${route.params.item.description}`
+                          : null}
+                      </Text>
+                      {/* Make tooltip content go to flex-start */}
+                      <Text style={{ color: '#fff', fontSize: 16 }}>{' '.repeat(100)}</Text>
+                    </View>
+                  }
+                  backgroundColor={colors.darkGrey}
+                  height="auto"
+                  width="80%"
+                  actionType="press"
+                >
+                  <Icon name={'information-circle-outline'} size={24} color={'#fff'}></Icon>
+                </Tooltip>
+              </View>
+            );
+          },
+
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
         })}
