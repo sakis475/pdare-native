@@ -51,6 +51,7 @@ interface ItemReq {
   title: string;
   quantity?: number;
   newItemId?: string;
+  comment?: string;
 }
 
 interface catGroupedItems {

@@ -86,6 +86,9 @@ export function CatalogItemAdded({
                   {allProperties.map((e) => e.propertyValue).join(', ')}
                 </Text>
               ) : null}
+              {item.comment ? (
+                <Text style={[styles.itemDetails, { fontStyle: 'italic' }]}>{item.comment}</Text>
+              ) : null}
               <CurrencyFormat value={totalCost} currency={'€'} fontSize={12}></CurrencyFormat>
             </Animated.View>
           </View>

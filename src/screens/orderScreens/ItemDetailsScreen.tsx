@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,11 +7,13 @@ import {
   ScrollView,
   FlatList,
   ActivityIndicator,
+  Keyboard,
 } from 'react-native';
-import { Checkbox, Divider, RadioButton } from 'react-native-paper';
+import { Checkbox, Divider, RadioButton, TextInput } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/orderStorage';
 import { navigateBack } from '../../navigation/AppNavigator';
+import CommentBottomSheet from '../../components/bottomSheets/CommentBottomSheet';
 
 const UnifiedSelect = ({
   itemPropertiesGrouped,
@@ -126,9 +128,26 @@ const ItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
   const isUpdate = Boolean(route.params.isUpdate);
 
+  const [commentText, setCommentText] = useState(
+    route.params.item?.comment ? route.params.item.comment : 'Γράψε σχόλιο για το προϊόν'
+  );
+
+  //START COMMENT MODAL LOGIC
+  const commentBottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
+
+  const handleOpenModal = () => {
+    commentBottomSheetRef.current?.openModal();
+  };
+
+  const handleCloseModal = () => {
+    commentBottomSheetRef.current?.closeModal();
+    Keyboard.dismiss();
+  };
+
+  //END COMMENT MODAL LOGIC
+
   useEffect(() => {
     //reset item everytime screen mounts
-
     const deepCopy = JSON.parse(JSON.stringify(route.params.item));
 
     setItem(deepCopy);
@@ -160,6 +179,15 @@ const ItemDetailsScreen = ({ route }: any) => {
     }));
   };
 
+  const handleCommentUpdate = (itemComment: string) => {
+    setCommentText(itemComment ? itemComment : 'Γράψε σχόλιο για το προϊόν');
+
+    setItem((prevItem: any) => ({
+      ...prevItem,
+      comment: itemComment,
+    }));
+  };
+
   return (
     <View style={styles.container}>
       {item ? (
@@ -176,9 +204,21 @@ const ItemDetailsScreen = ({ route }: any) => {
                   isUpdate={isUpdate}
                 ></UnifiedSelect>
 
-                {index !== array.length - 1 && <Divider style={{ marginVertical: 8 }} />}
+                <Divider style={{ marginVertical: 8 }}></Divider>
               </View>
             ))}
+            <Text style={styles.header}>Σχόλιο</Text>
+            <TouchableOpacity
+              onPress={handleOpenModal}
+              style={{
+                width: '100%',
+                minHeight: 50,
+                backgroundColor: colors.veryLighterGrey,
+                justifyContent: 'center',
+              }}
+            >
+              <Text style={styles.commentText}>{commentText}</Text>
+            </TouchableOpacity>
           </ScrollView>
           <View style={styles.addItemContainer}>
             <TouchableOpacity
@@ -198,6 +238,11 @@ const ItemDetailsScreen = ({ route }: any) => {
               </Text>
             </TouchableOpacity>
           </View>
+          <CommentBottomSheet
+            ref={commentBottomSheetRef}
+            item={item}
+            itemCommentChange={handleCommentUpdate}
+          ></CommentBottomSheet>
         </View>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
@@ -237,6 +282,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     alignItems: 'center',
+  },
+  commentText: {
+    color: colors.black,
+    marginLeft: 20,
   },
 });
 

@@ -125,7 +125,7 @@ export const convertNewOrderToRequestObject = (newOrder: NewOrder): CreateNewOrd
       id: item.id,
       itemProperties: [],
       quantity: item.quantity ? item.quantity : 1,
-      comment: '',
+      comment: item.comment ? item.comment : '',
     };
 
     if (
