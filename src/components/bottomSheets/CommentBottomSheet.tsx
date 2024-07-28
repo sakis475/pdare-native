@@ -85,7 +85,7 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
           backgroundStyle={{ backgroundColor: colors.darkGrey }}
         >
           <BottomSheetView style={styles.tableChangeContainer}>
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, gap: 3 }}>
               <CategoryHeader title="Σχόλιο"></CategoryHeader>
               <TextInput
                 mode={'flat'}
