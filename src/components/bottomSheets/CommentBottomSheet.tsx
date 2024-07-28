@@ -60,7 +60,7 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
           </Text>
         </TouchableOpacity>
       </View>
-    )
+    );
 
     return (
       <Portal>
@@ -100,13 +100,9 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
                 ref={textInputRef} // Set ref here
                 multiline={true}
               />
-              {Platform.OS === 'ios' ?
-                <CloseModalBtn></CloseModalBtn> : null
-              }
+              {Platform.OS === 'ios' ? <CloseModalBtn></CloseModalBtn> : null}
             </View>
-            {Platform.OS === 'android' ?
-              <CloseModalBtn></CloseModalBtn> : null
-            }
+            {Platform.OS === 'android' ? <CloseModalBtn></CloseModalBtn> : null}
           </BottomSheetView>
         </BottomSheet>
       </Portal>
