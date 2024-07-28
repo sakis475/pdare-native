@@ -63,14 +63,14 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
               onPress={() => {
                 handleCloseModal();
               }}
-            />
-          )}
+              />
+            )}
           handleIndicatorStyle={{ backgroundColor: '#fff' }}
           backgroundStyle={{ backgroundColor: colors.darkGrey }}
         >
           <BottomSheetView style={styles.tableChangeContainer}>
             <CategoryHeader title="Σχόλιο"></CategoryHeader>
-            <View style={{ flex: 1 }}>
+            <View style={{ marginTop: 3, flex: 1 }}>
               <TextInput
                 mode={'flat'}
                 value={commentText}
@@ -79,23 +79,23 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
                   setCommentText(changedText);
                 }}
                 contentStyle={{ backgroundColor: colors.white }}
-                style={{ backgroundColor: colors.white, minHeight: 150, fontSize: 20 }}
+                style={{ backgroundColor: colors.white, minHeight: 100, fontSize: 20 }}
                 textColor={colors.black}
                 ref={textInputRef} // Set ref here
                 multiline={true}
               />
-            </View>
-            <View style={{ marginTop: 3 }}>
-              <TouchableOpacity
-                style={{ padding: 20, backgroundColor: 'rgba(0,0,0,0.5)' }}
-                onPress={() => {
-                  handleCloseModal();
-                }}
-              >
-                <Text style={{ textAlign: 'center', color: colors.white }}>
-                  Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color="#fff" />
-                </Text>
-              </TouchableOpacity>
+              <View style={{ marginTop: 3, flex: 1 }}>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => {
+                    handleCloseModal();
+                  }}
+                >
+                  <Text style={styles.closeButtonText}>
+                    Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color={colors.white} />
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </BottomSheetView>
         </BottomSheet>
@@ -109,6 +109,16 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     justifyContent: 'center',
     height: '100%',
+  },
+  closeButton: {
+    padding: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center', // Center align the text horizontally
+    justifyContent: 'center', // Center align the text vertically
+  },
+  closeButtonText: {
+    color: colors.white,
+    textAlign: 'center',
   },
 });
 
