@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Keyboard, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Portal } from '@gorhom/portal';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -14,6 +14,7 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../core/theme';
 import { TextInput } from 'react-native-paper';
 import { CategoryHeader } from '../helpers/CategoryHeader';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface CommentBottomSheetProps {
   item: ItemReq;
@@ -46,6 +47,21 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
       closeModal: handleCloseModal,
     }));
 
+    const CloseModalBtn = () => (
+      <View style={{ marginTop: 3, flex: 1 }}>
+        <TouchableOpacity
+          style={styles.closeButton}
+          onPress={() => {
+            handleCloseModal();
+          }}
+        >
+          <Text style={styles.closeButtonText}>
+            Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color={colors.white} />
+          </Text>
+        </TouchableOpacity>
+      </View>
+    )
+
     return (
       <Portal>
         <BottomSheet
@@ -63,14 +79,14 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
               onPress={() => {
                 handleCloseModal();
               }}
-              />
-            )}
+            />
+          )}
           handleIndicatorStyle={{ backgroundColor: '#fff' }}
           backgroundStyle={{ backgroundColor: colors.darkGrey }}
         >
           <BottomSheetView style={styles.tableChangeContainer}>
-            <CategoryHeader title="Σχόλιο"></CategoryHeader>
-            <View style={{ marginTop: 3, flex: 1 }}>
+            <View style={{ flex: 1 }}>
+              <CategoryHeader title="Σχόλιο"></CategoryHeader>
               <TextInput
                 mode={'flat'}
                 value={commentText}
@@ -84,19 +100,13 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
                 ref={textInputRef} // Set ref here
                 multiline={true}
               />
-              <View style={{ marginTop: 3, flex: 1 }}>
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => {
-                    handleCloseModal();
-                  }}
-                >
-                  <Text style={styles.closeButtonText}>
-                    Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color={colors.white} />
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              {Platform.OS === 'ios' ?
+                <CloseModalBtn></CloseModalBtn> : null
+              }
             </View>
+            {Platform.OS === 'android' ?
+              <CloseModalBtn></CloseModalBtn> : null
+            }
           </BottomSheetView>
         </BottomSheet>
       </Portal>
