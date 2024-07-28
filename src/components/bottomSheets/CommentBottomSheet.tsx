@@ -48,7 +48,7 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
     }));
 
     const CloseModalBtn = () => (
-      <View style={{ marginTop: 3, flex: 1 }}>
+      <View>
         <TouchableOpacity
           style={styles.closeButton}
           onPress={() => {
