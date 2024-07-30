@@ -34,4 +34,6 @@ export const colors = {
   green: '#2ba331',
 
   orange: '#e77e18',
+
+  lightRed: '#ff272e',
 };

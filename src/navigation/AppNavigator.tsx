@@ -3,7 +3,7 @@ import { BottomNavigation, Text } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import TablesScreen from '../screens/TablesScreen';
-import LoginScreen from '../screens/LoginScreen';
+import LoginScreen from '../screens/authenticationScreens/LoginScreen';
 import { setLocalizedStrings, strings } from '../core/strings';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
@@ -52,6 +52,12 @@ export function navigateToDraft() {
 const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}>
+      <Stack.Screen
+        name={ScreenNames.LoginScreen}
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      
       <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
 
       <Stack.Screen
@@ -266,5 +272,6 @@ export enum ScreenNames {
   ItemDetailsScreen = 'itemDetailsScreen',
   RestaurantSettingsScreen = 'restaurantSettingsScreen',
   ManageProductsScreen = 'manageProductsScreen',
+  LoginScreen = 'loginScreen',
 }
 export default AppNavigator;
