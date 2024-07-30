@@ -22,6 +22,7 @@ import Tooltip from 'rn-tooltip';
 import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
+import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -53,11 +54,17 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}>
       <Stack.Screen
+        name={ScreenNames.RegisterScreen}
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
         name={ScreenNames.LoginScreen}
         component={LoginScreen}
         options={{ headerShown: false }}
       />
-      
+
       <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
 
       <Stack.Screen
@@ -273,5 +280,6 @@ export enum ScreenNames {
   RestaurantSettingsScreen = 'restaurantSettingsScreen',
   ManageProductsScreen = 'manageProductsScreen',
   LoginScreen = 'loginScreen',
+  RegisterScreen = 'registerScreen',
 }
 export default AppNavigator;
