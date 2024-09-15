@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Checkbox, Divider, RadioButton, TextInput } from 'react-native-paper';
 import { colors } from '../../core/theme';
-import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/orderStorage';
+import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/storage/orderStorage';
 import { navigateBack } from '../../navigation/AppNavigator';
 import CommentBottomSheet from '../../components/bottomSheets/CommentBottomSheet';
 

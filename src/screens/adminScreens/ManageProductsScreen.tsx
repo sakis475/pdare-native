@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Text } from 'react-native';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import { colors } from '../../core/theme';
-import { reqFetchItems } from '../../helpers/orderStorage';
+import { reqFetchItems } from '../../helpers/storage/orderStorage';
 import { CategoryEditable } from '../../components/itemComponents/CategoryEditable';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 const ManageProductsScreen = ({ route }: any) => {
@@ -11,6 +11,11 @@ const ManageProductsScreen = ({ route }: any) => {
 
   const fetchItems = async () => {
     const items = await reqFetchItems();
+
+    if (!items) {
+      return Promise<null>;
+    }
+
     const categories: Category[] = [];
     for (const categoryName of Object.keys(items)) {
       const category = items[categoryName].length > 0 ? items[categoryName][0].category : null;

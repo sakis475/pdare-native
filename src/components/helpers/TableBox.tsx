@@ -2,13 +2,24 @@ import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../core/theme';
+import dayjs, { datetimeDiff } from '../../core/dayjs';
 
-export function TableBox({ table, onPress }: any) {
+export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
+  const minutesPassed = datetimeDiff(
+    dayjs.utc(),
+    dayjs(table.occupiedByOrder?.createdAt),
+    'minutes'
+  );
+  const elapsedTime = table.occupiedByOrder?.createdAt
+    ? minutesPassed > 240
+      ? '240' + "'"
+      : minutesPassed + "'"
+    : '';
   return (
     <TouchableOpacity key={table.id} style={styles.table} activeOpacity={0.7} onPress={onPress}>
       <View style={styles.content}>
         <Text style={styles.tableName}>{table.tableName}</Text>
-        <Text style={styles.elapsedTime}>95'</Text>
+        {elapsedTime ? <Text style={styles.elapsedTime}>{elapsedTime}</Text> : null}
         <View style={[styles.personsCount, { flexDirection: 'row' }]}>
           <Text style={{ fontSize: 16, color: colors.white }}>x5</Text>
         </View>

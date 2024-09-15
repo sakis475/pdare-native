@@ -1,7 +1,7 @@
-import { getStorage, setStorage } from '../storage/store';
+import { getStorage, setStorage } from '../../storage/store';
 
 export const getHelperStorage = async (): Promise<HelperStorage> => {
-  const helperStorage: HelperStorage = await getStorage('helperStorage');
+  const helperStorage: HelperStorage | null = await getStorage('helperStorage');
 
   if (!helperStorage) {
     return {};

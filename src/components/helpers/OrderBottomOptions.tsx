@@ -20,7 +20,6 @@ const OrderBottomOptions: React.FC<OrderBottomOptionsProps> = ({
   const bottomTempOrderSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
   const handleTempOrderOpenModal = () => {
-    console.log('open modal temp');
     bottomTempOrderSheetRef.current?.openModal();
   };
 

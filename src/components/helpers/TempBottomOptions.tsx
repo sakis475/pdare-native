@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { colors } from '../../core/theme';
-import { convertNewOrderToRequestObject, getTempOrder } from '../../helpers/orderStorage';
+import {
+  clearNewOrder,
+  convertNewOrderToRequestObject,
+  getTempOrder,
+} from '../../helpers/storage/orderStorage';
+import { toast } from '../../core/utils';
+import { postRequest } from '../../helpers/requests';
+import { navigate, navigateToTables, ScreenNames } from '../../navigation/AppNavigator';
 
 interface TempBottomOptionsProps {
   tableName: string;
@@ -14,28 +21,54 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   handleOpenModal, //opens table modal
   handleTempOrderPress, //opens additems screen
 }) => {
+  const [noTable, setNoTable] = useState(!tableName);
+
+  useEffect(() => {
+    setNoTable(!tableName);
+  }, [tableName]);
+
   const handleOrderSend = async () => {
     const newOrder = await getTempOrder();
-
+    if (!newOrder?.items?.length || newOrder?.items?.length === 0) {
+      toast('info', 'Add Items First', '', 1600);
+      return;
+    }
     const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
 
-    console.log(JSON.stringify(convertedServerOrder, null, 2));
+    const result = await postRequest('/orders', convertedServerOrder);
+    if (result?.id) {
+      toast('success', 'Success', '', 1000);
+      clearNewOrder();
+      navigateToTables();
+    }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={[styles.button, styles.sendOrderButton]} onPress={handleOrderSend}>
-        <Text style={[styles.buttonText]}>Αποστολή</Text>
+      <TouchableOpacity
+        style={[styles.button, styles.sendOrderButton, noTable ? styles.noTableOtherBtns : null]}
+        onPress={handleOrderSend}
+        disabled={noTable}
+      >
+        <Text style={[styles.buttonText, noTable ? styles.noTableOtherText : null]}>Αποστολή</Text>
       </TouchableOpacity>
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={[styles.button, styles.tableButton]} onPress={handleOpenModal}>
-          <Text style={styles.buttonText}>{tableName}</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.tableButton, noTable ? styles.noTableBorder : null]}
+          onPress={handleOpenModal}
+        >
+          <Text style={[styles.buttonText, noTable ? styles.noTableText : null]}>
+            {tableName ?? 'Επιλογή Τραπεζιού'}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.button, styles.tempOrderButton]}
+          style={[styles.button, styles.tempOrderButton, noTable ? styles.noTableOtherBtns : null]}
           onPress={handleTempOrderPress}
+          disabled={noTable}
         >
-          <Text style={styles.buttonText}>Προσθήκη</Text>
+          <Text style={[styles.buttonText, noTable ? styles.noTableOtherText : null]}>
+            Προσθήκη
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -85,6 +118,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  noTableText: {
+    fontSize: 15,
+  },
+  noTableBorder: {
+    borderWidth: 2,
+    borderColor: colors.green,
+  },
+  noTableOtherBtns: { backgroundColor: colors.darkerGrey },
+  noTableOtherText: { color: colors.slightlyLighterGrey },
 });
 
 export default TempBottomOptions;

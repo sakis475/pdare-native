@@ -14,7 +14,7 @@ import { colors } from '../../core/theme';
 import { SelectTable } from '../tableSelect/SelectTable';
 import { getStorage } from '../../storage/store';
 import { Portal } from '@gorhom/portal';
-import { reqFetchTables } from '../../helpers/tablesStorage';
+import { reqFetchTables } from '../../helpers/storage/tablesStorage';
 
 interface TableSelectBottomSheetProps {
   handleSelectTable: (table: Table) => void;
@@ -23,6 +23,7 @@ interface TableSelectBottomSheetProps {
 const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
   ({ handleSelectTable }, ref) => {
     const [availableTables, setAvailableTables] = useState<Table[]>([]);
+    const [renderKey, setRenderKey] = useState<number>(0);
 
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => [300, 300], []);
@@ -37,6 +38,7 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
       bottomSheetRef.current?.close();
       Keyboard.dismiss();
       setAvailableTables([]);
+      setRenderKey((prevKey) => prevKey + 1); // Update the key to force re-render
     }, [setAvailableTables]);
 
     const handleSheetChanges = (index: number) => {
@@ -73,6 +75,7 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
         >
           <BottomSheetView style={styles.tableChangeContainer}>
             <SelectTable
+              key={renderKey} // Add key prop to force re-render
               allTables={availableTables}
               onTableSelect={(table: Table) => {
                 handleCloseModal();

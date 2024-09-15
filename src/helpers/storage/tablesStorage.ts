@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import * as Requests from './requests';
-import { getStorage, setStorage } from '../storage/store';
+import * as Requests from '../requests';
+import { getStorage, setStorage } from '../../storage/store';
 
 export const reqFetchTables = async () => {
   const fetchTables: Table[] = await Requests.getRequest('/tables?availableOnly=true');
@@ -10,6 +10,7 @@ export const reqFetchTables = async () => {
 
 export const setTable = async (table: Table) => {
   const order: NewOrder = await getStorage('newOrder');
+  if (!order) return;
   order.table = table;
   await setStorage('newOrder', order);
   return order;

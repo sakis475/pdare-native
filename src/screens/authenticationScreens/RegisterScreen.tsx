@@ -9,11 +9,17 @@ import { colors } from '../../core/theme';
 const logoImage = require('../../../assets/mywaitericon.png');
 
 const RegisterScreen: React.FC = () => {
-  const [userName, setUserName] = useState('');
+  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordRepeat, setPasswordRepeat] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [surnameError, setSurnameError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
 
   const emailValidator = (email: string) => {
     if (!email) return 'Πρέπει να εισάγεται το Email σας';
@@ -25,27 +31,60 @@ const RegisterScreen: React.FC = () => {
   const passwordValidator = (password: string) => {
     if (!password) return 'Πρέπει να εισάγεται τον Κωδικό σας';
     if (password.length < 5) return 'Ο κωδικός πρέπει να είναι τουλάχιστον 5 χαρακτήρες μεγάλος';
+    if (passwordRepeat !== password) return 'Οι κωδικός επαλήθευσης δεν ταιριάζει.';
+    return '';
+  };
+
+  const usernameValidator = (username: string) => {
+    if (!username) return 'Πρέπει να συμπληρώσετε Όνομα Χρήστη';
+    return '';
+  };
+
+  const nameValidator = (name: string) => {
+    if (!name) return 'Πρέπει να συμπληρώσετε το όνομα σας';
+    return '';
+  };
+
+  const surnameValidator = (surname: string) => {
+    if (!surname) return 'Πρέπει να συμπληρώσετε το επίθετο σας';
     return '';
   };
 
   useEffect(() => {
+    setUsernameError('');
+  }, [username]);
+  useEffect(() => {
+    setNameError('');
+  }, [name]);
+  useEffect(() => {
+    setSurnameError('');
+  }, [surname]);
+  useEffect(() => {
     setEmailError('');
+  }, [email]);
+  useEffect(() => {
     setPasswordError('');
-  }, [email, password]);
+  }, [password, passwordRepeat]);
 
   const _onLoginPressed = () => {
+    const usernameError = usernameValidator(username);
     const emailError = emailValidator(email);
     const passwordError = passwordValidator(password);
+    const nameError = nameValidator(name);
+    const surnameError = surnameValidator(surname);
 
-    emailError ? setEmailError(emailError) : setEmailError('');
-    passwordError ? setPasswordError(passwordError) : setPasswordError('');
-    if (emailError || passwordError) {
+    setUsernameError(usernameError);
+    setEmailError(emailError);
+    setPasswordError(passwordError);
+    setNameError(nameError);
+    setSurnameError(surnameError);
+
+    if (usernameError || emailError || passwordError || nameError || surnameError) {
       return;
     }
 
     // Handle login logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
+    console.log(username, email, password, name, surname);
   };
 
   // Shared value for rotation
@@ -99,9 +138,9 @@ const RegisterScreen: React.FC = () => {
             <View style={styles.fieldWrapper}>
               <TextInput
                 label="Όνομα Χρήστη"
-                value={userName}
-                onChangeText={(text) => setUserName(text)}
-                error={!!emailError}
+                value={username}
+                onChangeText={(text) => setUsername(text)}
+                error={!!usernameError}
                 autoCapitalize="none"
                 textContentType="emailAddress"
                 style={styles.input}
@@ -109,22 +148,35 @@ const RegisterScreen: React.FC = () => {
                 underlineColor={colors.lighterGrey}
                 activeUnderlineColor={colors.white}
               />
-              {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
+              {usernameError ? <Text style={styles.error}>{usernameError}</Text> : null}
             </View>
             <View style={styles.fieldWrapper}>
               <TextInput
-                label="Όνομα/Επώνυμο"
-                value={userName}
-                onChangeText={(text) => setUserName(text)}
-                error={!!emailError}
+                label="Όνομα"
+                value={name}
+                onChangeText={(text) => setName(text)}
+                error={!!nameError}
                 autoCapitalize="none"
-                textContentType="emailAddress"
                 style={styles.input}
                 textColor={colors.white}
                 underlineColor={colors.lighterGrey}
                 activeUnderlineColor={colors.white}
               />
-              {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
+              {nameError ? <Text style={styles.error}>{nameError}</Text> : null}
+            </View>
+            <View style={styles.fieldWrapper}>
+              <TextInput
+                label="Επώνυμο"
+                value={surname}
+                onChangeText={(text) => setSurname(text)}
+                error={!!surnameError}
+                autoCapitalize="none"
+                style={styles.input}
+                textColor={colors.white}
+                underlineColor={colors.lighterGrey}
+                activeUnderlineColor={colors.white}
+              />
+              {surnameError ? <Text style={styles.error}>{surnameError}</Text> : null}
             </View>
             {/* Repeat other fields similarly */}
             <View style={styles.fieldWrapper}>
@@ -160,8 +212,8 @@ const RegisterScreen: React.FC = () => {
             <View style={styles.fieldWrapper}>
               <TextInput
                 label="Επαλήθευση Κωδικού"
-                value={password}
-                onChangeText={(text) => setPassword(text)}
+                value={passwordRepeat}
+                onChangeText={(text) => setPasswordRepeat(text)}
                 error={!!passwordError}
                 secureTextEntry={true}
                 style={styles.input}
@@ -223,8 +275,8 @@ const styles = StyleSheet.create({
   formContainer: {
     backgroundColor: '#383838',
     paddingTop: 15,
-    borderTopEndRadius: 10,
-    borderTopStartRadius: 10,
+    marginBottom: 20,
+    borderRadius: 10,
     borderColor: colors.black,
     marginHorizontal: 20,
     flex: 1,

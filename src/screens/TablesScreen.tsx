@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
 import {
   View,
@@ -10,50 +10,44 @@ import {
   SafeAreaView,
   Keyboard,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { TableBox } from '../components/helpers/TableBox';
 
 import { strings } from '../core/strings';
 import { HeaderBar } from '../components/helpers/HeaderBar';
-import { SelectTable } from '../components/tableSelect/SelectTable';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
+
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
 import { Portal, PortalHost } from '@gorhom/portal';
-import { createNewOrder, reqFetchItems } from '../helpers/orderStorage';
+import { createNewOrder } from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
-import { ScreenNames, navigate, navigateToDraft } from '../navigation/AppNavigator';
+import { ScreenNames, navigate } from '../navigation/AppNavigator';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
-const TablesScreen = () => {
-  const [loading, setLoading] = useState(false);
-
-  const [availableTables, setAvailableTables] = useState([]);
-  const navigation = useNavigation();
-
+const TablesScreen = ({ route }: any) => {
+  const isFocused = useIsFocused();
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        fetchData();
+      };
+    }, [])
+  );
   const fetchData = async () => {
     try {
-      // const data = await getRequest("123");
-      // if (data?.id) {
-      //   console.log(data.id, "data.id");
-      //   setReq(data);
-      // }
+      const allTables = await Requests.getRequest('/tables');
+      setActiveTables(allTables);
+      console.log('tablesScreen', allTables);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
 
   useEffect(() => {
+    console.log(isFocused, 'isFocused');
     fetchData(); // Call the fetchData function
-  }, []);
+  }, [isFocused]);
 
-  const [selectedTable, setSelectedTable] = useState(null);
-  const [activeTables, setActiveTables] = useState([
-    { id: 1, tableName: 'TEST', occupiedByOrder: 'order1' },
-    { id: 2, tableName: 'A4', occupiedByOrder: 'order2' },
-    { id: 3, tableName: 'B1', occupiedByOrder: 'order3' },
-    { id: 4, tableName: 'B2', occupiedByOrder: 'order4' },
-    { id: 5, tableName: 'B2', occupiedByOrder: 'order5' },
-  ]);
+  const [activeTables, setActiveTables] = useState<Table[]>([]);
 
   //START TABLE MODAL LOGIC
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
@@ -70,7 +64,7 @@ const TablesScreen = () => {
   //END TABLE MODAL LOGIC
 
   const handleSelectTable = async (table: Table) => {
-    await createNewOrder({ id: 1, isEnabled: true, tableName: 'A1A', tableOrder: 1 });
+    await createNewOrder(table);
     // navigate(ScreenNames.NewOrderScreen, { tableName: table });
     navigate(ScreenNames.NewOrderScreen, { tableName: table.tableName });
   };

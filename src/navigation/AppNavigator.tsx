@@ -19,17 +19,31 @@ import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
 import ManageProductsScreen from '../screens/adminScreens/ManageProductsScreen';
 import Tooltip from 'rn-tooltip';
-import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
+import StartLoadingScreen from '../screens/StartLoadingScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
 
 export function navigate(name: ScreenNames, params?: {}) {
+  if (name === ScreenNames.LoginScreen) {
+    navigateReset(ScreenNames.LoginScreen);
+  }
+
   if (navigationRef.current) {
     navigationRef.current.navigate(name, params);
+  }
+}
+
+export function navigateReset(initialScreen: ScreenNames) {
+  if (navigationRef.current) {
+    navigationRef.current.reset({
+      index: 0,
+      routes: [{ name: initialScreen }],
+    });
   }
 }
 
@@ -39,13 +53,18 @@ export function navigateBack() {
   }
 }
 
-// Function to navigate to MainTabs and switch to Draft tab
 export function navigateToDraft() {
   if (navigationRef.current) {
-    console.log('navigateToDraft entered');
-
     navigationRef.current.navigate('MainTabs', {
       screenIndex: 1,
+    });
+  }
+}
+
+export function navigateToTables() {
+  if (navigationRef.current) {
+    navigationRef.current.navigate('MainTabs', {
+      screenIndex: 0,
     });
   }
 }
@@ -54,10 +73,12 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}>
       <Stack.Screen
-        name={ScreenNames.RegisterScreen}
-        component={RegisterScreen}
+        name={ScreenNames.StartLoadingScreen}
+        component={StartLoadingScreen}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
 
       <Stack.Screen
         name={ScreenNames.LoginScreen}
@@ -65,7 +86,11 @@ const AppNavigator = () => {
         options={{ headerShown: false }}
       />
 
-      <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+      <Stack.Screen
+        name={ScreenNames.RegisterScreen}
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
 
       <Stack.Screen
         name={ScreenNames.NewOrderScreen}
@@ -219,8 +244,6 @@ const MainTabs = ({ route }: any) => {
   //       setIndex(route.params.screenIndex);
   //     }
 
-  //     console.log(index, 'index');
-  //     console.log(route.params?.screenIndex, 'route.params?.screenIndex');
   //   }, [route.params?.screenIndex])
   // );
 
@@ -243,7 +266,6 @@ const MainTabs = ({ route }: any) => {
   const renderScene = BottomNavigation.SceneMap({
     [strings.Tables]: TablesScreen,
     [strings.Draft]: TempOrderScreen,
-    [strings.Login]: LoginScreen,
   });
 
   return (
@@ -272,6 +294,7 @@ const styles = StyleSheet.create({
 });
 
 export enum ScreenNames {
+  MainTabs = 'MainTabs',
   NewOrderScreen = 'newOrderScreen',
   ItemListScreen = 'itemListScreen',
   TempOrderScreen = 'tempOrderScreen',
@@ -280,6 +303,7 @@ export enum ScreenNames {
   RestaurantSettingsScreen = 'restaurantSettingsScreen',
   ManageProductsScreen = 'manageProductsScreen',
   LoginScreen = 'loginScreen',
+  StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',
 }
 export default AppNavigator;

@@ -25,7 +25,7 @@ const TableSelectHorizontalContainer = ({
   onTableSelect: any;
 }) => {
   //TODO: pass search key, filter allTables by search key, sort by name
-  const [allTables, setAllTables] = useState<Table[]>(tables);
+  const [allTables, setAllTables] = useState<Table[]>(tables ?? []);
 
   useEffect(() => {
     filterTable(searchWord);
@@ -82,7 +82,7 @@ const TableSelectHorizontalContainer = ({
           ></TableBox>
         </View>
       ) : allTables.length === 0 ? (
-        <Text style={styles.boxText}>Όλα τα τραπέζια είναι κατειλημμένα.</Text>
+        <Text style={styles.boxText}>Δεν βρέθηκε διαθέσιμο τραπέζι.</Text>
       ) : allTables?.length ? (
         contentWidth > screenWidth ? (
           <ScrollView

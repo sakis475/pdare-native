@@ -45,7 +45,6 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
 
   const handleItemPress = (item: ItemReq) => {
     // Handle the item press event
-    console.log('Item pressed:', item);
     setTimeout(() => {
       handleCloseModal();
     }, 200);

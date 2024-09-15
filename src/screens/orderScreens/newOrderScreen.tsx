@@ -24,7 +24,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { CatalogItem } from '../../components/CatalogItem';
-import { SelectTable } from '../../components/tableSelect/SelectTable';
+
 import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
 import * as Requests from '../../helpers/requests';
@@ -39,17 +39,23 @@ import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
-import { getTableTempOrder, reqFetchItems, setTableTempOrder } from '../../helpers/orderStorage';
+import {
+  getTableTempOrder,
+  reqFetchItems,
+  setTableTempOrder,
+} from '../../helpers/storage/orderStorage';
 
 const NewOrderScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params?.tableName);
   const [items, setItems] = useState<catGroupedItems>();
   const [categories, setCategories] = useState<string[]>([]);
-  const navigation = useNavigation();
-  const [focusedCategoryIndex, setFocusedCategoryIndex] = useState(0);
 
   const fetchItems = async () => {
     const newOrder = await reqFetchItems();
+
+    if (!newOrder) {
+      return;
+    }
     setItems(newOrder);
 
     if (!tableName) {

@@ -1,5 +1,3 @@
-import { Dayjs } from 'dayjs';
-
 type JWTUser = {
   username: string;
   firstName: string;
@@ -11,5 +9,5 @@ type JWTUser = {
 
 export type SessionBearer = {
   token: string;
-  createdAt: Dayjs;
+  info: { expiresAt: string };
 };

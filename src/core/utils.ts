@@ -1,9 +1,9 @@
 import { NavigationProp } from '@react-navigation/native';
-import dayjs, { Dayjs } from 'dayjs';
 import { Alert, Button } from 'react-native';
 import Toast, { ToastType } from 'react-native-toast-message';
 import { Dialog, Portal, Text } from 'react-native-paper';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 
 export const emailValidator = (email: string) => {
   const re = /\S+@\S+\.\S+/;
@@ -26,24 +26,14 @@ export const nameValidator = (name: string) => {
   return '';
 };
 
-export function convertDateToLocal(date: Dayjs | Date) {
-  const now = new Date();
-  const hoursToAdd = -now.getTimezoneOffset() / 60;
-
-  date = dayjs(date);
-
-  date = date.add(hoursToAdd, 'hours');
-
-  return date;
-}
-
 export function toast(type: ToastType, title: string, text: string = '', visibilityTime = 4000) {
   Toast.show({
     type,
     text1: title,
     text2: text,
-    position: 'bottom',
-    bottomOffset: 60,
+    position: 'top',
+    // bottomOffset: 60,
+    topOffset: 10,
     visibilityTime,
   });
 }
@@ -101,3 +91,15 @@ export function AlertWithOptions(
 
   return true; // This prevents the default behavior
 }
+
+export const checkInternetConnectivity = () => {
+  try {
+    NetInfo.fetch().then((state) => {
+      if (!state.isConnected || !state.isInternetReachable) {
+        toast('error', 'No internet connection');
+      }
+    });
+  } catch (error) {
+    console.log('NetInfo failed', error);
+  }
+};

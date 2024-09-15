@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { Divider } from 'react-native-paper';
 import { ScreenNames, navigate } from '../navigation/AppNavigator';
 import { colors } from '../core/theme';
+import { removeAllStorage } from '../storage/store';
 
 const ProfileOptionsScreen = ({ route }: any) => {
   const navigation = useNavigation();
@@ -14,6 +15,11 @@ const ProfileOptionsScreen = ({ route }: any) => {
       id: '1',
       title: 'Restaurant Settings',
       onPress: () => handlePress(ScreenNames.RestaurantSettingsScreen),
+    },
+    {
+      id: '2',
+      title: 'Clear Storage',
+      onPress: () => removeAllStorage(),
     },
   ];
 

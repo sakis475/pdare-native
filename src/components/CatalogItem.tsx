@@ -57,7 +57,6 @@ export function CatalogItem({
   };
 
   const handleEdit = () => {
-    console.log('Edit action triggered');
     handlePress();
     // Add your edit functionality here
   };
@@ -110,7 +109,6 @@ export function CatalogItem({
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              console.log('undelete pressed');
               onAction('undelete');
             }}
             activeOpacity={0.6}

@@ -5,6 +5,8 @@ import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
+import { login } from '../../helpers/storage/tokenRequests';
+import { navigateReset, ScreenNames } from '../../navigation/AppNavigator';
 
 const logoImage = require('../../../assets/mywaitericon.png');
 
@@ -17,8 +19,11 @@ const LoginScreen: React.FC = () => {
 
   const emailValidator = (email: string) => {
     if (!email) return 'Πρέπει να εισάγεται το Email σας';
-    const re = /\S+@\S+\.\S+/;
-    if (!re.test(email)) return 'Ουυπς.Το Email δεν είναι έγκυρο';
+
+    if (email.includes('@')) {
+      const re = /\S+@\S+\.\S+/;
+      if (!re.test(email)) return 'Ουυπς.Το Email δεν είναι έγκυρο';
+    }
     return '';
   };
 
@@ -33,7 +38,7 @@ const LoginScreen: React.FC = () => {
     setPasswordError('');
   }, [email, password]);
 
-  const _onLoginPressed = () => {
+  const _onLoginPressed = async () => {
     const emailError = emailValidator(email);
     const passwordError = passwordValidator(password);
 
@@ -43,9 +48,7 @@ const LoginScreen: React.FC = () => {
       return;
     }
 
-    // Handle login logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
+    await login(email, password);
   };
 
   // Shared value for rotation

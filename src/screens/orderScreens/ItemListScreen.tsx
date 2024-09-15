@@ -20,33 +20,16 @@ import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBot
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
 import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
-import { setTableTempOrder } from '../../helpers/orderStorage';
-import { getHelperStorage } from '../../helpers/helpersStorage';
+import { setTableTempOrder } from '../../helpers/storage/orderStorage';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>([]);
 
-  const isFocused = useIsFocused();
-
-  const comingFromPreviewEditItemDetail = async () => {
-    const helperStorage = await getHelperStorage();
-
-    if (helperStorage.isBackFromPreview) {
-      console.log('is back from preview');
-    } else {
-      console.log('is not back from preview call true setForceOpenTempOrderModal');
-    }
-  };
-
-  useEffect(() => {
-    comingFromPreviewEditItemDetail();
-  }, [isFocused]);
-
   const fetchItems = async () => {
-    const fetchItems: catGroupedItems = await getStorage('groupedItems');
+    const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
 
-    const categoryItems = fetchItems[categoryTitle];
+    const categoryItems = fetchedItems[categoryTitle];
 
     setItems(categoryItems);
   };

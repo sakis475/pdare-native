@@ -63,12 +63,16 @@ interface Table {
   isEnabled: boolean;
   tableName: string;
   tableOrder: number;
+  occupiedByOrder?: NewOrder;
 }
 
 interface NewOrder {
   table: Table;
   items: ItemReq[];
   comment?: string;
+  createdAt?: string;
+  closedAt?: string;
+  orderItems?: any;
 }
 
 interface SendOrderItem {
@@ -84,7 +88,7 @@ interface OrderNavigationState {
 }
 
 interface CreateNewOrderRequest {
-  table: number;
+  table: number | string;
   comment: string;
   items: NewOrderRequestItem[];
 }
@@ -93,4 +97,12 @@ interface NewOrderRequestItem {
   itemProperties: number[];
   quantity: number;
   comment: string;
+}
+
+interface User {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
 }

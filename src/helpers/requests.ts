@@ -1,69 +1,68 @@
-import axios, { isAxiosError } from 'axios';
+import axios, { Axios, AxiosError } from 'axios';
 import { BASE_URL, REQ_TIMEOUT } from '../storage/env';
 
 import { SessionBearer } from '../types/requests.types';
 import { getStorage, setStorage } from '../storage/store';
-import dayjs from 'dayjs';
-import { toast } from '../core/utils';
+
+import { checkInternetConnectivity, toast } from '../core/utils';
+import { navigate, ScreenNames } from '../navigation/AppNavigator';
+import dayjs, { datetimeDiff } from '../core/dayjs';
+
+export async function refreshToken() {
+  const bearer: SessionBearer | null = await getStorage('session_bearer');
+  console.log(bearer, 'bearer');
+  if (!bearer) {
+    //go to login page
+    navigate(ScreenNames.LoginScreen);
+    return;
+  }
+
+  try {
+    const refreshToken: SessionBearer = await postRequest('/login/session', {
+      jwt: bearer?.token,
+    });
+
+    if (refreshToken) {
+      await setBearer(refreshToken);
+      return refreshToken;
+    } else {
+      //go to login page
+      navigate(ScreenNames.LoginScreen);
+      return;
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response?.data.appcode === 'AU02') {
+        toast('error', 'Your session is expired');
+      }
+    } else {
+      toast('error', 'Something bad happened...');
+    }
+    navigate(ScreenNames.LoginScreen);
+  }
+}
 
 export async function getBearer() {
-  try {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcyMjEyMjEyMSwiZXhwIjoxNzIyNzI2OTIxfQ.NByPEUNbMy8o_nc9KUAURe2QQmoGZyBWu4HUu6eLGSc';
-
-    const bearer: SessionBearer = await getStorage('session_bearer');
-    if (!bearer) {
-      //go to login page
-      console.log('REDIRECT TO LOGIN PAGE0');
-    }
-
-    const tokenMinutes = dayjs().diff(dayjs(bearer.createdAt), 'minutes');
-
-    //if it is past 6 days then request a new one
-    if (tokenMinutes > 8640 && tokenMinutes < 10080 && bearer?.token) {
-      const refreshToken = await postRequest('/login/session', {
-        jwt: bearer?.token,
-      }); //await axios.post("/login/session", bearer.token);
-
-      console.log(refreshToken);
-
-      if (refreshToken) {
-        const tokenJWT = refreshToken;
-        if (!tokenJWT) {
-          //go to login page
-          console.log('REDIRECT TO LOGIN PAGE1');
-        } else {
-          await setBearer(tokenJWT);
-        }
-      } else {
-        //go to login page
-        console.log('REDIRECT TO LOGIN PAGE2');
-      }
-    }
-
-    return bearer;
-  } catch (error) {
-    toast('error', 'Something bad happened...');
+  const bearer: SessionBearer | null = await getStorage('session_bearer');
+  console.log(bearer, 'bearer');
+  if (!bearer) {
+    //go to login page
+    navigate(ScreenNames.LoginScreen);
+    return;
   }
+
+  const tokenMinutes = datetimeDiff(dayjs(bearer.info.expiresAt), dayjs(), 'minutes');
+
+  //if its not valid for 10 mins then request a new one
+  if (bearer?.token && tokenMinutes < 10) {
+    return await refreshToken();
+  }
+  return bearer;
 }
 
-export async function setBearer(token: string) {
+export async function setBearer(sessionBearer: SessionBearer) {
   try {
-    await setStorage('session_bearer', { token, createdAt: dayjs() });
-  } catch (error) {
-    toast('error', 'Something bad happened...');
-  }
-}
-
-export async function login(username: string, password: string) {
-  try {
-    const res = await postRequest('/login', { username, password });
-
-    if (res) {
-      await setBearer(res);
-      return true;
-    }
-
-    return false;
+    await setStorage('session_bearer', sessionBearer);
   } catch (error) {
     toast('error', 'Something bad happened...');
   }
@@ -71,10 +70,14 @@ export async function login(username: string, password: string) {
 
 export async function getRequest(url: string) {
   try {
+    checkInternetConnectivity();
     const auth = await getBearer();
+    if (!auth) {
+      return;
+    }
     const options = {
       headers: {
-        Authorization: `Bearer ${auth}`,
+        Authorization: `Bearer ${auth?.token}`,
       },
       timeout: REQ_TIMEOUT,
     };
@@ -83,22 +86,22 @@ export async function getRequest(url: string) {
     const response = await axios.get(BASE_URL + url, options);
     return response.data;
   } catch (error) {
-    console.log(error);
-    toast('error', 'Error: Something bad happened...');
+    handleAxiosError(error as AxiosError);
   }
 }
 
 export async function postRequest(url: string, body?: any) {
   try {
+    checkInternetConnectivity();
     let options = {};
 
-    if (url !== '/login' && url !== '/login/session') {
+    if (!['/login', '/login/session'].includes(url)) {
       const auth = await getBearer();
 
       if (auth) {
         options = {
           headers: {
-            Authorization: `Bearer ${auth}`,
+            Authorization: `Bearer ${auth.token}`,
           },
           timeout: REQ_TIMEOUT,
         };
@@ -108,30 +111,34 @@ export async function postRequest(url: string, body?: any) {
     const response = await axios.post(BASE_URL + url, body, options);
     return response.data;
   } catch (error) {
-    toast('error', 'Something bad happened...');
+    handleAxiosError(error as AxiosError);
   }
 }
 
-export async function updateIsEnabled(url: string, body?: any) {
-  try {
-    let config = {
-      headers: {
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNha2lzIiwiZmlyc3ROYW1lIjoizpjOrM69zr_PgiIsInJvbGUiOiJvd25lciIsImxhc3ROYW1lIjoizqDOuc-AzrvOuc66zqzPhM-DzrfPgiIsImlhdCI6MTcxNTEwOTk2MSwiZXhwIjoxNzE1NzE0NzYxfQ.uewporfS8qeuRGioLzQQ5RzsY2FP6pJ-hpvtfotQUdo`,
-      },
-      data: body, // Data to be sent in the body of the request
-      timeout: REQ_TIMEOUT,
-    };
+function handleAxiosError(error: any) {
+  if (axios.isAxiosError(error)) {
+    if (error?.response?.data?.appcode) {
+      switch (error.response.data.appcode) {
+        case 'DT10':
+          toast('error', 'Table is occupied, choose other table', '', 2500);
+          break;
 
-    // if (url !== '/login' && url !== '/login/session') {
-    //   const bearer = await getBearer();
-    //   if (bearer) {
-    //     config.headers['Authorization'] = `Bearer ${bearer.token}`;
-    //   }
-    // }
+        default:
+          toast('error', error.response.data.message, '', 2500);
+          break;
+      }
+    } else if (error.request) {
+      toast('error', 'No Server Response', '', 2000);
+    } else {
+      toast('error', error?.message);
+    }
+  } else {
+    console.error('Unexpected error:', error);
 
-    const response = await axios.delete(BASE_URL + url, config);
-    return response.data;
-  } catch (error) {
-    console.error(error); // It's a good practice to log the error for debugging purposes
+    toast('error', 'An error occurred while processing your request');
+  }
+
+  if (error?.response?.status === 401) {
+    navigate(ScreenNames.LoginScreen);
   }
 }
