@@ -9,8 +9,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { strings } from '../../core/strings';
-import { sortNumberAndStrings } from '../../core/utils';
 import { colors } from '../../core/theme';
 
 const boxSize = 80;

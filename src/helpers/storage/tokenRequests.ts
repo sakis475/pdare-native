@@ -1,10 +1,5 @@
 import { toast } from '../../core/utils';
-import {
-  navigate,
-  navigateReset,
-  navigateToTables,
-  ScreenNames,
-} from '../../navigation/AppNavigator';
+import { navigate, navigateReset, ScreenNames } from '../../navigation/AppNavigator';
 import { SessionBearer } from '../../types/requests.types';
 import { postRequest, setBearer } from '../requests';
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TouchableHighlight } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AlertWithOptions } from '../../core/utils';

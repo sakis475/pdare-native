@@ -1,8 +1,5 @@
-import { NavigationProp } from '@react-navigation/native';
-import { Alert, Button } from 'react-native';
+import { Alert } from 'react-native';
 import Toast, { ToastType } from 'react-native-toast-message';
-import { Dialog, Portal, Text } from 'react-native-paper';
-import { useEffect, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 
 export const emailValidator = (email: string) => {

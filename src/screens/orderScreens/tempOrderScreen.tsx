@@ -24,26 +24,19 @@ import {
   Keyboard,
   SafeAreaView,
 } from 'react-native';
-import { CatalogItem } from '../../components/CatalogItem';
-import { NavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
+
 import { Divider, Portal } from 'react-native-paper';
-import * as Requests from '../../helpers/requests';
-import { getStorage, setStorage } from '../../storage/store';
-import { HeaderBackButton } from '@react-navigation/elements';
-import { AlertWithOptions } from '../../core/utils';
+
 import { colors } from '../../core/theme';
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
+import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import {
   createNewOrder,
   getTempOrder,
   setTableTempOrder,
 } from '../../helpers/storage/orderStorage';
-import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdded';
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
 import { HeaderBar } from '../../components/helpers/HeaderBar';
@@ -57,7 +50,6 @@ const TempOrderScreen = ({
   const [tableName, setTableName] = useState('');
   const [items, setItems] = useState<ItemReq[]>();
   const [refreshList, setRefreshList] = useState(false);
-  const isFocused = useIsFocused();
 
   const fetchItems = async () => {
     const tempOrder: NewOrder = await getTempOrder();
@@ -68,7 +60,7 @@ const TempOrderScreen = ({
 
   useEffect(() => {
     fetchItems();
-  }, [route, isFocused, isSheetOpen]);
+  }, [route, isSheetOpen]);
 
   const handleSelectTable = async (table: Table) => {
     if (!items.length && table?.id) {

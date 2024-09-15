@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { TextInput } from 'react-native-paper';
-import { strings } from '../../core/strings';
 import TableSelectHorizontalContainer from './TableSelectHorizontalContainer';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '../../core/theme';

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import { colors } from '../../core/theme';

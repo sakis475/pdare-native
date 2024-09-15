@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { BASE_URL, REQ_TIMEOUT } from '../storage/env';
 
 import { SessionBearer } from '../types/requests.types';

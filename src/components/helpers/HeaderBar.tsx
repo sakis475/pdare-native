@@ -1,13 +1,10 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
 import { colors } from '../../core/theme';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 
 export function HeaderBar({ headerTitle }: { headerTitle?: string }) {
-  const navigation = useNavigation();
-
   return (
     <View style={styles.headerBarContainer}>
       <View>

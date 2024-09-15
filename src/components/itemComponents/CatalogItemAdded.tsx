@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';

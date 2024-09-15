@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
-import {
-  Text,
-  StyleSheet,
-  View,
-  Touchable,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import QuantitySelector from './helpers/QuantitySelector'; // Make sure the path is correct
-import { AlertWithOptions, toast } from '../core/utils';
-import * as Requests from '../helpers/requests';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { colors } from '../core/theme';
 import { CurrencyFormat } from './helpers/CurrencyFormat';
@@ -70,12 +62,6 @@ export function CatalogItem({
   };
 
   return (
-    // <TouchableWithoutFeedback
-    //   onPress={handlePress}
-    //   onPressIn={handlePressIn}
-    //   onPressOut={handlePressOut}
-    //   disabled={type === 'Deleted'}
-    // >
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <Text
@@ -124,7 +110,6 @@ export function CatalogItem({
         ></SortButtons>
       ) : null}
     </View>
-    // </TouchableWithoutFeedback>
   );
 }
 const styles = StyleSheet.create({

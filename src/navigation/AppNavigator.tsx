@@ -1,19 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BottomNavigation, Text } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import TablesScreen from '../screens/TablesScreen';
 import LoginScreen from '../screens/authenticationScreens/LoginScreen';
-import { setLocalizedStrings, strings } from '../core/strings';
+import { strings } from '../core/strings';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
 import RestaurantSettingsScreen from '../screens/adminScreens/RestaurantSettingsScreen';
 import NewOrderScreen from '../screens/orderScreens/newOrderScreen';
-import {
-  NavigationContainer,
-  NavigationContainerRef,
-  useFocusEffect,
-} from '@react-navigation/native';
+import { NavigationContainerRef } from '@react-navigation/native';
 import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';

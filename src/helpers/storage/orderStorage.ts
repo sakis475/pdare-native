@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as Requests from '../requests';
-import { getStorage, removeItemStorage, setStorage } from '../../storage/store';
+import { getStorage, setStorage } from '../../storage/store';
 import uuid from 'react-native-uuid';
 
 export const reqFetchItems = async () => {

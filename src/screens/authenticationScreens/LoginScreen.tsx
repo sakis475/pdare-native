@@ -6,7 +6,6 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-na
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
 import { login } from '../../helpers/storage/tokenRequests';
-import { navigateReset, ScreenNames } from '../../navigation/AppNavigator';
 
 const logoImage = require('../../../assets/mywaitericon.png');
 

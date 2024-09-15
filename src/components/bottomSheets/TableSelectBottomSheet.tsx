@@ -8,11 +8,8 @@ import React, {
 } from 'react';
 import { Keyboard, StyleSheet } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
-
-import * as Requests from '../../helpers/requests';
 import { colors } from '../../core/theme';
 import { SelectTable } from '../tableSelect/SelectTable';
-import { getStorage } from '../../storage/store';
 import { Portal } from '@gorhom/portal';
 import { reqFetchTables } from '../../helpers/storage/tablesStorage';
 

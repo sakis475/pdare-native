@@ -9,10 +9,8 @@ import React, {
   useState,
 } from 'react';
 import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
-import * as Requests from '../../helpers/requests';
-import { getStorage, setStorage } from '../../storage/store';
+import { getStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';

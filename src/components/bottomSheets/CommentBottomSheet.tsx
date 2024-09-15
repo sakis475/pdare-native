@@ -14,7 +14,6 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../core/theme';
 import { TextInput } from 'react-native-paper';
 import { CategoryHeader } from '../helpers/CategoryHeader';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface CommentBottomSheetProps {
   item: ItemReq;

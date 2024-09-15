@@ -8,7 +8,7 @@ import {
 } from '../../helpers/storage/orderStorage';
 import { toast } from '../../core/utils';
 import { postRequest } from '../../helpers/requests';
-import { navigate, navigateToTables, ScreenNames } from '../../navigation/AppNavigator';
+import { navigateToTables } from '../../navigation/AppNavigator';
 
 interface TempBottomOptionsProps {
   tableName: string;

@@ -2,8 +2,6 @@ import LocalizedStrings from 'react-native-localization';
 import { getStorage, setStorage } from '../storage/store';
 import { DEFAULT_APP_LANGUAGE } from '../storage/env';
 
-import lang_en from './locales/lang_en.json';
-import lang_fr from './locales/lang_fr.json';
 import lang_el from './locales/lang_el.json';
 
 export const strings = new LocalizedStrings({

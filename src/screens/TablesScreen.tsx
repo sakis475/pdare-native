@@ -17,7 +17,7 @@ import { HeaderBar } from '../components/helpers/HeaderBar';
 
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
-import { Portal, PortalHost } from '@gorhom/portal';
+import { Portal } from '@gorhom/portal';
 import { createNewOrder } from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
 import { ScreenNames, navigate } from '../navigation/AppNavigator';

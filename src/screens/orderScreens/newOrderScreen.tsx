@@ -1,40 +1,13 @@
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
-  FlatList,
-  Alert,
-  BackHandler,
-  KeyboardAvoidingView,
-  Platform,
-  Dimensions,
   ActivityIndicator,
   Keyboard,
 } from 'react-native';
-import { CatalogItem } from '../../components/CatalogItem';
-
-import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
-import { Divider } from 'react-native-paper';
-import * as Requests from '../../helpers/requests';
-import { getStorage, setStorage } from '../../storage/store';
-import { HeaderBackButton } from '@react-navigation/elements';
-import { AlertWithOptions } from '../../core/utils';
 import { colors } from '../../core/theme';
-
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';

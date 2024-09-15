@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Text, TextInput, Button, Divider } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
 
 const logoImage = require('../../../assets/mywaitericon.png');
