@@ -29,7 +29,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
 
   const handleOrderSend = async () => {
     const newOrder = await getTempOrder();
-    if (!newOrder?.items?.length || newOrder?.items?.length === 0) {
+    if (!newOrder?.orderItems?.length || newOrder?.orderItems?.length === 0) {
       toast('info', 'Add Items First', '', 1600);
       return;
     }

@@ -1,29 +1,5 @@
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-  Alert,
-  BackHandler,
-  KeyboardAvoidingView,
-  Platform,
-  Dimensions,
-  ActivityIndicator,
-  Keyboard,
-  SafeAreaView,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Keyboard, SafeAreaView } from 'react-native';
 
 import { Divider, Portal } from 'react-native-paper';
 
@@ -52,10 +28,10 @@ const TempOrderScreen = ({
   const [refreshList, setRefreshList] = useState(false);
 
   const fetchItems = async () => {
-    const tempOrder: NewOrder = await getTempOrder();
+    const tempOrder: Order = await getTempOrder();
 
     setTableName(tempOrder?.table?.tableName);
-    setItems(tempOrder?.items ?? []);
+    setItems(tempOrder?.orderItems ?? []);
   };
 
   useEffect(() => {

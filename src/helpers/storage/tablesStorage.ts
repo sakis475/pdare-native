@@ -9,7 +9,7 @@ export const reqFetchTables = async () => {
 };
 
 export const setTable = async (table: Table) => {
-  const order: NewOrder = await getStorage('newOrder');
+  const order: Order = await getStorage('newOrder');
   if (!order) return;
   order.table = table;
   await setStorage('newOrder', order);

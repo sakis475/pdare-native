@@ -2,7 +2,7 @@ import { AppLanguage } from '../core/strings';
 
 export const ENV_TYPE: 'PROD' | 'DEV' = 'DEV';
 export const BASE_URL =
-  'https://ee4b-2a10-9300-400-e40-5a93-a70e-2908-b2e.ngrok-free.app' + '/api/v1';
+  'https://0209-2a10-9300-400-e40-5a93-a70e-2908-b2e.ngrok-free.app' + '/api/v1';
 export const DEFAULT_APP_LANGUAGE: AppLanguage = 'lang_en';
 export const REQ_TIMEOUT = 15000;
 

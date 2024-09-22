@@ -11,7 +11,7 @@ export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
   );
   const elapsedTime = table.occupiedByOrder?.createdAt
     ? minutesPassed > 240
-      ? '240' + "'"
+      ? '240' + "'+"
       : minutesPassed + "'"
     : '';
   return (

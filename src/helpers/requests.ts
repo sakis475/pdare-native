@@ -10,7 +10,6 @@ import dayjs, { datetimeDiff } from '../core/dayjs';
 
 export async function refreshToken() {
   const bearer: SessionBearer | null = await getStorage('session_bearer');
-  console.log(bearer, 'bearer');
   if (!bearer) {
     //go to login page
     navigate(ScreenNames.LoginScreen);

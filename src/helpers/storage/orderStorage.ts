@@ -2,7 +2,9 @@ import _ from 'lodash';
 import * as Requests from '../requests';
 import { getStorage, setStorage } from '../../storage/store';
 import uuid from 'react-native-uuid';
+import { isEnabled } from 'react-native/Libraries/Performance/Systrace';
 
+/* Fetches all items of the catalogue and stores them in a custom format */
 export const reqFetchItems = async () => {
   const fetchItems: ItemReq[] = await Requests.getRequest('/items');
 
@@ -29,7 +31,7 @@ export const getGroupedItems = async () => {
 
 //+++++++ New Order Storage ++++++++//
 export const setTableTempOrder = async (table: Table) => {
-  const order: NewOrder | null = await getStorage('newOrder');
+  const order: Order | null = await getStorage('newOrder');
 
   if (!order) return null;
 
@@ -41,7 +43,7 @@ export const setTableTempOrder = async (table: Table) => {
 };
 
 export const getTableTempOrder = async () => {
-  const order: NewOrder | null = await getStorage('newOrder');
+  const order: Order | null = await getStorage('newOrder');
 
   if (order?.table) {
     return order.table;
@@ -50,11 +52,11 @@ export const getTableTempOrder = async () => {
   }
 };
 
-export const createNewOrder = async (table: Table): Promise<NewOrder> => {
-  const newOrder: NewOrder = {
+export const createNewOrder = async (table: Table): Promise<Order> => {
+  const newOrder: Order = {
     table: table,
     comment: '',
-    items: [],
+    orderItems: [],
   };
 
   await setStorage('newOrder', newOrder);
@@ -62,57 +64,48 @@ export const createNewOrder = async (table: Table): Promise<NewOrder> => {
   return newOrder;
 };
 
-export const getTempOrder = async (): Promise<NewOrder | null> => {
-  const tempOrder: NewOrder | null = await getStorage('newOrder');
+export const getTempOrder = async (): Promise<Order | null> => {
+  const tempOrder: Order | null = await getStorage('newOrder');
 
   return tempOrder;
 };
 
 export const addNewItemToTemp = async (item: ItemReq) => {
-  const tempOrder: NewOrder | null = await getStorage('newOrder');
+  const tempOrder: Order | null = await getStorage('newOrder');
 
-  // const existingItemIndex = tempOrder.items?.findIndex((i) => {
-  //   return i.id === item.id && _.isEqual(i.itemPropertiesGrouped, item.itemPropertiesGrouped);
-  // });
-  // if (existingItemIndex >= 0) {
-  //   //handle already existing item
-  //   tempOrder.items[existingItemIndex].quantity =
-  //     (tempOrder.items[existingItemIndex].quantity || 1) + 1;
-  // } else {
   const newItemId: string = uuid.v4() as string;
-  tempOrder!.items.push({ ...item, quantity: 1, newItemId });
-  // }
+  tempOrder!.orderItems.push({ ...item, quantity: 1, newItemId });
   await setStorage('newOrder', tempOrder);
 };
 
 export const updateQuantityOfTempItem = async (quantity: number, newItemId: string) => {
   if (!quantity) return;
-  const tempOrder: NewOrder | null = await getStorage('newOrder');
-  const itemIndex = tempOrder!.items.findIndex((e) => e.newItemId === newItemId);
+  const tempOrder: Order | null = await getStorage('newOrder');
+  const itemIndex = tempOrder!.orderItems.findIndex((e) => e.newItemId === newItemId);
 
   if (itemIndex !== -1) {
-    tempOrder!.items[itemIndex].quantity = quantity;
+    tempOrder!.orderItems[itemIndex].quantity = quantity;
     await setStorage('newOrder', tempOrder);
   }
 };
 
 export const updateItemOfTempItem = async (item: ItemReq, newItemId: string) => {
-  const tempOrder: NewOrder | null = await getStorage('newOrder');
-  const itemIndex = tempOrder!.items.findIndex((e) => e.newItemId === newItemId);
+  const tempOrder: Order | null = await getStorage('newOrder');
+  const itemIndex = tempOrder!.orderItems.findIndex((e) => e.newItemId === newItemId);
 
   if (itemIndex !== -1) {
-    tempOrder!.items[itemIndex] = item;
+    tempOrder!.orderItems[itemIndex] = item;
     await setStorage('newOrder', tempOrder);
   }
 };
 
 export const removeItemOfTemp = async (newItemId: string) => {
-  const tempOrder: NewOrder | null = await getStorage('newOrder');
+  const tempOrder: Order | null = await getStorage('newOrder');
 
-  const itemIndex = tempOrder!.items.findIndex((i) => i.newItemId === newItemId);
+  const itemIndex = tempOrder!.orderItems.findIndex((i) => i.newItemId === newItemId);
 
   if (itemIndex !== -1) {
-    tempOrder!.items.splice(itemIndex, 1);
+    tempOrder!.orderItems.splice(itemIndex, 1);
     await setStorage('newOrder', tempOrder);
     return tempOrder;
   } else {
@@ -124,8 +117,8 @@ export const isItemPropertiesGrouped = (value: any): value is ItemPropertiesGrou
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
 
-export const convertNewOrderToRequestObject = (newOrder: NewOrder): CreateNewOrderRequest => {
-  const newOrderRequestItems = newOrder?.items.map((item) => {
+export const convertNewOrderToRequestObject = (newOrder: Order): CreateNewOrderRequest => {
+  const newOrderRequestItems = newOrder?.orderItems.map((item) => {
     const newOrderRequestItem: NewOrderRequestItem = {
       id: item.id,
       itemProperties: [],
@@ -159,11 +152,59 @@ export const convertNewOrderToRequestObject = (newOrder: NewOrder): CreateNewOrd
 };
 
 export const clearNewOrder = async () => {
-  const clearOrder: NewOrder = {
+  const clearOrder: Order = {
     table: null,
     comment: '',
-    items: [],
+    orderItems: [],
   };
 
   await setStorage('newOrder', clearOrder);
+};
+
+/**  */
+/**
+ * Converts table.occupiedByOrder to Order (storage-> newOrder)
+ */
+export const convertOccupiedOrderToOrder = async (tableio: TableIO): Promise<Order> => {
+  const items: ItemReq[] = await Requests.getRequest('/items');
+  const occupiedByOrder = tableio.occupiedByOrder;
+  if (!items || occupiedByOrder?.orderItems?.length < 1) {
+    return null;
+  }
+
+  const table: Table = {
+    id: tableio.id,
+    tableName: tableio.tableName,
+    isEnabled: tableio.isEnabled,
+    tableOrder: tableio.tableOrder,
+  };
+
+  const order: Order = {
+    table: table,
+    orderItems: [],
+    comment: occupiedByOrder.comment,
+    createdAt: occupiedByOrder.createdAt,
+  };
+
+  for (const orderItem of occupiedByOrder.orderItems) {
+    const originalItem = items.find((e) => e.id === orderItem.item?.id);
+    originalItem.newItemId = uuid.v4() as string;
+    originalItem.quantity = orderItem.quantity;
+    originalItem.comment = orderItem.comment;
+    const propertiesIds = orderItem.itemPropertyOfItem.map((e) => e.itemProperty.id);
+    for (const group of Object.values(originalItem.itemPropertiesGrouped)) {
+      for (const property of group) {
+        if (propertiesIds.includes(property.id)) {
+          property.selected = true;
+        }
+      }
+    }
+
+    order.orderItems.push(originalItem);
+  }
+  return order;
+};
+
+export const updateActiveOrdersStorage = async (activeOrders: Order[]) => {
+  return await setStorage('activeOrders', activeOrders);
 };

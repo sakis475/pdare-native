@@ -8,6 +8,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PortalProvider } from '@gorhom/portal';
+import { ENV_TYPE } from './src/storage/env';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -16,6 +17,9 @@ const App = () => {
     const initializeApp = async () => {
       await setLocalizedStrings();
       setLocalizedStringsLoaded(true);
+      if (ENV_TYPE === 'DEV') {
+        require('./src/helpers/Reactotron.js');
+      }
     };
     initializeApp();
   }, []);

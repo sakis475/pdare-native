@@ -18,10 +18,15 @@ import { HeaderBar } from '../components/helpers/HeaderBar';
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
 import { Portal } from '@gorhom/portal';
-import { createNewOrder } from '../helpers/storage/orderStorage';
+import {
+  convertOccupiedOrderToOrder,
+  createNewOrder,
+  updateActiveOrdersStorage,
+} from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
 import { ScreenNames, navigate } from '../navigation/AppNavigator';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { setStorage } from '../storage/store';
 
 const TablesScreen = ({ route }: any) => {
   const isFocused = useIsFocused();
@@ -35,8 +40,16 @@ const TablesScreen = ({ route }: any) => {
   const fetchData = async () => {
     try {
       const allTables = await Requests.getRequest('/tables');
+
+      const activeOrders: Order[] = [];
+      for (const table of allTables) {
+        if (!table.occupiedByOrder) continue;
+        const converted = await convertOccupiedOrderToOrder(table);
+        activeOrders.push(converted);
+      }
+
+      await updateActiveOrdersStorage(activeOrders);
       setActiveTables(allTables);
-      console.log('tablesScreen', allTables);
     } catch (error) {
       console.error('Error fetching data:', error);
     }

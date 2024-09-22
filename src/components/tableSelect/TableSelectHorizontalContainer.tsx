@@ -23,14 +23,14 @@ const TableSelectHorizontalContainer = ({
   onTableSelect: any;
 }) => {
   //TODO: pass search key, filter allTables by search key, sort by name
-  const [allTables, setAllTables] = useState<Table[]>(tables ?? []);
+  const [allTables, setAllTables] = useState<Table[]>(tables?.length ? tables : []);
 
   useEffect(() => {
     filterTable(searchWord);
   }, [searchWord]);
 
   useEffect(() => {
-    setAllTables(tables);
+    setAllTables(tables ?? []);
   }, [tables]);
 
   const handleTableSelect = (table: Table) => {
@@ -64,7 +64,7 @@ const TableSelectHorizontalContainer = ({
   };
 
   const screenWidth = Dimensions.get('window').width;
-  const numColumns = Math.ceil(allTables.length / 2);
+  const numColumns = allTables?.length > 0 ? Math.ceil(allTables.length / 2) : 0;
   const contentWidth = (numColumns + 1) * boxSize; // Assuming each box has a width of 30 and margin of 5
 
   return (

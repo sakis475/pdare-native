@@ -63,16 +63,15 @@ interface Table {
   isEnabled: boolean;
   tableName: string;
   tableOrder: number;
-  occupiedByOrder?: NewOrder;
+  occupiedByOrder?: Order;
 }
 
-interface NewOrder {
+interface Order {
   table: Table;
-  items: ItemReq[];
+  orderItems: ItemReq[];
   comment?: string;
   createdAt?: string;
   closedAt?: string;
-  orderItems?: any;
 }
 
 interface SendOrderItem {
