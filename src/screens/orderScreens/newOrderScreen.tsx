@@ -14,22 +14,23 @@ import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBot
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import {
   getTableTempOrder,
+  getTempOrder,
   reqFetchItems,
   setTableTempOrder,
+  setTempOrder,
 } from '../../helpers/storage/orderStorage';
 
-const NewOrderScreen = ({ route }: any) => {
-  const [tableName, setTableName] = useState(route.params?.tableName);
-  const [items, setItems] = useState<catGroupedItems>();
+const NewOrderScreen = ({ route, navigation }: any) => {
+  const [tableName, setTableName] = useState(route.params?.table?.tableName);
   const [categories, setCategories] = useState<string[]>([]);
+
+  const [headerTitle, setHeaderTitle] = useState('');
 
   const fetchItems = async () => {
     const newOrder = await reqFetchItems();
-
     if (!newOrder) {
       return;
     }
-    setItems(newOrder);
 
     if (!tableName) {
       const fetchTempTable = await getTableTempOrder();
@@ -38,11 +39,32 @@ const NewOrderScreen = ({ route }: any) => {
 
     const categories = Object.keys(newOrder);
     setCategories(categories);
+
+    const tempOrder = await getTempOrder();
+
+    const newTitle = !!tempOrder?.orderItems?.[0]?.alreadySend
+      ? 'Ενημέρωση Παραγγελίας'
+      : 'Καινούργια Παραγγελία';
+
+    setHeaderTitle(newTitle); // Update the title in state
+
+    if (tempOrder?.table?.id !== route.params?.table?.id && route.params?.table?.occupiedByOrder) {
+      await setTempOrder(route.params.table.occupiedByOrder);
+    }
   };
 
   useEffect(() => {
+    console.log(route.params?.table?.occupiedByOrder, 'new table!');
     fetchItems();
-  }, []);
+  }, [route.params?.table?.id]);
+
+  useEffect(() => {
+    if (navigation && headerTitle) {
+      navigation.setOptions({
+        headerTitle: headerTitle,
+      });
+    }
+  }, [navigation, headerTitle]);
 
   const handleSelectTable = (table: Table) => {
     setTableName(table.tableName);
@@ -98,7 +120,6 @@ const NewOrderScreen = ({ route }: any) => {
               numColumns={3}
             />
           </View>
-
           <OrderBottomOptions
             tableName={tableName}
             handleOpenModal={handleOpenModal}

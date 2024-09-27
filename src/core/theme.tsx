@@ -26,6 +26,7 @@ export const colors = {
 
   white: '#fff',
 
+  darkBlue: '#1844e2',
   blue: '#3058E9',
 
   lightBlack: '#333',
@@ -36,4 +37,6 @@ export const colors = {
   orange: '#e77e18',
 
   lightRed: '#ff272e',
+  veryLightRed: '#ff4349',
+  veryLighterRed: '#ff999c',
 };

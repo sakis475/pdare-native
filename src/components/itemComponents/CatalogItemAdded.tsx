@@ -84,7 +84,15 @@ export function CatalogItemAdded({
                 </Text>
               ) : null}
               {item.comment ? (
-                <Text style={[styles.itemDetails, { fontStyle: 'italic' }]}>{item.comment}</Text>
+                <Text
+                  style={[
+                    styles.itemDetails,
+                    { fontStyle: 'italic', justifyContent: 'center', alignItems: 'center' },
+                  ]}
+                >
+                  <MaterialIcons name="insert-comment"></MaterialIcons>
+                  {' ' + item.comment}
+                </Text>
               ) : null}
               <CurrencyFormat value={totalCost} currency={'€'} fontSize={12}></CurrencyFormat>
             </Animated.View>

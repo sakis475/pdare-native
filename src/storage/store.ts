@@ -53,6 +53,7 @@ interface StorageTypes {
   groupedItems: catGroupedItems;
   newOrder: Order;
   userInfo: User;
+  activeOrders: Order[];
 }
 
 // Type for storage keys

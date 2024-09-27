@@ -11,12 +11,15 @@ import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBot
 import {
   createNewOrder,
   getTempOrder,
+  markActiveItemForDelete,
   setTableTempOrder,
 } from '../../helpers/storage/orderStorage';
 import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdded';
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
 import { HeaderBar } from '../../components/helpers/HeaderBar';
 import { strings } from '../../core/strings';
+import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
+import { useIsFocused } from '@react-navigation/native';
 const TempOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -24,30 +27,36 @@ const TempOrderScreen = ({
   onItemPress = () => {},
 }: any) => {
   const [tableName, setTableName] = useState('');
+  const [table, setTable] = useState<Table>();
   const [items, setItems] = useState<ItemReq[]>();
-  const [refreshList, setRefreshList] = useState(false);
+  const [headerTitle, setHeaderTitle] = useState('');
 
   const fetchItems = async () => {
     const tempOrder: Order = await getTempOrder();
-
+    setHeaderTitle(
+      tempOrder?.orderItems?.[0]?.alreadySend ? 'Ενημέρωση παραγγελίας' : 'Καινούργια Παραγγελία'
+    );
     setTableName(tempOrder?.table?.tableName);
+
+    setTable(tempOrder?.table);
     setItems(tempOrder?.orderItems ?? []);
   };
-
+  const isFocused = useIsFocused();
   useEffect(() => {
     fetchItems();
-  }, [route, isSheetOpen]);
+  }, [route, isSheetOpen, isFocused]);
 
   const handleSelectTable = async (table: Table) => {
+    let clearTable = table;
     if (!items.length && table?.id) {
-      await createNewOrder(table);
+      clearTable = (await createNewOrder(table))?.table;
     }
-    setTableName(table.tableName);
-    setTableTempOrder(table);
+    setTableName(clearTable.tableName);
+    setTableTempOrder(clearTable);
   };
 
   const handleTempOrderPress = () => {
-    navigate(ScreenNames.NewOrderScreen, { tableName: tableName });
+    navigate(ScreenNames.NewOrderScreen, { table: table });
   };
 
   //START TABLE MODAL LOGIC
@@ -73,20 +82,36 @@ const TempOrderScreen = ({
 
   const renderItems = (item: ItemReq) => {
     return (
-      <View style={{ marginVertical: 10 }}>
-        {/* TODO: Create another component for showing added items, remove button, increment, on press open editItems etc.. */}
-        <CatalogItemAdded
-          item={item}
-          refreshList={refreshTempList}
-          onItemPress={() => onItemPress(item)}
-        />
+      <View
+        style={{
+          marginVertical: 10,
+          paddingVertical: 5,
+          backgroundColor: item.markForDelete ? colors.lightRed : null,
+        }}
+      >
+        {item.alreadySend === true ? (
+          <CatalogItemDisabled
+            item={item}
+            refreshList={refreshTempList}
+            onItemDelete={async (item: ItemReq) => {
+              await markActiveItemForDelete(item);
+              refreshTempList();
+            }}
+          />
+        ) : (
+          <CatalogItemAdded
+            item={item}
+            refreshList={refreshTempList}
+            onItemPress={() => onItemPress(item)}
+          />
+        )}
       </View>
     );
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {!bottomSheetMode ? <HeaderBar headerTitle={strings.NewOrder}></HeaderBar> : null}
+      {!bottomSheetMode ? <HeaderBar headerTitle={headerTitle}></HeaderBar> : null}
 
       <View style={styles.container}>
         {items && items.length > 0 ? (
@@ -95,7 +120,7 @@ const TempOrderScreen = ({
               <FlashList
                 data={items}
                 keyExtractor={(item) => {
-                  const uniqueId = item.newItemId!;
+                  const uniqueId = item.newItemId;
                   return uniqueId;
                 }}
                 renderItem={({ item }) => renderItems(item)}
@@ -124,7 +149,7 @@ const TempOrderScreen = ({
         {!bottomSheetMode ? (
           <View>
             <TempBottomOptions
-              tableName={tableName}
+              table={table}
               handleOpenModal={handleOpenModal}
               handleTempOrderPress={handleTempOrderPress}
             />

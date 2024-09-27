@@ -6,27 +6,51 @@ import {
   convertNewOrderToRequestObject,
   getTempOrder,
 } from '../../helpers/storage/orderStorage';
-import { toast } from '../../core/utils';
-import { postRequest } from '../../helpers/requests';
+import { AlertWithOptions, toast } from '../../core/utils';
+import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/AppNavigator';
+import { useIsFocused } from '@react-navigation/native';
 
 interface TempBottomOptionsProps {
-  tableName: string;
+  table: Table;
   handleOpenModal: () => void;
   handleTempOrderPress: () => void;
+  handleCloseOrder?: () => void;
 }
 
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
-  tableName,
+  table,
   handleOpenModal, //opens table modal
   handleTempOrderPress, //opens additems screen
+  handleCloseOrder,
 }) => {
-  const [noTable, setNoTable] = useState(!tableName);
+  const [noTable, setNoTable] = useState(!table?.tableName);
+  const [tempOrder, setTempOrder] = useState<Order>();
 
+  const [isOrderView, setIsOrderView] = useState(true);
+
+  const fetchTempOrder = async () => {
+    let order = table?.occupiedByOrder;
+    if (!table?.occupiedByOrder) {
+      order = await getTempOrder();
+    }
+
+    const lastItem = order?.orderItems?.slice(-1)?.[0];
+    setIsOrderView(lastItem?.alreadySend && !lastItem?.markForDelete);
+    setTempOrder(order);
+  };
   useEffect(() => {
-    setNoTable(!tableName);
-  }, [tableName]);
+    fetchTempOrder();
+    setNoTable(!table?.tableName);
+  }, [table]);
 
+  const handleOrderSendSuccess = async (request: any) => {
+    if (request?.id) {
+      toast('success', 'Success', '', 1000);
+      await clearNewOrder();
+      navigateToTables();
+    }
+  };
   const handleOrderSend = async () => {
     const newOrder = await getTempOrder();
     if (!newOrder?.orderItems?.length || newOrder?.orderItems?.length === 0) {
@@ -35,30 +59,65 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     }
     const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
 
-    const result = await postRequest('/orders', convertedServerOrder);
-    if (result?.id) {
-      toast('success', 'Success', '', 1000);
-      clearNewOrder();
-      navigateToTables();
+    let result;
+    if (convertedServerOrder?.orderId) {
+      const itemsRemainingLength = newOrder.orderItems.filter((e) => !e.markForDelete)?.length;
+      if (itemsRemainingLength === 0) {
+        AlertWithOptions(
+          'Κλείσιμο Παραγγελίας',
+          'Η παραγγελία θα κλείσει γιατί δεν έχει κανένα προιόν.',
+          async () => {
+            result = await patchRequest(
+              `/orders/${convertedServerOrder?.orderId}`,
+              convertedServerOrder
+            );
+            handleOrderSendSuccess(result);
+          },
+          () => {}
+        );
+      } else {
+        result = await patchRequest(
+          `/orders/${convertedServerOrder?.orderId}`,
+          convertedServerOrder
+        );
+        handleOrderSendSuccess(result);
+      }
+    } else {
+      result = await postRequest('/orders', convertedServerOrder);
+      handleOrderSendSuccess(result);
     }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.button, styles.sendOrderButton, noTable ? styles.noTableOtherBtns : null]}
+        style={[
+          styles.button,
+          styles.sendOrderButton,
+          noTable || isOrderView ? styles.noTableOtherBtns : null,
+        ]}
         onPress={handleOrderSend}
-        disabled={noTable}
+        disabled={noTable || isOrderView}
       >
         <Text style={[styles.buttonText, noTable ? styles.noTableOtherText : null]}>Αποστολή</Text>
       </TouchableOpacity>
+
       <View style={styles.actionsContainer}>
+        {tempOrder?.createdAt ? (
+          <TouchableOpacity
+            style={[styles.button, styles.closeButton, noTable ? styles.noTableBorder : null]}
+            onPress={handleCloseOrder}
+          >
+            <Text style={[styles.buttonText, noTable ? styles.noTableText : null]}>Κλείσιμο</Text>
+          </TouchableOpacity>
+        ) : null}
+
         <TouchableOpacity
           style={[styles.button, styles.tableButton, noTable ? styles.noTableBorder : null]}
           onPress={handleOpenModal}
         >
           <Text style={[styles.buttonText, noTable ? styles.noTableText : null]}>
-            {tableName ?? 'Επιλογή Τραπεζιού'}
+            {table?.tableName ?? 'Επιλογή Τραπεζιού'}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -90,7 +149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 4,
     borderRadius: 6,
-    height: 60,
+    height: 50,
     width: 60,
   },
   sendOrderButton: {
@@ -105,7 +164,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tempOrderButton: {
-    flex: 1,
+    flex: 2,
     backgroundColor: colors.blue,
     borderRadius: 50,
   },
@@ -113,8 +172,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.lightGrey,
   },
+  closeButton: {
+    flex: 1,
+    backgroundColor: colors.veryLightRed,
+  },
   buttonText: {
     color: colors.white,
+    fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
   },

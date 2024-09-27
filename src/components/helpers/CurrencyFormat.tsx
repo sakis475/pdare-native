@@ -7,15 +7,18 @@ export function CurrencyFormat({
   currency,
   color = colors.white,
   fontSize = 16,
+  quantity,
 }: {
   value: number;
   currency: string;
   color?: string;
   fontSize?: number;
+  quantity?: number;
 }) {
   return (
     <View>
       <Text style={{ color: color, fontSize }}>
+        {quantity ? `(${quantity}) ` : ''}
         {currency} {value.toFixed(2)}
       </Text>
     </View>

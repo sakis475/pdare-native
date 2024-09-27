@@ -83,7 +83,7 @@ export function AlertWithOptions(
       },
       { text: okTitle, onPress: onOK }, // Go back if OK pressed
     ],
-    { cancelable: true } // Prevents the alert from being dismissed on tapping outside
+    { cancelable: false } // Prevents the alert from being dismissed on tapping outside
   );
 
   return true; // This prevents the default behavior

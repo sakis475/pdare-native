@@ -7,6 +7,7 @@ interface ItemProperty {
   orderGroup: number | null;
   orderItem: number | null;
   selected: boolean;
+  oItemPropertyId?: number;
 }
 
 // example [Milk: [], Sugar: []]
@@ -52,6 +53,9 @@ interface ItemReq {
   quantity?: number;
   newItemId?: string;
   comment?: string;
+  alreadySend?: boolean;
+  oItemId?: number;
+  markForDelete?: boolean;
 }
 
 interface catGroupedItems {
@@ -60,15 +64,17 @@ interface catGroupedItems {
 
 interface Table {
   id: number;
-  isEnabled: boolean;
   tableName: string;
+  isEnabled: boolean;
   tableOrder: number;
   occupiedByOrder?: Order;
 }
 
 interface Order {
+  id?: number;
   table: Table;
   orderItems: ItemReq[];
+  couvert: number;
   comment?: string;
   createdAt?: string;
   closedAt?: string;
@@ -87,13 +93,16 @@ interface OrderNavigationState {
 }
 
 interface CreateNewOrderRequest {
+  orderId?: number;
   table: number | string;
   comment: string;
   items: NewOrderRequestItem[];
 }
 interface NewOrderRequestItem {
   id: number;
-  itemProperties: number[];
+  oItemId: number;
+  delete: boolean;
+  itemProperties: { id: number; oItemPropertyId: number }[];
   quantity: number;
   comment: string;
 }

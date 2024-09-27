@@ -27,8 +27,9 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
 
     const handleOpenModal = useCallback(async () => {
       bottomSheetRef.current?.expand();
-      const availableTables = await reqFetchTables();
-      setAvailableTables(availableTables);
+      let allTables = await reqFetchTables();
+      allTables = allTables.filter((e) => !e.occupiedByOrder);
+      setAvailableTables(allTables);
     }, [setAvailableTables]);
 
     const handleCloseModal = useCallback(() => {

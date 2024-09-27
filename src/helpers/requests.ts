@@ -43,7 +43,6 @@ export async function refreshToken() {
 
 export async function getBearer() {
   const bearer: SessionBearer | null = await getStorage('session_bearer');
-  console.log(bearer, 'bearer');
   if (!bearer) {
     //go to login page
     navigate(ScreenNames.LoginScreen);
@@ -60,6 +59,7 @@ export async function getBearer() {
 }
 
 export async function setBearer(sessionBearer: SessionBearer) {
+  console.log(sessionBearer, 'sessionBearer');
   try {
     await setStorage('session_bearer', sessionBearer);
   } catch (error) {
@@ -81,7 +81,7 @@ export async function getRequest(url: string) {
       timeout: REQ_TIMEOUT,
     };
 
-    console.log(BASE_URL + url);
+    console.log('GET ' + BASE_URL + url);
     const response = await axios.get(BASE_URL + url, options);
     return response.data;
   } catch (error) {
@@ -106,8 +106,33 @@ export async function postRequest(url: string, body?: any) {
         };
       }
     }
-
+    console.log('POST ' + BASE_URL + url);
     const response = await axios.post(BASE_URL + url, body, options);
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error as AxiosError);
+  }
+}
+
+export async function patchRequest(url: string, body?: any) {
+  try {
+    checkInternetConnectivity();
+    let options = {};
+
+    if (!['/login', '/login/session'].includes(url)) {
+      const auth = await getBearer();
+
+      if (auth) {
+        options = {
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+          timeout: REQ_TIMEOUT,
+        };
+      }
+    }
+    console.log('PATCH ' + BASE_URL + url);
+    const response = await axios.patch(BASE_URL + url, body, options);
     return response.data;
   } catch (error) {
     handleAxiosError(error as AxiosError);

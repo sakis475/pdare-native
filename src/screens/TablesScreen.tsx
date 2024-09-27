@@ -9,6 +9,7 @@ import {
   ScrollView,
   SafeAreaView,
   Keyboard,
+  FlatList,
 } from 'react-native';
 import { TableBox } from '../components/helpers/TableBox';
 
@@ -21,12 +22,14 @@ import { Portal } from '@gorhom/portal';
 import {
   convertOccupiedOrderToOrder,
   createNewOrder,
+  getTempOrder,
   updateActiveOrdersStorage,
 } from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
-import { ScreenNames, navigate } from '../navigation/AppNavigator';
+import { ScreenNames, navigate, navigateToDraft } from '../navigation/AppNavigator';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-import { setStorage } from '../storage/store';
+import _ from 'lodash';
+import { FlashList } from '@shopify/flash-list';
 
 const TablesScreen = ({ route }: any) => {
   const isFocused = useIsFocused();
@@ -37,18 +40,32 @@ const TablesScreen = ({ route }: any) => {
       };
     }, [])
   );
+
+  /**This should be handled by sockets! */
   const fetchData = async () => {
     try {
-      const allTables = await Requests.getRequest('/tables');
+      const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
+      const items: ItemReq[] = await Requests.getRequest('/items');
+      const allTables: Table[] = [];
 
-      const activeOrders: Order[] = [];
-      for (const table of allTables) {
-        if (!table.occupiedByOrder) continue;
-        const converted = await convertOccupiedOrderToOrder(table);
-        activeOrders.push(converted);
+      for (const table of allTablesIO) {
+        let occupiedByOrder: Order = null;
+        if (table.occupiedByOrder) {
+          occupiedByOrder = convertOccupiedOrderToOrder(table, items);
+        } else {
+          continue;
+        }
+
+        const _table: Table = {
+          id: table.id,
+          tableName: table.tableName,
+          isEnabled: table.isEnabled,
+          tableOrder: table.tableOrder,
+          occupiedByOrder: occupiedByOrder,
+        };
+        allTables.push(_table);
       }
 
-      await updateActiveOrdersStorage(activeOrders);
       setActiveTables(allTables);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -56,8 +73,7 @@ const TablesScreen = ({ route }: any) => {
   };
 
   useEffect(() => {
-    console.log(isFocused, 'isFocused');
-    fetchData(); // Call the fetchData function
+    fetchData();
   }, [isFocused]);
 
   const [activeTables, setActiveTables] = useState<Table[]>([]);
@@ -77,25 +93,41 @@ const TablesScreen = ({ route }: any) => {
   //END TABLE MODAL LOGIC
 
   const handleSelectTable = async (table: Table) => {
-    await createNewOrder(table);
-    // navigate(ScreenNames.NewOrderScreen, { tableName: table });
-    navigate(ScreenNames.NewOrderScreen, { tableName: table.tableName });
+    const newTable = await createNewOrder(table);
+    navigate(ScreenNames.NewOrderScreen, { table: newTable.table });
   };
 
+  const handleExistingTable = async (table: Table) => {
+    const tempOrder = await getTempOrder();
+
+    if (tempOrder?.table?.id === table?.id) {
+      navigateToDraft();
+    } else {
+      navigate(ScreenNames.ActiveOrderScreen, { tableParam: table });
+    }
+  };
+  const renderItems = (table: Table, index: number) => (
+    <View style={styles.tableItem} key={table.id}>
+      <TableBox
+        table={table}
+        onPress={(table: Table) => {
+          handleExistingTable(table);
+        }}
+      ></TableBox>
+    </View>
+  );
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderBar headerTitle={strings.Tables}></HeaderBar>
       <View style={styles.container}>
-        <View style={styles.scrollableTableContainer}>
-          <ScrollView>
-            <View style={styles.tableContainer}>
-              {activeTables.map((table) => (
-                <View style={styles.tableItem} key={table.id}>
-                  <TableBox table={table} onPress={() => {}}></TableBox>
-                </View>
-              ))}
-            </View>
-          </ScrollView>
+        <View style={styles.tableContainer}>
+          <FlashList
+            data={activeTables}
+            renderItem={({ item, index }) => renderItems(item, index)}
+            keyExtractor={(item) => item.tableName + item.id}
+            estimatedItemSize={20}
+            numColumns={3}
+          />
         </View>
 
         <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
@@ -112,27 +144,23 @@ const TablesScreen = ({ route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 16,
     backgroundColor: '#2F2F2F',
   },
-  scrollableTableContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '90%',
-  },
   tableContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flex: 1,
   },
+
   tableItem: {
-    width: '33.33%',
-    padding: 8,
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
   selectTableBtn: {
     backgroundColor: 'blue',
     borderRadius: 8,
     padding: 20,
+    marginVertical: 10,
     alignItems: 'center',
   },
   selectTableBtnText: {

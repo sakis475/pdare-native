@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
 import StartLoadingScreen from '../screens/StartLoadingScreen';
+import ActiveOrderScreen from '../screens/orderScreens/activeOrderScreens/ActiveOrderScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -92,7 +93,18 @@ const AppNavigator = () => {
         name={ScreenNames.NewOrderScreen}
         component={NewOrderScreen}
         options={({ route }: any) => ({
-          title: strings.Categories,
+          // title: strings.Categories,
+          headerTitle: () => {
+            return (
+              <CustomNavigationScreenHeaderTitle
+                title={
+                  !!route.params?.table?.occupiedByOrder
+                    ? 'Ενημέρωση Παραγγελίας'
+                    : 'Καινούργια Παραγγελία'
+                }
+              ></CustomNavigationScreenHeaderTitle>
+            );
+          },
           animation: 'slide_from_right',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
@@ -102,7 +114,24 @@ const AppNavigator = () => {
           headerBackVisible: false,
         })}
       />
-
+      <Stack.Screen
+        name={ScreenNames.ActiveOrderScreen}
+        component={ActiveOrderScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={route.params?.tableParam?.tableName}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
       <Stack.Screen
         name={ScreenNames.ItemListScreen}
         component={ItemListScreen}
@@ -122,7 +151,15 @@ const AppNavigator = () => {
         name={ScreenNames.TempOrderScreen}
         component={TempOrderScreen}
         options={({ route }: any) => ({
-          title: strings.DraftOrder,
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={
+                !!route.params?.table?.occupiedByOrder
+                  ? 'Ενημέρωση Παραγγελίας'
+                  : 'Καινούργια Παραγγελία'
+              }
+            ></CustomNavigationScreenHeaderTitle>
+          ),
           animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
@@ -256,7 +293,6 @@ const MainTabs = ({ route }: any) => {
       title: strings.Draft,
       focusedIcon: 'clipboard-outline',
     },
-    // { key: strings.Login, title: strings.Login, focusedIcon: 'heart-outline' },
   ];
 
   const renderScene = BottomNavigation.SceneMap({
@@ -269,7 +305,7 @@ const MainTabs = ({ route }: any) => {
       navigationState={{ index, routes }}
       onIndexChange={setIndex}
       renderScene={renderScene}
-      barStyle={{ backgroundColor: colors.darkerGrey }}
+      barStyle={{ backgroundColor: colors.darkerGrey, height: 70 }}
       activeColor="#147eb8"
       inactiveColor="#FFFFFF"
       sceneAnimationEnabled={true}
@@ -301,5 +337,6 @@ export enum ScreenNames {
   LoginScreen = 'loginScreen',
   StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',
+  ActiveOrderScreen = 'activeOrderScreen',
 }
 export default AppNavigator;
