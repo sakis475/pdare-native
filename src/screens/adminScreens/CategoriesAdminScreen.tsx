@@ -3,7 +3,6 @@ import { View, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-nati
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   runOnJS,
   useAnimatedGestureHandler,
 } from 'react-native-reanimated';
@@ -16,7 +15,7 @@ const MARGIN = 10;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BOX_SIZE = (SCREEN_WIDTH - MARGIN * (GRID_SIZE + 1)) / GRID_SIZE;
 const GRID_WIDTH = BOX_SIZE * GRID_SIZE + MARGIN * (GRID_SIZE - 1);
-const SWAP_THRESHOLD = BOX_SIZE * 0.6; // Increased threshold for easier swapping
+const SWAP_THRESHOLD = BOX_SIZE * 0.6;
 
 interface Category {
   id: number;
@@ -90,20 +89,19 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
         }
       }
 
-      // Swap if the closest box is within the threshold and it's not the original position
       if (closestIndex !== null && minDistance < SWAP_THRESHOLD && closestIndex !== item.index) {
         runOnJS(onDragEnd)(item.index, closestIndex);
       } else {
         runOnJS(onDragEnd)(item.index, null);
       }
 
-      translateX.value = withSpring(0, { damping: 20, stiffness: 200 });
-      translateY.value = withSpring(0, { damping: 20, stiffness: 200 });
+      // Reset position immediately without animation
+      translateX.value = 0;
+      translateY.value = 0;
     },
   });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    //@ts-ignore
     transform: [{ translateX: translateX.value }, { translateY: translateY.value }],
     zIndex: translateX.value !== 0 || translateY.value !== 0 ? 1 : 0,
   }));
@@ -119,15 +117,26 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
 
 const DraggableGridScreen: React.FC = () => {
   const [categories, setCategories] = useState<BoxData[]>([
-    { id: 1, title: 'Category 1', color: '#FF5733', index: 0 },
-    { id: 2, title: 'Category 2', color: '#33FF57', index: 1 },
-    { id: 3, title: 'Category 3', color: '#3357FF', index: 2 },
-    { id: 4, title: 'Category 4', color: '#FF33F1', index: 3 },
-    { id: 5, title: 'Category 5', color: '#33FFF1', index: 4 },
-    { id: 6, title: 'Category 6', color: '#F1FF33', index: 5 },
-    { id: 7, title: 'Category 7', color: '#FF8C33', index: 6 },
-    { id: 8, title: 'Category 8', color: '#8C33FF', index: 7 },
-    { id: 9, title: 'Category 9', color: '#33FFCB', index: 8 },
+    { id: 1, title: 'Ultra Category 1', color: '#A7B3F9', index: 0 },
+    { id: 2, title: 'Awesome Group 2', color: '#F45D8E', index: 1 },
+    { id: 3, title: 'Mega Set 3', color: '#2CDA91', index: 2 },
+    { id: 4, title: 'Epic Collection 4', color: '#8A67BE', index: 3 },
+    { id: 5, title: 'Super Type 5', color: '#E9C46A', index: 4 },
+    { id: 6, title: 'Hyper Class 6', color: '#4ECDC4', index: 5 },
+    { id: 7, title: 'Cool Variety 7', color: '#FF6B6B', index: 6 },
+    { id: 8, title: 'Fantastic Kind 8', color: '#45B7D1', index: 7 },
+    { id: 9, title: 'Amazing Section 9', color: '#98CE00', index: 8 },
+    { id: 10, title: 'Extreme Assortment 10', color: '#FFA07A', index: 9 },
+    { id: 11, title: 'Ultra Group 11', color: '#20B2AA', index: 10 },
+    { id: 12, title: 'Mega Category 12', color: '#FF69B4', index: 11 },
+    { id: 13, title: 'Super Collection 13', color: '#7B68EE', index: 12 },
+    { id: 14, title: 'Epic Set 14', color: '#00FA9A', index: 13 },
+    { id: 15, title: 'Awesome Type 15', color: '#FF4500', index: 14 },
+    { id: 16, title: 'Hyper Variety 16', color: '#1E90FF', index: 15 },
+    { id: 17, title: 'Cool Class 17', color: '#FFD700', index: 16 },
+    { id: 18, title: 'Fantastic Section 18', color: '#8A2BE2', index: 17 },
+    { id: 19, title: 'Amazing Kind 19', color: '#32CD32', index: 18 },
+    { id: 20, title: 'Extreme Assortment 20', color: '#FF6347', index: 19 },
   ]);
 
   const onDragEnd = useCallback((fromIndex: number, toIndex: number | null) => {
@@ -137,8 +146,9 @@ const DraggableGridScreen: React.FC = () => {
 
     setCategories((prevCategories) => {
       const newCategories = [...prevCategories];
-      const [movedItem] = newCategories.splice(fromIndex, 1);
-      newCategories.splice(toIndex, 0, movedItem);
+      newCategories[fromIndex] = prevCategories[toIndex];
+      newCategories[toIndex] = prevCategories[fromIndex];
+
       return newCategories.map((item, index) => ({ ...item, index }));
     });
   }, []);
@@ -157,7 +167,7 @@ const DraggableGridScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
     padding: MARGIN,
   },
