@@ -1,5 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, Text, StyleProp } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Text,
+  StyleProp,
+  ScrollView,
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -72,7 +80,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
       translateY.value = ctx.startY + event.translationY;
     },
     onEnd: () => {
-      const totalItems = categoriesLength; // Assuming 'categories' is accessible here
+      const totalItems = categoriesLength;
       const actualRows = Math.ceil(totalItems / GRID_SIZE);
       const itemRow = Math.floor(item.index / GRID_SIZE);
       const itemCol = item.index % GRID_SIZE;
@@ -171,22 +179,30 @@ const DraggableGridScreen: React.FC = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.grid}>
-        {categories.map((category) => (
-          <Box
-            key={`category-${category.id}`}
-            item={category}
-            onDragEnd={onDragEnd}
-            categoriesLength={categories.length}
-          />
-        ))}
+    <ScrollView
+      contentContainerStyle={styles.scrollViewContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.container}>
+        <View style={styles.grid}>
+          {categories.map((category) => (
+            <Box
+              key={`category-${category.id}`}
+              item={category}
+              onDragEnd={onDragEnd}
+              categoriesLength={categories.length}
+            />
+          ))}
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollViewContent: {
+    // flexGrow: 1,
+  },
   container: {
     flex: 1,
     alignItems: 'center',
