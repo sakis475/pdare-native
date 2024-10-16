@@ -31,6 +31,7 @@ interface BoxData extends Category {
 
 type BoxProps = {
   item: BoxData;
+  categoriesLength: number;
   onDragEnd: (fromIndex: number, toIndex: number | null) => void;
 };
 
@@ -52,7 +53,7 @@ const CategoryBox: React.FC<Category> = (category) => {
   );
 };
 
-const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
+const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const isDragging = useSharedValue(false);
@@ -71,17 +72,22 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
       translateY.value = ctx.startY + event.translationY;
     },
     onEnd: () => {
-      const currentCenterX =
-        (item.index % GRID_SIZE) * (BOX_SIZE + MARGIN) + translateX.value + BOX_SIZE / 2;
-      const currentCenterY =
-        Math.floor(item.index / GRID_SIZE) * (BOX_SIZE + MARGIN) + translateY.value + BOX_SIZE / 2;
+      const totalItems = categoriesLength; // Assuming 'categories' is accessible here
+      const actualRows = Math.ceil(totalItems / GRID_SIZE);
+      const itemRow = Math.floor(item.index / GRID_SIZE);
+      const itemCol = item.index % GRID_SIZE;
 
-      let closestIndex = null;
+      const currentCenterX = itemCol * (BOX_SIZE + MARGIN) + translateX.value + BOX_SIZE / 2;
+      const currentCenterY = itemRow * (BOX_SIZE + MARGIN) + translateY.value + BOX_SIZE / 2;
+
+      let closestIndex = item.index;
       let minDistance = Number.MAX_VALUE;
 
-      for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
-        const targetCenterX = (i % GRID_SIZE) * (BOX_SIZE + MARGIN) + BOX_SIZE / 2;
-        const targetCenterY = Math.floor(i / GRID_SIZE) * (BOX_SIZE + MARGIN) + BOX_SIZE / 2;
+      for (let i = 0; i < totalItems; i++) {
+        const targetRow = Math.floor(i / GRID_SIZE);
+        const targetCol = i % GRID_SIZE;
+        const targetCenterX = targetCol * (BOX_SIZE + MARGIN) + BOX_SIZE / 2;
+        const targetCenterY = targetRow * (BOX_SIZE + MARGIN) + BOX_SIZE / 2;
 
         const distance = Math.sqrt(
           Math.pow(currentCenterX - targetCenterX, 2) + Math.pow(currentCenterY - targetCenterY, 2)
@@ -93,7 +99,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
         }
       }
 
-      if (closestIndex !== null && minDistance < SWAP_THRESHOLD && closestIndex !== item.index) {
+      if (closestIndex !== item.index) {
         runOnJS(onDragEnd)(item.index, closestIndex);
       } else {
         runOnJS(onDragEnd)(item.index, null);
@@ -160,7 +166,6 @@ const DraggableGridScreen: React.FC = () => {
       const newCategories = [...prevCategories];
       newCategories[fromIndex] = prevCategories[toIndex];
       newCategories[toIndex] = prevCategories[fromIndex];
-      console.log(fromIndex, toIndex);
       return newCategories.map((item, index) => ({ ...item, index }));
     });
   }, []);
@@ -169,7 +174,12 @@ const DraggableGridScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.grid}>
         {categories.map((category) => (
-          <Box key={`category-${category.id}`} item={category} onDragEnd={onDragEnd} />
+          <Box
+            key={`category-${category.id}`}
+            item={category}
+            onDragEnd={onDragEnd}
+            categoriesLength={categories.length}
+          />
         ))}
       </View>
     </View>
