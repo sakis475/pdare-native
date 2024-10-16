@@ -74,16 +74,18 @@ const TablesScreen = ({ currentIndex }: any) => {
 
   useEffect(() => {
     socketManager.on(EventId.tableOrdersUpdated, handleTableUpdates);
-
+    fetchInitialTables();
     return () => {
       socketManager.off(EventId.tableOrdersUpdated);
     };
   }, []);
-  useEffect(() => {
-    if (currentIndex && currentIndex !== 0) return;
-    // Fetch initial data
-    fetchInitialTables();
-  }, [currentIndex]);
+
+  //This propably is not needed because every component mounts it will listen for socket emitter
+  // useEffect(() => {
+  //   if (currentIndex && currentIndex !== 0) return;
+  //   // Fetch initial data
+  //   fetchInitialTables();
+  // }, [currentIndex]);
 
   const [activeTables, setActiveTables] = useState<Table[]>([]);
 

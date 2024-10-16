@@ -9,6 +9,7 @@ import Animated, {
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { getTextColorBasedOnLuminance } from '../../core/utils';
 import { colors } from '../../core/theme';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
 const GRID_SIZE = 3;
 const MARGIN = 10;
@@ -16,6 +17,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BOX_SIZE = (SCREEN_WIDTH - MARGIN * (GRID_SIZE + 1)) / GRID_SIZE;
 const GRID_WIDTH = BOX_SIZE * GRID_SIZE + MARGIN * (GRID_SIZE - 1);
 const SWAP_THRESHOLD = BOX_SIZE * 0.6;
+const DRAG_HANDLE_SIZE = 20;
 
 interface Category {
   id: number;
@@ -53,6 +55,7 @@ const CategoryBox: React.FC<Category> = (category) => {
 const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+  const isDragging = useSharedValue(false);
 
   const gestureHandler = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
@@ -61,6 +64,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
     onStart: (_, ctx) => {
       ctx.startX = translateX.value;
       ctx.startY = translateY.value;
+      isDragging.value = true;
     },
     onActive: (event, ctx) => {
       translateX.value = ctx.startX + event.translationX;
@@ -98,20 +102,28 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
       // Reset position immediately without animation
       translateX.value = 0;
       translateY.value = 0;
+      isDragging.value = false;
     },
   });
 
   const animatedStyle = useAnimatedStyle<StyleProp<any>>(() => ({
     transform: [{ translateX: translateX.value }, { translateY: translateY.value }],
-    zIndex: translateX.value !== 0 || translateY.value !== 0 ? 1 : 0,
+    zIndex: isDragging.value ? 1 : 0,
   }));
 
   return (
-    <PanGestureHandler onGestureEvent={gestureHandler}>
-      <Animated.View style={[styles.boxWrapper, animatedStyle]}>
-        <CategoryBox {...item} />
-      </Animated.View>
-    </PanGestureHandler>
+    <Animated.View style={[styles.boxWrapper, animatedStyle]}>
+      <CategoryBox {...item} />
+      <PanGestureHandler onGestureEvent={gestureHandler}>
+        <Animated.View style={[styles.dragHandle]}>
+          <FontAwesome6
+            name="bars"
+            size={DRAG_HANDLE_SIZE}
+            color={getTextColorBasedOnLuminance(item.color)}
+          ></FontAwesome6>
+        </Animated.View>
+      </PanGestureHandler>
+    </Animated.View>
   );
 };
 
@@ -148,7 +160,7 @@ const DraggableGridScreen: React.FC = () => {
       const newCategories = [...prevCategories];
       newCategories[fromIndex] = prevCategories[toIndex];
       newCategories[toIndex] = prevCategories[fromIndex];
-
+      console.log(fromIndex, toIndex);
       return newCategories.map((item, index) => ({ ...item, index }));
     });
   }, []);
@@ -167,7 +179,6 @@ const DraggableGridScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
     alignItems: 'center',
     padding: MARGIN,
   },
@@ -218,6 +229,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 2,
     elevation: 10,
+  },
+  dragHandle: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    width: DRAG_HANDLE_SIZE,
+    height: DRAG_HANDLE_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
   },
 });
 

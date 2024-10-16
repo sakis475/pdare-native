@@ -38,7 +38,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
   };
 
   useEffect(() => {
-    if (currentIndex && currentIndex !== 2) return;
+    if (currentIndex !== 2) return;
     fetchOrders();
   }, [currentIndex]);
 
