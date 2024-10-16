@@ -5,8 +5,8 @@ import {
   Dimensions,
   TouchableOpacity,
   Text,
-  StyleProp,
   ScrollView,
+  StyleProp,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -20,11 +20,11 @@ import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
 const GRID_SIZE = 3;
-const MARGIN = 10;
+const MARGIN = 4;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const BOX_SIZE = (SCREEN_WIDTH - MARGIN * (GRID_SIZE + 1)) / GRID_SIZE;
+const TOTAL_MARGIN = MARGIN * (GRID_SIZE + 1);
+const BOX_SIZE = (SCREEN_WIDTH - TOTAL_MARGIN) / GRID_SIZE;
 const GRID_WIDTH = BOX_SIZE * GRID_SIZE + MARGIN * (GRID_SIZE - 1);
-const SWAP_THRESHOLD = BOX_SIZE * 0.6;
 const DRAG_HANDLE_SIZE = 20;
 
 interface Category {
@@ -167,7 +167,7 @@ const DraggableGridScreen: React.FC = () => {
 
   const onDragEnd = useCallback((fromIndex: number, toIndex: number | null) => {
     if (toIndex === null || toIndex === fromIndex) {
-      return; // No swap needed
+      return;
     }
 
     setCategories((prevCategories) => {
@@ -201,18 +201,19 @@ const DraggableGridScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   scrollViewContent: {
-    // flexGrow: 1,
+    flexGrow: 1,
   },
   container: {
     flex: 1,
     alignItems: 'center',
-    padding: MARGIN,
+    paddingHorizontal: MARGIN,
+    paddingTop: MARGIN,
   },
   grid: {
     width: GRID_WIDTH,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
   },
   boxWrapper: {
     width: BOX_SIZE,
@@ -228,8 +229,8 @@ const styles = StyleSheet.create({
   },
   shadowBox: {
     position: 'absolute',
-    width: BOX_SIZE,
-    height: BOX_SIZE,
+    width: BOX_SIZE - 5,
+    height: BOX_SIZE - 5,
     backgroundColor: colors.black,
     top: 9,
     left: 5,
@@ -242,8 +243,9 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   categoryBox: {
-    width: BOX_SIZE,
-    height: BOX_SIZE,
+    width: BOX_SIZE - 10,
+    height: BOX_SIZE - 10,
+    padding: 5,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
@@ -258,8 +260,8 @@ const styles = StyleSheet.create({
   },
   dragHandle: {
     position: 'absolute',
-    top: 5,
-    right: 5,
+    top: 10,
+    right: 10,
     width: DRAG_HANDLE_SIZE,
     height: DRAG_HANDLE_SIZE,
     justifyContent: 'center',
