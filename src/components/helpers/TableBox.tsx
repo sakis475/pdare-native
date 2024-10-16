@@ -1,20 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import { colors } from '../../core/theme';
 import dayjs, { datetimeDiff } from '../../core/dayjs';
 import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
 
 export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
-  const minutesPassed = datetimeDiff(
-    dayjs.utc(),
-    dayjs(table.occupiedByOrder?.createdAt),
-    'minutes'
-  );
-  const elapsedTime = table.occupiedByOrder?.createdAt
-    ? minutesPassed > 240
-      ? '240' + "'+"
-      : minutesPassed + "'"
-    : '';
+  const [elapsedTime, setElapsedTime] = useState('');
+
+  const calculateElapsedTime = () => {
+    if (table.occupiedByOrder?.createdAt) {
+      const minutesPassed = datetimeDiff(
+        dayjs.utc(),
+        dayjs(table.occupiedByOrder.createdAt),
+        'minutes'
+      );
+
+      if (minutesPassed > 240) {
+        setElapsedTime("240' +");
+      } else {
+        setElapsedTime(`${minutesPassed}'`);
+      }
+    } else {
+      setElapsedTime('');
+    }
+  };
+
+  useEffect(() => {
+    // Initial calculation
+    calculateElapsedTime();
+
+    // Update elapsed time every minute
+    const interval = setInterval(calculateElapsedTime, 60000); // Update every minute
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [table.occupiedByOrder?.createdAt]); // Recalculate if createdAt changes
+
   return (
     <TouchableOpacity
       key={table.id}

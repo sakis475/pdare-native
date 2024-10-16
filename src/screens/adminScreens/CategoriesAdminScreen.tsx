@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity, Text, StyleProp } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -101,7 +101,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd }) => {
     },
   });
 
-  const animatedStyle = useAnimatedStyle(() => ({
+  const animatedStyle = useAnimatedStyle<StyleProp<any>>(() => ({
     transform: [{ translateX: translateX.value }, { translateY: translateY.value }],
     zIndex: translateX.value !== 0 || translateY.value !== 0 ? 1 : 0,
   }));

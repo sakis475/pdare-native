@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppLanguage } from '../core/strings';
 import { SessionBearer } from '../types/requests.types';
 import { toast } from '../core/utils';
+import { HelperStorage } from '../helpers/storage/helpersStorage';
 
 // Function to set item in AsyncStorage
 export async function setStorage<K extends StorageKey>(key: K, value: StorageTypes[K] | null) {
@@ -49,11 +50,13 @@ export async function removeAllStorage() {
 interface StorageTypes {
   app_language: AppLanguage;
   session_bearer: SessionBearer;
-  helperStorage: { isBackFromPreview?: boolean };
+  helperStorage: HelperStorage;
   groupedItems: catGroupedItems;
   newOrder: Order;
-  userInfo: User;
   activeOrders: Order[];
+  items: ItemReq[];
+  categories: Category[];
+  currentUser: User;
 }
 
 // Type for storage keys

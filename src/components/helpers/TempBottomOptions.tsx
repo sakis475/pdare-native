@@ -9,25 +9,24 @@ import {
 import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/AppNavigator';
-import { useIsFocused } from '@react-navigation/native';
 
 interface TempBottomOptionsProps {
   table: Table;
-  handleOpenModal: () => void;
+  handleOpenSelectTableModal: () => void;
   handleTempOrderPress: () => void;
-  handleCloseOrder?: () => void;
 }
 
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   table,
-  handleOpenModal, //opens table modal
+  handleOpenSelectTableModal, //opens table modal
   handleTempOrderPress, //opens additems screen
-  handleCloseOrder,
 }) => {
   const [noTable, setNoTable] = useState(!table?.tableName);
   const [tempOrder, setTempOrder] = useState<Order>();
 
   const [isOrderView, setIsOrderView] = useState(true);
+
+  const [tableChanged, setTableChanged] = useState(false);
 
   const fetchTempOrder = async () => {
     let order = table?.occupiedByOrder;
@@ -35,8 +34,14 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       order = await getTempOrder();
     }
 
+    if (order?.table && table?.id !== order?.table?.id) {
+      setTableChanged(true);
+    }
+
     const lastItem = order?.orderItems?.slice(-1)?.[0];
-    setIsOrderView(lastItem?.alreadySend && !lastItem?.markForDelete);
+
+    const isAnyItemMarkedAsDeleted = order?.orderItems?.some((e) => e.markForDelete);
+    setIsOrderView(lastItem?.alreadySend && !isAnyItemMarkedAsDeleted);
     setTempOrder(order);
   };
   useEffect(() => {
@@ -58,7 +63,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       return;
     }
     const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
-
+    console.log(JSON.stringify(convertedServerOrder, null, 2), 'convertedServerOrder');
     let result;
     if (convertedServerOrder?.orderId) {
       const itemsRemainingLength = newOrder.orderItems.filter((e) => !e.markForDelete)?.length;
@@ -88,6 +93,25 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     }
   };
 
+  const handleCloseOrder = async () => {
+    let order = table?.occupiedByOrder;
+    if (!table?.occupiedByOrder) {
+      order = await getTempOrder();
+    }
+    const orderId = order.id;
+    console.log(orderId);
+    AlertWithOptions(
+      'Κλείσιμο Παραγγελίας',
+      'Είστε σίγουροι ότι θέλετε να κλείσετε την παραγγελία;',
+      async () => {
+        await patchRequest(`/orders/close/${orderId}`);
+        toast('success', 'Deleted', '', 1000);
+        navigateToTables();
+      },
+      () => {}
+    );
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -113,8 +137,12 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
         ) : null}
 
         <TouchableOpacity
-          style={[styles.button, styles.tableButton, noTable ? styles.noTableBorder : null]}
-          onPress={handleOpenModal}
+          style={[
+            styles.button,
+            styles.tableButton,
+            noTable ? styles.noTableBorder : tableChanged ? styles.changedTable : null,
+          ]}
+          onPress={handleOpenSelectTableModal}
         >
           <Text style={[styles.buttonText, noTable ? styles.noTableText : null]}>
             {table?.tableName ?? 'Επιλογή Τραπεζιού'}
@@ -191,6 +219,7 @@ const styles = StyleSheet.create({
   },
   noTableOtherBtns: { backgroundColor: colors.darkerGrey },
   noTableOtherText: { color: colors.slightlyLighterGrey },
+  changedTable: { backgroundColor: colors.blue },
 });
 
 export default TempBottomOptions;

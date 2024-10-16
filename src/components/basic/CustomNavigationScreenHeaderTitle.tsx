@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { colors } from '../../core/theme';
 
-const CustomNavigationScreenHeaderTitle = ({ title }: any) => {
+const CustomNavigationScreenHeaderTitle = ({ title, bold }: any) => {
   const { width } = useWindowDimensions(); // Get the width of the screen
 
   return (
     <View style={[styles.headerTitleContainer, { maxWidth: width - 80 }]}>
-      <Text style={styles.headerTitle} numberOfLines={0}>
+      <Text style={[styles.headerTitle, bold ? { fontWeight: 'bold' } : null]} numberOfLines={0}>
         {title}
       </Text>
     </View>

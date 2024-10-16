@@ -1,10 +1,11 @@
 import { AppLanguage } from '../core/strings';
 
 export const ENV_TYPE: 'PROD' | 'DEV' = 'DEV';
-export const BASE_URL =
-  'https://0209-2a10-9300-400-e40-5a93-a70e-2908-b2e.ngrok-free.app' + '/api/v1';
+export const BASE_DOMAIN = 'https://4510-2a10-9300-400-e40-5a93-a70e-2908-b2e.ngrok-free.app';
+export const BASE_URL = BASE_DOMAIN + '/api/v1';
 export const DEFAULT_APP_LANGUAGE: AppLanguage = 'lang_en';
 export const REQ_TIMEOUT = 15000;
+export const DEFAULT_SOCKET_CONNECTIONS = ['testio'];
 
 //✅ 1. Create a logo screen that acts as a waiting page until login page shows up or not. Make sure it Shows it only when app is from closed state to open. Not on minimize
 //2. Finish register page and connect/adapt api for that.

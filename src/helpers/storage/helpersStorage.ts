@@ -27,6 +27,4 @@ export const updateHelperStorage = async (
   return updatedStorage;
 };
 
-type HelperStorage = {
-  isBackFromPreview?: boolean;
-};
+export type HelperStorage = {};

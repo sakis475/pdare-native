@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import Toast, { ToastType } from 'react-native-toast-message';
 import NetInfo from '@react-native-community/netinfo';
+import { colors } from './theme';
 
 export const emailValidator = (email: string) => {
   const re = /\S+@\S+\.\S+/;
@@ -99,4 +100,21 @@ export const checkInternetConnectivity = () => {
   } catch (error) {
     console.log('NetInfo failed', error);
   }
+};
+
+export const getTextColorBasedOnLuminance = (hexColor: string) => {
+  if (!hexColor) {
+    return '';
+  }
+  // Extract the R, G, B values from the hex color
+  const rgb = parseInt(hexColor.slice(1), 16); // Convert hex to integer
+  const r = (rgb >> 16) & 0xff; // Extract the red value
+  const g = (rgb >> 8) & 0xff; // Extract the green value
+  const b = (rgb >> 0) & 0xff; // Extract the blue value
+
+  // Calculate luminance
+  const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+  // Return black or white based on luminance
+  return luminance > 128 ? colors.black : colors.white;
 };

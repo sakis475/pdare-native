@@ -10,4 +10,5 @@ type JWTUser = {
 export type SessionBearer = {
   token: string;
   info: { expiresAt: string };
+  user: User;
 };

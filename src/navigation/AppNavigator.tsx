@@ -9,7 +9,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
 import RestaurantSettingsScreen from '../screens/adminScreens/RestaurantSettingsScreen';
 import NewOrderScreen from '../screens/orderScreens/newOrderScreen';
-import { NavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainerRef, Route } from '@react-navigation/native';
 import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
@@ -21,6 +21,8 @@ import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigat
 import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
 import StartLoadingScreen from '../screens/StartLoadingScreen';
 import ActiveOrderScreen from '../screens/orderScreens/activeOrderScreens/ActiveOrderScreen';
+import HistoryOrdersScreen from '../screens/HistoryOrdersScreen';
+import DraggableGridScreen from '../screens/adminScreens/CategoriesAdminScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -173,7 +175,13 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ScreenNames.ProfileScreen}
         component={ProfileScreen}
-        options={{
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Λογαριασμός'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
           animation: 'simple_push',
           headerStyle: {
             backgroundColor: colors.grey,
@@ -181,12 +189,18 @@ const AppNavigator = () => {
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
-        }}
+        })}
       />
       <Stack.Screen
         name={ScreenNames.RestaurantSettingsScreen}
         component={RestaurantSettingsScreen}
-        options={{
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Restaurant Settings'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
           animation: 'slide_from_right',
           headerStyle: {
             backgroundColor: colors.grey,
@@ -194,12 +208,18 @@ const AppNavigator = () => {
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
-        }}
+        })}
       />
       <Stack.Screen
         name={ScreenNames.ManageProductsScreen}
         component={ManageProductsScreen}
-        options={{
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Προϊόντα'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
           animation: 'slide_from_right',
           headerStyle: {
             backgroundColor: colors.grey,
@@ -207,7 +227,26 @@ const AppNavigator = () => {
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
-        }}
+        })}
+      />
+      <Stack.Screen
+        name={ScreenNames.ManageCategoriesScreen}
+        component={DraggableGridScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Προϊόντα'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.grey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
       />
       <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
@@ -286,19 +325,36 @@ const MainTabs = ({ route }: any) => {
     }
   }, [route]);
 
-  const routes = [
-    { key: strings.Tables, title: strings.Tables, focusedIcon: 'apps' },
+  const [routes, setRoutes] = useState<any[]>([
+    {
+      key: strings.Tables,
+      title: strings.Tables,
+      focusedIcon: 'apps',
+    },
     {
       key: strings.Draft,
       title: strings.Draft,
       focusedIcon: 'clipboard-outline',
     },
-  ];
+    {
+      key: strings.History,
+      title: strings.History,
+      focusedIcon: 'history',
+    },
+  ]);
 
-  const renderScene = BottomNavigation.SceneMap({
-    [strings.Tables]: TablesScreen,
-    [strings.Draft]: TempOrderScreen,
-  });
+  const renderScene = ({ route }: any) => {
+    switch (route.key) {
+      case strings.Tables:
+        return <TablesScreen currentIndex={index} />;
+      case strings.Draft:
+        return <TempOrderScreen currentIndex={index} />;
+      case strings.History:
+        return <HistoryOrdersScreen currentIndex={index} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <BottomNavigation
@@ -334,6 +390,7 @@ export enum ScreenNames {
   ItemDetailsScreen = 'itemDetailsScreen',
   RestaurantSettingsScreen = 'restaurantSettingsScreen',
   ManageProductsScreen = 'manageProductsScreen',
+  ManageCategoriesScreen = 'manageCategoriesScreen',
   LoginScreen = 'loginScreen',
   StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',

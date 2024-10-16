@@ -15,6 +15,9 @@ export function CurrencyFormat({
   fontSize?: number;
   quantity?: number;
 }) {
+  if (typeof value !== 'number') {
+    return null;
+  }
   return (
     <View>
       <Text style={{ color: color, fontSize }}>

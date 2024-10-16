@@ -18,6 +18,11 @@ const ProfileOptionsScreen = ({ route }: any) => {
     },
     {
       id: '2',
+      title: 'Account Delete',
+      onPress: () => {},
+    },
+    {
+      id: '6',
       title: 'Clear Storage',
       onPress: () => removeAllStorage(),
     },

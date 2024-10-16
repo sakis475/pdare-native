@@ -16,7 +16,7 @@ const RestaurantSettingsScreen = ({ route }: any) => {
       id: '2',
       title: 'Manage Categories',
       icon: 'shape-outline',
-      screen: ScreenNames.ManageProductsScreen,
+      screen: ScreenNames.ManageCategoriesScreen,
     },
     {
       id: '3',

@@ -20,13 +20,14 @@ import { HeaderBar } from '../../components/helpers/HeaderBar';
 import { strings } from '../../core/strings';
 import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
 import { useIsFocused } from '@react-navigation/native';
+import { AlertWithOptions } from '../../core/utils';
 const TempOrderScreen = ({
+  currentIndex,
   route,
   bottomSheetMode = false,
   isSheetOpen,
   onItemPress = () => {},
 }: any) => {
-  const [tableName, setTableName] = useState('');
   const [table, setTable] = useState<Table>();
   const [items, setItems] = useState<ItemReq[]>();
   const [headerTitle, setHeaderTitle] = useState('');
@@ -36,22 +37,23 @@ const TempOrderScreen = ({
     setHeaderTitle(
       tempOrder?.orderItems?.[0]?.alreadySend ? 'Ενημέρωση παραγγελίας' : 'Καινούργια Παραγγελία'
     );
-    setTableName(tempOrder?.table?.tableName);
 
     setTable(tempOrder?.table);
     setItems(tempOrder?.orderItems ?? []);
   };
   const isFocused = useIsFocused();
   useEffect(() => {
+    if (currentIndex && currentIndex !== 1) return;
     fetchItems();
-  }, [route, isSheetOpen, isFocused]);
+  }, [route, isSheetOpen, isFocused, currentIndex]);
 
-  const handleSelectTable = async (table: Table) => {
-    let clearTable = table;
-    if (!items.length && table?.id) {
-      clearTable = (await createNewOrder(table))?.table;
+  const handleSelectTable = async (newTable: Table) => {
+    let clearTable = newTable;
+    if (!items.length && newTable?.id) {
+      clearTable = (await createNewOrder(newTable))?.table;
     }
-    setTableName(clearTable.tableName);
+
+    setTable(clearTable);
     setTableTempOrder(clearTable);
   };
 
@@ -62,8 +64,19 @@ const TempOrderScreen = ({
   //START TABLE MODAL LOGIC
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
-  const handleOpenModal = () => {
-    bottomSheetRef.current?.openModal();
+  const handleOpenSelectTableModal = () => {
+    if (table) {
+      AlertWithOptions(
+        'Αλλαγή Τραπεζιού',
+        'Είστε σίγουροι ότι θέλετε να αλλάξετε τραπέζι;',
+        () => {
+          bottomSheetRef.current?.openModal();
+        },
+        () => {}
+      );
+    } else {
+      bottomSheetRef.current?.openModal();
+    }
   };
 
   const handleCloseModal = () => {
@@ -136,11 +149,9 @@ const TempOrderScreen = ({
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                Πατήστε το κουμπί «Προσθήκη»
+                Προϊόντα που θα προσθέσετε
               </Text>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                για να προσθέσετε καινούργια προϊόντα.
-              </Text>
+              <Text style={{ textAlign: 'center', color: '#ffffff' }}>θα εμφανιστούν εδώ.</Text>
             </View>
           </>
         ) : (
@@ -150,7 +161,7 @@ const TempOrderScreen = ({
           <View>
             <TempBottomOptions
               table={table}
-              handleOpenModal={handleOpenModal}
+              handleOpenSelectTableModal={handleOpenSelectTableModal}
               handleTempOrderPress={handleTempOrderPress}
             />
             <Portal>

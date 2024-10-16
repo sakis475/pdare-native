@@ -15,19 +15,26 @@ import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import {
   getTableTempOrder,
   getTempOrder,
-  reqFetchItems,
   setTableTempOrder,
   setTempOrder,
 } from '../../helpers/storage/orderStorage';
+import { getTextColorBasedOnLuminance } from '../../core/utils';
+import { getStorage } from '../../storage/store';
+import { storageInitData } from '../../helpers/storage/storageInit';
 
 const NewOrderScreen = ({ route, navigation }: any) => {
   const [tableName, setTableName] = useState(route.params?.table?.tableName);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [headerTitle, setHeaderTitle] = useState('');
 
   const fetchItems = async () => {
-    const newOrder = await reqFetchItems();
+    let newOrder = await getStorage('groupedItems');
+    if (!newOrder) {
+      await storageInitData();
+    }
+
+    newOrder = await getStorage('groupedItems');
     if (!newOrder) {
       return;
     }
@@ -37,7 +44,7 @@ const NewOrderScreen = ({ route, navigation }: any) => {
       setTableName(fetchTempTable?.tableName);
     }
 
-    const categories = Object.keys(newOrder);
+    const categories = await getStorage('categories');
     setCategories(categories);
 
     const tempOrder = await getTempOrder();
@@ -94,16 +101,24 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     navigateToDraft();
   };
 
-  const renderCategories = (categoryTitle: string) => {
+  const renderCategories = (category: Category) => {
+    const textColor = getTextColorBasedOnLuminance(category.color ?? colors.darkGrey);
     return (
-      <TouchableOpacity
-        style={styles.categoryBox}
-        onPress={() => {
-          handleCategoryPress(ScreenNames.ItemListScreen, { tableName, categoryTitle });
-        }}
-      >
-        <Text style={{ color: '#ffffff' }}>{categoryTitle}</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <View style={styles.shadowBox}></View>
+        <TouchableOpacity
+          style={[styles.categoryBox, { backgroundColor: category.color ?? colors.darkGrey }]}
+          onPress={() => {
+            handleCategoryPress(ScreenNames.ItemListScreen, {
+              tableName,
+              categoryTitle: category.title,
+            });
+          }}
+          activeOpacity={0.7}
+        >
+          <Text style={{ color: textColor, fontWeight: 'bold' }}>{category.title}</Text>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -173,17 +188,53 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)', // Adjust color and opacity as needed
   },
+  buttonContainer: {
+    width: 100,
+    height: 110, // Slightly taller to include the shadow part
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    marginBottom: 5,
+  },
+  shadowBox: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    backgroundColor: colors.black, // Shadow color for 3D effect
+    top: 9, // Offset to give depth
+    left: 5,
+    zIndex: 0, // Place behind the button
+    borderRadius: 5, // Optional, if you want rounded corners
+    // Optional shadow for additional depth (iOS only)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    // Android
+    elevation: 8,
+  },
   categoryBox: {
     width: 100,
     height: 100,
-    borderColor: '#fff',
-    borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
     marginBottom: 10,
-    color: '#ffffff',
+    zIndex: 1, // Ensure the button is on top of the shadow
+    borderRadius: 5, // Optional: rounded corners
+    borderWidth: 1,
+    borderColor: colors.black,
+
+    // Sharper shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+
+    // Sharp shadow for Android
+    elevation: 10,
   },
+
   categoryFlashListContainer: { paddingHorizontal: 20 },
 });
 export default NewOrderScreen;

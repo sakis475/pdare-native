@@ -7,6 +7,8 @@ import { getStorage, setStorage } from '../storage/store';
 import { checkInternetConnectivity, toast } from '../core/utils';
 import { navigate, ScreenNames } from '../navigation/AppNavigator';
 import dayjs, { datetimeDiff } from '../core/dayjs';
+import { socketManager } from './Sockets/SocketManager';
+import { storageInitData } from './storage/storageInit';
 
 export async function refreshToken() {
   const bearer: SessionBearer | null = await getStorage('session_bearer');
@@ -62,6 +64,9 @@ export async function setBearer(sessionBearer: SessionBearer) {
   console.log(sessionBearer, 'sessionBearer');
   try {
     await setStorage('session_bearer', sessionBearer);
+    await setStorage('currentUser', sessionBearer.user);
+    await socketManager.updateUserInstance();
+    await storageInitData();
   } catch (error) {
     toast('error', 'Something bad happened...');
   }

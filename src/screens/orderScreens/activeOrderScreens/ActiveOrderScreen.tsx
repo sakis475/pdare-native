@@ -25,13 +25,11 @@ const ActiveOrderScreen = ({
   isSheetOpen,
   onItemPress = () => {},
 }: any) => {
-  const [tableName, setTableName] = useState('');
   const [items, setItems] = useState<ItemReq[]>();
   const [table, setTable] = useState<Table>(route.params?.tableParam);
 
   const fetchItems = async () => {
     const tempOrder: Order = table.occupiedByOrder;
-    setTableName(tempOrder?.table?.tableName);
     setItems(tempOrder?.orderItems ?? []);
   };
 
@@ -43,7 +41,7 @@ const ActiveOrderScreen = ({
     if (!items.length && table?.id) {
       await createNewOrder(table);
     }
-    setTableName(table.tableName);
+    setTable(table);
     setTableTempOrder(table);
   };
 
@@ -88,8 +86,15 @@ const ActiveOrderScreen = ({
   //START TABLE MODAL LOGIC
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
-  const handleOpenModal = () => {
-    bottomSheetRef.current?.openModal();
+  const handleOpenSelectTableModal = () => {
+    AlertWithOptions(
+      'Αλλαγή Τραπεζιού',
+      'Είστε σίγουροι ότι θέλετε να αλλάξετε τραπέζι;',
+      () => {
+        bottomSheetRef.current?.openModal();
+      },
+      () => {}
+    );
   };
 
   const handleCloseModal = () => {
@@ -174,11 +179,9 @@ const ActiveOrderScreen = ({
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                Πατήστε το κουμπί «Προσθήκη»
+                Προϊόντα που θα προσθέσετε
               </Text>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                για να προσθέσετε καινούργια προϊόντα.
-              </Text>
+              <Text style={{ textAlign: 'center', color: '#ffffff' }}>θα εμφανιστούν εδώ.</Text>
             </View>
           </>
         ) : (
@@ -188,7 +191,7 @@ const ActiveOrderScreen = ({
           <View style={{ marginBottom: 20 }}>
             <TempBottomOptions
               table={table}
-              handleOpenModal={handleOpenModal}
+              handleOpenSelectTableModal={handleOpenSelectTableModal}
               handleTempOrderPress={handleTempOrderPress}
             />
             <Portal>

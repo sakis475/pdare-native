@@ -30,51 +30,60 @@ import { ScreenNames, navigate, navigateToDraft } from '../navigation/AppNavigat
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import _ from 'lodash';
 import { FlashList } from '@shopify/flash-list';
+import { EventId, socketManager } from '../helpers/Sockets/SocketManager';
+import { getStorage } from '../storage/store';
 
-const TablesScreen = ({ route }: any) => {
-  const isFocused = useIsFocused();
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        fetchData();
-      };
-    }, [])
-  );
-
-  /**This should be handled by sockets! */
-  const fetchData = async () => {
+const TablesScreen = ({ currentIndex }: any) => {
+  const fetchInitialTables = async (): Promise<void> => {
     try {
       const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
-      const items: ItemReq[] = await Requests.getRequest('/items');
-      const allTables: Table[] = [];
+      if (!allTablesIO) {
+        return;
+      }
+      const allTables = await processTables(allTablesIO);
+      setActiveTables(allTables);
+    } catch (error) {
+      console.error('Error fetching initial table data:', error);
+    }
+  };
 
-      for (const table of allTablesIO) {
-        let occupiedByOrder: Order = null;
-        if (table.occupiedByOrder) {
-          occupiedByOrder = convertOccupiedOrderToOrder(table, items);
-        } else {
-          continue;
-        }
+  // Function to handle updates from socket
+  const handleTableUpdates = async (updatedTablesIO: TableIO[]): Promise<void> => {
+    const updatedTables = await processTables(updatedTablesIO);
+    setActiveTables(updatedTables);
+  };
 
-        const _table: Table = {
+  // Function to process table data
+  const processTables = async (tablesIO: TableIO[]): Promise<Table[]> => {
+    const items: ItemReq[] = await getStorage('items');
+
+    return tablesIO.reduce((acc: Table[], table: TableIO) => {
+      if (table.occupiedByOrder) {
+        const occupiedByOrder = convertOccupiedOrderToOrder(table, items);
+        acc.push({
           id: table.id,
           tableName: table.tableName,
           isEnabled: table.isEnabled,
           tableOrder: table.tableOrder,
           occupiedByOrder: occupiedByOrder,
-        };
-        allTables.push(_table);
+        });
       }
-
-      setActiveTables(allTables);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
+      return acc;
+    }, []);
   };
 
   useEffect(() => {
-    fetchData();
-  }, [isFocused]);
+    socketManager.on(EventId.tableOrdersUpdated, handleTableUpdates);
+
+    return () => {
+      socketManager.off(EventId.tableOrdersUpdated);
+    };
+  }, []);
+  useEffect(() => {
+    if (currentIndex && currentIndex !== 0) return;
+    // Fetch initial data
+    fetchInitialTables();
+  }, [currentIndex]);
 
   const [activeTables, setActiveTables] = useState<Table[]>([]);
 

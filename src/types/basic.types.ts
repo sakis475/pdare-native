@@ -20,6 +20,7 @@ interface Category {
   title: string;
   orderCategory: number;
   isEnabled?: boolean;
+  color?: string;
 }
 
 interface Restaurant {
@@ -78,6 +79,8 @@ interface Order {
   comment?: string;
   createdAt?: string;
   closedAt?: string;
+  originalTable?: Table;
+  finalCost?: number;
 }
 
 interface SendOrderItem {
@@ -113,4 +116,5 @@ interface User {
   firstName: string;
   lastName: string;
   role: string;
+  restaurant?: Restaurant;
 }

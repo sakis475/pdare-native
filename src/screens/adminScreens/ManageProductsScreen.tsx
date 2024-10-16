@@ -5,12 +5,13 @@ import { colors } from '../../core/theme';
 import { reqFetchItems } from '../../helpers/storage/orderStorage';
 import { CategoryEditable } from '../../components/itemComponents/CategoryEditable';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import { getStorage } from '../../storage/store';
 const ManageProductsScreen = ({ route }: any) => {
   const [items, setItems] = useState<catGroupedItems>();
   const [categories, setCategories] = useState<Category[]>();
 
   const fetchItems = async () => {
-    const items = await reqFetchItems();
+    const items = await getStorage('groupedItems');
 
     if (!items) {
       return Promise<null>;

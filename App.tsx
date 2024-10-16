@@ -8,7 +8,9 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PortalProvider } from '@gorhom/portal';
-import { ENV_TYPE } from './src/storage/env';
+import { BASE_DOMAIN, ENV_TYPE } from './src/storage/env';
+import { socketManager } from './src/helpers/Sockets/SocketManager';
+import { socketEventSubscriber } from './src/helpers/Sockets/SocketEventSubscriber';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -20,6 +22,10 @@ const App = () => {
       if (ENV_TYPE === 'DEV') {
         require('./src/helpers/Reactotron.js');
       }
+
+      await socketManager.updateUserInstance();
+      socketManager.connect(BASE_DOMAIN);
+      socketEventSubscriber.initialize();
     };
     initializeApp();
   }, []);
