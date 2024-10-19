@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import { colors } from '../../core/theme';
-import { reqFetchItems } from '../../helpers/storage/orderStorage';
 import { CategoryEditable } from '../../components/itemComponents/CategoryEditable';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { getStorage } from '../../storage/store';
-const ManageProductsScreen = ({ route }: any) => {
+const AdminProductsScreen = ({ route }: any) => {
   const [items, setItems] = useState<catGroupedItems>();
   const [categories, setCategories] = useState<Category[]>();
 
@@ -102,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ManageProductsScreen;
+export default AdminProductsScreen;

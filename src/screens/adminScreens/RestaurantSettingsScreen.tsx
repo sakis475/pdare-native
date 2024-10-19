@@ -10,7 +10,7 @@ const RestaurantSettingsScreen = ({ route }: any) => {
       id: '1',
       title: 'Manage Products',
       icon: 'food-fork-drink',
-      screen: ScreenNames.ManageProductsScreen,
+      screen: ScreenNames.AdminProductsScreen,
     },
     {
       id: '2',
@@ -22,13 +22,13 @@ const RestaurantSettingsScreen = ({ route }: any) => {
       id: '3',
       title: 'Manage Users',
       icon: 'account-group',
-      screen: ScreenNames.ManageProductsScreen,
+      screen: ScreenNames.AdminProductsScreen,
     },
     {
       id: '4',
       title: 'Statistics',
       icon: 'chart-bar',
-      screen: ScreenNames.ManageProductsScreen,
+      screen: ScreenNames.AdminProductsScreen,
     },
   ];
 

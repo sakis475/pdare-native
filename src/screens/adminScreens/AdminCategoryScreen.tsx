@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -18,8 +18,11 @@ import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-g
 import { getTextColorBasedOnLuminance } from '../../core/utils';
 import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import { getStorage } from '../../storage/store';
+import { ActivityIndicator } from 'react-native-paper';
+import { navigate, ScreenNames } from '../../navigation/AppNavigator';
 
-const GRID_SIZE = 3;
+const GRID_SIZE = 4;
 const MARGIN = 4;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const TOTAL_MARGIN = MARGIN * (GRID_SIZE + 1);
@@ -27,11 +30,11 @@ const BOX_SIZE = (SCREEN_WIDTH - TOTAL_MARGIN) / GRID_SIZE;
 const GRID_WIDTH = BOX_SIZE * GRID_SIZE + MARGIN * (GRID_SIZE - 1);
 const DRAG_HANDLE_SIZE = 20;
 
-interface Category {
-  id: number;
-  title: string;
-  color: string;
-}
+// interface Category {
+//   id: number;
+//   title: string;
+//   color: string;
+// }
 
 interface BoxData extends Category {
   index: number;
@@ -43,6 +46,10 @@ type BoxProps = {
   onDragEnd: (fromIndex: number, toIndex: number | null) => void;
 };
 
+const handleCategoryPress = (screenName: ScreenNames, props: any = null) => {
+  navigate(screenName, props);
+};
+
 const CategoryBox: React.FC<Category> = (category) => {
   const textColor = getTextColorBasedOnLuminance(category.color ?? colors.darkGrey);
   return (
@@ -51,7 +58,9 @@ const CategoryBox: React.FC<Category> = (category) => {
       <TouchableOpacity
         style={[styles.categoryBox, { backgroundColor: category.color ?? colors.darkGrey }]}
         onPress={() => {
-          console.log('pressed', category.title);
+          handleCategoryPress(ScreenNames.ManageItemsScreen, {
+            categoryTitle: category.title,
+          });
         }}
         activeOpacity={0.7}
       >
@@ -133,7 +142,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
           <FontAwesome6
             name="bars"
             size={DRAG_HANDLE_SIZE}
-            color={getTextColorBasedOnLuminance(item.color)}
+            color={getTextColorBasedOnLuminance(item.color ?? colors.darkGrey)}
           ></FontAwesome6>
         </Animated.View>
       </PanGestureHandler>
@@ -141,29 +150,43 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
   );
 };
 
-const DraggableGridScreen: React.FC = () => {
-  const [categories, setCategories] = useState<BoxData[]>([
-    { id: 1, title: 'Ultra Category 1', color: '#A7B3F9', index: 0 },
-    { id: 2, title: 'Awesome Group 2', color: '#F45D8E', index: 1 },
-    { id: 3, title: 'Mega Set 3', color: '#2CDA91', index: 2 },
-    { id: 4, title: 'Epic Collection 4', color: '#8A67BE', index: 3 },
-    { id: 5, title: 'Super Type 5', color: '#E9C46A', index: 4 },
-    { id: 6, title: 'Hyper Class 6', color: '#4ECDC4', index: 5 },
-    { id: 7, title: 'Cool Variety 7', color: '#FF6B6B', index: 6 },
-    { id: 8, title: 'Fantastic Kind 8', color: '#45B7D1', index: 7 },
-    { id: 9, title: 'Amazing Section 9', color: '#98CE00', index: 8 },
-    { id: 10, title: 'Extreme Assortment 10', color: '#FFA07A', index: 9 },
-    { id: 11, title: 'Ultra Group 11', color: '#20B2AA', index: 10 },
-    { id: 12, title: 'Mega Category 12', color: '#FF69B4', index: 11 },
-    { id: 13, title: 'Super Collection 13', color: '#7B68EE', index: 12 },
-    { id: 14, title: 'Epic Set 14', color: '#00FA9A', index: 13 },
-    { id: 15, title: 'Awesome Type 15', color: '#FF4500', index: 14 },
-    { id: 16, title: 'Hyper Variety 16', color: '#1E90FF', index: 15 },
-    { id: 17, title: 'Cool Class 17', color: '#FFD700', index: 16 },
-    { id: 18, title: 'Fantastic Section 18', color: '#8A2BE2', index: 17 },
-    { id: 19, title: 'Amazing Kind 19', color: '#32CD32', index: 18 },
-    { id: 20, title: 'Extreme Assortment 20', color: '#FF6347', index: 19 },
-  ]);
+const AdminCategoryScreen = () => {
+  const [categories, setCategories] = useState<BoxData[]>();
+
+  const fetchCategories = async () => {
+    const allCategories = await getStorage('categories');
+
+    let index = 0;
+    const categoriesf = allCategories.map((e) => Object.assign(e, { index: index++ }));
+    setCategories(categoriesf);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // const [categories, setCategories] = useState<Category[]>([
+  //   { id: 1, title: 'Ultra Category 1', color: '#A7B3F9', index: 0 },
+  //   { id: 2, title: 'Awesome Group 2', color: '#F45D8E', index: 1 },
+  //   { id: 3, title: 'Mega Set 3', color: '#2CDA91', index: 2 },
+  //   { id: 4, title: 'Epic Collection 4', color: '#8A67BE', index: 3 },
+  //   { id: 5, title: 'Super Type 5', color: '#E9C46A', index: 4 },
+  //   { id: 6, title: 'Hyper Class 6', color: '#4ECDC4', index: 5 },
+  //   { id: 7, title: 'Cool Variety 7', color: '#FF6B6B', index: 6 },
+  //   { id: 8, title: 'Fantastic Kind 8', color: '#45B7D1', index: 7 },
+  //   { id: 9, title: 'Amazing Section 9', color: '#98CE00', index: 8 },
+  //   { id: 10, title: 'Extreme Assortment 10', color: '#FFA07A', index: 9 },
+  //   { id: 11, title: 'Ultra Group 11', color: '#20B2AA', index: 10 },
+  //   { id: 12, title: 'Mega Category 12', color: '#FF69B4', index: 11 },
+  //   { id: 13, title: 'Super Collection 13', color: '#7B68EE', index: 12 },
+  //   { id: 14, title: 'Epic Set 14', color: '#00FA9A', index: 13 },
+  //   { id: 15, title: 'Awesome Type 15', color: '#FF4500', index: 14 },
+  //   { id: 16, title: 'Hyper Variety 16', color: '#1E90FF', index: 15 },
+  //   { id: 17, title: 'Cool Class 17', color: '#FFD700', index: 16 },
+  //   { id: 18, title: 'Fantastic Section 18', color: '#8A2BE2', index: 17 },
+  //   { id: 19, title: 'Amazing Kind 19', color: '#32CD32', index: 18 },
+  //   { id: 20, title: 'Extreme Assortment 20', color: '#FF6347', index: 19 },
+  // ]);
 
   const onDragEnd = useCallback((fromIndex: number, toIndex: number | null) => {
     if (toIndex === null || toIndex === fromIndex) {
@@ -179,27 +202,39 @@ const DraggableGridScreen: React.FC = () => {
   }, []);
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollViewContent}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.container}>
-        <View style={styles.grid}>
-          {categories.map((category) => (
-            <Box
-              key={`category-${category.id}`}
-              item={category}
-              onDragEnd={onDragEnd}
-              categoriesLength={categories.length}
-            />
-          ))}
-        </View>
-      </View>
-    </ScrollView>
+    <>
+      {categories?.length ? (
+        <ScrollView
+          style={styles.scrollViewContainer} // Apply the scrollViewContainer style here
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <View style={styles.grid}>
+              {categories.map((category) => (
+                <Box
+                  key={`category-${category.id}`}
+                  item={category}
+                  onDragEnd={onDragEnd}
+                  categoriesLength={categories.length}
+                />
+              ))}
+            </View>
+          </View>
+        </ScrollView>
+      ) : (
+        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+      )}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollViewContainer: {
+    flex: 1,
+    paddingTop: 10,
+    backgroundColor: '#2F2F2F',
+  },
   scrollViewContent: {
     flexGrow: 1,
   },
@@ -270,4 +305,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DraggableGridScreen;
+export default AdminCategoryScreen;

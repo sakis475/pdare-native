@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Keyboard,
+  Dimensions,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
@@ -21,6 +22,11 @@ import {
 import { getTextColorBasedOnLuminance } from '../../core/utils';
 import { getStorage } from '../../storage/store';
 import { storageInitData } from '../../helpers/storage/storageInit';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const COLUMN_COUNT = 4;
+const MARGIN = 1;
+const BOX_SIZE = (SCREEN_WIDTH - MARGIN * (COLUMN_COUNT + 1)) / COLUMN_COUNT;
 
 const NewOrderScreen = ({ route, navigation }: any) => {
   const [tableName, setTableName] = useState(route.params?.table?.tableName);
@@ -101,7 +107,7 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     navigateToDraft();
   };
 
-  const renderCategories = (category: Category) => {
+  const renderCategories = ({ item: category }: { item: Category }) => {
     const textColor = getTextColorBasedOnLuminance(category.color ?? colors.darkGrey);
     return (
       <View style={styles.buttonContainer}>
@@ -116,7 +122,7 @@ const NewOrderScreen = ({ route, navigation }: any) => {
           }}
           activeOpacity={0.7}
         >
-          <Text style={{ color: textColor, fontWeight: 'bold' }}>{category.title}</Text>
+          <Text style={[styles.categoryText, { color: textColor }]}>{category.title}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -129,10 +135,10 @@ const NewOrderScreen = ({ route, navigation }: any) => {
           <View style={styles.categoriesContainer}>
             <FlashList
               data={categories}
-              renderItem={({ item }) => renderCategories(item)}
-              estimatedItemSize={20}
+              renderItem={renderCategories}
+              estimatedItemSize={BOX_SIZE}
               contentContainerStyle={styles.categoryFlashListContainer}
-              numColumns={3}
+              numColumns={COLUMN_COUNT}
             />
           </View>
           <OrderBottomOptions
@@ -148,93 +154,62 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 10,
     flex: 1,
-    paddingTop: 6,
     backgroundColor: '#2F2F2F',
-    justifyContent: 'center',
-    alignContent: 'center',
   },
   categoriesContainer: {
-    // height: 50, // Set a fixed height for the container of the FlatList
-    // backgroundColor: 'red',
     flex: 1,
-    marginVertical: 16,
-    marginHorizontal: 8,
-  },
-  categoriesFlatList: {
-    flexGrow: 0, // Prevent FlatList from growing beyond the items it contains
-  },
-  categoriesList: {
-    alignItems: 'center',
-    paddingRight: 16, // Adds padding to the end of the list for better scrolling experience
-  },
-  categoryItem: {
-    backgroundColor: 'grey',
-    borderRadius: 2,
-    paddingVertical: 12,
-    paddingHorizontal: 60, //categoriesLength > 3 ? 16 : 36,
-    // width: 150,
-    marginHorizontal: 2,
-  },
-  categoryText: {
-    color: 'white',
-    fontWeight: 'bold',
-    margin: 0,
-    textAlign: 'center',
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Adjust color and opacity as needed
   },
   buttonContainer: {
-    width: 100,
-    height: 110, // Slightly taller to include the shadow part
+    width: BOX_SIZE,
+    height: BOX_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    marginBottom: 5,
+    margin: MARGIN / 2,
   },
   shadowBox: {
     position: 'absolute',
-    width: 100,
-    height: 100,
-    backgroundColor: colors.black, // Shadow color for 3D effect
-    top: 9, // Offset to give depth
-    left: 5,
-    zIndex: 0, // Place behind the button
-    borderRadius: 5, // Optional, if you want rounded corners
-    // Optional shadow for additional depth (iOS only)
+    width: BOX_SIZE - 10,
+    height: BOX_SIZE - 10,
+    backgroundColor: colors.black,
+    top: 10,
+    left: 10,
+    zIndex: 0,
+    borderRadius: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    // Android
     elevation: 8,
   },
   categoryBox: {
-    width: 100,
-    height: 100,
+    width: BOX_SIZE - 10,
+    height: BOX_SIZE - 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-    zIndex: 1, // Ensure the button is on top of the shadow
-    borderRadius: 5, // Optional: rounded corners
+    zIndex: 1,
+    borderRadius: 5,
     borderWidth: 1,
     borderColor: colors.black,
-
-    // Sharper shadow for iOS
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 2,
-
-    // Sharp shadow for Android
     elevation: 10,
   },
-
-  categoryFlashListContainer: { paddingHorizontal: 20 },
+  categoryText: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  categoryFlashListContainer: {
+    paddingHorizontal: MARGIN / 2,
+  },
 });
+
 export default NewOrderScreen;

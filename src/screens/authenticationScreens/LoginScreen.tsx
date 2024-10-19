@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, TextInput, Button, Divider } from 'react-native-paper';
-import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
+import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
@@ -68,96 +68,98 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <LongPressGestureHandler
-        onHandlerStateChange={({ nativeEvent }) => {
-          if (nativeEvent.state === State.ACTIVE) {
-            handleLongPress();
-          }
-        }}
-      >
-        <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
-      </LongPressGestureHandler>
-      <Text style={styles.appTitle}>OrderPOS</Text>
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
-          Advanced Ordering App for Food and Beverages Services
-        </Text>
-      </View>
-      <Divider style={styles.divider} />
+    <ScrollView>
+      <View style={styles.container}>
+        <LongPressGestureHandler
+          onHandlerStateChange={({ nativeEvent }) => {
+            if (nativeEvent.state === State.ACTIVE) {
+              handleLongPress();
+            }
+          }}
+        >
+          <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
+        </LongPressGestureHandler>
+        <Text style={styles.appTitle}>OrderPOS</Text>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
+            Advanced Ordering App for Food and Beverages Services
+          </Text>
+        </View>
+        <Divider style={styles.divider} />
 
-      <View
-        style={{
-          backgroundColor: '#383838',
-          paddingHorizontal: 25,
-          paddingTop: 15,
-          paddingBottom: 35,
-          borderRadius: 10,
-          borderColor: colors.black,
-        }}
-      >
-        <Text style={styles.header}>Σύνδεση</Text>
+        <View
+          style={{
+            backgroundColor: '#383838',
+            paddingHorizontal: 25,
+            paddingTop: 15,
+            paddingBottom: 35,
+            borderRadius: 10,
+            borderColor: colors.black,
+          }}
+        >
+          <Text style={styles.header}>Σύνδεση</Text>
 
-        <View style={{ gap: 15 }}>
-          <View>
-            <TextInput
-              label="Email"
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-              error={!!emailError}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-              style={styles.input}
-              textColor={colors.white}
-              underlineColor={colors.lighterGrey}
-              activeUnderlineColor={colors.white}
-            />
-            {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
-          </View>
-          <View>
-            <View style={[styles.passwordInputContainer]}>
+          <View style={{ gap: 15 }}>
+            <View>
               <TextInput
-                label="Κωδικός"
-                value={password}
-                onChangeText={(text) => setPassword(text)}
-                error={!!passwordError}
-                secureTextEntry={!isPasswordVisible}
-                style={[styles.input, { flex: 1 }]}
+                label="Email"
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+                error={!!emailError}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                style={styles.input}
                 textColor={colors.white}
-                underlineColor={colors.lightGrey}
+                underlineColor={colors.lighterGrey}
                 activeUnderlineColor={colors.white}
               />
-              <TouchableOpacity
-                onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                style={styles.eyeIcon}
-              >
-                <MaterialCommunityIcons
-                  name={isPasswordVisible ? 'eye-off' : 'eye'}
-                  size={24}
-                  color={colors.white}
-                />
-              </TouchableOpacity>
+              {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
             </View>
-            {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
+            <View>
+              <View style={[styles.passwordInputContainer]}>
+                <TextInput
+                  label="Κωδικός"
+                  value={password}
+                  onChangeText={(text) => setPassword(text)}
+                  error={!!passwordError}
+                  secureTextEntry={!isPasswordVisible}
+                  style={[styles.input, { flex: 1 }]}
+                  textColor={colors.white}
+                  underlineColor={colors.lightGrey}
+                  activeUnderlineColor={colors.white}
+                />
+                <TouchableOpacity
+                  onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                  style={styles.eyeIcon}
+                >
+                  <MaterialCommunityIcons
+                    name={isPasswordVisible ? 'eye-off' : 'eye'}
+                    size={24}
+                    color={colors.white}
+                  />
+                </TouchableOpacity>
+              </View>
+              {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
+            </View>
           </View>
+          <TouchableOpacity style={{ marginTop: 2 }}>
+            <Text style={{ textAlign: 'right', fontSize: 12, color: colors.veryLighterGrey }}>
+              Επαναφορά κωδικού πρόσβασης
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={_onLoginPressed} style={styles.button}>
+            <Text style={styles.text}>Σύνδεση</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={{ marginTop: 2 }}>
-          <Text style={{ textAlign: 'right', fontSize: 12, color: colors.veryLighterGrey }}>
-            Επαναφορά κωδικού πρόσβασης
+        <TouchableOpacity style={{ marginTop: 10 }}>
+          <Text style={{ textAlign: 'center', fontSize: 14, color: colors.veryLighterGrey }}>
+            Δημιουργία Καινούργιου Λογαριασμού
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={_onLoginPressed} style={styles.button}>
-          <Text style={styles.text}>Σύνδεση</Text>
-        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={{ marginTop: 10 }}>
-        <Text style={{ textAlign: 'center', fontSize: 14, color: colors.veryLighterGrey }}>
-          Δημιουργία Καινούργιου Λογαριασμού
-        </Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

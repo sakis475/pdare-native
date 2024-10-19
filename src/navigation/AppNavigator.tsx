@@ -13,7 +13,7 @@ import { NavigationContainerRef, Route } from '@react-navigation/native';
 import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
-import ManageProductsScreen from '../screens/adminScreens/ManageProductsScreen';
+import AdminProductsScreen from '../screens/adminScreens/AdminProductsScreen';
 import Tooltip from 'rn-tooltip';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -22,7 +22,8 @@ import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
 import StartLoadingScreen from '../screens/StartLoadingScreen';
 import ActiveOrderScreen from '../screens/orderScreens/activeOrderScreens/ActiveOrderScreen';
 import HistoryOrdersScreen from '../screens/HistoryOrdersScreen';
-import DraggableGridScreen from '../screens/adminScreens/CategoriesAdminScreen';
+import AdminCategoryScreen from '../screens/adminScreens/AdminCategoryScreen';
+import AdminItemListScreen from '../screens/adminScreens/AdminItemListScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -184,7 +185,7 @@ const AppNavigator = () => {
           ),
           animation: 'simple_push',
           headerStyle: {
-            backgroundColor: colors.grey,
+            backgroundColor: colors.darkerGrey,
           },
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
@@ -203,7 +204,7 @@ const AppNavigator = () => {
           ),
           animation: 'slide_from_right',
           headerStyle: {
-            backgroundColor: colors.grey,
+            backgroundColor: colors.darkerGrey,
           },
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
@@ -211,8 +212,8 @@ const AppNavigator = () => {
         })}
       />
       <Stack.Screen
-        name={ScreenNames.ManageProductsScreen}
-        component={ManageProductsScreen}
+        name={ScreenNames.AdminProductsScreen}
+        component={AdminProductsScreen}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -222,7 +223,7 @@ const AppNavigator = () => {
           ),
           animation: 'slide_from_right',
           headerStyle: {
-            backgroundColor: colors.grey,
+            backgroundColor: colors.darkerGrey,
           },
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
@@ -231,23 +232,43 @@ const AppNavigator = () => {
       />
       <Stack.Screen
         name={ScreenNames.ManageCategoriesScreen}
-        component={DraggableGridScreen}
+        component={AdminCategoryScreen}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Προϊόντα'}
+              title={'Διαχείριση Κατηγορίας'}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
           animation: 'slide_from_right',
           headerStyle: {
-            backgroundColor: colors.grey,
+            backgroundColor: colors.darkerGrey,
           },
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
         })}
       />
+      <Stack.Screen
+        name={ScreenNames.ManageItemsScreen}
+        component={AdminItemListScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Διαχείριση Προϊόντων'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+
       <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
         component={ItemDetailsScreen}
@@ -259,7 +280,7 @@ const AppNavigator = () => {
             ></CustomNavigationScreenHeaderTitle>
           ),
           headerStyle: {
-            backgroundColor: colors.grey,
+            backgroundColor: colors.darkerGrey,
           },
           headerRight: () => {
             return (
@@ -389,8 +410,9 @@ export enum ScreenNames {
   ProfileScreen = 'profileScreen',
   ItemDetailsScreen = 'itemDetailsScreen',
   RestaurantSettingsScreen = 'restaurantSettingsScreen',
-  ManageProductsScreen = 'manageProductsScreen',
+  AdminProductsScreen = 'AdminProductsScreen',
   ManageCategoriesScreen = 'manageCategoriesScreen',
+  ManageItemsScreen = 'manageItemsScreen',
   LoginScreen = 'loginScreen',
   StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',
