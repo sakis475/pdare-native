@@ -4,17 +4,12 @@ import { Divider } from 'react-native-paper';
 import { getStorage, setStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
-import { navigateToDraft } from '../../navigation/AppNavigator';
-import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
-import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
-import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
-import { setTableTempOrder } from '../../helpers/storage/orderStorage';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import { CatalogItemEditable } from '../../components/itemComponents/CatalogItemEditable';
 
 const AdminItemListScreen = ({ route }: any) => {
-  const [tableName, setTableName] = useState(route.params.tableName);
-  const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
+  const [categoryTitle, setCategoryTitle] = useState(route.params?.categoryTitle || 'Καφές');
   const [items, setItems] = useState<ItemReq[]>([]);
 
   const fetchItems = async () => {
@@ -26,15 +21,6 @@ const AdminItemListScreen = ({ route }: any) => {
   useEffect(() => {
     fetchItems();
   }, []);
-
-  const handleSelectTable = (table: Table) => {
-    setTableName(table.tableName);
-    setTableTempOrder(table);
-  };
-
-  const handleTempOrderPress = () => {
-    navigateToDraft();
-  };
 
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
@@ -65,7 +51,7 @@ const AdminItemListScreen = ({ route }: any) => {
           <FontAwesome6 name="bars" size={20} color="#fff" />
         </Pressable>
         <View style={styles.itemContent}>
-          <CatalogItemAdd item={item} />
+          <CatalogItemEditable item={item} />
         </View>
       </View>
     );
@@ -86,12 +72,12 @@ const AdminItemListScreen = ({ route }: any) => {
               ItemSeparatorComponent={Divider}
             />
           </View>
-          <OrderBottomOptions
+          {/* <OrderBottomOptions
             tableName={tableName}
             handleOpenModal={handleOpenModal}
             handleTempOrderPress={handleTempOrderPress}
-          />
-          <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
+          /> */}
+          {/* <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} /> */}
         </>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />

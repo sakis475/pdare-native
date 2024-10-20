@@ -24,6 +24,7 @@ import ActiveOrderScreen from '../screens/orderScreens/activeOrderScreens/Active
 import HistoryOrdersScreen from '../screens/HistoryOrdersScreen';
 import AdminCategoryScreen from '../screens/adminScreens/AdminCategoryScreen';
 import AdminItemListScreen from '../screens/adminScreens/AdminItemListScreen';
+import AdminItemDetailsScreen from '../screens/adminScreens/AdminItemDetailsScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -71,7 +72,10 @@ export function navigateToTables() {
 
 const AppNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}>
+    <Stack.Navigator
+      screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}
+      initialRouteName={ScreenNames.ManageItemsScreen}
+    >
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}
         component={StartLoadingScreen}
@@ -268,6 +272,25 @@ const AppNavigator = () => {
           headerBackVisible: false,
         })}
       />
+      <Stack.Screen
+        name={ScreenNames.ManageItemDetailsScreen}
+        component={AdminItemDetailsScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Λεπτομέρειες Προϊόντος'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
 
       <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
@@ -413,6 +436,7 @@ export enum ScreenNames {
   AdminProductsScreen = 'AdminProductsScreen',
   ManageCategoriesScreen = 'manageCategoriesScreen',
   ManageItemsScreen = 'manageItemsScreen',
+  ManageItemDetailsScreen = 'manageItemsDetailsScreen',
   LoginScreen = 'loginScreen',
   StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',

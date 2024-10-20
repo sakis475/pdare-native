@@ -3,12 +3,13 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import { colors } from '../../core/theme';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 export function CatalogItemEditable({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);
 
   const handleAddNewItemPress = () => {
-    navigate(ScreenNames.ItemDetailsScreen, { item });
+    navigate(ScreenNames.ManageItemDetailsScreen, { item });
   };
 
   return (
@@ -21,7 +22,7 @@ export function CatalogItemEditable({ item }: { item: ItemReq }) {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleAddNewItemPress} activeOpacity={0.6}>
-        <Text style={styles.buttonText}>+</Text>
+        <Entypo name="edit" size={20} color={colors.white}></Entypo>
       </TouchableOpacity>
     </View>
   );
@@ -36,14 +37,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   itemTitle: {
-    color: colors.white, // White text color for the title
-    fontWeight: 'bold', // Bold font weight for the title
-    fontSize: 18, // Adjust the font size as necessary
-    marginBottom: 4, // Space between the title and the subtitle
-  },
-  itemDetails: {
-    color: colors.lighterGrey, // Lighter grey color for the subtitle, adjust as needed
-    fontSize: 14, // Adjust the font size as necessary
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginBottom: 4,
   },
   textPressed: {
     opacity: 0.5, // Apply opacity when pressed
@@ -56,11 +53,11 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   button: {
-    width: 45, // Width of the button
-    height: 45, // Height of the button
+    width: 33, // Width of the button
+    height: 33, // Height of the button
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.slightlyLighterGrey, // Slightly lighter color for buttons
+    backgroundColor: colors.lightGrey, // Slightly lighter color for buttons
     borderRadius: 6, // Rounded corners for the buttons
     marginHorizontal: 4, // Space between buttons
   },
