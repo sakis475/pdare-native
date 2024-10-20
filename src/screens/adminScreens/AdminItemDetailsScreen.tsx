@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Pressable,
+  TextInput,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import { navigateBack } from '../../navigation/AppNavigator';
@@ -23,6 +24,9 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     setItem(deepCopy);
   }, [route.params.item]);
 
+  // useEffect(() => {
+  //   console.log(item?.itemPropertiesGrouped[0]);
+  // }, [item]);
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
     if (!item) return;
     setItem((prevItem: any) => ({
@@ -110,6 +114,44 @@ const UnifiedSelect = ({
   itemPropertiesGrouped: ItemProperty[];
   onSelectChange: (updatedProperties: ItemProperty[]) => void;
 }) => {
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingValue, setEditingValue] = useState('');
+
+  const handleEdit = (item: ItemProperty) => {
+    setEditingId(item.id);
+    setEditingValue(item.propertyValue);
+  };
+
+  const handleSaveEdit = () => {
+    if (editingId !== null) {
+      const updatedProperties = itemPropertiesGrouped.map((item) =>
+        item.id === editingId ? { ...item, propertyValue: editingValue } : item
+      );
+      onSelectChange(updatedProperties);
+      setEditingId(null);
+    }
+  };
+
+  const handleAddNew = () => {
+    const newId = Math.max(...itemPropertiesGrouped.map((item) => item.id), 0) + 1;
+    const newProperty: ItemProperty = {
+      id: newId,
+      propertyName: itemPropertiesGrouped[0].propertyName,
+      propertyValue: 'unnamed-property',
+      propertyType: 'singleselect',
+      isEnabled: true,
+      orderGroup: null,
+      orderItem: itemPropertiesGrouped.length,
+      selected: false,
+    };
+    onSelectChange([...itemPropertiesGrouped, newProperty]);
+  };
+
+  const handleDelete = (id: number) => {
+    const updatedProperties = itemPropertiesGrouped.filter((item) => item.id !== id);
+    onSelectChange(updatedProperties);
+  };
+
   const renderItem = ({ item, drag, isActive }: RenderItemParams<ItemProperty>) => (
     <TouchableOpacity
       style={[styles.itemContainer, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}
@@ -119,19 +161,47 @@ const UnifiedSelect = ({
       <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
         <MaterialIcons name="drag-handle" size={20} color="#fff" />
       </Pressable>
+
       <View style={styles.itemContent}>
-        <Text style={styles.itemText}>{item.propertyValue}</Text>
+        {editingId === item.id ? (
+          <>
+            <TouchableOpacity onPress={handleSaveEdit} style={styles.editButton}>
+              <MaterialIcons name="border-color" size={15} color="#fff" />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              value={editingValue}
+              onChangeText={setEditingValue}
+              autoFocus
+            />
+          </>
+        ) : (
+          <>
+            <TouchableOpacity onPress={() => handleEdit(item)} style={styles.editButton}>
+              <MaterialIcons name="border-color" size={15} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.input}>{item.propertyValue}</Text>
+          </>
+        )}
+        <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
+          <MaterialIcons name="delete" size={20} color="#fff" />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <DraggableFlatList
-      data={itemPropertiesGrouped}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString() + item.propertyValue}
-      onDragEnd={({ data }) => onSelectChange(data)}
-    />
+    <View style={styles.container}>
+      <DraggableFlatList
+        data={itemPropertiesGrouped}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString() + item.propertyValue}
+        onDragEnd={({ data }) => onSelectChange(data)}
+      />
+      <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
+        <Text style={styles.addButtonText}>Add New Property</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -163,6 +233,12 @@ const styles = StyleSheet.create({
   dragHandle: {
     padding: 8,
   },
+  input: {
+    flex: 1,
+    color: '#ffffff',
+    fontSize: 16,
+    padding: 8,
+  },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -174,11 +250,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
+    // padding: 8,
   },
   itemText: {
     color: '#ffffff',
-    marginLeft: 8,
+    marginLeft: 1,
   },
   commentButton: {
     width: '100%',
@@ -205,6 +281,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: '#ffffff',
+  },
+  editButton: {
+    // padding: 8,
+    margin: 0,
+    padding: 0,
+  },
+  editInput: {
+    flex: 1,
+    color: '#ffffff',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 4,
+  },
+  addButton: {
+    backgroundColor: colors.primary,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  addButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
   },
 });
 
