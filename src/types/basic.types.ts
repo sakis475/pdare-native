@@ -8,6 +8,8 @@ interface ItemProperty {
   orderItem: number | null;
   selected: boolean;
   oItemPropertyId?: number;
+  isEdited?: boolean;
+  originalPropertyValue?: string;
 }
 
 // example [Milk: [], Sugar: []]

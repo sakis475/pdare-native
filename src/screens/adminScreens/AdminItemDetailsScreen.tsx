@@ -20,13 +20,26 @@ const AdminItemDetailsScreen = ({ route }: any) => {
   useEffect(() => {
     const deepCopy = JSON.parse(JSON.stringify(route.params.item));
     // Convert itemPropertiesGrouped from object to array of [key, value] pairs
-    deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped);
+    deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
+      ([key, value]: any) => {
+        // Add originalPropertyValue to each property
+        return [
+          key,
+          value.map((prop: ItemProperty) => ({
+            ...prop,
+            originalPropertyValue: prop.propertyValue,
+            isEdited: false,
+          })),
+        ];
+      }
+    );
     setItem(deepCopy);
   }, [route.params.item]);
 
   // useEffect(() => {
   //   console.log(item?.itemPropertiesGrouped[0]);
   // }, [item]);
+
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
     if (!item) return;
     setItem((prevItem: any) => ({
@@ -106,16 +119,15 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     </View>
   );
 };
-
-const UnifiedSelect = ({
-  itemPropertiesGrouped,
-  onSelectChange,
-}: {
+interface UnifiedSelectProps {
   itemPropertiesGrouped: ItemProperty[];
   onSelectChange: (updatedProperties: ItemProperty[]) => void;
-}) => {
+}
+
+const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, onSelectChange }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
+  const inputRef = useRef<TextInput>(null);
 
   const handleEdit = (item: ItemProperty) => {
     setEditingId(item.id);
@@ -125,7 +137,13 @@ const UnifiedSelect = ({
   const handleSaveEdit = () => {
     if (editingId !== null) {
       const updatedProperties = itemPropertiesGrouped.map((item) =>
-        item.id === editingId ? { ...item, propertyValue: editingValue } : item
+        item.id === editingId
+          ? {
+              ...item,
+              propertyValue: editingValue,
+              isEdited: editingValue !== item.originalPropertyValue,
+            }
+          : item
       );
       onSelectChange(updatedProperties);
       setEditingId(null);
@@ -143,6 +161,7 @@ const UnifiedSelect = ({
       orderGroup: null,
       orderItem: itemPropertiesGrouped.length,
       selected: false,
+      isEdited: false,
     };
     onSelectChange([...itemPropertiesGrouped, newProperty]);
   };
@@ -166,21 +185,25 @@ const UnifiedSelect = ({
         {editingId === item.id ? (
           <>
             <TouchableOpacity onPress={handleSaveEdit} style={styles.editButton}>
-              <MaterialIcons name="border-color" size={15} color="#fff" />
+              <MaterialIcons name="check" size={20} color="#fff" />
             </TouchableOpacity>
             <TextInput
-              style={styles.input}
+              ref={inputRef}
+              style={[styles.input, styles.editingInput]}
               value={editingValue}
               onChangeText={setEditingValue}
+              onBlur={handleSaveEdit}
               autoFocus
             />
           </>
         ) : (
           <>
             <TouchableOpacity onPress={() => handleEdit(item)} style={styles.editButton}>
-              <MaterialIcons name="border-color" size={15} color="#fff" />
+              <MaterialIcons name="edit" size={20} color="#fff" />
             </TouchableOpacity>
-            <Text style={styles.input}>{item.propertyValue}</Text>
+            <Text style={[styles.input, item.isEdited && styles.editedInput]}>
+              {item.propertyValue}
+            </Text>
           </>
         )}
         <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
@@ -307,6 +330,13 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 8,
     marginLeft: 8,
+  },
+  editingInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 4,
+  },
+  editedInput: {
+    backgroundColor: 'rgba(0, 255, 0, 0.2)',
   },
 });
 
