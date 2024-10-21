@@ -5,17 +5,26 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Pressable,
   TextInput,
   FlatList,
+  Alert,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import { navigateBack } from '../../navigation/AppNavigator';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
+import { AlertWithOptions } from '../../core/utils';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
+  const [editingPropertyName, setEditingPropertyName] = useState<string | null>(null);
+  const [editedName, setEditedName] = useState<string>('');
+  const [originalPropertyNames, setOriginalPropertyNames] = useState<{ [key: string]: string }>({});
+  const propertyTypeBottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(
+    null
+  );
+  const [editingPropertyType, setEditingPropertyType] = useState<string | null>(null);
 
   useEffect(() => {
     const deepCopy = JSON.parse(JSON.stringify(route.params.item));
@@ -32,6 +41,12 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       }
     );
     setItem(deepCopy);
+    // console.log(JSON.stringify(deepCopy));
+    // Initialize originalPropertyNames
+    const originals = Object.fromEntries(
+      deepCopy.itemPropertiesGrouped.map(([key]: [string, any]) => [key, key])
+    );
+    setOriginalPropertyNames(originals);
   }, [route.params.item]);
 
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
@@ -61,10 +76,96 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     }));
   };
 
+  const startEditing = (propertyName: string) => {
+    setEditingPropertyName(propertyName);
+    setEditedName(propertyName);
+  };
+
+  const handlePropertyNameEdit = () => {
+    if (!item || !editingPropertyName) return;
+    setItem((prevItem: any) => {
+      const updatedItemPropertiesGrouped = prevItem.itemPropertiesGrouped.map(
+        ([key, value]: [string, any[]]) =>
+          key === editingPropertyName ? [editedName, value] : [key, value]
+      );
+
+      const itemPropertyNames = updatedItemPropertiesGrouped.map(([key]: [string, any]) => key);
+      const duplicatePropertyNames = itemPropertyNames.filter(
+        (item: any, index: number) => itemPropertyNames.indexOf(item) < index
+      );
+      if (duplicatePropertyNames.length) {
+        AlertWithOptions(
+          'Duplicate Name',
+          'A property with this name already exists. Please choose a different name.',
+          ...[, , ,],
+          ''
+        );
+        return {
+          ...prevItem,
+        };
+      }
+      return {
+        ...prevItem,
+        itemPropertiesGrouped: updatedItemPropertiesGrouped,
+      };
+    });
+    setEditingPropertyName(null);
+  };
+
+  const handlePropertyTypeChange = (newType: string) => {
+    if (!item || !editingPropertyType) return;
+    setItem((prevItem: any) => ({
+      ...prevItem,
+      itemPropertiesGrouped: prevItem.itemPropertiesGrouped.map(([key, value]: [string, any[]]) =>
+        key === editingPropertyType
+          ? [key, value.map((prop) => ({ ...prop, propertyType: newType }))]
+          : [key, value]
+      ),
+    }));
+    setEditingPropertyType(null);
+    propertyTypeBottomSheetRef.current?.closeModal();
+  };
+
   const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => (
     <View style={styles.propertyGroup}>
       <View style={styles.propertyGroupHeader}>
-        <Text style={styles.header}>{propertyName}</Text>
+        {editingPropertyName === propertyName ? (
+          <View style={styles.itemContainer}>
+            <TouchableOpacity onPress={handlePropertyNameEdit} style={styles.editButton}>
+              <MaterialIcons name="check" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TextInput
+              style={[styles.input, styles.editingInput]}
+              value={editedName}
+              onChangeText={setEditedName}
+              onBlur={handlePropertyNameEdit}
+              autoFocus
+            />
+          </View>
+        ) : (
+          <View style={styles.itemContainer}>
+            <TouchableOpacity onPress={() => startEditing(propertyName)} style={styles.editButton}>
+              <MaterialIcons name="edit" size={20} color="#fff" />
+            </TouchableOpacity>
+            <Text
+              style={[
+                styles.header,
+                propertyName !== originalPropertyNames[propertyName] && styles.editedInput,
+              ]}
+            >
+              {propertyName}
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                setEditingPropertyType(propertyName);
+                propertyTypeBottomSheetRef.current?.openModal();
+              }}
+              style={styles.propertyTypeButton}
+            >
+              <Text style={styles.propertyTypeText}>{properties[0].propertyType}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.reorderButtons}>
           <TouchableOpacity
             onPress={() => movePropertyGroup(index, 'up')}
@@ -115,11 +216,18 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                   ...item,
                   itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
                 };
-                navigateBack();
+
+                console.log(JSON.stringify(itemToSave), 'itemToSave');
+                // navigateBack();
               }}
             >
               <Text style={styles.addItemBtnText}>Αποθήκευση</Text>
             </TouchableOpacity>
+            <PropertyTypeBottomSheet
+              ref={propertyTypeBottomSheetRef}
+              currentType={editingPropertyType}
+              onTypeChange={handlePropertyTypeChange}
+            />
           </View>
         </>
       ) : (
@@ -128,7 +236,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     </View>
   );
 };
-
 interface UnifiedSelectProps {
   itemPropertiesGrouped: ItemProperty[];
   onSelectChange: (updatedProperties: ItemProperty[]) => void;
@@ -278,7 +385,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 16,
     backgroundColor: colors.darkGrey,
   },
   propertyGroupContent: {
@@ -348,7 +456,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   editedInput: {
-    backgroundColor: 'rgba(0, 255, 0, 0.2)',
+    color: colors.green,
   },
   reorderButtons: {
     flexDirection: 'row',
@@ -358,6 +466,16 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.5,
+  },
+  propertyTypeButton: {
+    marginLeft: 10,
+    padding: 5,
+    backgroundColor: colors.grey,
+    borderRadius: 5,
+  },
+  propertyTypeText: {
+    color: colors.white,
+    fontSize: 12,
   },
 });
 

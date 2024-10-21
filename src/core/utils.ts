@@ -68,8 +68,8 @@ export function normalizeGreek(str: string) {
 export function AlertWithOptions(
   title: string,
   message: string,
-  onOK: any,
-  onCancel: any,
+  onOK: any = () => {},
+  onCancel: any = () => {},
   okTitle: string = 'OK',
   cancelTitle: string = 'Cancel'
 ) {
