@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
   Pressable,
   TextInput,
+  FlatList,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import { navigateBack } from '../../navigation/AppNavigator';
-import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -19,10 +19,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
   useEffect(() => {
     const deepCopy = JSON.parse(JSON.stringify(route.params.item));
-    // Convert itemPropertiesGrouped from object to array of [key, value] pairs
     deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
       ([key, value]: any) => {
-        // Add originalPropertyValue to each property
         return [
           key,
           value.map((prop: ItemProperty) => ({
@@ -36,10 +34,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     setItem(deepCopy);
   }, [route.params.item]);
 
-  // useEffect(() => {
-  //   console.log(item?.itemPropertiesGrouped[0]);
-  // }, [item]);
-
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
     if (!item) return;
     setItem((prevItem: any) => ({
@@ -50,19 +44,46 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     }));
   };
 
-  const renderPropertyGroup = ({
-    item: [propertyName, properties],
-    drag,
-    isActive,
-  }: RenderItemParams<[string, ItemProperty[]]>) => (
-    <View
-      style={[styles.propertyGroup, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}
-    >
+  const movePropertyGroup = (index: number, direction: 'up' | 'down') => {
+    if (!item) return;
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= (item.itemPropertiesGrouped as any).length) return;
+
+    const newItemPropertiesGrouped = [...(item.itemPropertiesGrouped as any)];
+    [newItemPropertiesGrouped[index], newItemPropertiesGrouped[newIndex]] = [
+      newItemPropertiesGrouped[newIndex],
+      newItemPropertiesGrouped[index],
+    ];
+
+    setItem((prevItem: any) => ({
+      ...prevItem,
+      itemPropertiesGrouped: newItemPropertiesGrouped,
+    }));
+  };
+
+  const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => (
+    <View style={styles.propertyGroup}>
       <View style={styles.propertyGroupHeader}>
-        <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
-          <FontAwesome6 name="bars" size={20} color="#fff" />
-        </Pressable>
         <Text style={styles.header}>{propertyName}</Text>
+        <View style={styles.reorderButtons}>
+          <TouchableOpacity
+            onPress={() => movePropertyGroup(index, 'up')}
+            disabled={index === 0}
+            style={[styles.reorderButton, index === 0 && styles.disabledButton]}
+          >
+            <MaterialIcons name="arrow-upward" size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => movePropertyGroup(index, 'down')}
+            disabled={index === (item!.itemPropertiesGrouped as any).length - 1}
+            style={[
+              styles.reorderButton,
+              index === (item!.itemPropertiesGrouped as any).length - 1 && styles.disabledButton,
+            ]}
+          >
+            <MaterialIcons name="arrow-downward" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.propertyGroupContent}>
         <UnifiedSelect
@@ -80,32 +101,20 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       {item ? (
         <>
           <View style={{ flex: 1 }}>
-            <DraggableFlatList
+            <FlatList
               data={item.itemPropertiesGrouped as any}
               renderItem={renderPropertyGroup}
               keyExtractor={([key]) => key}
-              onDragEnd={({ data }) => {
-                setItem((prevItem: any) => ({
-                  ...prevItem,
-                  itemPropertiesGrouped: data,
-                }));
-              }}
             />
           </View>
           <View style={styles.addItemContainer}>
             <TouchableOpacity
               style={styles.addItemBtn}
               onPress={async () => {
-                // Convert itemPropertiesGrouped back to an object before saving
                 const itemToSave = {
                   ...item,
                   itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
                 };
-                // if (isUpdate) {
-                //   await updateItemOfTempItem(itemToSave, itemToSave.newItemId!);
-                // } else {
-                //   await addNewItemToTemp(itemToSave);
-                // }
                 navigateBack();
               }}
             >
@@ -119,6 +128,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     </View>
   );
 };
+
 interface UnifiedSelectProps {
   itemPropertiesGrouped: ItemProperty[];
   onSelectChange: (updatedProperties: ItemProperty[]) => void;
@@ -171,15 +181,30 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
     onSelectChange(updatedProperties);
   };
 
-  const renderItem = ({ item, drag, isActive }: RenderItemParams<ItemProperty>) => (
-    <TouchableOpacity
-      style={[styles.itemContainer, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}
-      onLongPress={drag}
-      activeOpacity={0.8}
-    >
-      <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
-        <MaterialIcons name="drag-handle" size={20} color="#fff" />
-      </Pressable>
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= itemPropertiesGrouped.length) return;
+
+    const newProperties = [...itemPropertiesGrouped];
+    [newProperties[index], newProperties[newIndex]] = [
+      newProperties[newIndex],
+      newProperties[index],
+    ];
+
+    onSelectChange(newProperties);
+  };
+
+  const renderItem = ({ item, index }: { item: ItemProperty; index: number }) => (
+    <View style={styles.itemContainer}>
+      <View style={styles.reorderButtons}>
+        <TouchableOpacity
+          onPress={() => moveItem(index, 'up')}
+          disabled={index === 0}
+          style={[styles.reorderButton, index === 0 && styles.disabledButton]}
+        >
+          <MaterialIcons name="arrow-upward" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.itemContent}>
         {editingId === item.id ? (
@@ -210,16 +235,27 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
           <MaterialIcons name="delete" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+      <View style={styles.reorderButtons}>
+        <TouchableOpacity
+          onPress={() => moveItem(index, 'down')}
+          disabled={index === itemPropertiesGrouped.length - 1}
+          style={[
+            styles.reorderButton,
+            index === itemPropertiesGrouped.length - 1 && styles.disabledButton,
+          ]}
+        >
+          <MaterialIcons name="arrow-downward" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 
   return (
     <View style={styles.container}>
-      <DraggableFlatList
+      <FlatList
         data={itemPropertiesGrouped}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString() + item.propertyValue}
-        onDragEnd={({ data }) => onSelectChange(data)}
       />
       <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
         <Text style={styles.addButtonText}>Add New Property</Text>
@@ -241,6 +277,7 @@ const styles = StyleSheet.create({
   propertyGroupHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 8,
     backgroundColor: colors.darkGrey,
   },
@@ -251,10 +288,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#ffffff',
-    marginLeft: 16,
-  },
-  dragHandle: {
-    padding: 8,
   },
   input: {
     flex: 1,
@@ -268,26 +301,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 8,
     overflow: 'hidden',
+    backgroundColor: colors.grey,
   },
   itemContent: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    // padding: 8,
-  },
-  itemText: {
-    color: '#ffffff',
-    marginLeft: 1,
-  },
-  commentButton: {
-    width: '100%',
-    minHeight: 50,
-    backgroundColor: colors.veryLighterGrey,
-    justifyContent: 'center',
-  },
-  commentText: {
-    color: colors.black,
-    marginLeft: 20,
   },
   addItemContainer: {
     paddingVertical: 8,
@@ -306,15 +325,8 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   editButton: {
-    // padding: 8,
     margin: 0,
     padding: 0,
-  },
-  editInput: {
-    flex: 1,
-    color: '#ffffff',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 4,
   },
   addButton: {
     backgroundColor: colors.primary,
@@ -337,6 +349,15 @@ const styles = StyleSheet.create({
   },
   editedInput: {
     backgroundColor: 'rgba(0, 255, 0, 0.2)',
+  },
+  reorderButtons: {
+    flexDirection: 'row',
+  },
+  reorderButton: {
+    paddingHorizontal: 5,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
 
