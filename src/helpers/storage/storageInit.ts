@@ -26,7 +26,7 @@ async function storageInitCategories() {
 }
 
 // groupedItems;
-async function storageInitGroupedItems() {
+export async function storageInitGroupedItems() {
   let items: ItemReq[];
   items = await getStorage('items');
 

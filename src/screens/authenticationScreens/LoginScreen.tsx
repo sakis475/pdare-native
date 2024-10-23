@@ -68,7 +68,7 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={{ flex: 1, height: '100%', backgroundColor: colors.lightBlack }}>
       <View style={styles.container}>
         <LongPressGestureHandler
           onHandlerStateChange={({ nativeEvent }) => {
@@ -165,7 +165,6 @@ const LoginScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     padding: 20,
     backgroundColor: colors.lightBlack,

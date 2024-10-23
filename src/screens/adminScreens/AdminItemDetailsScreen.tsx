@@ -15,6 +15,7 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
 import { AlertWithOptions } from '../../core/utils';
+import { Checkbox, RadioButton } from 'react-native-paper';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -126,76 +127,129 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     propertyTypeBottomSheetRef.current?.closeModal();
   };
 
-  const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => (
-    <View style={styles.propertyGroup}>
-      <View style={styles.propertyGroupHeader}>
-        {editingPropertyName === propertyName ? (
-          <View style={styles.itemContainer}>
-            <TouchableOpacity onPress={handlePropertyNameEdit} style={styles.editButton}>
-              <MaterialIcons name="check" size={20} color="#fff" />
-            </TouchableOpacity>
-            <TextInput
-              style={[styles.input, styles.editingInput]}
-              value={editedName}
-              onChangeText={setEditedName}
-              onBlur={handlePropertyNameEdit}
-              autoFocus
-            />
+  const TypeSelect = ({ propertyType }: any) => {
+    return (
+      <View>
+        {propertyType === 'singleselect' ? (
+          <View style={styles.itemContent}>
+            <MaterialIcons name="radio-button-checked" size={20} color={colors.white} />
+            <Text style={styles.text}>Μονό</Text>
           </View>
         ) : (
-          <View style={styles.itemContainer}>
-            <TouchableOpacity onPress={() => startEditing(propertyName)} style={styles.editButton}>
-              <MaterialIcons name="edit" size={20} color="#fff" />
-            </TouchableOpacity>
-            <Text
-              style={[
-                styles.header,
-                propertyName !== originalPropertyNames[propertyName] && styles.editedInput,
-              ]}
-            >
-              {propertyName}
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setEditingPropertyType(propertyName);
-                propertyTypeBottomSheetRef.current?.openModal();
-              }}
-              style={styles.propertyTypeButton}
-            >
-              <Text style={styles.propertyTypeText}>{properties[0].propertyType}</Text>
-            </TouchableOpacity>
+          <View style={styles.itemContent}>
+            <MaterialIcons name="check-box" size={20} color={colors.white} />
+            <Text style={styles.text}>Πολλαπλό</Text>
           </View>
         )}
-        <View style={styles.reorderButtons}>
-          <TouchableOpacity
-            onPress={() => movePropertyGroup(index, 'up')}
-            disabled={index === 0}
-            style={[styles.reorderButton, index === 0 && styles.disabledButton]}
-          >
-            <MaterialIcons name="arrow-upward" size={20} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => movePropertyGroup(index, 'down')}
-            disabled={index === (item!.itemPropertiesGrouped as any).length - 1}
-            style={[
-              styles.reorderButton,
-              index === (item!.itemPropertiesGrouped as any).length - 1 && styles.disabledButton,
-            ]}
-          >
-            <MaterialIcons name="arrow-downward" size={20} color="#fff" />
-          </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => {
+    const itemPropertyWillBeDeleted = !properties?.length;
+
+    return (
+      <View style={styles.propertyGroup}>
+        <View style={styles.propertyGroupHeader}>
+          {editingPropertyName === propertyName ? (
+            <View style={styles.itemContainer}>
+              <TouchableOpacity onPress={handlePropertyNameEdit} style={styles.editButton}>
+                <MaterialIcons name="check" size={20} color="#fff" />
+              </TouchableOpacity>
+              <TextInput
+                style={[styles.input, styles.editingInput]}
+                value={editedName}
+                onChangeText={setEditedName}
+                onBlur={handlePropertyNameEdit}
+                autoFocus
+              />
+            </View>
+          ) : (
+            <View
+              style={[
+                styles.itemContainer,
+                {
+                  justifyContent: 'space-between',
+                  backgroundColor: itemPropertyWillBeDeleted ? colors.lightRed : null,
+                },
+              ]}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => startEditing(propertyName)}
+                  style={styles.editButton}
+                  disabled={itemPropertyWillBeDeleted}
+                >
+                  <MaterialIcons name="edit" size={20} color="#fff" />
+                </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.header,
+                    propertyName !== originalPropertyNames[propertyName] && styles.editedInput,
+                    itemPropertyWillBeDeleted && styles.deletedText,
+                  ]}
+                >
+                  {propertyName}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  setEditingPropertyType(propertyName);
+                  propertyTypeBottomSheetRef.current?.openModal();
+                }}
+                style={styles.propertyTypeButton}
+                disabled={itemPropertyWillBeDeleted}
+              >
+                <Text style={styles.propertyTypeText}>
+                  <TypeSelect propertyType={properties?.[0]?.propertyType}></TypeSelect>
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          <View style={styles.reorderButtons}>
+            <TouchableOpacity
+              onPress={() => movePropertyGroup(index, 'up')}
+              disabled={index === 0 || itemPropertyWillBeDeleted}
+              style={[
+                styles.reorderButton,
+                (index === 0 || itemPropertyWillBeDeleted) && styles.disabledButton,
+              ]}
+            >
+              <MaterialIcons name="arrow-upward" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => movePropertyGroup(index, 'down')}
+              disabled={
+                index === (item!.itemPropertiesGrouped as any).length - 1 ||
+                itemPropertyWillBeDeleted
+              }
+              style={[
+                styles.reorderButton,
+                (index === (item!.itemPropertiesGrouped as any).length - 1 ||
+                  itemPropertyWillBeDeleted) &&
+                  styles.disabledButton,
+              ]}
+            >
+              <MaterialIcons name="arrow-downward" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.propertyGroupContent}>
+          <UnifiedSelect
+            itemPropertiesGrouped={properties}
+            onSelectChange={(updatedProperties) =>
+              handleSelectChange(propertyName, updatedProperties)
+            }
+          />
         </View>
       </View>
-      <View style={styles.propertyGroupContent}>
-        <UnifiedSelect
-          itemPropertiesGrouped={properties}
-          onSelectChange={(updatedProperties) =>
-            handleSelectChange(propertyName, updatedProperties)
-          }
-        />
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -271,12 +325,12 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
     const newId = Math.max(...itemPropertiesGrouped.map((item) => item.id), 0) + 1;
     const newProperty: ItemProperty = {
       id: newId,
-      propertyName: itemPropertiesGrouped[0].propertyName,
+      propertyName: itemPropertiesGrouped?.[0]?.propertyName ?? 'multiselect',
       propertyValue: 'unnamed-property',
       propertyType: 'singleselect',
       isEnabled: true,
       orderGroup: null,
-      orderItem: itemPropertiesGrouped.length,
+      orderItem: itemPropertiesGrouped?.length ?? 0,
       selected: false,
       isEdited: false,
     };
@@ -333,6 +387,24 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
             <TouchableOpacity onPress={() => handleEdit(item)} style={styles.editButton}>
               <MaterialIcons name="edit" size={20} color="#fff" />
             </TouchableOpacity>
+
+            {item.propertyType === 'singleselect' ? (
+              <RadioButton.Android
+                value={item.propertyValue}
+                status={item.selected ? 'checked' : 'unchecked'}
+                color={'#6495ED'}
+                uncheckedColor={'#ffffff'}
+                onPress={() => {}}
+              />
+            ) : (
+              <Checkbox.Android
+                status={item.selected ? 'checked' : 'unchecked'}
+                color={'#6495ED'}
+                uncheckedColor={'#ffffff'}
+                onPress={() => {}}
+              />
+            )}
+
             <Text style={[styles.input, item.isEdited && styles.editedInput]}>
               {item.propertyValue}
             </Text>
@@ -404,12 +476,13 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   itemContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
     borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: colors.grey,
+    padding: 3,
   },
   itemContent: {
     flex: 1,
@@ -470,12 +543,20 @@ const styles = StyleSheet.create({
   propertyTypeButton: {
     marginLeft: 10,
     padding: 5,
-    backgroundColor: colors.grey,
     borderRadius: 5,
   },
   propertyTypeText: {
     color: colors.white,
     fontSize: 12,
+  },
+  text: {
+    fontSize: 16,
+    color: colors.white,
+  },
+  deletedText: {
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid',
+    color: colors.white,
   },
 });
 

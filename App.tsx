@@ -11,6 +11,7 @@ import { PortalProvider } from '@gorhom/portal';
 import { BASE_DOMAIN, ENV_TYPE } from './src/storage/env';
 import { socketManager } from './src/helpers/Sockets/SocketManager';
 import { socketEventSubscriber } from './src/helpers/Sockets/SocketEventSubscriber';
+import { getStorage } from './src/storage/store';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -21,9 +22,11 @@ const App = () => {
       setLocalizedStringsLoaded(true);
       if (ENV_TYPE === 'DEV') {
         require('./src/helpers/Reactotron.js');
+        console.log(await getStorage('session_bearer'), 'session_bearer');
       }
 
       await socketManager.updateUserInstance();
+
       socketManager.connect(BASE_DOMAIN);
       socketEventSubscriber.initialize();
     };

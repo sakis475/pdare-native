@@ -1,5 +1,6 @@
-import { getStorage, setStorage } from '../../storage/store';
-import { EventId, EventString, socketManager } from './SocketManager';
+import { setStorage } from '../../storage/store';
+import { storageInitGroupedItems } from '../storage/storageInit';
+import { EventId, socketManager } from './SocketManager';
 
 class SocketEventSubscriber {
   // Method to initialize and subscribe to all socket events
@@ -9,6 +10,8 @@ class SocketEventSubscriber {
 
   // Handler for "itemsUpdated" event
   private static async handleItemsUpdate(items: ItemReq[]): Promise<void> {
+    console.log('Socket Event: handleItemsUpdate');
+
     const categoriesAll = items.map((e) => e.category);
     const uniqueCategories = categoriesAll
       ?.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id))
@@ -16,6 +19,7 @@ class SocketEventSubscriber {
 
     setStorage('categories', uniqueCategories);
     setStorage('items', items);
+    storageInitGroupedItems();
   }
 }
 

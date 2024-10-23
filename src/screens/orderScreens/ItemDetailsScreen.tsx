@@ -37,21 +37,21 @@ const UnifiedSelect = ({
   const [checkedStates, setCheckedStates] = useState<{ [key: number]: boolean }>({}); // For checkboxes
 
   useEffect(() => {
-    if (isUpdate) {
-      const multiCheckedStates: any = {};
-      for (const itemProperty of itemPropertiesGrouped) {
-        if (itemProperty.propertyType === 'singleselect') {
-          if (itemProperty.selected) {
-            setSelectedId(itemProperty.id);
-          }
-        } else if (itemProperty.propertyType === 'multiselect') {
-          if (itemProperty.selected) {
-            multiCheckedStates[itemProperty.id] = true;
-          }
+    // if (isUpdate) {
+    const multiCheckedStates: any = {};
+    for (const itemProperty of itemPropertiesGrouped) {
+      if (itemProperty.propertyType === 'singleselect') {
+        if (itemProperty.selected) {
+          setSelectedId(itemProperty.id);
+        }
+      } else if (itemProperty.propertyType === 'multiselect') {
+        if (itemProperty.selected) {
+          multiCheckedStates[itemProperty.id] = true;
         }
       }
-      setCheckedStates(multiCheckedStates);
     }
+    setCheckedStates(multiCheckedStates);
+    // }
   }, []);
 
   const handleRadioSelectChange = (property: ItemProperty) => {
@@ -151,6 +151,8 @@ const ItemDetailsScreen = ({ route }: any) => {
     const deepCopy = JSON.parse(JSON.stringify(route.params.item));
 
     setItem(deepCopy);
+
+    console.log(JSON.stringify(deepCopy), 'item');
   }, [route.params.item]);
 
   const handleSelectChange = (updatedProperty: ItemProperty) => {

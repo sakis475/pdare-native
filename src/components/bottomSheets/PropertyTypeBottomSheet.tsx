@@ -56,8 +56,8 @@ const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
           backgroundStyle={{ backgroundColor: colors.darkGrey }}
         >
           <BottomSheetView style={styles.container}>
-            <Text style={styles.title}>Τύπος Επιλογής</Text>
-            <Text style={styles.subtitle}>{currentType}</Text>
+            <Text style={styles.title}>Αλλαγή Τύπου Επιλογής</Text>
+            <Text style={styles.subtitle}>Τίτλος: {currentType}</Text>
             <TouchableOpacity
               style={[styles.button, currentType === 'singleselect' && styles.selectedButton]}
               onPress={() => handleTypeSelection('singleselect')}
