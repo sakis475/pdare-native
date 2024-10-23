@@ -42,16 +42,20 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       }
     );
     setItem(deepCopy);
-    // console.log(JSON.stringify(deepCopy));
-    // Initialize originalPropertyNames
+
     const originals = Object.fromEntries(
       deepCopy.itemPropertiesGrouped.map(([key]: [string, any]) => [key, key])
     );
     setOriginalPropertyNames(originals);
   }, [route.params.item]);
 
+  // useEffect(() => {
+  //   console.log(JSON.stringify(item), 'item');
+  // }, [item]);
+
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
     if (!item) return;
+
     setItem((prevItem: any) => ({
       ...prevItem,
       itemPropertiesGrouped: prevItem.itemPropertiesGrouped.map(([key, value]: [string, any[]]) =>
@@ -117,11 +121,31 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     if (!item || !editingPropertyType) return;
     setItem((prevItem: any) => ({
       ...prevItem,
-      itemPropertiesGrouped: prevItem.itemPropertiesGrouped.map(([key, value]: [string, any[]]) =>
-        key === editingPropertyType
-          ? [key, value.map((prop) => ({ ...prop, propertyType: newType }))]
-          : [key, value]
-      ),
+      itemPropertiesGrouped: prevItem.itemPropertiesGrouped.map(([key, value]: [string, any[]]) => {
+        if (key === editingPropertyType) {
+          // If switching to singleselect, ensure only one item remains selected
+          if (newType === 'singleselect') {
+            const selectedItems = value.filter((prop) => prop.selected);
+            // If multiple items are selected, keep only the first one selected
+            const updatedProperties = value.map((prop, index) => ({
+              ...prop,
+              propertyType: newType,
+              selected: selectedItems.length > 0 ? prop.id === selectedItems[0].id : false,
+            }));
+            return [key, updatedProperties];
+          } else {
+            // If switching to multiselect, keep existing selections
+            return [
+              key,
+              value.map((prop) => ({
+                ...prop,
+                propertyType: newType,
+              })),
+            ];
+          }
+        }
+        return [key, value];
+      }),
     }));
     setEditingPropertyType(null);
     propertyTypeBottomSheetRef.current?.closeModal();
@@ -251,6 +275,32 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     );
   };
 
+  const transformItemData = (inputItem: any): any => {
+    // Flatten itemPropertiesGrouped into a single array
+    const itemProperties = Object.values(inputItem.itemPropertiesGrouped)
+      .flat()
+      .map((prop: any) => ({
+        propertyName: prop.propertyName,
+        propertyType: prop.propertyType,
+        propertyValue: prop.propertyValue,
+        orderGroup: prop.orderGroup,
+        orderItem: prop.orderItem,
+      }));
+
+    // Transform to the desired output format
+    return {
+      title: inputItem.title,
+      description: inputItem.description,
+      cost: inputItem.cost,
+      orderItem: null, // Setting to null as per the output example
+      isEnabled: inputItem.isEnabled,
+      category: {
+        id: inputItem.category.id,
+      },
+      itemProperties,
+    };
+  };
+
   return (
     <View style={styles.container}>
       {item ? (
@@ -270,8 +320,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                   ...item,
                   itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
                 };
-
-                console.log(JSON.stringify(itemToSave), 'itemToSave');
+                const tranformedData = transformItemData(itemToSave);
+                console.log(JSON.stringify(tranformedData, null, 2), 'itemToSave');
                 // navigateBack();
               }}
             >
@@ -300,6 +350,26 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
   const [editingValue, setEditingValue] = useState('');
   const inputRef = useRef<TextInput>(null);
 
+  const handleSelectionChange = (selectedItem: ItemProperty) => {
+    let updatedProperties: ItemProperty[];
+
+    if (selectedItem.propertyType === 'singleselect') {
+      // For radio buttons: only one can be selected
+      updatedProperties = itemPropertiesGrouped.map((item) => ({
+        ...item,
+        selected: item.id === selectedItem.id ? !item.selected : false,
+      }));
+    } else {
+      // For checkboxes: multiple can be selected
+      updatedProperties = itemPropertiesGrouped.map((item) => ({
+        ...item,
+        selected: item.id === selectedItem.id ? !item.selected : item.selected,
+      }));
+    }
+
+    onSelectChange(updatedProperties);
+  };
+
   const handleEdit = (item: ItemProperty) => {
     setEditingId(item.id);
     setEditingValue(item.propertyValue);
@@ -327,7 +397,7 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
       id: newId,
       propertyName: itemPropertiesGrouped?.[0]?.propertyName ?? 'multiselect',
       propertyValue: 'unnamed-property',
-      propertyType: 'singleselect',
+      propertyType: itemPropertiesGrouped?.[0]?.propertyType ?? 'singleselect',
       isEnabled: true,
       orderGroup: null,
       orderItem: itemPropertiesGrouped?.length ?? 0,
@@ -384,27 +454,25 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
           </>
         ) : (
           <>
-            <TouchableOpacity onPress={() => handleEdit(item)} style={styles.editButton}>
-              <MaterialIcons name="edit" size={20} color="#fff" />
-            </TouchableOpacity>
-
             {item.propertyType === 'singleselect' ? (
               <RadioButton.Android
                 value={item.propertyValue}
                 status={item.selected ? 'checked' : 'unchecked'}
                 color={'#6495ED'}
                 uncheckedColor={'#ffffff'}
-                onPress={() => {}}
+                onPress={() => handleSelectionChange(item)}
               />
             ) : (
               <Checkbox.Android
                 status={item.selected ? 'checked' : 'unchecked'}
                 color={'#6495ED'}
                 uncheckedColor={'#ffffff'}
-                onPress={() => {}}
+                onPress={() => handleSelectionChange(item)}
               />
             )}
-
+            <TouchableOpacity onPress={() => handleEdit(item)} style={styles.editButton}>
+              <MaterialIcons name="edit" size={20} color="#fff" />
+            </TouchableOpacity>
             <Text style={[styles.input, item.isEdited && styles.editedInput]}>
               {item.propertyValue}
             </Text>
@@ -437,7 +505,7 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
         keyExtractor={(item) => item.id.toString() + item.propertyValue}
       />
       <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add New Property</Text>
+        <Text style={styles.addButtonText}>Προσθήκη Νέου</Text>
       </TouchableOpacity>
     </View>
   );
