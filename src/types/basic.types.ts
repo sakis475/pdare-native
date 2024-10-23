@@ -7,6 +7,8 @@ interface ItemProperty {
   orderGroup: number | null;
   orderItem: number | null;
   selected: boolean;
+  required?: boolean;
+  dependsOn?: number;
   oItemPropertyId?: number;
   isEdited?: boolean;
   originalPropertyValue?: string;

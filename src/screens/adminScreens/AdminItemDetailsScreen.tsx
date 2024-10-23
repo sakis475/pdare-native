@@ -182,6 +182,45 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     );
   };
 
+  const handleAddPropertyGroup = () => {
+    if (!item) return;
+
+    // Create a default name for the new group
+    let newGroupName = 'Ιδιότητα';
+    let counter = 1;
+
+    // Check if name exists and increment counter until we find a unique name
+    while ((item.itemPropertiesGrouped as any).some(([key]: any) => key === newGroupName)) {
+      counter++;
+      newGroupName = `Ιδιότητα ${counter}`;
+    }
+
+    // Create a new property with default values
+    const newProperty: ItemProperty = {
+      id: Date.now(), // Use timestamp as temporary id
+      propertyName: newGroupName,
+      propertyValue: 'Επιλογή',
+      propertyType: 'singleselect',
+      selected: false,
+      required: false,
+      dependsOn: null,
+      isEnabled: true,
+      orderGroup: (item.itemPropertiesGrouped as any).length,
+      orderItem: 0,
+      originalPropertyValue: 'Επιλογή 1',
+      isEdited: false,
+    };
+
+    // Add new group to itemPropertiesGrouped
+    setItem((prevItem) => ({
+      ...prevItem,
+      itemPropertiesGrouped: [
+        ...(prevItem.itemPropertiesGrouped as any),
+        [newGroupName, [newProperty]],
+      ],
+    }));
+  };
+
   const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => {
     const itemPropertyWillBeDeleted = !properties?.length;
 
@@ -362,10 +401,24 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               renderItem={renderPropertyGroup}
               keyExtractor={([key]) => key}
             />
+            <View style={{ alignItems: 'flex-end' }}>
+              <TouchableOpacity
+                style={[
+                  styles.addItemBtn,
+                  { borderRadius: 20, backgroundColor: colors.darkerBlue },
+                ]}
+                onPress={handleAddPropertyGroup}
+              >
+                <Text style={[styles.addItemBtnText, { fontSize: 14 }]}>
+                  Προσθήκη Nέας Ιδιότητας
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
+
           <View style={styles.addItemContainer}>
             <TouchableOpacity style={styles.addItemBtn} onPress={() => handleSave()}>
-              <Text style={styles.addItemBtnText}>Αποθήκευση</Text>
+              <Text style={styles.addItemBtnText}>Αποθήκευση Όλων</Text>
             </TouchableOpacity>
             <PropertyTypeBottomSheet
               ref={propertyTypeBottomSheetRef}
@@ -436,7 +489,7 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
     const newProperty: ItemProperty = {
       id: newId,
       propertyName: itemPropertiesGrouped?.[0]?.propertyName ?? 'multiselect',
-      propertyValue: 'unnamed-property',
+      propertyValue: 'Επιλογή',
       propertyType: itemPropertiesGrouped?.[0]?.propertyType ?? 'singleselect',
       isEnabled: true,
       orderGroup: null,
@@ -607,12 +660,10 @@ const styles = StyleSheet.create({
   },
   addItemContainer: {
     paddingVertical: 8,
-    paddingHorizontal: 16,
     backgroundColor: colors.darkGrey,
   },
   addItemBtn: {
     backgroundColor: 'blue',
-    borderRadius: 8,
     padding: 20,
     alignItems: 'center',
   },
