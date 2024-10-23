@@ -70,14 +70,27 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     if (newIndex < 0 || newIndex >= (item.itemPropertiesGrouped as any).length) return;
 
     const newItemPropertiesGrouped = [...(item.itemPropertiesGrouped as any)];
+
+    // Swap positions
     [newItemPropertiesGrouped[index], newItemPropertiesGrouped[newIndex]] = [
       newItemPropertiesGrouped[newIndex],
       newItemPropertiesGrouped[index],
     ];
 
+    // Update orderGroup for all items in both moved groups
+    const updatedPropertiesGrouped = newItemPropertiesGrouped.map(
+      ([key, properties]: [string, ItemProperty[]], groupIndex: number) => {
+        const updatedProperties = properties.map((prop) => ({
+          ...prop,
+          orderGroup: groupIndex, // Update orderGroup based on new position
+        }));
+        return [key, updatedProperties];
+      }
+    );
+
     setItem((prevItem: any) => ({
       ...prevItem,
-      itemPropertiesGrouped: newItemPropertiesGrouped,
+      itemPropertiesGrouped: updatedPropertiesGrouped,
     }));
   };
 
@@ -280,6 +293,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     const itemProperties = Object.values(inputItem.itemPropertiesGrouped)
       .flat()
       .map((prop: any) => ({
+        id: prop.id,
         propertyName: prop.propertyName,
         propertyType: prop.propertyType,
         propertyValue: prop.propertyValue,
@@ -289,6 +303,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
     // Transform to the desired output format
     return {
+      id: inputItem.id,
       title: inputItem.title,
       description: inputItem.description,
       cost: inputItem.cost,
@@ -299,6 +314,42 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       },
       itemProperties,
     };
+  };
+
+  const reorderAllItems = (inputItem: any) => {
+    // First ensure we're working with entries if we have an object
+    const itemPropertiesEntries = Array.isArray(inputItem.itemPropertiesGrouped)
+      ? inputItem.itemPropertiesGrouped
+      : Object.entries(inputItem.itemPropertiesGrouped);
+
+    // Update ordering
+    const updatedGrouped = itemPropertiesEntries.map(
+      ([key, properties]: [string, ItemProperty[]], groupIndex: number) => {
+        const updatedProperties = properties.map((prop, itemIndex) => ({
+          ...prop,
+          orderGroup: groupIndex,
+          orderItem: itemIndex,
+        }));
+        return [key, updatedProperties];
+      }
+    );
+
+    return {
+      ...inputItem,
+      itemPropertiesGrouped: Object.fromEntries(updatedGrouped),
+    };
+  };
+
+  const handleSave = async () => {
+    if (!item) return;
+    const itemToSave = {
+      ...item,
+      itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
+    };
+    const reorderedItem = reorderAllItems(itemToSave);
+    const transformedData = transformItemData(reorderedItem);
+    console.log(JSON.stringify(transformedData, null, 2), 'itemToSave');
+    // navigateBack();
   };
 
   return (
@@ -313,18 +364,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
             />
           </View>
           <View style={styles.addItemContainer}>
-            <TouchableOpacity
-              style={styles.addItemBtn}
-              onPress={async () => {
-                const itemToSave = {
-                  ...item,
-                  itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
-                };
-                const tranformedData = transformItemData(itemToSave);
-                console.log(JSON.stringify(tranformedData, null, 2), 'itemToSave');
-                // navigateBack();
-              }}
-            >
+            <TouchableOpacity style={styles.addItemBtn} onPress={() => handleSave()}>
               <Text style={styles.addItemBtnText}>Αποθήκευση</Text>
             </TouchableOpacity>
             <PropertyTypeBottomSheet
@@ -417,12 +457,20 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
     if (newIndex < 0 || newIndex >= itemPropertiesGrouped.length) return;
 
     const newProperties = [...itemPropertiesGrouped];
+
+    // Swap positions
     [newProperties[index], newProperties[newIndex]] = [
       newProperties[newIndex],
       newProperties[index],
     ];
 
-    onSelectChange(newProperties);
+    // Update orderItem for all items to match their new positions
+    const updatedProperties = newProperties.map((prop, idx) => ({
+      ...prop,
+      orderItem: idx,
+    }));
+
+    onSelectChange(updatedProperties);
   };
 
   const renderItem = ({ item, index }: { item: ItemProperty; index: number }) => (
