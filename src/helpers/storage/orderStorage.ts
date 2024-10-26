@@ -230,7 +230,6 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
     comment: occupiedByOrder.comment,
     createdAt: occupiedByOrder.createdAt,
   };
-  // console.log(JSON.stringify(tableio, null, 2), 'tableio');
   for (const orderItem of occupiedByOrder.orderItems) {
     const originalItem = _.cloneDeep(items.find((e) => e.id === orderItem?.item?.id));
     originalItem.newItemId = uuid.v4() as string;
@@ -242,7 +241,6 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
 
     for (const group of Object.values(originalItem.itemPropertiesGrouped)) {
       for (const property of group) {
-        // console.log(property, 'property');
         if (propertiesIds.includes(property.id)) {
           property.selected = true;
           property.oItemPropertyId = orderItem.itemPropertyOfItem.find(
@@ -258,4 +256,29 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
 
 export const updateActiveOrdersStorage = async (activeOrders: Order[]) => {
   return await setStorage('activeOrders', activeOrders);
+};
+
+export const getItems = async () => {
+  const items: ItemReq[] = await getStorage('items');
+  return items;
+};
+
+export const setItems = async (items: ItemReq[]) => {
+  await setStorage('items', items);
+};
+
+export const getItem = async (id: number) => {
+  const items = await getItems();
+  const item = items.find((e) => e.id === id);
+  if (!item) return null;
+  return item;
+};
+
+export const updateItem = async (updatedItem: ItemReq) => {
+  let items = await getItems();
+  const storageItemIndex = items.findIndex((e) => e.id === updatedItem.id);
+  if (storageItemIndex > 0) {
+    items[storageItemIndex] = updatedItem;
+    setItems(items);
+  }
 };

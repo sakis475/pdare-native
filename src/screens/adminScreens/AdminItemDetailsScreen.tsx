@@ -16,6 +16,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
 import { AlertWithOptions } from '../../core/utils';
 import { Checkbox, RadioButton } from 'react-native-paper';
+import { patchRequest } from '../../helpers/requests';
+import { getItem, updateItem } from '../../helpers/storage/orderStorage';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -27,8 +29,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
   );
   const [editingPropertyType, setEditingPropertyType] = useState<string | null>(null);
 
-  useEffect(() => {
-    const deepCopy = JSON.parse(JSON.stringify(route.params.item));
+  const getItemStorage = async () => {
+    const deepCopy: any = await getItem(route.params.item.id);
     deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
       ([key, value]: any) => {
         return [
@@ -47,6 +49,9 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       deepCopy.itemPropertiesGrouped.map(([key]: [string, any]) => [key, key])
     );
     setOriginalPropertyNames(originals);
+  };
+  useEffect(() => {
+    getItemStorage();
   }, [route.params.item]);
 
   // useEffect(() => {
@@ -104,13 +109,22 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     setItem((prevItem: any) => {
       const updatedItemPropertiesGrouped = prevItem.itemPropertiesGrouped.map(
         ([key, value]: [string, any[]]) =>
-          key === editingPropertyName ? [editedName, value] : [key, value]
+          key === editingPropertyName
+            ? [
+                editedName,
+                value.map((prop) => ({
+                  ...prop,
+                  propertyName: editedName, // Update the propertyName in each property
+                })),
+              ]
+            : [key, value]
       );
 
       const itemPropertyNames = updatedItemPropertiesGrouped.map(([key]: [string, any]) => key);
       const duplicatePropertyNames = itemPropertyNames.filter(
         (item: any, index: number) => itemPropertyNames.indexOf(item) < index
       );
+
       if (duplicatePropertyNames.length) {
         AlertWithOptions(
           'Duplicate Name',
@@ -122,6 +136,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
           ...prevItem,
         };
       }
+
       return {
         ...prevItem,
         itemPropertiesGrouped: updatedItemPropertiesGrouped,
@@ -197,7 +212,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
     // Create a new property with default values
     const newProperty: ItemProperty = {
-      id: Date.now(), // Use timestamp as temporary id
+      id: -1,
       propertyName: newGroupName,
       propertyValue: 'Επιλογή',
       propertyType: 'singleselect',
@@ -207,7 +222,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       isEnabled: true,
       orderGroup: (item.itemPropertiesGrouped as any).length,
       orderItem: 0,
-      originalPropertyValue: 'Επιλογή 1',
+      originalPropertyValue: 'Επιλογή',
       isEdited: false,
     };
 
@@ -218,6 +233,17 @@ const AdminItemDetailsScreen = ({ route }: any) => {
         ...(prevItem.itemPropertiesGrouped as any),
         [newGroupName, [newProperty]],
       ],
+    }));
+  };
+
+  const handleDeletePropertyGroup = (propertyName: string) => {
+    if (!item) return;
+
+    setItem((prevItem: any) => ({
+      ...prevItem,
+      itemPropertiesGrouped: (prevItem.itemPropertiesGrouped as any).filter(
+        ([key]: [string, any]) => key !== propertyName
+      ),
     }));
   };
 
@@ -254,6 +280,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
+                  gap: 8,
                 }}
               >
                 <TouchableOpacity
@@ -263,6 +290,15 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 >
                   <MaterialIcons name="edit" size={20} color="#fff" />
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => handleDeletePropertyGroup(propertyName)}
+                  style={[styles.deleteButton, { marginLeft: 0 }]}
+                  disabled={itemPropertyWillBeDeleted}
+                >
+                  <MaterialIcons name="delete" size={20} color={colors.lightRed} />
+                </TouchableOpacity>
+
                 <Text
                   style={[
                     styles.header,
@@ -331,14 +367,21 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     // Flatten itemPropertiesGrouped into a single array
     const itemProperties = Object.values(inputItem.itemPropertiesGrouped)
       .flat()
-      .map((prop: any) => ({
-        id: prop.id,
-        propertyName: prop.propertyName,
-        propertyType: prop.propertyType,
-        propertyValue: prop.propertyValue,
-        orderGroup: prop.orderGroup,
-        orderItem: prop.orderItem,
-      }));
+      .map((prop: any) => {
+        const obj = {
+          propertyName: prop.propertyName,
+          propertyType: prop.propertyType,
+          propertyValue: prop.propertyValue,
+          orderGroup: prop.orderGroup,
+          orderItem: prop.orderItem,
+          selected: prop.selected,
+        };
+
+        if (prop.id > 0) {
+          Object.assign(obj, { id: prop.id });
+        }
+        return obj;
+      });
 
     // Transform to the desired output format
     return {
@@ -387,7 +430,32 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     };
     const reorderedItem = reorderAllItems(itemToSave);
     const transformedData = transformItemData(reorderedItem);
-    console.log(JSON.stringify(transformedData, null, 2), 'itemToSave');
+
+    console.log(transformedData, 'transformedData');
+
+    const updatedItem = await patchRequest('/items/save', [transformedData]);
+    await updateItem(updatedItem[0]);
+    const deepCopy = JSON.parse(JSON.stringify(updatedItem[0]));
+    deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
+      ([key, value]: any) => {
+        return [
+          key,
+          value.map((prop: ItemProperty) => ({
+            ...prop,
+            originalPropertyValue: prop.propertyValue,
+            isEdited: false,
+          })),
+        ];
+      }
+    );
+    setItem(deepCopy);
+
+    const originals = Object.fromEntries(
+      deepCopy.itemPropertiesGrouped.map(([key]: [string, any]) => [key, key])
+    );
+    setOriginalPropertyNames(originals);
+
+    // console.log(JSON.stringify(deepCopy, null, 2), 'updatedItem');
     // navigateBack();
   };
 
@@ -603,7 +671,9 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
       <FlatList
         data={itemPropertiesGrouped}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString() + item.propertyValue}
+        keyExtractor={(item) =>
+          item.id?.toString() ?? Math.random().toString() + item.propertyValue
+        }
       />
       <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
         <Text style={styles.addButtonText}>Προσθήκη Νέου</Text>
