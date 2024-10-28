@@ -278,7 +278,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Λεπτομέρειες Προϊόντος'}
+              title={route.params?.item?.title}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),

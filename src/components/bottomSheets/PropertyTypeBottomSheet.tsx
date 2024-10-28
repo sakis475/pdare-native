@@ -1,4 +1,11 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Portal } from '@gorhom/portal';
@@ -13,8 +20,10 @@ interface PropertyTypeBottomSheetProps {
 const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
   ({ currentType, onTypeChange }, ref) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
-    const snapPoints = useMemo(() => ['30%', '30%'], []);
 
+    const [contentHeight, setContentHeight] = useState(0);
+
+    const snapPoints = useMemo(() => (contentHeight ? [contentHeight] : ['25%']), [contentHeight]);
     const handleOpenModal = useCallback(() => {
       bottomSheetRef.current?.expand();
     }, []);
@@ -35,43 +44,52 @@ const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
 
     return (
       <Portal>
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={snapPoints}
-          enablePanDownToClose={false}
-          enableOverDrag={false}
-          enableContentPanningGesture={false}
-          backdropComponent={(backdropProps) => (
-            <BottomSheetBackdrop
-              {...backdropProps}
-              enableTouchThrough={false}
-              opacity={0.7}
-              onPress={() => {
-                handleCloseModal();
-              }}
-            />
-          )}
-          handleIndicatorStyle={{ backgroundColor: '#fff' }}
-          backgroundStyle={{ backgroundColor: colors.darkGrey }}
+        <View
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            setContentHeight(height + 20); // Add padding if needed
+          }}
         >
-          <BottomSheetView style={styles.container}>
-            <Text style={styles.title}>Αλλαγή Τύπου Επιλογής</Text>
-            <Text style={styles.subtitle}>Τίτλος: {currentType}</Text>
-            <TouchableOpacity
-              style={[styles.button, currentType === 'singleselect' && styles.selectedButton]}
-              onPress={() => handleTypeSelection('singleselect')}
-            >
-              <Text style={styles.buttonText}>Μονή</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, currentType === 'multiselect' && styles.selectedButton]}
-              onPress={() => handleTypeSelection('multiselect')}
-            >
-              <Text style={styles.buttonText}>Πολλαπλή</Text>
-            </TouchableOpacity>
-          </BottomSheetView>
-        </BottomSheet>
+          <BottomSheet
+            ref={bottomSheetRef}
+            index={-1}
+            snapPoints={snapPoints}
+            enablePanDownToClose={false}
+            enableOverDrag={false}
+            enableContentPanningGesture={false}
+            backdropComponent={(backdropProps) => (
+              <BottomSheetBackdrop
+                {...backdropProps}
+                enableTouchThrough={false}
+                opacity={0.7}
+                onPress={() => {
+                  handleCloseModal();
+                }}
+              />
+            )}
+            handleIndicatorStyle={{ backgroundColor: '#fff' }}
+            backgroundStyle={{ backgroundColor: colors.darkGrey }}
+          >
+            <BottomSheetView style={styles.container}>
+              <Text style={styles.title}>Αλλαγή Τύπου Επιλογής</Text>
+              <Text style={styles.subtitle}>
+                Επιλέξτε αν θέλετε να έχετε πολλαπλή επιλογή ιδιοτήτων ή μονή
+              </Text>
+              <TouchableOpacity
+                style={[styles.button, currentType === 'singleselect' && styles.selectedButton]}
+                onPress={() => handleTypeSelection('singleselect')}
+              >
+                <Text style={styles.buttonText}>Μονή</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, currentType === 'multiselect' && styles.selectedButton]}
+                onPress={() => handleTypeSelection('multiselect')}
+              >
+                <Text style={styles.buttonText}>Πολλαπλή</Text>
+              </TouchableOpacity>
+            </BottomSheetView>
+          </BottomSheet>
+        </View>
       </Portal>
     );
   }

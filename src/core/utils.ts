@@ -90,15 +90,18 @@ export function AlertWithOptions(
   return true; // This prevents the default behavior
 }
 
-export const checkInternetConnectivity = () => {
+export const checkInternetConnectivity = async () => {
   try {
-    NetInfo.fetch().then((state) => {
-      if (!state.isConnected || !state.isInternetReachable) {
-        toast('error', 'No internet connection');
-      }
-    });
+    const state = await NetInfo.fetch();
+    
+    if (!state.isConnected || !state.isInternetReachable) {
+      toast('error', 'No internet connection');
+      return false;
+    }
+    return true;
   } catch (error) {
     console.log('NetInfo failed', error);
+    return false;
   }
 };
 

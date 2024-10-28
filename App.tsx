@@ -21,7 +21,7 @@ const App = () => {
       await setLocalizedStrings();
       setLocalizedStringsLoaded(true);
       if (ENV_TYPE === 'DEV') {
-        require('./src/helpers/Reactotron.js');
+        // require('./src/helpers/Reactotron.js');
         console.log(await getStorage('session_bearer'), 'session_bearer');
       }
 

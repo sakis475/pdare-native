@@ -14,7 +14,7 @@ import { navigateBack } from '../../navigation/AppNavigator';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
-import { AlertWithOptions } from '../../core/utils';
+import { AlertWithOptions, toast } from '../../core/utils';
 import { Checkbox, RadioButton } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
 import { getItem, updateItem } from '../../helpers/storage/orderStorage';
@@ -185,12 +185,10 @@ const AdminItemDetailsScreen = ({ route }: any) => {
         {propertyType === 'singleselect' ? (
           <View style={styles.itemContent}>
             <MaterialIcons name="radio-button-checked" size={20} color={colors.white} />
-            <Text style={styles.text}>Μονό</Text>
           </View>
         ) : (
           <View style={styles.itemContent}>
             <MaterialIcons name="check-box" size={20} color={colors.white} />
-            <Text style={styles.text}>Πολλαπλό</Text>
           </View>
         )}
       </View>
@@ -227,13 +225,25 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     };
 
     // Add new group to itemPropertiesGrouped
-    setItem((prevItem) => ({
-      ...prevItem,
-      itemPropertiesGrouped: [
-        ...(prevItem.itemPropertiesGrouped as any),
-        [newGroupName, [newProperty]],
-      ],
-    }));
+    // setItem((prevItem) => ({
+    //   ...prevItem,
+    //   itemPropertiesGrouped: [
+    //     ...(prevItem.itemPropertiesGrouped as any),
+    //     [newGroupName, [newProperty]],
+    //   ],
+    // }));
+
+    setItem((prevItem) => {
+      const newItem = {
+        ...prevItem,
+        itemPropertiesGrouped: [
+          ...(prevItem.itemPropertiesGrouped as any),
+          [newGroupName, [newProperty]],
+        ],
+      };
+
+      return newItem;
+    });
   };
 
   const handleDeletePropertyGroup = (propertyName: string) => {
@@ -309,21 +319,21 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                   {propertyName}
                 </Text>
               </View>
-              <TouchableOpacity
-                onPress={() => {
-                  setEditingPropertyType(propertyName);
-                  propertyTypeBottomSheetRef.current?.openModal();
-                }}
-                style={styles.propertyTypeButton}
-                disabled={itemPropertyWillBeDeleted}
-              >
-                <Text style={styles.propertyTypeText}>
-                  <TypeSelect propertyType={properties?.[0]?.propertyType}></TypeSelect>
-                </Text>
-              </TouchableOpacity>
             </View>
           )}
           <View style={styles.reorderButtons}>
+            <TouchableOpacity
+              onPress={() => {
+                setEditingPropertyType(propertyName);
+                propertyTypeBottomSheetRef.current?.openModal();
+              }}
+              style={styles.propertyTypeButton}
+              disabled={itemPropertyWillBeDeleted}
+            >
+              <Text style={styles.propertyTypeText}>
+                <TypeSelect propertyType={properties?.[0]?.propertyType}></TypeSelect>
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => movePropertyGroup(index, 'up')}
               disabled={index === 0 || itemPropertyWillBeDeleted}
@@ -429,11 +439,16 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
     };
     const reorderedItem = reorderAllItems(itemToSave);
+    // console.log(JSON.stringify(reorderedItem), 'reorderedItem');
     const transformedData = transformItemData(reorderedItem);
+    // console.log(transformedData, 'transformedData');
+    try {
+      var updatedItem = await patchRequest('/items/save', [transformedData]);
+    } catch (error) {
+      toast('error', 'Κάτι πήγε λάθος', 'Ξαναπροσπαθήστε αργότερα');
+    }
 
-    console.log(transformedData, 'transformedData');
-
-    const updatedItem = await patchRequest('/items/save', [transformedData]);
+    if (!updatedItem || updatedItem.length) return;
     await updateItem(updatedItem[0]);
     const deepCopy = JSON.parse(JSON.stringify(updatedItem[0]));
     deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
@@ -553,7 +568,7 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
   };
 
   const handleAddNew = () => {
-    const newId = Math.max(...itemPropertiesGrouped.map((item) => item.id), 0) + 1;
+    const newId = -1;
     const newProperty: ItemProperty = {
       id: newId,
       propertyName: itemPropertiesGrouped?.[0]?.propertyName ?? 'multiselect',
