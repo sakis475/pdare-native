@@ -251,17 +251,27 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
     setItem((prevItem: any) => ({
       ...prevItem,
-      itemPropertiesGrouped: (prevItem.itemPropertiesGrouped as any).filter(
-        ([key]: [string, any]) => key !== propertyName
-      ),
+      itemPropertiesGrouped: prevItem.itemPropertiesGrouped.map(([key, value]: [string, any[]]) => {
+        if (key === propertyName) {
+          // Toggle the isDeleted state for all properties in the group
+          return [
+            key,
+            value.map((prop) => ({
+              ...prop,
+              isDeleted: !prop.isDeleted, // Toggle the deleted state
+            })),
+          ];
+        }
+        return [key, value];
+      }),
     }));
   };
 
   const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => {
-    const itemPropertyWillBeDeleted = !properties?.length;
+    const isDeleted = properties?.[0]?.isDeleted || !properties?.length;
 
     return (
-      <View style={styles.propertyGroup}>
+      <View style={[styles.propertyGroup, isDeleted && styles.deletedPropertyGroup]}>
         <View style={styles.propertyGroupHeader}>
           {editingPropertyName === propertyName ? (
             <View style={styles.itemContainer}>
@@ -282,7 +292,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 styles.itemContainer,
                 {
                   justifyContent: 'space-between',
-                  backgroundColor: itemPropertyWillBeDeleted ? colors.lightRed : null,
+                  backgroundColor: isDeleted ? colors.lightRed : null,
                 },
               ]}
             >
@@ -296,7 +306,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 <TouchableOpacity
                   onPress={() => startEditing(propertyName)}
                   style={styles.editButton}
-                  disabled={itemPropertyWillBeDeleted}
+                  disabled={isDeleted}
                 >
                   <MaterialIcons name="edit" size={20} color="#fff" />
                 </TouchableOpacity>
@@ -304,16 +314,19 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 <TouchableOpacity
                   onPress={() => handleDeletePropertyGroup(propertyName)}
                   style={[styles.deleteButton, { marginLeft: 0 }]}
-                  disabled={itemPropertyWillBeDeleted}
                 >
-                  <MaterialIcons name="delete" size={20} color={colors.lightRed} />
+                  <MaterialIcons
+                    name={isDeleted ? 'restore' : 'delete'}
+                    size={20}
+                    color={isDeleted ? colors.green : colors.lightRed}
+                  />
                 </TouchableOpacity>
 
                 <Text
                   style={[
                     styles.header,
                     propertyName !== originalPropertyNames[propertyName] && styles.editedInput,
-                    itemPropertyWillBeDeleted && styles.deletedText,
+                    isDeleted && styles.deletedText,
                   ]}
                 >
                   {propertyName}
@@ -328,7 +341,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 propertyTypeBottomSheetRef.current?.openModal();
               }}
               style={styles.propertyTypeButton}
-              disabled={itemPropertyWillBeDeleted}
+              disabled={isDeleted}
             >
               <Text style={styles.propertyTypeText}>
                 <TypeSelect propertyType={properties?.[0]?.propertyType}></TypeSelect>
@@ -336,24 +349,17 @@ const AdminItemDetailsScreen = ({ route }: any) => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => movePropertyGroup(index, 'up')}
-              disabled={index === 0 || itemPropertyWillBeDeleted}
-              style={[
-                styles.reorderButton,
-                (index === 0 || itemPropertyWillBeDeleted) && styles.disabledButton,
-              ]}
+              disabled={index === 0 || isDeleted}
+              style={[styles.reorderButton, (index === 0 || isDeleted) && styles.disabledButton]}
             >
               <MaterialIcons name="arrow-upward" size={20} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => movePropertyGroup(index, 'down')}
-              disabled={
-                index === (item!.itemPropertiesGrouped as any).length - 1 ||
-                itemPropertyWillBeDeleted
-              }
+              disabled={index === (item!.itemPropertiesGrouped as any).length - 1 || isDeleted}
               style={[
                 styles.reorderButton,
-                (index === (item!.itemPropertiesGrouped as any).length - 1 ||
-                  itemPropertyWillBeDeleted) &&
+                (index === (item!.itemPropertiesGrouped as any).length - 1 || isDeleted) &&
                   styles.disabledButton,
               ]}
             >
@@ -361,12 +367,13 @@ const AdminItemDetailsScreen = ({ route }: any) => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.propertyGroupContent}>
+        <View style={[styles.propertyGroupContent, isDeleted && styles.disabledContent]}>
           <UnifiedSelect
             itemPropertiesGrouped={properties}
             onSelectChange={(updatedProperties) =>
               handleSelectChange(propertyName, updatedProperties)
             }
+            disabled={isDeleted}
           />
         </View>
       </View>
@@ -377,6 +384,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     // Flatten itemPropertiesGrouped into a single array
     const itemProperties = Object.values(inputItem.itemPropertiesGrouped)
       .flat()
+      // .filter((prop: any) => !prop.isDeleted) // Filter out deleted properties
       .map((prop: any) => {
         const obj = {
           propertyName: prop.propertyName,
@@ -384,7 +392,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
           propertyValue: prop.propertyValue,
           orderGroup: prop.orderGroup,
           orderItem: prop.orderItem,
-          selected: prop.selected,
+          selected: !!prop.selected,
+          isDelete: !!prop.isDeleted,
         };
 
         if (prop.id > 0) {
@@ -441,7 +450,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     const reorderedItem = reorderAllItems(itemToSave);
     // console.log(JSON.stringify(reorderedItem), 'reorderedItem');
     const transformedData = transformItemData(reorderedItem);
-    // console.log(transformedData, 'transformedData');
+
+    console.log(transformedData, 'transformedData');
     try {
       var updatedItem = await patchRequest('/items/save', [transformedData]);
     } catch (error) {
@@ -519,9 +529,14 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 interface UnifiedSelectProps {
   itemPropertiesGrouped: ItemProperty[];
   onSelectChange: (updatedProperties: ItemProperty[]) => void;
+  disabled: boolean;
 }
 
-const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, onSelectChange }) => {
+const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
+  itemPropertiesGrouped,
+  onSelectChange,
+  disabled,
+}) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -682,7 +697,7 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({ itemPropertiesGrouped, on
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, disabled && styles.disabledContainer]}>
       <FlatList
         data={itemPropertiesGrouped}
         renderItem={renderItem}
@@ -809,6 +824,16 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid',
     color: colors.white,
+  },
+  deletedPropertyGroup: {
+    opacity: 0.7,
+  },
+  disabledContent: {
+    opacity: 0.5,
+    pointerEvents: 'none',
+  },
+  disabledContainer: {
+    opacity: 0.5,
   },
 });
 
