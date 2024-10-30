@@ -155,6 +155,9 @@ const AdminCategoryScreen = () => {
 
   const fetchCategories = async () => {
     const allCategories = await getStorage('categories');
+    if (!allCategories) {
+      return;
+    }
 
     let index = 0;
     const categoriesf = allCategories.map((e) => Object.assign(e, { index: index++ }));

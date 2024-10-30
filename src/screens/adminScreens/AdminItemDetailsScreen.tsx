@@ -39,6 +39,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
             ...prop,
             originalPropertyValue: prop.propertyValue,
             isEdited: false,
+            isDeleted: !prop.isEnabled, // Initialize isDeleted based on isEnabled
           })),
         ];
       }
@@ -54,9 +55,9 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     getItemStorage();
   }, [route.params.item]);
 
-  // useEffect(() => {
-  //   console.log(JSON.stringify(item), 'item');
-  // }, [item]);
+  useEffect(() => {
+    console.log(JSON.stringify(item), 'item');
+  }, [item]);
 
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
     if (!item) return;
@@ -199,13 +200,13 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     if (!item) return;
 
     // Create a default name for the new group
-    let newGroupName = 'Ιδιότητα';
+    let newGroupName = 'Επιλογή';
     let counter = 1;
 
     // Check if name exists and increment counter until we find a unique name
     while ((item.itemPropertiesGrouped as any).some(([key]: any) => key === newGroupName)) {
       counter++;
-      newGroupName = `Ιδιότητα ${counter}`;
+      newGroupName = `Επιλογή ${counter}`;
     }
 
     // Create a new property with default values
@@ -223,15 +224,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       originalPropertyValue: 'Επιλογή',
       isEdited: false,
     };
-
-    // Add new group to itemPropertiesGrouped
-    // setItem((prevItem) => ({
-    //   ...prevItem,
-    //   itemPropertiesGrouped: [
-    //     ...(prevItem.itemPropertiesGrouped as any),
-    //     [newGroupName, [newProperty]],
-    //   ],
-    // }));
 
     setItem((prevItem) => {
       const newItem = {
@@ -253,12 +245,12 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       ...prevItem,
       itemPropertiesGrouped: prevItem.itemPropertiesGrouped.map(([key, value]: [string, any[]]) => {
         if (key === propertyName) {
-          // Toggle the isDeleted state for all properties in the group
+          // Set isDeleted for the group, but preserve individual property isDeleted states
           return [
             key,
             value.map((prop) => ({
               ...prop,
-              isDeleted: !prop.isDeleted, // Toggle the deleted state
+              isDeletedGroup: !prop.isDeletedGroup, // Use a separate flag for group deletion
             })),
           ];
         }
@@ -268,7 +260,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
   };
 
   const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => {
-    const isDeleted = properties?.[0]?.isDeleted || !properties?.length;
+    const isDeleted = properties?.[0]?.isDeletedGroup || !properties?.length;
 
     return (
       <View style={[styles.propertyGroup, isDeleted && styles.deletedPropertyGroup]}>
@@ -381,10 +373,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
   };
 
   const transformItemData = (inputItem: any): any => {
-    // Flatten itemPropertiesGrouped into a single array
-    const itemProperties = Object.values(inputItem.itemPropertiesGrouped)
-      .flat()
-      // .filter((prop: any) => !prop.isDeleted) // Filter out deleted properties
+    const itemProperties = Object.entries(inputItem.itemPropertiesGrouped)
+      .flatMap(([_, value]) => value)
       .map((prop: any) => {
         const obj = {
           propertyName: prop.propertyName,
@@ -393,7 +383,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
           orderGroup: prop.orderGroup,
           orderItem: prop.orderItem,
           selected: !!prop.selected,
-          isDelete: !!prop.isDeleted,
+          isEnabled: prop.isDeleted || prop.isDeletedGroup ? false : true, // Consider both flags
         };
 
         if (prop.id > 0) {
@@ -402,13 +392,12 @@ const AdminItemDetailsScreen = ({ route }: any) => {
         return obj;
       });
 
-    // Transform to the desired output format
     return {
       id: inputItem.id,
       title: inputItem.title,
       description: inputItem.description,
       cost: inputItem.cost,
-      orderItem: null, // Setting to null as per the output example
+      orderItem: null,
       isEnabled: inputItem.isEnabled,
       category: {
         id: inputItem.category.id,
@@ -443,45 +432,68 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
   const handleSave = async () => {
     if (!item) return;
-    const itemToSave = {
-      ...item,
-      itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
-    };
-    const reorderedItem = reorderAllItems(itemToSave);
-    // console.log(JSON.stringify(reorderedItem), 'reorderedItem');
-    const transformedData = transformItemData(reorderedItem);
 
-    console.log(transformedData, 'transformedData');
     try {
-      var updatedItem = await patchRequest('/items/save', [transformedData]);
+      const itemToSave = {
+        ...item,
+        itemPropertiesGrouped: Object.fromEntries(item.itemPropertiesGrouped as any),
+      };
+
+      const reorderedItem = reorderAllItems(itemToSave);
+      const transformedData = transformItemData(reorderedItem);
+
+      console.log('Sending to server:', transformedData);
+
+      const response = await patchRequest('/items/save', [transformedData]);
+
+      if (!response || !Array.isArray(response) || response.length === 0) {
+        throw new Error('Invalid server response');
+      }
+
+      const updatedItem = response[0];
+      if (!updatedItem) {
+        throw new Error('No item data in response');
+      }
+
+      // Update local storage
+      await updateItem(updatedItem);
+
+      // Process the response data
+      const deepCopy = JSON.parse(JSON.stringify(updatedItem));
+
+      // Transform the itemProperties back into grouped format with metadata
+      deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
+        ([key, value]: any) => {
+          return [
+            key,
+            value.map((prop: ItemProperty) => ({
+              ...prop,
+              originalPropertyValue: prop.propertyValue,
+              isEdited: false,
+              isDeleted: !prop.isEnabled, // Make sure to maintain isDeleted state based on isEnabled
+            })),
+          ];
+        }
+      );
+
+      // Update the originalPropertyNames state
+      const originals = Object.fromEntries(
+        deepCopy.itemPropertiesGrouped.map(([key]: [string, any]) => [key, key])
+      );
+      setOriginalPropertyNames(originals);
+
+      // Update the main item state
+      setItem(deepCopy);
+
+      // Show success message
+      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
+
+      // Optionally navigate back
+      // navigateBack();
     } catch (error) {
+      console.error('Save error:', error);
       toast('error', 'Κάτι πήγε λάθος', 'Ξαναπροσπαθήστε αργότερα');
     }
-
-    if (!updatedItem || updatedItem.length) return;
-    await updateItem(updatedItem[0]);
-    const deepCopy = JSON.parse(JSON.stringify(updatedItem[0]));
-    deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
-      ([key, value]: any) => {
-        return [
-          key,
-          value.map((prop: ItemProperty) => ({
-            ...prop,
-            originalPropertyValue: prop.propertyValue,
-            isEdited: false,
-          })),
-        ];
-      }
-    );
-    setItem(deepCopy);
-
-    const originals = Object.fromEntries(
-      deepCopy.itemPropertiesGrouped.map(([key]: [string, any]) => [key, key])
-    );
-    setOriginalPropertyNames(originals);
-
-    // console.log(JSON.stringify(deepCopy, null, 2), 'updatedItem');
-    // navigateBack();
   };
 
   return (
@@ -539,7 +551,15 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
+  const [newItemCounter, setNewItemCounter] = useState(0); // Add counter for generating unique IDs
   const inputRef = useRef<TextInput>(null);
+
+  // Reset counter when itemPropertiesGrouped changes completely
+  useEffect(() => {
+    if (itemPropertiesGrouped.length === 0) {
+      setNewItemCounter(0);
+    }
+  }, [itemPropertiesGrouped]);
 
   const handleSelectionChange = (selectedItem: ItemProperty) => {
     let updatedProperties: ItemProperty[];
@@ -568,6 +588,21 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
 
   const handleSaveEdit = () => {
     if (editingId !== null) {
+      // Check for duplicate names when editing
+      const isDuplicate = itemPropertiesGrouped.some(
+        (item) =>
+          item.id !== editingId && item.propertyValue.toLowerCase() === editingValue.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        Alert.alert(
+          'Duplicate Name',
+          'A property with this name already exists. Please choose a different name.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
       const updatedProperties = itemPropertiesGrouped.map((item) =>
         item.id === editingId
           ? {
@@ -582,24 +617,57 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
     }
   };
 
+  const generateUniqueId = () => {
+    // Generate a unique negative ID for new items
+    const newId = -(Date.now() + newItemCounter);
+    setNewItemCounter((prev) => prev + 1);
+    return newId;
+  };
+
   const handleAddNew = () => {
-    const newId = -1;
+    // Base name for new property
+    let baseName = 'Επιλογή';
+    let counter = 1;
+    let newPropertyValue = baseName;
+
+    // Keep incrementing counter until we find a unique name
+    while (
+      itemPropertiesGrouped.some(
+        (item) => item.propertyValue.toLowerCase() === newPropertyValue.toLowerCase()
+      )
+    ) {
+      counter++;
+      newPropertyValue = `${baseName} ${counter}`;
+    }
+
     const newProperty: ItemProperty = {
-      id: newId,
+      id: generateUniqueId(), // Use unique negative ID
       propertyName: itemPropertiesGrouped?.[0]?.propertyName ?? 'multiselect',
-      propertyValue: 'Επιλογή',
+      propertyValue: newPropertyValue,
       propertyType: itemPropertiesGrouped?.[0]?.propertyType ?? 'singleselect',
       isEnabled: true,
       orderGroup: null,
       orderItem: itemPropertiesGrouped?.length ?? 0,
       selected: false,
       isEdited: false,
+      originalPropertyValue: newPropertyValue, // Add this to track changes
     };
-    onSelectChange([...itemPropertiesGrouped, newProperty]);
+
+    // Create a new array with the new property
+    const updatedProperties = [...itemPropertiesGrouped, newProperty];
+    onSelectChange(updatedProperties);
   };
 
   const handleDelete = (id: number) => {
-    const updatedProperties = itemPropertiesGrouped.filter((item) => item.id !== id);
+    const updatedProperties = itemPropertiesGrouped.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          isDeleted: !item.isDeleted, // Individual property deletion flag
+        };
+      }
+      return item;
+    });
     onSelectChange(updatedProperties);
   };
 
@@ -624,86 +692,108 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
     onSelectChange(updatedProperties);
   };
 
-  const renderItem = ({ item, index }: { item: ItemProperty; index: number }) => (
-    <View style={styles.itemContainer}>
-      <View style={styles.reorderButtons}>
-        <TouchableOpacity
-          onPress={() => moveItem(index, 'up')}
-          disabled={index === 0}
-          style={[styles.reorderButton, index === 0 && styles.disabledButton]}
-        >
-          <MaterialIcons name="arrow-upward" size={20} color="#fff" />
-        </TouchableOpacity>
-      </View>
+  const renderItem = ({ item, index }: { item: ItemProperty; index: number }) => {
+    // Check both group and individual deletion status
+    const isDeleted = item.isDeleted || item.isDeletedGroup;
 
-      <View style={styles.itemContent}>
-        {editingId === item.id ? (
-          <>
-            <TouchableOpacity onPress={handleSaveEdit} style={styles.editButton}>
-              <MaterialIcons name="check" size={20} color="#fff" />
-            </TouchableOpacity>
-            <TextInput
-              ref={inputRef}
-              style={[styles.input, styles.editingInput]}
-              value={editingValue}
-              onChangeText={setEditingValue}
-              onBlur={handleSaveEdit}
-              autoFocus
-            />
-          </>
-        ) : (
-          <>
-            {item.propertyType === 'singleselect' ? (
-              <RadioButton.Android
-                value={item.propertyValue}
-                status={item.selected ? 'checked' : 'unchecked'}
-                color={'#6495ED'}
-                uncheckedColor={'#ffffff'}
-                onPress={() => handleSelectionChange(item)}
+    return (
+      <View style={[styles.itemContainer, isDeleted && styles.deletedItem]}>
+        <View style={styles.reorderButtons}>
+          <TouchableOpacity
+            onPress={() => moveItem(index, 'up')}
+            disabled={index === 0 || isDeleted}
+            style={[styles.reorderButton, (index === 0 || isDeleted) && styles.disabledButton]}
+          >
+            <MaterialIcons name="arrow-upward" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.itemContent}>
+          {editingId === item.id ? (
+            <>
+              <TouchableOpacity onPress={handleSaveEdit} style={styles.editButton}>
+                <MaterialIcons name="check" size={20} color="#fff" />
+              </TouchableOpacity>
+              <TextInput
+                ref={inputRef}
+                style={[styles.input, styles.editingInput]}
+                value={editingValue}
+                onChangeText={setEditingValue}
+                onBlur={handleSaveEdit}
+                autoFocus
               />
-            ) : (
-              <Checkbox.Android
-                status={item.selected ? 'checked' : 'unchecked'}
-                color={'#6495ED'}
-                uncheckedColor={'#ffffff'}
-                onPress={() => handleSelectionChange(item)}
-              />
-            )}
-            <TouchableOpacity onPress={() => handleEdit(item)} style={styles.editButton}>
-              <MaterialIcons name="edit" size={20} color="#fff" />
-            </TouchableOpacity>
-            <Text style={[styles.input, item.isEdited && styles.editedInput]}>
-              {item.propertyValue}
-            </Text>
-          </>
-        )}
-        <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
-          <MaterialIcons name="delete" size={20} color="#fff" />
-        </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              {item.propertyType === 'singleselect' ? (
+                <RadioButton.Android
+                  value={item.propertyValue}
+                  status={item.selected ? 'checked' : 'unchecked'}
+                  color={'#6495ED'}
+                  uncheckedColor={'#ffffff'}
+                  onPress={() => handleSelectionChange(item)}
+                  disabled={isDeleted}
+                />
+              ) : (
+                <Checkbox.Android
+                  status={item.selected ? 'checked' : 'unchecked'}
+                  color={'#6495ED'}
+                  uncheckedColor={'#ffffff'}
+                  onPress={() => handleSelectionChange(item)}
+                  disabled={isDeleted}
+                />
+              )}
+              <TouchableOpacity
+                onPress={() => handleEdit(item)}
+                style={styles.editButton}
+                disabled={isDeleted}
+              >
+                <MaterialIcons name="edit" size={20} color="#fff" />
+              </TouchableOpacity>
+              <Text
+                style={[
+                  styles.input,
+                  item.isEdited && styles.editedInput,
+                  isDeleted && styles.deletedText,
+                ]}
+              >
+                {item.propertyValue}
+              </Text>
+              {/* Only show delete button if group is not deleted */}
+              {!item.isDeletedGroup && (
+                <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
+                  <MaterialIcons
+                    name={item.isDeleted ? 'restore' : 'delete'}
+                    size={20}
+                    color={item.isDeleted ? colors.green : colors.lightRed}
+                  />
+                </TouchableOpacity>
+              )}
+            </>
+          )}
+        </View>
+        <View style={styles.reorderButtons}>
+          <TouchableOpacity
+            onPress={() => moveItem(index, 'down')}
+            disabled={index === itemPropertiesGrouped.length - 1 || isDeleted}
+            style={[
+              styles.reorderButton,
+              (index === itemPropertiesGrouped.length - 1 || isDeleted) && styles.disabledButton,
+            ]}
+          >
+            <MaterialIcons name="arrow-downward" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.reorderButtons}>
-        <TouchableOpacity
-          onPress={() => moveItem(index, 'down')}
-          disabled={index === itemPropertiesGrouped.length - 1}
-          style={[
-            styles.reorderButton,
-            index === itemPropertiesGrouped.length - 1 && styles.disabledButton,
-          ]}
-        >
-          <MaterialIcons name="arrow-downward" size={20} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, disabled && styles.disabledContainer]}>
       <FlatList
         data={itemPropertiesGrouped}
         renderItem={renderItem}
-        keyExtractor={(item) =>
-          item.id?.toString() ?? Math.random().toString() + item.propertyValue
-        }
+        keyExtractor={(item) => item.id.toString()}
       />
       <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
         <Text style={styles.addButtonText}>Προσθήκη Νέου</Text>
@@ -834,6 +924,10 @@ const styles = StyleSheet.create({
   },
   disabledContainer: {
     opacity: 0.5,
+  },
+  deletedItem: {
+    opacity: 0.7,
+    backgroundColor: colors.lightRed,
   },
 });
 

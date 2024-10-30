@@ -12,6 +12,8 @@ interface ItemProperty {
   oItemPropertyId?: number;
   isEdited?: boolean;
   originalPropertyValue?: string;
+  isDeleted?: boolean;
+  isDeletedGroup?: boolean;
 }
 
 // example [Milk: [], Sugar: []]
