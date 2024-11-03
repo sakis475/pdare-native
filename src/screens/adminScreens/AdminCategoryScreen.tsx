@@ -325,12 +325,16 @@ const AdminCategoryScreen = () => {
     fetchCategories();
   }, []);
 
+  const handleCategoryUpdate = async (boxData: BoxData[]) => {
+    await setStorage('categories', boxData);
+    setCategories(boxData);
+  };
+
   const handleEditCategory = async (updatedCategory: Category) => {
     const newCategories = categories.map((cat) =>
       cat.id === updatedCategory.id ? { ...updatedCategory, index: cat.index } : cat
     );
-    await setStorage('categories', newCategories);
-    setCategories(newCategories);
+    await handleCategoryUpdate(newCategories);
   };
 
   const handleCreateCategory = async (newCategory: Category) => {
@@ -338,16 +342,14 @@ const AdminCategoryScreen = () => {
       ...(categories || []),
       { ...newCategory, index: categories?.length || 0 },
     ];
-    await setStorage('categories', newCategories);
-    setCategories(newCategories);
+    await handleCategoryUpdate(newCategories);
   };
 
   const handleDeleteCategory = async (categoryId: number) => {
     const newCategories = categories.map((cat) =>
       cat.id === categoryId ? { ...cat, isEnabled: false } : cat
     );
-    await setStorage('categories', newCategories);
-    setCategories(newCategories);
+    await handleCategoryUpdate(newCategories);
   };
 
   const handleEditPress = (category: Category) => {
