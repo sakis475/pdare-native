@@ -20,11 +20,11 @@ import { AlertWithOptions, getTextColorBasedOnLuminance } from '../../core/utils
 import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { getStorage, setStorage } from '../../storage/store';
-import { ActivityIndicator } from 'react-native-paper';
 import { navigate, ScreenNames } from '../../navigation/AppNavigator';
 import { TextInput, Button } from 'react-native-paper';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { getItemsOfCategory } from '../../helpers/storage/orderStorage';
+import { ActivityIndicator, FAB } from 'react-native-paper';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -41,10 +41,11 @@ interface BoxData extends Category {
 
 interface EditModalProps {
   visible: boolean;
-  category: Category;
+  category?: Category | null;
   onDismiss: () => void;
   onSave: (updatedCategory: Category) => void;
-  onDelete: (id: number) => void;
+  onDelete?: (id: number) => void;
+  mode: 'edit' | 'create';
 }
 
 type BoxProps = {
@@ -69,14 +70,15 @@ const EditModal: React.FC<EditModalProps> = ({
   onDismiss,
   onSave,
   onDelete,
+  mode,
 }) => {
-  const [title, setTitle] = useState(category.title);
-  const [color, setColor] = useState(category.color || colors.darkGrey);
+  const [title, setTitle] = useState(category?.title || '');
+  const [color, setColor] = useState(category?.color || colors.darkGrey);
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   useEffect(() => {
-    setTitle(category.title);
-    setColor(category.color || colors.darkGrey);
+    setTitle(category?.title || '');
+    setColor(category?.color || colors.darkGrey);
   }, [category]);
 
   const handleSave = () => {
@@ -91,20 +93,36 @@ const EditModal: React.FC<EditModalProps> = ({
       );
       return;
     }
-    onSave({
-      ...category,
-      title: title.trim(),
-      color,
-    });
+
+    if (mode === 'create') {
+      const newCategory: Category = {
+        title: title.trim(),
+        color,
+        isEnabled: true,
+        orderCategory: 1,
+      };
+      onSave(newCategory);
+    } else {
+      onSave({
+        ...category,
+        title: title.trim(),
+        color,
+      });
+    }
     onDismiss();
   };
 
   const handleDelete = async () => {
+    if (!category || !onDelete) return;
+
     if (await isCategoryEmpty(category)) {
       AlertWithOptions(
         'Επιβεβαίωση Διαγραφής',
-        `Είστε σίγουροι ότι θέλετε να διαγράψετε την κατηγορία “${category.title}”;`,
-        onDelete(category.id),
+        `Είστε σίγουροι ότι θέλετε να διαγράψετε την κατηγορία "${category.title}";`,
+        () => {
+          onDelete(category.id);
+          onDismiss();
+        },
         undefined,
         'Διαγραφή'
       );
@@ -124,7 +142,9 @@ const EditModal: React.FC<EditModalProps> = ({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Ενημέρωση Κατηγορίας</Text>
+          <Text style={styles.modalTitle}>
+            {mode === 'create' ? 'Δημιουργία Κατηγορίας' : 'Ενημέρωση Κατηγορίας'}
+          </Text>
 
           <TextInput
             label="Τίτλος Κατηγορίας"
@@ -153,27 +173,22 @@ const EditModal: React.FC<EditModalProps> = ({
                 noSnap={true}
                 row={true}
               />
-              {/* <Button
-                mode="contained"
-                onPress={() => setShowColorPicker(false)}
-                style={styles.colorPickerButton}
-              >
-                Επιβεβαίωση
-              </Button> */}
             </View>
           )}
           <View style={styles.buttonUpdateContainer}>
-            <Button
-              mode="outlined"
-              onPress={handleDelete}
-              style={[styles.deleteButton]}
-              textColor={colors.lightRed}
-            >
-              <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
-            </Button>
+            {mode === 'edit' && onDelete && (
+              <Button
+                mode="outlined"
+                onPress={handleDelete}
+                style={[styles.deleteButton]}
+                textColor={colors.lightRed}
+              >
+                <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
+              </Button>
+            )}
 
             <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              Αποθήκευση
+              {mode === 'create' ? 'Δημιουργία' : 'Αποθήκευση'}
             </Button>
           </View>
           <View style={styles.buttonUpdateContainer}>
@@ -291,8 +306,9 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
 
 const AdminCategoryScreen = () => {
   const [categories, setCategories] = useState<BoxData[]>();
-  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [modalMode, setModalMode] = useState<'edit' | 'create'>('edit');
 
   const fetchCategories = async () => {
     const allCategories = await getStorage('categories');
@@ -317,6 +333,15 @@ const AdminCategoryScreen = () => {
     setCategories(newCategories);
   };
 
+  const handleCreateCategory = async (newCategory: Category) => {
+    const newCategories = [
+      ...(categories || []),
+      { ...newCategory, index: categories?.length || 0 },
+    ];
+    await setStorage('categories', newCategories);
+    setCategories(newCategories);
+  };
+
   const handleDeleteCategory = async (categoryId: number) => {
     const newCategories = categories.map((cat) =>
       cat.id === categoryId ? { ...cat, isEnabled: false } : cat
@@ -327,7 +352,14 @@ const AdminCategoryScreen = () => {
 
   const handleEditPress = (category: Category) => {
     setSelectedCategory(category);
-    setEditModalVisible(true);
+    setModalMode('edit');
+    setModalVisible(true);
+  };
+
+  const handleCreatePress = () => {
+    setSelectedCategory(null);
+    setModalMode('create');
+    setModalVisible(true);
   };
 
   const onDragEnd = useCallback((fromIndex: number, toIndex: number | null) => {
@@ -346,45 +378,48 @@ const AdminCategoryScreen = () => {
   return (
     <>
       {categories?.length ? (
-        <ScrollView
-          style={styles.scrollViewContainer}
-          contentContainerStyle={styles.scrollViewContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.container}>
-            <View style={styles.grid}>
-              {categories
-                .filter((category) => category.isEnabled !== false)
-                .map((category) => (
-                  <Box
-                    key={`category-${category.id}`}
-                    item={{
-                      ...category,
-                      onEdit: () => handleEditPress(category),
-                    }}
-                    onDragEnd={onDragEnd}
-                    categoriesLength={categories.length}
-                  />
-                ))}
+        <View style={styles.mainContainer}>
+          <ScrollView
+            style={styles.scrollViewContainer}
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.container}>
+              <View style={styles.grid}>
+                {categories
+                  .filter((category) => category.isEnabled !== false)
+                  .map((category) => (
+                    <Box
+                      key={`category-${category.id}`}
+                      item={{
+                        ...category,
+                        onEdit: () => handleEditPress(category),
+                      }}
+                      onDragEnd={onDragEnd}
+                      categoriesLength={categories.length}
+                    />
+                  ))}
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+
+          <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
+        </View>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       )}
 
-      {selectedCategory && (
-        <EditModal
-          visible={editModalVisible}
-          category={selectedCategory}
-          onDismiss={() => {
-            setEditModalVisible(false);
-            setSelectedCategory(null);
-          }}
-          onSave={handleEditCategory}
-          onDelete={handleDeleteCategory}
-        />
-      )}
+      <EditModal
+        visible={modalVisible}
+        category={selectedCategory}
+        onDismiss={() => {
+          setModalVisible(false);
+          setSelectedCategory(null);
+        }}
+        onSave={modalMode === 'create' ? handleCreateCategory : handleEditCategory}
+        onDelete={modalMode === 'edit' ? handleDeleteCategory : undefined}
+        mode={modalMode}
+      />
     </>
   );
 };
@@ -512,6 +547,16 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 3,
+  },
+  mainContainer: {
+    flex: 1,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
   },
 });
 

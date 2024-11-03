@@ -22,9 +22,9 @@ interface ItemPropertiesGrouped {
 }
 
 interface Category {
-  id: number;
+  id?: number;
   title: string;
-  orderCategory: number;
+  orderCategory?: number;
   isEnabled?: boolean;
   color?: string;
 }
