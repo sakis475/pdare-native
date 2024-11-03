@@ -229,6 +229,11 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
   const translateY = useSharedValue(0);
   const isDragging = useSharedValue(false);
 
+  useEffect(() => {
+    translateX.value = 0;
+    translateY.value = 0;
+  }, [categoriesLength]);
+
   const gestureHandler = useAnimatedGestureHandler<
     PanGestureHandlerGestureEvent,
     { startX: number; startY: number }
@@ -244,7 +249,6 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
     },
     onEnd: () => {
       const totalItems = categoriesLength;
-      const actualRows = Math.ceil(totalItems / GRID_SIZE);
       const itemRow = Math.floor(item.index / GRID_SIZE);
       const itemCol = item.index % GRID_SIZE;
 
@@ -254,6 +258,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
       let closestIndex = item.index;
       let minDistance = Number.MAX_VALUE;
 
+      // Only consider valid indices based on current total items
       for (let i = 0; i < totalItems; i++) {
         const targetRow = Math.floor(i / GRID_SIZE);
         const targetCol = i % GRID_SIZE;
@@ -276,7 +281,6 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
         runOnJS(onDragEnd)(item.index, null);
       }
 
-      // Reset position immediately without animation
       translateX.value = 0;
       translateY.value = 0;
       isDragging.value = false;
@@ -297,7 +301,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
             name="bars"
             size={DRAG_HANDLE_SIZE}
             color={getTextColorBasedOnLuminance(item.color ?? colors.darkGrey)}
-          ></FontAwesome6>
+          />
         </Animated.View>
       </PanGestureHandler>
     </Animated.View>
