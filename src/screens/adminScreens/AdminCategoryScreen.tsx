@@ -7,6 +7,7 @@ import {
   Text,
   ScrollView,
   StyleProp,
+  Modal,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -15,12 +16,15 @@ import Animated, {
   useAnimatedGestureHandler,
 } from 'react-native-reanimated';
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-import { getTextColorBasedOnLuminance } from '../../core/utils';
+import { AlertWithOptions, getTextColorBasedOnLuminance } from '../../core/utils';
 import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import { getStorage } from '../../storage/store';
+import { getStorage, setStorage } from '../../storage/store';
 import { ActivityIndicator } from 'react-native-paper';
 import { navigate, ScreenNames } from '../../navigation/AppNavigator';
+import { TextInput, Button } from 'react-native-paper';
+import ColorPicker from 'react-native-wheel-color-picker';
+import { getItemsOfCategory } from '../../helpers/storage/orderStorage';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -32,6 +36,15 @@ const DRAG_HANDLE_SIZE = 20;
 
 interface BoxData extends Category {
   index: number;
+  onEdit?: any;
+}
+
+interface EditModalProps {
+  visible: boolean;
+  category: Category;
+  onDismiss: () => void;
+  onSave: (updatedCategory: Category) => void;
+  onDelete: (id: number) => void;
 }
 
 type BoxProps = {
@@ -44,7 +57,137 @@ const handleCategoryPress = (screenName: ScreenNames, props: any = null) => {
   navigate(screenName, props);
 };
 
-const CategoryBox: React.FC<Category> = (category) => {
+const isCategoryEmpty = async (category: Category) => {
+  const itemsOfCategory = await getItemsOfCategory(category);
+
+  return itemsOfCategory.length === 0;
+};
+
+const EditModal: React.FC<EditModalProps> = ({
+  visible,
+  category,
+  onDismiss,
+  onSave,
+  onDelete,
+}) => {
+  const [title, setTitle] = useState(category.title);
+  const [color, setColor] = useState(category.color || colors.darkGrey);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+
+  useEffect(() => {
+    setTitle(category.title);
+    setColor(category.color || colors.darkGrey);
+  }, [category]);
+
+  const handleSave = () => {
+    if (!title.trim()) {
+      AlertWithOptions(
+        '',
+        `Ο τίτλος της κατηγορίας είναι κενός`,
+        undefined,
+        undefined,
+        undefined,
+        ''
+      );
+      return;
+    }
+    onSave({
+      ...category,
+      title: title.trim(),
+      color,
+    });
+    onDismiss();
+  };
+
+  const handleDelete = async () => {
+    if (await isCategoryEmpty(category)) {
+      AlertWithOptions(
+        'Επιβεβαίωση Διαγραφής',
+        `Είστε σίγουροι ότι θέλετε να διαγράψετε την κατηγορία “${category.title}”;`,
+        onDelete(category.id),
+        undefined,
+        'Διαγραφή'
+      );
+    } else {
+      AlertWithOptions(
+        'Η διαγραφή δεν επιτρέπεται',
+        `Πρέπει πρώτα να διαγράψετε όλα τα προιόντα της κατηγορίας`,
+        undefined,
+        undefined,
+        undefined,
+        ''
+      );
+    }
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Ενημέρωση Κατηγορίας</Text>
+
+          <TextInput
+            label="Τίτλος Κατηγορίας"
+            value={title}
+            onChangeText={setTitle}
+            style={styles.input}
+            mode="outlined"
+          />
+
+          <TouchableOpacity
+            style={[styles.colorPreview, { backgroundColor: color }]}
+            onPress={() => setShowColorPicker(!showColorPicker)}
+          >
+            <Text style={{ color: getTextColorBasedOnLuminance(color) }}>
+              Επιλογή Χρώματος Κατηγορίας
+            </Text>
+          </TouchableOpacity>
+
+          {showColorPicker && (
+            <View style={styles.colorPickerContainer}>
+              <ColorPicker
+                color={color}
+                onColorChange={setColor}
+                thumbSize={30}
+                sliderSize={40}
+                noSnap={true}
+                row={true}
+              />
+              {/* <Button
+                mode="contained"
+                onPress={() => setShowColorPicker(false)}
+                style={styles.colorPickerButton}
+              >
+                Επιβεβαίωση
+              </Button> */}
+            </View>
+          )}
+          <View style={styles.buttonUpdateContainer}>
+            <Button
+              mode="outlined"
+              onPress={handleDelete}
+              style={[styles.deleteButton]}
+              textColor={colors.lightRed}
+            >
+              <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
+            </Button>
+
+            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
+              Αποθήκευση
+            </Button>
+          </View>
+          <View style={styles.buttonUpdateContainer}>
+            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
+              Ακύρωση
+            </Button>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const CategoryBox: React.FC<Category & { onEdit?: () => void }> = (category) => {
   const textColor = getTextColorBasedOnLuminance(category.color ?? colors.darkGrey);
   return (
     <View style={styles.buttonContainer}>
@@ -57,6 +200,9 @@ const CategoryBox: React.FC<Category> = (category) => {
         }}
         activeOpacity={0.7}
       >
+        <TouchableOpacity style={styles.editButton} onPress={category.onEdit}>
+          <FontAwesome6 name="pencil" size={16} color={textColor} />
+        </TouchableOpacity>
         <Text style={{ color: textColor, fontWeight: 'bold' }}>{category.title}</Text>
       </TouchableOpacity>
     </View>
@@ -145,6 +291,8 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
 
 const AdminCategoryScreen = () => {
   const [categories, setCategories] = useState<BoxData[]>();
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   const fetchCategories = async () => {
     const allCategories = await getStorage('categories');
@@ -160,6 +308,27 @@ const AdminCategoryScreen = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  const handleEditCategory = async (updatedCategory: Category) => {
+    const newCategories = categories.map((cat) =>
+      cat.id === updatedCategory.id ? { ...updatedCategory, index: cat.index } : cat
+    );
+    await setStorage('categories', newCategories);
+    setCategories(newCategories);
+  };
+
+  const handleDeleteCategory = async (categoryId: number) => {
+    const newCategories = categories.map((cat) =>
+      cat.id === categoryId ? { ...cat, isEnabled: false } : cat
+    );
+    await setStorage('categories', newCategories);
+    setCategories(newCategories);
+  };
+
+  const handleEditPress = (category: Category) => {
+    setSelectedCategory(category);
+    setEditModalVisible(true);
+  };
 
   const onDragEnd = useCallback((fromIndex: number, toIndex: number | null) => {
     if (toIndex === null || toIndex === fromIndex) {
@@ -178,25 +347,43 @@ const AdminCategoryScreen = () => {
     <>
       {categories?.length ? (
         <ScrollView
-          style={styles.scrollViewContainer} // Apply the scrollViewContainer style here
+          style={styles.scrollViewContainer}
           contentContainerStyle={styles.scrollViewContent}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.container}>
             <View style={styles.grid}>
-              {categories.map((category) => (
-                <Box
-                  key={`category-${category.id}`}
-                  item={category}
-                  onDragEnd={onDragEnd}
-                  categoriesLength={categories.length}
-                />
-              ))}
+              {categories
+                .filter((category) => category.isEnabled !== false)
+                .map((category) => (
+                  <Box
+                    key={`category-${category.id}`}
+                    item={{
+                      ...category,
+                      onEdit: () => handleEditPress(category),
+                    }}
+                    onDragEnd={onDragEnd}
+                    categoriesLength={categories.length}
+                  />
+                ))}
             </View>
           </View>
         </ScrollView>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+      )}
+
+      {selectedCategory && (
+        <EditModal
+          visible={editModalVisible}
+          category={selectedCategory}
+          onDismiss={() => {
+            setEditModalVisible(false);
+            setSelectedCategory(null);
+          }}
+          onSave={handleEditCategory}
+          onDelete={handleDeleteCategory}
+        />
       )}
     </>
   );
@@ -260,6 +447,71 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 2,
+  },
+  editButton: {
+    position: 'absolute',
+    top: 5,
+    left: 5,
+    width: DRAG_HANDLE_SIZE,
+    height: DRAG_HANDLE_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    marginBottom: 20,
+  },
+  colorPreview: {
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  colorPickerContainer: {
+    height: 300,
+    marginBottom: 20,
+  },
+  colorPickerButton: {
+    marginTop: 10,
+  },
+  buttonUpdateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 8,
+  },
+  deleteButton: {
+    borderColor: 'red',
+    minWidth: 48,
+    padding: 0,
+  },
+  cancelButton: {
+    flex: 1,
+    fontSize: 20,
+  },
+  saveButton: {
+    flex: 3,
   },
 });
 

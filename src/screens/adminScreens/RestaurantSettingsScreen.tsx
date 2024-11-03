@@ -8,25 +8,25 @@ const RestaurantSettingsScreen = ({ route }: any) => {
   const options = [
     {
       id: '1',
-      title: 'Manage Products',
-      icon: 'food-fork-drink',
+      title: 'Προφίλ',
+      icon: 'account',
       screen: ScreenNames.AdminProductsScreen,
     },
     {
       id: '2',
-      title: 'Manage Categories',
+      title: 'Προϊόντα',
       icon: 'shape-outline',
       screen: ScreenNames.ManageCategoriesScreen,
     },
     {
       id: '3',
-      title: 'Manage Users',
+      title: 'Προσωπικό',
       icon: 'account-group',
       screen: ScreenNames.AdminProductsScreen,
     },
     {
       id: '4',
-      title: 'Statistics',
+      title: 'Στατιστικά',
       icon: 'chart-bar',
       screen: ScreenNames.AdminProductsScreen,
     },

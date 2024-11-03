@@ -11,7 +11,9 @@ export function HeaderBar({ headerTitle }: { headerTitle?: string }) {
         <Text style={styles.headerTitle}>{headerTitle}</Text>
       </View>
       <View style={styles.profileButton}>
-        <ProfileButton handlePress={() => navigate(ScreenNames.ProfileScreen)}></ProfileButton>
+        <ProfileButton
+          handlePress={() => navigate(ScreenNames.RestaurantSettingsScreen)}
+        ></ProfileButton>
       </View>
     </View>
   );

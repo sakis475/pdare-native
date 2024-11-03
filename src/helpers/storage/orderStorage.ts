@@ -282,3 +282,10 @@ export const updateItem = async (updatedItem: ItemReq) => {
     setItems(items);
   }
 };
+
+export const getItemsOfCategory = async (category: Category) => {
+  const allItems = await getItems();
+  const items = allItems.filter((e) => e.category.id === category.id);
+  if (!items) return [];
+  return items;
+};

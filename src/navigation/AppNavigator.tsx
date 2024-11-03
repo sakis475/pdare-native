@@ -178,31 +178,12 @@ const AppNavigator = () => {
       />
 
       <Stack.Screen
-        name={ScreenNames.ProfileScreen}
-        component={ProfileScreen}
-        options={({ route }: any) => ({
-          headerTitle: () => (
-            <CustomNavigationScreenHeaderTitle
-              title={'Λογαριασμός'}
-              bold={true}
-            ></CustomNavigationScreenHeaderTitle>
-          ),
-          animation: 'simple_push',
-          headerStyle: {
-            backgroundColor: colors.darkerGrey,
-          },
-          headerTintColor: 'white',
-          headerLeft: navigateBackBtn,
-          headerBackVisible: false,
-        })}
-      />
-      <Stack.Screen
         name={ScreenNames.RestaurantSettingsScreen}
         component={RestaurantSettingsScreen}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Restaurant Settings'}
+              title={'Λογαριασμός'}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -384,6 +365,11 @@ const MainTabs = ({ route }: any) => {
       key: strings.History,
       title: strings.History,
       focusedIcon: 'history',
+    },
+    {
+      key: strings.Expo,
+      title: strings.Expo,
+      focusedIcon: 'clipboard-multiple-outline',
     },
   ]);
 
