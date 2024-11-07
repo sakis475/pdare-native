@@ -1,16 +1,176 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Keyboard, Pressable } from 'react-native';
-import { Divider } from 'react-native-paper';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  Keyboard,
+  Pressable,
+  Modal,
+  TouchableOpacity,
+} from 'react-native';
+import { Button, Divider, FAB, Text, TextInput } from 'react-native-paper';
 import { getStorage, setStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { CatalogItemEditable } from '../../components/itemComponents/CatalogItemEditable';
+import { AlertWithOptions, toast } from '../../core/utils';
+import { patchRequest } from '../../helpers/requests';
+import { LoadingOverlay } from '../../components/basic/SavingOverlay';
+
+interface EditItemModalProps {
+  visible: boolean;
+  item?: ItemReq | null;
+  onDismiss: () => void;
+  onSave: (updatedItem: ItemReq) => void;
+  onDelete?: (id: number) => void;
+  mode: 'edit' | 'create';
+}
+
+const EditItemModal: React.FC<EditItemModalProps> = ({
+  visible,
+  item,
+  onDismiss,
+  onSave,
+  onDelete,
+  mode,
+}) => {
+  const [title, setTitle] = useState(item?.title || '');
+  const [description, setDescription] = useState(item?.description || '');
+  const [cost, setCost] = useState(item?.cost?.toString() || '');
+
+  useEffect(() => {
+    setTitle(item?.title || '');
+    setDescription(item?.description || '');
+    setCost(item?.cost?.toString() || '');
+  }, [item]);
+
+  const handleSave = () => {
+    if (!title.trim()) {
+      AlertWithOptions(
+        '',
+        `Ο τίτλος του προϊόντος είναι κενός`,
+        undefined,
+        undefined,
+        undefined,
+        ''
+      );
+      return;
+    }
+
+    if (!cost || isNaN(Number(cost))) {
+      AlertWithOptions('', `Η τιμή πρέπει να είναι αριθμός`, undefined, undefined, undefined, '');
+      return;
+    }
+
+    if (mode === 'create') {
+      const newItem: ItemReq = {
+        title: title.trim(),
+        description: description.trim(),
+        cost: Number(cost),
+        isEnabled: true,
+        category: item?.category,
+        itemPropertiesGrouped: [],
+        orderItem: 0,
+        quantity: 0,
+      };
+      onSave(newItem);
+    } else if (item) {
+      onSave({
+        ...item,
+        title: title.trim(),
+        description: description.trim(),
+        cost: Number(cost),
+      });
+    }
+    onDismiss();
+  };
+
+  const handleDelete = () => {
+    if (!item || !onDelete) return;
+
+    AlertWithOptions(
+      'Επιβεβαίωση Διαγραφής',
+      `Είστε σίγουροι ότι θέλετε να διαγράψετε το "${item.title}";`,
+      () => {
+        onDelete(item.id);
+        onDismiss();
+      },
+      undefined,
+      'Διαγραφή'
+    );
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>
+            {mode === 'create' ? 'Δημιουργία Προϊόντος' : 'Ενημέρωση Προϊόντος'}
+          </Text>
+
+          <TextInput
+            label="Τίτλος Προϊόντος"
+            value={title}
+            onChangeText={setTitle}
+            style={styles.input}
+            mode="outlined"
+          />
+
+          <TextInput
+            label="Περιγραφή"
+            value={description}
+            onChangeText={setDescription}
+            style={styles.input}
+            mode="outlined"
+            multiline
+            numberOfLines={3}
+          />
+
+          <TextInput
+            label="Τιμή"
+            value={cost}
+            onChangeText={setCost}
+            style={styles.input}
+            mode="outlined"
+            keyboardType="numeric"
+          />
+
+          <View style={styles.buttonContainer}>
+            {mode === 'edit' && onDelete && (
+              <Button
+                mode="outlined"
+                onPress={handleDelete}
+                style={[styles.deleteButton]}
+                textColor={colors.lightRed}
+              >
+                <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
+              </Button>
+            )}
+
+            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
+              {mode === 'create' ? 'Δημιουργία' : 'Αποθήκευση'}
+            </Button>
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
+              Ακύρωση
+            </Button>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const AdminItemListScreen = ({ route }: any) => {
-  const [categoryTitle, setCategoryTitle] = useState(route.params?.categoryTitle || 'Καφές');
+  const [categoryTitle, setCategoryTitle] = useState(route.params?.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ItemReq | null>(null);
+  const [modalMode, setModalMode] = useState<'edit' | 'create'>('edit');
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchItems = async () => {
     const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
@@ -22,40 +182,99 @@ const AdminItemListScreen = ({ route }: any) => {
     fetchItems();
   }, []);
 
-  const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
+  const handleItemUpdate = async (updatedItems: ItemReq[]) => {
+    setIsLoading(true);
+    try {
+      // Update order for all items
+      const itemsWithUpdatedOrder = updatedItems.map((item, index) => ({
+        ...item,
+        orderItem: index,
+      }));
 
-  const handleOpenModal = () => {
-    bottomSheetRef.current?.openModal();
+      // Send to server
+      const response = await patchRequest('/items/save', itemsWithUpdatedOrder);
+      // Update local storage
+      const allItems: catGroupedItems = (await getStorage('groupedItems')) || {};
+      allItems[categoryTitle] = response;
+      await setStorage('groupedItems', allItems);
+
+      // Update state
+      setItems(response);
+
+      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
+    } catch (error) {
+      console.error('Error updating items:', error);
+      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleCloseModal = () => {
-    bottomSheetRef.current?.closeModal();
-    Keyboard.dismiss();
+  const handleEditItem = async (updatedItem: ItemReq) => {
+    const newItems = items.map((item) => (item.id === updatedItem.id ? updatedItem : item));
+    await handleItemUpdate(newItems);
+  };
+
+  const handleCreateItem = async (newItem: ItemReq) => {
+    // Add category info to new item
+    const itemWithCategory = {
+      ...newItem,
+      category: items[0].category,
+    };
+
+    const newItems = [...items, itemWithCategory];
+    await handleItemUpdate(newItems);
+  };
+
+  const handleDelete = async (id: number) => {
+    const newItems = items.map((item) => (item.id === id ? { ...item, isEnabled: false } : item));
+    await handleItemUpdate(newItems);
+  };
+
+  const handleEditPress = (item: ItemReq) => {
+    setSelectedItem(item);
+    setModalMode('edit');
+    setModalVisible(true);
+  };
+
+  const handleCreatePress = () => {
+    setSelectedItem(null);
+    setModalMode('create');
+    setModalVisible(true);
   };
 
   const handleDragEnd = useCallback(
-    async ({ data }: { data: ItemReq[] }) => {
-      setItems(data);
-      // Update the order in storage
-      const allItems: catGroupedItems = (await getStorage('groupedItems')) || {};
-      allItems[categoryTitle] = data;
-      await setStorage('groupedItems', allItems);
+    async ({ data, from, to }: { data: ItemReq[]; from: number; to: number }) => {
+      // Only update if position actually changed
+      if (from !== to) {
+        setIsLoading(true);
+        setItems(data);
+        await handleItemUpdate(data);
+      } else {
+        console.log('No order change detected, skipping update');
+      }
     },
-    [categoryTitle]
+    [categoryTitle, handleItemUpdate]
   );
 
-  const renderItem = useCallback(({ item, drag, isActive }: RenderItemParams<ItemReq>) => {
-    return (
-      <View style={[styles.item, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}>
-        <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
-          <FontAwesome6 name="bars" size={20} color="#fff" />
-        </Pressable>
-        <View style={styles.itemContent}>
-          <CatalogItemEditable item={item} />
+  const renderItem = useCallback(
+    ({ item, drag, isActive }: RenderItemParams<ItemReq>) => {
+      return (
+        <View style={[styles.item, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}>
+          <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
+            <FontAwesome6 name="bars" size={20} color="#fff" />
+          </Pressable>
+          <TouchableOpacity style={styles.editButton} onPress={() => handleEditPress(item)}>
+            <FontAwesome6 name="pencil" size={20} color="#fff" />
+          </TouchableOpacity>
+          <View style={styles.itemContent}>
+            <CatalogItemEditable item={item} />
+          </View>
         </View>
-      </View>
-    );
-  }, []);
+      );
+    },
+    [handleDelete, handleEditPress]
+  );
 
   return (
     <View style={styles.container}>
@@ -64,7 +283,7 @@ const AdminItemListScreen = ({ route }: any) => {
           <CategoryHeader title={items[0].category?.title} />
           <View style={styles.categoriesContainer}>
             <DraggableFlatList
-              data={items}
+              data={items.filter((item) => item.isEnabled !== false)}
               renderItem={renderItem}
               keyExtractor={(item) => item.id.toString()}
               onDragEnd={handleDragEnd}
@@ -72,16 +291,26 @@ const AdminItemListScreen = ({ route }: any) => {
               ItemSeparatorComponent={Divider}
             />
           </View>
-          {/* <OrderBottomOptions
-            tableName={tableName}
-            handleOpenModal={handleOpenModal}
-            handleTempOrderPress={handleTempOrderPress}
-          /> */}
-          {/* <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} /> */}
+
+          <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
         </>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       )}
+
+      <EditItemModal
+        visible={modalVisible}
+        item={selectedItem}
+        onDismiss={() => {
+          setModalVisible(false);
+          setSelectedItem(null);
+        }}
+        onSave={modalMode === 'create' ? handleCreateItem : handleEditItem}
+        onDelete={modalMode === 'edit' ? handleDelete : undefined}
+        mode={modalMode}
+      />
+
+      {isLoading && <LoadingOverlay />}
     </View>
   );
 };
@@ -116,6 +345,63 @@ const styles = StyleSheet.create({
   },
   categoryFlashListContainer: {
     paddingHorizontal: 20,
+    paddingBottom: 100,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: colors.grey,
+  },
+  input: {
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 8,
+  },
+  deleteButton: {
+    borderColor: colors.lightRed,
+    minWidth: 48,
+    padding: 0,
+  },
+  cancelButton: {
+    flex: 1,
+  },
+  saveButton: {
+    flex: 3,
+  },
+  editButton: {
+    padding: 8,
+    marginRight: 4,
+    backgroundColor: colors.darkGrey,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

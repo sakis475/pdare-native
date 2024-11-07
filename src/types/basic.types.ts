@@ -48,14 +48,14 @@ interface Item {
 }
 
 interface ItemReq {
-  id: number;
+  id?: number;
   category: Category;
   cost: number;
   description: string;
   isEnabled: boolean;
   itemPropertiesGrouped: ItemPropertiesGrouped | ItemProperty[];
   orderItem: number;
-  restaurant: Restaurant;
+  restaurant?: Restaurant;
   title: string;
   quantity?: number;
   newItemId?: string;

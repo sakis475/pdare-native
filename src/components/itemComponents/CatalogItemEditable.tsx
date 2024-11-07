@@ -4,6 +4,7 @@ import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import { colors } from '../../core/theme';
 import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
 export function CatalogItemEditable({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);
@@ -18,22 +19,25 @@ export function CatalogItemEditable({ item }: { item: ItemReq }) {
         <Text style={[styles.itemTitle, isPressedIn ? styles.textPressed : null]}>
           {item.title}
         </Text>
-        <CurrencyFormat value={item.cost} currency={'€'}></CurrencyFormat>
+        <CurrencyFormat value={item.cost} currency={'€'} />
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleAddNewItemPress} activeOpacity={0.6}>
-        <Entypo name="edit" size={20} color={colors.white}></Entypo>
-      </TouchableOpacity>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleAddNewItemPress} activeOpacity={0.6}>
+          <Entypo name="chevron-right" size={20} color={colors.white} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     flex: 1,
   },
   textContainer: {
-    flex: 1, // Take up as much space as possible on the left side
+    flex: 1,
     justifyContent: 'center',
   },
   itemTitle: {
@@ -43,27 +47,22 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   textPressed: {
-    opacity: 0.5, // Apply opacity when pressed
+    opacity: 0.5,
   },
   buttonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.lightBlack, // Dark background for the container
-    borderRadius: 5, // Rounded corners for the container
-    padding: 4,
+    gap: 8, // Space between buttons
   },
   button: {
-    width: 33, // Width of the button
-    height: 33, // Height of the button
+    width: 33,
+    height: 33,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.lightGrey, // Slightly lighter color for buttons
-    borderRadius: 6, // Rounded corners for the buttons
-    marginHorizontal: 4, // Space between buttons
+    backgroundColor: colors.lightGrey,
+    borderRadius: 6,
   },
-  buttonText: {
-    color: colors.white, // White text color
-    fontSize: 24, // Larger font size for the text in the buttons
-    fontWeight: 'bold', // Bold font weight
+  deleteButton: {
+    backgroundColor: '#FF3B30', // Red color for delete button
   },
 });

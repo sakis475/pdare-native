@@ -24,7 +24,7 @@ export const nameValidator = (name: string) => {
   return '';
 };
 
-export function toast(type: ToastType, title: string, text: string = '', visibilityTime = 4000) {
+export function toast(type: ToastType, title: string, text: string = '', visibilityTime = 3000) {
   Toast.show({
     type,
     text1: title,
@@ -93,7 +93,7 @@ export function AlertWithOptions(
 export const checkInternetConnectivity = async () => {
   try {
     const state = await NetInfo.fetch();
-    
+
     if (!state.isConnected || !state.isInternetReachable) {
       toast('error', 'No internet connection');
       return false;

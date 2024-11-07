@@ -231,25 +231,31 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
     createdAt: occupiedByOrder.createdAt,
   };
   for (const orderItem of occupiedByOrder.orderItems) {
-    const originalItem = _.cloneDeep(items.find((e) => e.id === orderItem?.item?.id));
-    originalItem.newItemId = uuid.v4() as string;
-    originalItem.quantity = orderItem.quantity;
-    originalItem.comment = orderItem.comment;
-    originalItem.alreadySend = true;
-    originalItem.oItemId = orderItem.id;
-    const propertiesIds = orderItem.itemPropertyOfItem.map((e) => e.itemProperty.id);
+    try {
+      const originalItem = _.cloneDeep(items.find((e) => e.id === orderItem?.item?.id));
+      originalItem.newItemId = uuid.v4() as string;
+      originalItem.quantity = orderItem.quantity;
+      originalItem.comment = orderItem.comment;
+      originalItem.alreadySend = true;
+      originalItem.oItemId = orderItem.id;
+      const propertiesIds = orderItem.itemPropertyOfItem.map((e) => e.itemProperty.id);
 
-    for (const group of Object.values(originalItem.itemPropertiesGrouped)) {
-      for (const property of group) {
-        if (propertiesIds.includes(property.id)) {
-          property.selected = true;
-          property.oItemPropertyId = orderItem.itemPropertyOfItem.find(
-            (e) => e.itemProperty.id === property.id
-          ).id;
+      for (const group of Object.values(originalItem.itemPropertiesGrouped)) {
+        for (const property of group) {
+          if (propertiesIds.includes(property.id)) {
+            property.selected = true;
+            property.oItemPropertyId = orderItem.itemPropertyOfItem.find(
+              (e) => e.itemProperty.id === property.id
+            ).id;
+          }
         }
       }
+      order.orderItems.push(originalItem);
+    } catch (error) {
+      console.log(error);
+      console.log(orderItem, 'orderItem');
+      console.log(items, 'items');
     }
-    order.orderItems.push(originalItem);
   }
   return order;
 };

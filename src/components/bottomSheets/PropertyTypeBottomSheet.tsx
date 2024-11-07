@@ -1,15 +1,7 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Portal } from '@gorhom/portal';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../core/theme';
 
 interface PropertyTypeBottomSheetProps {
@@ -20,76 +12,76 @@ interface PropertyTypeBottomSheetProps {
 const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
   ({ currentType, onTypeChange }, ref) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
+    const snapPoints = useMemo(() => [280, 340], []);
 
-    const [contentHeight, setContentHeight] = useState(0);
-
-    const snapPoints = useMemo(() => (contentHeight ? [contentHeight] : ['25%']), [contentHeight]);
     const handleOpenModal = useCallback(() => {
       bottomSheetRef.current?.expand();
     }, []);
 
-    const handleCloseModal = () => {
+    const handleCloseModal = useCallback(() => {
       bottomSheetRef.current?.close();
-    };
+    }, []);
 
     useImperativeHandle(ref, () => ({
       openModal: handleOpenModal,
       closeModal: handleCloseModal,
     }));
 
-    const handleTypeSelection = (type: string) => {
-      onTypeChange(type);
-      handleCloseModal();
-    };
+    const renderBackdrop = useCallback(
+      (props: any) => (
+        <BottomSheetBackdrop
+          {...props}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          enableTouchThrough={false}
+          pressBehavior="close"
+        />
+      ),
+      []
+    );
+
+    const handleTypeSelection = useCallback(
+      (type: string) => {
+        onTypeChange(type);
+        handleCloseModal();
+      },
+      [onTypeChange, handleCloseModal]
+    );
 
     return (
       <Portal>
-        <View
-          onLayout={(event) => {
-            const { height } = event.nativeEvent.layout;
-            setContentHeight(height + 20); // Add padding if needed
-          }}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+          backdropComponent={renderBackdrop}
+          handleIndicatorStyle={styles.handleIndicator}
+          backgroundStyle={styles.bottomSheetBackground}
         >
-          <BottomSheet
-            ref={bottomSheetRef}
-            index={-1}
-            snapPoints={snapPoints}
-            enablePanDownToClose={false}
-            enableOverDrag={false}
-            enableContentPanningGesture={false}
-            backdropComponent={(backdropProps) => (
-              <BottomSheetBackdrop
-                {...backdropProps}
-                enableTouchThrough={false}
-                opacity={0.7}
-                onPress={() => {
-                  handleCloseModal();
-                }}
-              />
-            )}
-            handleIndicatorStyle={{ backgroundColor: '#fff' }}
-            backgroundStyle={{ backgroundColor: colors.darkGrey }}
-          >
-            <BottomSheetView style={styles.container}>
+          <BottomSheetView style={styles.container}>
+            <View style={styles.contentContainer}>
               <Text style={styles.title}>Αλλαγή Τύπου Επιλογής</Text>
               <Text style={styles.subtitle}>
                 Επιλέξτε αν θέλετε να έχετε πολλαπλή επιλογή ιδιοτήτων ή μονή
               </Text>
-              <TouchableOpacity
-                style={[styles.button, currentType === 'singleselect' && styles.selectedButton]}
-                onPress={() => handleTypeSelection('singleselect')}
-              >
-                <Text style={styles.buttonText}>Μονή</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, currentType === 'multiselect' && styles.selectedButton]}
-                onPress={() => handleTypeSelection('multiselect')}
-              >
-                <Text style={styles.buttonText}>Πολλαπλή</Text>
-              </TouchableOpacity>
-            </BottomSheetView>
-          </BottomSheet>
-        </View>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[styles.button, currentType === 'singleselect' && styles.selectedButton]}
+                  onPress={() => handleTypeSelection('singleselect')}
+                >
+                  <Text style={styles.buttonText}>Μονή</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, currentType === 'multiselect' && styles.selectedButton]}
+                  onPress={() => handleTypeSelection('multiselect')}
+                >
+                  <Text style={styles.buttonText}>Πολλαπλή</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </BottomSheetView>
+        </BottomSheet>
       </Portal>
     );
   }
@@ -97,14 +89,31 @@ const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    justifyContent: 'center', // Centers content vertically
+  },
+  contentContainer: {
     padding: 20,
+    alignItems: 'center', // Centers content horizontally
+    justifyContent: 'center', // Additional vertical centering
+  },
+  buttonContainer: {
+    width: '100%', // Takes full width to ensure buttons are properly centered
+    maxWidth: 300, // Maximum width for buttons
+    marginTop: 20,
+  },
+  bottomSheetBackground: {
+    backgroundColor: colors.darkGrey,
+  },
+  handleIndicator: {
+    backgroundColor: '#fff',
+    width: 40,
   },
   title: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.white,
     textAlign: 'center',
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 12,
@@ -112,12 +121,16 @@ const styles = StyleSheet.create({
     color: colors.lighterGrey,
     textAlign: 'center',
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   button: {
     backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 5,
     marginBottom: 10,
+    height: 50,
+    justifyContent: 'center', // Centers button text vertically
+    alignItems: 'center', // Centers button text horizontally
   },
   selectedButton: {
     backgroundColor: colors.grey,

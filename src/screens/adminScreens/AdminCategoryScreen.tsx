@@ -16,7 +16,7 @@ import Animated, {
   useAnimatedGestureHandler,
 } from 'react-native-reanimated';
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-import { AlertWithOptions, getTextColorBasedOnLuminance } from '../../core/utils';
+import { AlertWithOptions, getTextColorBasedOnLuminance, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { getStorage, setStorage } from '../../storage/store';
@@ -25,6 +25,8 @@ import { TextInput, Button } from 'react-native-paper';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { getItemsOfCategory } from '../../helpers/storage/orderStorage';
 import { ActivityIndicator, FAB } from 'react-native-paper';
+import { patchRequest } from '../../helpers/requests';
+import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -313,6 +315,7 @@ const AdminCategoryScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [modalMode, setModalMode] = useState<'edit' | 'create'>('edit');
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchCategories = async () => {
     const allCategories = await getStorage('categories');
@@ -330,8 +333,24 @@ const AdminCategoryScreen = () => {
   }, []);
 
   const handleCategoryUpdate = async (boxData: BoxData[]) => {
-    await setStorage('categories', boxData);
-    setCategories(boxData);
+    setIsLoading(true);
+    try {
+      for (const [index, category] of boxData.entries()) {
+        category.orderCategory = index;
+      }
+      const allCategoriesResult: BoxData[] = await patchRequest('/categories/updateMany', boxData);
+      for (const category of allCategoriesResult) {
+        category.index = category.orderCategory;
+      }
+      await setStorage('categories', allCategoriesResult);
+      setCategories(allCategoriesResult);
+
+      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς', 1100);
+    } catch (error) {
+      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleEditCategory = async (updatedCategory: Category) => {
@@ -368,18 +387,20 @@ const AdminCategoryScreen = () => {
     setModalVisible(true);
   };
 
-  const onDragEnd = useCallback((fromIndex: number, toIndex: number | null) => {
-    if (toIndex === null || toIndex === fromIndex) {
-      return;
-    }
+  const onDragEnd = useCallback(
+    (fromIndex: number, toIndex: number | null) => {
+      if (toIndex === null || toIndex === fromIndex) {
+        return;
+      }
 
-    setCategories((prevCategories) => {
-      const newCategories = [...prevCategories];
-      newCategories[fromIndex] = prevCategories[toIndex];
-      newCategories[toIndex] = prevCategories[fromIndex];
-      return newCategories.map((item, index) => ({ ...item, index }));
-    });
-  }, []);
+      const copyCategories = [...categories];
+      copyCategories[fromIndex] = categories[toIndex];
+      copyCategories[toIndex] = categories[fromIndex];
+
+      handleCategoryUpdate(copyCategories);
+    },
+    [categories, handleCategoryUpdate]
+  );
 
   return (
     <>
@@ -426,6 +447,8 @@ const AdminCategoryScreen = () => {
         onDelete={modalMode === 'edit' ? handleDeleteCategory : undefined}
         mode={modalMode}
       />
+
+      {isLoading && <LoadingOverlay />}
     </>
   );
 };
@@ -517,6 +540,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
+    color: colors.grey,
   },
   input: {
     marginBottom: 20,

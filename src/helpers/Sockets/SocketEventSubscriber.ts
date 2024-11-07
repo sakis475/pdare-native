@@ -6,20 +6,20 @@ class SocketEventSubscriber {
   // Method to initialize and subscribe to all socket events
   public async initialize() {
     socketManager.on(EventId.itemsUpdated, SocketEventSubscriber.handleItemsUpdate);
+    socketManager.on(EventId.categoriesUpdated, SocketEventSubscriber.handleCategoriesUpdated);
   }
 
   // Handler for "itemsUpdated" event
   private static async handleItemsUpdate(items: ItemReq[]): Promise<void> {
     console.log('Socket Event: handleItemsUpdate');
-
-    const categoriesAll = items.map((e) => e.category);
-    const uniqueCategories = categoriesAll
-      ?.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id))
-      ?.sort((a, b) => a.orderCategory - b.orderCategory);
-
-    setStorage('categories', uniqueCategories);
+    console.log(items);
     setStorage('items', items);
     storageInitGroupedItems();
+  }
+
+  private static async handleCategoriesUpdated(categories: Category[]): Promise<void> {
+    console.log('Socket Event: categoriesUpdated');
+    setStorage('categories', categories);
   }
 }
 

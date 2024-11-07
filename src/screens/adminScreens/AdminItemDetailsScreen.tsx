@@ -10,14 +10,13 @@ import {
   Alert,
 } from 'react-native';
 import { colors } from '../../core/theme';
-import { navigateBack } from '../../navigation/AppNavigator';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
 import { AlertWithOptions, toast } from '../../core/utils';
-import { Checkbox, RadioButton } from 'react-native-paper';
+import { Checkbox, FAB, RadioButton } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
 import { getItem, updateItem } from '../../helpers/storage/orderStorage';
+import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -28,6 +27,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     null
   );
   const [editingPropertyType, setEditingPropertyType] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const getItemStorage = async () => {
     const deepCopy: any = await getItem(route.params.item.id);
@@ -433,6 +433,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
   const handleSave = async () => {
     if (!item) return;
 
+    setIsSaving(true); // Show loading overlay
     try {
       const itemToSave = {
         ...item,
@@ -445,7 +446,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       console.log('Sending to server:', transformedData);
 
       const response = await patchRequest('/items/save', [transformedData]);
-
       if (!response || !Array.isArray(response) || response.length === 0) {
         throw new Error('Invalid server response');
       }
@@ -470,7 +470,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               ...prop,
               originalPropertyValue: prop.propertyValue,
               isEdited: false,
-              isDeleted: !prop.isEnabled, // Make sure to maintain isDeleted state based on isEnabled
+              isDeleted: !prop.isEnabled,
             })),
           ];
         }
@@ -493,9 +493,12 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     } catch (error) {
       console.error('Save error:', error);
       toast('error', 'Κάτι πήγε λάθος', 'Ξαναπροσπαθήστε αργότερα');
+    } finally {
+      setIsSaving(false); // Hide loading overlay
     }
   };
 
+  // Modify the return statement to include the loading overlay
   return (
     <View style={styles.container}>
       {item ? (
@@ -505,20 +508,9 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               data={item.itemPropertiesGrouped as any}
               renderItem={renderPropertyGroup}
               keyExtractor={([key]) => key}
+              contentContainerStyle={{ paddingBottom: 50 }}
             />
-            <View style={{ alignItems: 'flex-end' }}>
-              <TouchableOpacity
-                style={[
-                  styles.addItemBtn,
-                  { borderRadius: 20, backgroundColor: colors.darkerBlue },
-                ]}
-                onPress={handleAddPropertyGroup}
-              >
-                <Text style={[styles.addItemBtnText, { fontSize: 14 }]}>
-                  Προσθήκη Nέας Ιδιότητας
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <FAB icon="plus" style={styles.fab} onPress={handleAddPropertyGroup} />
           </View>
 
           <View style={styles.addItemContainer}>
@@ -531,6 +523,9 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               onTypeChange={handlePropertyTypeChange}
             />
           </View>
+
+          {/* Add the loading overlay */}
+          {isSaving && <LoadingOverlay />}
         </>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
@@ -867,7 +862,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   addButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.darkBlue,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -928,6 +923,13 @@ const styles = StyleSheet.create({
   deletedItem: {
     opacity: 0.7,
     backgroundColor: colors.lightRed,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
   },
 });
 
