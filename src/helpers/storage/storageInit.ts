@@ -10,19 +10,10 @@ async function storageInitItems() {
 
 //categories
 async function storageInitCategories() {
-  let items: ItemReq[];
-  items = await getStorage('items');
+  const categories: Category[] = await Requests.getRequest('/categories/active');
 
-  if (!items) {
-    items = await storageInitItems();
-  }
-  const categoriesAll = items.map((e) => e.category);
-  const uniqueCategories = categoriesAll
-    ?.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id))
-    ?.sort((a, b) => a.orderCategory - b.orderCategory);
-
-  await setStorage('categories', uniqueCategories);
-  return uniqueCategories;
+  await setStorage('categories', categories);
+  return categories;
 }
 
 // groupedItems;

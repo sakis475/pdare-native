@@ -18,6 +18,7 @@ import { CatalogItemEditable } from '../../components/itemComponents/CatalogItem
 import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
+import { findCategoryByTitle } from '../../helpers/storage/orderStorage';
 
 interface EditItemModalProps {
   visible: boolean;
@@ -166,7 +167,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
 const AdminItemListScreen = ({ route }: any) => {
   const [categoryTitle, setCategoryTitle] = useState(route.params?.categoryTitle);
-  const [items, setItems] = useState<ItemReq[]>([]);
+  const [items, setItems] = useState<ItemReq[]>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ItemReq | null>(null);
   const [modalMode, setModalMode] = useState<'edit' | 'create'>('edit');
@@ -186,13 +187,20 @@ const AdminItemListScreen = ({ route }: any) => {
     setIsLoading(true);
     try {
       // Update order for all items
-      const itemsWithUpdatedOrder = updatedItems.map((item, index) => ({
-        ...item,
-        orderItem: index,
-      }));
+      // const itemsWithUpdatedOrder = updatedItems.map((item, index) => ({
+      //   ...item,
+      //   orderItem: index,
+      // }));
+
+      for (const [index, updatedItem] of updatedItems.entries()) {
+        updatedItem.orderItem = index;
+      }
 
       // Send to server
-      const response = await patchRequest('/items/save', itemsWithUpdatedOrder);
+      const response = await patchRequest('/items/save', updatedItems);
+      if (!Array.isArray(response)) {
+        return;
+      }
       // Update local storage
       const allItems: catGroupedItems = (await getStorage('groupedItems')) || {};
       allItems[categoryTitle] = response;
@@ -216,13 +224,17 @@ const AdminItemListScreen = ({ route }: any) => {
   };
 
   const handleCreateItem = async (newItem: ItemReq) => {
-    // Add category info to new item
+    let category: Category = items?.[0]?.category;
+    if (!category) {
+      category = await findCategoryByTitle(route.params?.categoryTitle);
+    }
+
     const itemWithCategory = {
       ...newItem,
-      category: items[0].category,
+      category,
     };
-
-    const newItems = [...items, itemWithCategory];
+    const otherItems = Array.isArray(items) ? [...items] : [];
+    const newItems = [...otherItems, itemWithCategory];
     await handleItemUpdate(newItems);
   };
 
@@ -285,7 +297,7 @@ const AdminItemListScreen = ({ route }: any) => {
             <DraggableFlatList
               data={items.filter((item) => item.isEnabled !== false)}
               renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item?.id + item?.title + item?.category?.title}
               onDragEnd={handleDragEnd}
               contentContainerStyle={styles.categoryFlashListContainer}
               ItemSeparatorComponent={Divider}
@@ -294,8 +306,25 @@ const AdminItemListScreen = ({ route }: any) => {
 
           <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
         </>
-      ) : (
+      ) : items === null ? (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+      ) : (
+        <>
+          {categoryTitle ? <CategoryHeader title={categoryTitle} /> : null}
+          <View
+            style={{
+              justifyContent: 'center',
+              alignContent: 'center',
+              flex: 1,
+              paddingHorizontal: 20,
+            }}
+          >
+            <Text style={{ textAlign: 'center', color: colors.white }}>
+              Προιόντα που προστέθετε θα εμφανίζονται εδώ.
+            </Text>
+            <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
+          </View>
+        </>
       )}
 
       <EditItemModal

@@ -52,12 +52,13 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     setOriginalPropertyNames(originals);
   };
   useEffect(() => {
+    setItem(null);
     getItemStorage();
   }, [route.params.item]);
 
-  useEffect(() => {
-    console.log(JSON.stringify(item), 'item');
-  }, [item]);
+  // useEffect(() => {
+  //   console.log(JSON.stringify(item), 'item');
+  // }, [item]);
 
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
     if (!item) return;
@@ -211,7 +212,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
     // Create a new property with default values
     const newProperty: ItemProperty = {
-      id: -1,
       propertyName: newGroupName,
       propertyValue: 'Επιλογή',
       propertyType: 'singleselect',
@@ -447,43 +447,20 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
       const response = await patchRequest('/items/save', [transformedData]);
       if (!response || !Array.isArray(response) || response.length === 0) {
-        throw new Error('Invalid server response');
+        return;
       }
 
-      const updatedItem = response[0];
+      const updatedItem = response.find((e) => e.id === item.id);
       if (!updatedItem) {
-        throw new Error('No item data in response');
+        return;
       }
 
       // Update local storage
       await updateItem(updatedItem);
 
-      // Process the response data
-      const deepCopy = JSON.parse(JSON.stringify(updatedItem));
-
-      // Transform the itemProperties back into grouped format with metadata
-      deepCopy.itemPropertiesGrouped = Object.entries(deepCopy.itemPropertiesGrouped).map(
-        ([key, value]: any) => {
-          return [
-            key,
-            value.map((prop: ItemProperty) => ({
-              ...prop,
-              originalPropertyValue: prop.propertyValue,
-              isEdited: false,
-              isDeleted: !prop.isEnabled,
-            })),
-          ];
-        }
-      );
-
-      // Update the originalPropertyNames state
-      const originals = Object.fromEntries(
-        deepCopy.itemPropertiesGrouped.map(([key]: [string, any]) => [key, key])
-      );
-      setOriginalPropertyNames(originals);
-
-      // Update the main item state
-      setItem(deepCopy);
+      //Re-load item
+      await getItemStorage();
+      // // Process the response data
 
       // Show success message
       toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
@@ -507,7 +484,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
             <FlatList
               data={item.itemPropertiesGrouped as any}
               renderItem={renderPropertyGroup}
-              keyExtractor={([key]) => key}
+              keyExtractor={(item, index) => `group-${item[0]}-${index}`}
               contentContainerStyle={{ paddingBottom: 50 }}
             />
             <FAB icon="plus" style={styles.fab} onPress={handleAddPropertyGroup} />
@@ -788,7 +765,11 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
       <FlatList
         data={itemPropertiesGrouped}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => {
+          // Handle both positive and negative IDs
+          const id = item?.id ?? '';
+          return `property-${id}-${item?.propertyValue}`;
+        }}
       />
       <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
         <Text style={styles.addButtonText}>Προσθήκη Νέου</Text>
@@ -798,6 +779,7 @@ const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
 };
 
 const styles = StyleSheet.create({
+  // Required and used styles - core layout
   container: {
     flex: 1,
     backgroundColor: '#2F2F2F',
@@ -818,17 +800,8 @@ const styles = StyleSheet.create({
   propertyGroupContent: {
     padding: 16,
   },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  input: {
-    flex: 1,
-    color: '#ffffff',
-    fontSize: 16,
-    padding: 8,
-  },
+
+  // Item-related styles
   itemContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -843,6 +816,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+
+  // Text and input styles
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  input: {
+    flex: 1,
+    color: '#ffffff',
+    fontSize: 16,
+    padding: 8,
+  },
+  editingInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 4,
+  },
+  editedInput: {
+    color: colors.green,
+  },
+  deletedText: {
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid',
+    color: colors.white,
+  },
+
+  // Button styles
   addItemContainer: {
     paddingVertical: 8,
     backgroundColor: colors.darkGrey,
@@ -861,6 +861,10 @@ const styles = StyleSheet.create({
     margin: 0,
     padding: 0,
   },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
+  },
   addButton: {
     backgroundColor: colors.darkBlue,
     padding: 12,
@@ -872,26 +876,16 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  deleteButton: {
-    padding: 8,
-    marginLeft: 8,
-  },
-  editingInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 4,
-  },
-  editedInput: {
-    color: colors.green,
-  },
+
+  // Reorder controls
   reorderButtons: {
     flexDirection: 'row',
   },
   reorderButton: {
     paddingHorizontal: 5,
   },
-  disabledButton: {
-    opacity: 0.5,
-  },
+
+  // Property type
   propertyTypeButton: {
     marginLeft: 10,
     padding: 5,
@@ -901,14 +895,10 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 12,
   },
-  text: {
-    fontSize: 16,
-    color: colors.white,
-  },
-  deletedText: {
-    textDecorationLine: 'line-through',
-    textDecorationStyle: 'solid',
-    color: colors.white,
+
+  // State styles
+  disabledButton: {
+    opacity: 0.5,
   },
   deletedPropertyGroup: {
     opacity: 0.7,
@@ -924,6 +914,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     backgroundColor: colors.lightRed,
   },
+
+  // FAB
   fab: {
     position: 'absolute',
     margin: 16,

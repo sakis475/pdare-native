@@ -295,3 +295,12 @@ export const getItemsOfCategory = async (category: Category) => {
   if (!items) return [];
   return items;
 };
+
+export const findCategoryByTitle = async (categoryTitle: string) => {
+  const allCategories = await getStorage('categories');
+
+  const category = allCategories.find((e) => e.title === categoryTitle);
+
+  if (category) return category;
+  else return null;
+};

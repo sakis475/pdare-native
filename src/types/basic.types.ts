@@ -1,5 +1,5 @@
 interface ItemProperty {
-  id: number;
+  id?: number;
   propertyName: string;
   propertyValue: string;
   propertyType: 'multiselect' | 'singleselect';

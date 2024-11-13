@@ -20,12 +20,18 @@ const RestaurantSettingsScreen = ({ route }: any) => {
     },
     {
       id: '3',
+      title: 'Ιδιότητες Προϊόντων',
+      icon: 'application-cog-outline',
+      screen: ScreenNames.ManageCategoriesScreen,
+    },
+    {
+      id: '4',
       title: 'Προσωπικό',
       icon: 'account-group',
       screen: ScreenNames.AdminProductsScreen,
     },
     {
-      id: '4',
+      id: '5',
       title: 'Στατιστικά',
       icon: 'chart-bar',
       screen: ScreenNames.AdminProductsScreen,
@@ -77,6 +83,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: '#fff',
     fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
 
