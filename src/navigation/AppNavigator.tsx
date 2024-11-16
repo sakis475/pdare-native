@@ -25,6 +25,8 @@ import HistoryOrdersScreen from '../screens/HistoryOrdersScreen';
 import AdminCategoryScreen from '../screens/adminScreens/AdminCategoryScreen';
 import AdminItemListScreen from '../screens/adminScreens/AdminItemListScreen';
 import AdminItemDetailsScreen from '../screens/adminScreens/AdminItemDetailsScreen';
+import AdminItemDetailsPatternScreen from '../screens/adminScreens/AdminItemDetailsPatternScreen';
+import AdminItemDetailsPatternEditScreen from '../screens/adminScreens/AdminItemDetailsPatternEditScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -274,6 +276,46 @@ const AppNavigator = () => {
       />
 
       <Stack.Screen
+        name={ScreenNames.ManageItemDetailsPatternScreen}
+        component={AdminItemDetailsPatternScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Πρότυπα Ιδιοτήτων'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+
+      <Stack.Screen
+        name={ScreenNames.ManageItemDetailsPatternEditScreen}
+        component={AdminItemDetailsPatternEditScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Pattern: ' + route.params?.pattern?.propertyPatternTitle}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+
+      <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
         component={ItemDetailsScreen}
         options={({ route }: any) => ({
@@ -424,6 +466,7 @@ export enum ScreenNames {
   ManageItemsScreen = 'manageItemsScreen',
   ManageItemDetailsScreen = 'manageItemsDetailsScreen',
   ManageItemDetailsPatternScreen = 'manageItemDetailsPatternScreen',
+  ManageItemDetailsPatternEditScreen = 'manageItemDetailsPatternEditScreen',
   LoginScreen = 'loginScreen',
   StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',

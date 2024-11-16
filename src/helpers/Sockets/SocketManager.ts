@@ -89,6 +89,7 @@ export enum EventId {
   tableOrdersUpdated = 'tableOrdersUpdated',
   itemsUpdated = 'itemsUpdated',
   categoriesUpdated = 'categoriesUpdated',
+  itemPropertyPatternsPattern = 'itemPropertyPatternsUpdated',
 }
 
 export type EventString<ID extends string | number> = `${EventId}:${ID}`;

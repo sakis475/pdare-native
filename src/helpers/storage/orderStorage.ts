@@ -304,3 +304,11 @@ export const findCategoryByTitle = async (categoryTitle: string) => {
   if (category) return category;
   else return null;
 };
+
+export const getItemPropertyPatterns = async () => {
+  return await getStorage('propertyPatterns');
+};
+
+export const setItemPropertyPatterns = async (itemPropertyPatterns: PropertyPattern[]) => {
+  return await setStorage('propertyPatterns', itemPropertyPatterns);
+};

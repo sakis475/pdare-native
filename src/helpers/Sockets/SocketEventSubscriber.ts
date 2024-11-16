@@ -7,6 +7,10 @@ class SocketEventSubscriber {
   public async initialize() {
     socketManager.on(EventId.itemsUpdated, SocketEventSubscriber.handleItemsUpdate);
     socketManager.on(EventId.categoriesUpdated, SocketEventSubscriber.handleCategoriesUpdated);
+    socketManager.on(
+      EventId.itemPropertyPatternsPattern,
+      SocketEventSubscriber.handleItemPropertiesPatternUpdated
+    );
   }
 
   // Handler for "itemsUpdated" event
@@ -20,6 +24,13 @@ class SocketEventSubscriber {
   private static async handleCategoriesUpdated(categories: Category[]): Promise<void> {
     console.log('Socket Event: categoriesUpdated');
     setStorage('categories', categories);
+  }
+
+  private static async handleItemPropertiesPatternUpdated(
+    propertyPatterns: PropertyPattern[]
+  ): Promise<void> {
+    console.log('Socket Event: handleItemPropertiesPatternUpdated');
+    setStorage('propertyPatterns', propertyPatterns);
   }
 }
 

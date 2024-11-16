@@ -243,19 +243,23 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
     setItem((prevItem: any) => ({
       ...prevItem,
-      itemPropertiesGrouped: prevItem.itemPropertiesGrouped.map(([key, value]: [string, any[]]) => {
-        if (key === propertyName) {
-          // Set isDeleted for the group, but preserve individual property isDeleted states
-          return [
-            key,
-            value.map((prop) => ({
-              ...prop,
-              isDeletedGroup: !prop.isDeletedGroup, // Use a separate flag for group deletion
-            })),
-          ];
-        }
-        return [key, value];
-      }),
+      itemPropertiesGrouped: prevItem.itemPropertiesGrouped
+        .map(([key, value]: [string, any[]]) => {
+          if (key === propertyName) {
+            if (value.find((e) => !e.id)) {
+              return [key, []];
+            }
+            return [
+              key,
+              value.map((prop) => ({
+                ...prop,
+                isDeletedGroup: !prop.isDeletedGroup,
+              })),
+            ];
+          }
+          return [key, value];
+        })
+        .filter((e: any) => e?.[1]?.length),
     }));
   };
 
@@ -516,7 +520,7 @@ interface UnifiedSelectProps {
   disabled: boolean;
 }
 
-const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
+export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
   itemPropertiesGrouped,
   onSelectChange,
   disabled,

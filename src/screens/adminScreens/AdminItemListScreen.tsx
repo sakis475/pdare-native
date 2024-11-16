@@ -186,16 +186,10 @@ const AdminItemListScreen = ({ route }: any) => {
   const handleItemUpdate = async (updatedItems: ItemReq[]) => {
     setIsLoading(true);
     try {
-      // Update order for all items
-      // const itemsWithUpdatedOrder = updatedItems.map((item, index) => ({
-      //   ...item,
-      //   orderItem: index,
-      // }));
-
       for (const [index, updatedItem] of updatedItems.entries()) {
         updatedItem.orderItem = index;
       }
-
+      console.log(updatedItems, 'updatedItems');
       // Send to server
       const response = await patchRequest('/items/save', updatedItems);
       if (!Array.isArray(response)) {

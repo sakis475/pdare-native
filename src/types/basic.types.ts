@@ -3,12 +3,12 @@ interface ItemProperty {
   propertyName: string;
   propertyValue: string;
   propertyType: 'multiselect' | 'singleselect';
-  isEnabled: boolean;
+  isEnabled?: boolean;
   orderGroup: number | null;
   orderItem: number | null;
   selected: boolean;
   required?: boolean;
-  dependsOn?: number;
+  dependsOn?: number | null;
   oItemPropertyId?: number;
   isEdited?: boolean;
   originalPropertyValue?: string;
@@ -27,6 +27,14 @@ interface Category {
   orderCategory?: number;
   isEnabled?: boolean;
   color?: string;
+}
+
+interface PropertyPattern {
+  id?: number;
+  propertyPatternTitle: string;
+  itemProperties: ItemProperty[];
+  markAsDelete?: boolean;
+  propertyPatternOrder?: number;
 }
 
 interface Restaurant {

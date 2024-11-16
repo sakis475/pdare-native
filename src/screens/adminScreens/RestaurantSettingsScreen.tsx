@@ -20,9 +20,9 @@ const RestaurantSettingsScreen = ({ route }: any) => {
     },
     {
       id: '3',
-      title: 'Ιδιότητες Προϊόντων',
-      icon: 'application-cog-outline',
-      screen: ScreenNames.ManageCategoriesScreen,
+      title: 'Πρότυπα Ιδιοτήτων',
+      icon: 'cards-variant',
+      screen: ScreenNames.ManageItemDetailsPatternScreen,
     },
     {
       id: '4',
@@ -37,8 +37,6 @@ const RestaurantSettingsScreen = ({ route }: any) => {
       screen: ScreenNames.AdminProductsScreen,
     },
   ];
-
-  const navigation = useNavigation();
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
