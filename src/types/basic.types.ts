@@ -35,6 +35,7 @@ interface PropertyPattern {
   itemProperties: ItemProperty[];
   markAsDelete?: boolean;
   propertyPatternOrder?: number;
+  category: Category;
 }
 
 interface Restaurant {

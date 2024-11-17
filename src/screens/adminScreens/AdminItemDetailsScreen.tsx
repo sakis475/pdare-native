@@ -17,6 +17,7 @@ import { Checkbox, FAB, RadioButton } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
 import { getItem, updateItem } from '../../helpers/storage/orderStorage';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
+import { SelectPatternModal } from './popupModals/SelectPatternModal';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -28,6 +29,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
   );
   const [editingPropertyType, setEditingPropertyType] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPatternModalVisible, setIsPatternModalVisible] = useState(false);
 
   const getItemStorage = async () => {
     const deepCopy: any = await getItem(route.params.item.id);
@@ -246,7 +248,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       itemPropertiesGrouped: prevItem.itemPropertiesGrouped
         .map(([key, value]: [string, any[]]) => {
           if (key === propertyName) {
-            if (value.find((e) => !e.id)) {
+            if (value.find((e) => !e.id || e.id < 0)) {
               return [key, []];
             }
             return [
@@ -261,6 +263,44 @@ const AdminItemDetailsScreen = ({ route }: any) => {
         })
         .filter((e: any) => e?.[1]?.length),
     }));
+  };
+
+  const handlePatternSelect = (pattern: PropertyPattern) => {
+    if (!item) return;
+
+    // Group the pattern properties by name
+    const groupedProperties = pattern.itemProperties.reduce((acc, prop) => {
+      const name = prop.propertyName;
+      if (!acc[name]) {
+        acc[name] = [];
+      }
+      acc[name].push({
+        ...prop,
+        originalPropertyValue: prop.propertyValue,
+        isEdited: false,
+        isDeleted: false,
+        isEnabled: true,
+      });
+      return acc;
+    }, {} as { [key: string]: ItemProperty[] });
+
+    // Convert to array format and update item
+    setItem((prevItem: any) => ({
+      ...prevItem,
+      itemPropertiesGrouped: Object.entries(groupedProperties).map(([key, value], groupIndex) => [
+        key,
+        value.map((prop, itemIndex) => ({
+          ...prop,
+          orderGroup: groupIndex,
+          orderItem: itemIndex,
+        })),
+      ]),
+    }));
+
+    // Update original property names
+    setOriginalPropertyNames(
+      Object.fromEntries(Object.keys(groupedProperties).map((key) => [key, key]))
+    );
   };
 
   const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => {
@@ -321,7 +361,9 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 <Text
                   style={[
                     styles.header,
-                    propertyName !== originalPropertyNames[propertyName] && styles.editedInput,
+                    (propertyName !== originalPropertyNames[propertyName] ||
+                      properties.some((e: any) => !e.id || e.id < 0)) &&
+                      styles.editedInput,
                     isDeleted && styles.deletedText,
                   ]}
                 >
@@ -491,7 +533,23 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               keyExtractor={(item, index) => `group-${item[0]}-${index}`}
               contentContainerStyle={{ paddingBottom: 50 }}
             />
-            <FAB icon="plus" style={styles.fab} onPress={handleAddPropertyGroup} />
+            {Object.keys(item.itemPropertiesGrouped).length > 0 ? (
+              <FAB icon="plus" style={styles.fab} onPress={handleAddPropertyGroup} />
+            ) : (
+              <>
+                <FAB
+                  icon="plus"
+                  style={styles.fab}
+                  onPress={() => setIsPatternModalVisible(true)}
+                />
+
+                <SelectPatternModal
+                  visible={isPatternModalVisible}
+                  onDismiss={() => setIsPatternModalVisible(false)}
+                  onSelect={handlePatternSelect}
+                />
+              </>
+            )}
           </View>
 
           <View style={styles.addItemContainer}>

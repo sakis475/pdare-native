@@ -83,7 +83,6 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     setTableName(table.tableName);
     setTableTempOrder(table);
   };
-
   //START TABLE MODAL LOGIC
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 

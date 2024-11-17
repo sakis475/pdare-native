@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -17,6 +17,10 @@ import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { navigate, ScreenNames } from '../../navigation/AppNavigator';
 import { useIsFocused } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { CategoryBottomSheet } from '../../components/bottomSheets/PatternCategorySelectBottomSheet';
+import { Portal } from 'react-native-paper';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 interface EditPatternModalProps {
   visible: boolean;
@@ -25,6 +29,10 @@ interface EditPatternModalProps {
   onSave: (updatedPattern: PropertyPattern) => void;
   onDelete?: (title: string) => void;
   mode: 'edit' | 'create';
+  onCategoryPress: () => void;
+  selectedCategory: Category | null;
+  title: string; // Add these
+  onTitleChange: (title: string) => void; // new props
 }
 
 const EditPatternModal: React.FC<EditPatternModalProps> = ({
@@ -34,18 +42,16 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
   onSave,
   onDelete,
   mode,
+  onCategoryPress,
+  selectedCategory,
+  title,
+  onTitleChange,
 }) => {
-  const [title, setTitle] = useState(pattern?.propertyPatternTitle || '');
-
-  useEffect(() => {
-    setTitle(pattern?.propertyPatternTitle || '');
-  }, [pattern]);
-
   const handleSave = () => {
     if (!title.trim()) {
       AlertWithOptions(
         '',
-        `Ο τίτλος του προτύπου είναι κενός`,
+        'Ο τίτλος του προτύπου είναι κενός',
         undefined,
         undefined,
         undefined,
@@ -54,16 +60,23 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
       return;
     }
 
+    if (!selectedCategory) {
+      AlertWithOptions('', 'Παρακαλώ επιλέξτε κατηγορία', undefined, undefined, undefined, '');
+      return;
+    }
+
     if (mode === 'create') {
       const newPattern: PropertyPattern = {
         propertyPatternTitle: title.trim(),
         itemProperties: [],
+        category: selectedCategory,
       };
       onSave(newPattern);
     } else if (pattern) {
       onSave({
         ...pattern,
         propertyPatternTitle: title.trim(),
+        category: selectedCategory,
       });
     }
     onDismiss();
@@ -88,17 +101,24 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {mode === 'create' ? 'Δημιουργία Προτύπου' : 'Ενημέρωση Προτύπου'}
-          </Text>
-
+          {/* ... */}
           <TextInput
             label="Τίτλος Προτύπου"
             value={title}
-            onChangeText={setTitle}
+            onChangeText={onTitleChange}
             style={styles.input}
             mode="outlined"
           />
+
+          <TouchableOpacity style={styles.categorySelector} onPress={onCategoryPress}>
+            <Text style={styles.categorySelectorLabel}>Κατηγορία</Text>
+            <View style={styles.categorySelectorContent}>
+              <Text style={styles.selectedCategory}>
+                {selectedCategory?.title || 'Επιλέξτε Κατηγορία'}
+              </Text>
+              <MaterialIcons name="keyboard-arrow-down" size={24} color={colors.grey} />
+            </View>
+          </TouchableOpacity>
 
           <View style={styles.buttonContainer}>
             {mode === 'edit' && onDelete && (
@@ -116,6 +136,7 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
               {mode === 'create' ? 'Δημιουργία' : 'Αποθήκευση'}
             </Button>
           </View>
+
           <View style={styles.buttonContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
               Ακύρωση
@@ -136,9 +157,32 @@ const AdminItemDetailsPatternScreen = () => {
 
   const isFocused = useIsFocused();
 
+  const [isSelectingCategory, setIsSelectingCategory] = useState(false);
+  const [tempSelectedCategory, setTempSelectedCategory] = useState<Category | null>(null);
+  const categoryBottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
+  const [patternTitle, setPatternTitle] = useState('');
+
+  const handleSheetClose = () => {
+    setIsSelectingCategory(false); // Show modal again when sheet closes
+  };
+
+  const handleCategoryPress = () => {
+    setIsSelectingCategory(true); // Hide modal
+    categoryBottomSheetRef.current?.openModal();
+  };
+
+  const handleCategorySelect = (category: Category) => {
+    setTempSelectedCategory(category);
+    categoryBottomSheetRef.current?.closeModal();
+    setTimeout(() => {
+      setIsSelectingCategory(false); // Show modal again
+    }, 100); // Small delay to ensure smooth transition
+  };
+
   const fetchPatterns = async () => {
     try {
       const fetchedPatterns = (await getStorage('propertyPatterns')) || [];
+
       // Filter out patterns marked as deleted when displaying
       setPatterns(fetchedPatterns.filter((pattern) => !pattern.markAsDelete));
     } catch (error) {
@@ -228,12 +272,16 @@ const AdminItemDetailsPatternScreen = () => {
 
   const handleEditPress = (pattern: PropertyPattern) => {
     setSelectedPattern(pattern);
+    setTempSelectedCategory(pattern.category);
+    setPatternTitle(pattern.propertyPatternTitle); // Set title when editing
     setModalMode('edit');
     setModalVisible(true);
   };
 
   const handleCreatePress = () => {
     setSelectedPattern(null);
+    setTempSelectedCategory(null);
+    setPatternTitle(''); // Reset title for new pattern
     setModalMode('create');
     setModalVisible(true);
   };
@@ -270,7 +318,7 @@ const AdminItemDetailsPatternScreen = () => {
               {pattern.propertyPatternTitle}
             </Text>
             <Text style={{ color: colors.white, fontSize: 12 }}>
-              {new Set(pattern.itemProperties?.map((prop) => prop.propertyName))?.size} Ιδιότητες
+              {new Set(pattern.itemProperties.map((prop) => prop.propertyName)).size} properties
             </Text>
           </View>
           <FontAwesome6 name="chevron-right" size={20} color="#fff" style={{ marginRight: 10 }} />
@@ -280,45 +328,63 @@ const AdminItemDetailsPatternScreen = () => {
     [handleEditPress]
   );
 
+  const handleModalDismiss = () => {
+    setModalVisible(false);
+    setSelectedPattern(null);
+    setTempSelectedCategory(null);
+    setPatternTitle(''); // Reset title on dismiss
+    setIsSelectingCategory(false);
+  };
+
   return (
-    <View style={styles.container}>
-      {patterns?.length > 0 ? (
-        <View style={styles.categoriesContainer}>
-          <DraggableFlatList
-            data={patterns}
-            renderItem={renderItem}
-            keyExtractor={(pattern) => pattern.propertyPatternTitle}
-            onDragEnd={handleDragEnd}
-            contentContainerStyle={styles.categoryFlashListContainer}
-            ItemSeparatorComponent={Divider}
-          />
-        </View>
-      ) : patterns === null ? (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-      ) : (
-        <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20 }}>
-          <Text style={{ textAlign: 'center', color: colors.white }}>
-            Πρότυπα που προστέθηκαν θα εμφανίζονται εδώ.
-          </Text>
-        </View>
-      )}
+    <BottomSheetModalProvider>
+      <View style={styles.container}>
+        {patterns?.length > 0 ? (
+          <View style={styles.categoriesContainer}>
+            <DraggableFlatList
+              data={patterns}
+              renderItem={renderItem}
+              keyExtractor={(pattern) => pattern.propertyPatternTitle}
+              onDragEnd={handleDragEnd}
+              contentContainerStyle={styles.categoryFlashListContainer}
+              ItemSeparatorComponent={Divider}
+            />
+          </View>
+        ) : patterns === null ? (
+          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        ) : (
+          <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20 }}>
+            <Text style={{ textAlign: 'center', color: colors.white }}>
+              Πρότυπα που προστέθηκαν θα εμφανίζονται εδώ.
+            </Text>
+          </View>
+        )}
 
-      <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
+        <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
 
-      <EditPatternModal
-        visible={modalVisible}
-        pattern={selectedPattern}
-        onDismiss={() => {
-          setModalVisible(false);
-          setSelectedPattern(null);
-        }}
-        onSave={modalMode === 'create' ? handleCreatePattern : handleEditPattern}
-        onDelete={modalMode === 'edit' ? handleDelete : undefined}
-        mode={modalMode}
-      />
+        <EditPatternModal
+          visible={modalVisible && !isSelectingCategory}
+          pattern={selectedPattern}
+          onDismiss={handleModalDismiss}
+          onSave={modalMode === 'create' ? handleCreatePattern : handleEditPattern}
+          onDelete={modalMode === 'edit' ? handleDelete : undefined}
+          mode={modalMode}
+          onCategoryPress={handleCategoryPress}
+          selectedCategory={tempSelectedCategory}
+          title={patternTitle}
+          onTitleChange={setPatternTitle}
+        />
 
-      {isLoading && <LoadingOverlay />}
-    </View>
+        <CategoryBottomSheet
+          ref={categoryBottomSheetRef}
+          currentCategory={tempSelectedCategory}
+          onCategoryChange={handleCategorySelect}
+          onClose={handleSheetClose}
+        />
+
+        {isLoading && <LoadingOverlay />}
+      </View>
+    </BottomSheetModalProvider>
   );
 };
 
@@ -409,6 +475,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.darkGrey,
     borderRadius: 4,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedCategory: {
+    fontSize: 16,
+    color: colors.darkGrey,
+  },
+  categorySelector: {
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.grey,
+    borderRadius: 4,
+    padding: 12,
+  },
+
+  categorySelectorLabel: {
+    fontSize: 12,
+    color: colors.grey,
+    marginBottom: 4,
+  },
+
+  categorySelectorContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
 });

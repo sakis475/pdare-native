@@ -8,6 +8,7 @@ import {
   TextInput,
   FlatList,
   Alert,
+  Animated,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -33,6 +34,19 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
   );
   const [editingPropertyType, setEditingPropertyType] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Add refs for FlatList and animation
+  const flatListRef = useRef<FlatList>(null);
+
+  // Function to scroll to bottom
+  const scrollToBottom = () => {
+    if (flatListRef.current && propertyGroups.length > 0) {
+      flatListRef.current.scrollToIndex({
+        index: propertyGroups.length - 1,
+        animated: true,
+      });
+    }
+  };
 
   const getStorageItemPropertyPattern = async () => {
     const allPatterns = await getItemPropertyPatterns();
@@ -196,8 +210,9 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
       newGroupName = `Επιλογή ${counter}`;
     }
 
+    const newId = generateRandomId();
     const newProperty: ItemProperty = {
-      id: generateRandomId(),
+      id: newId,
       propertyName: newGroupName,
       propertyValue: 'Επιλογή',
       propertyType: 'singleselect',
@@ -211,6 +226,11 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
     };
 
     setPropertyGroups((prevGroups) => [...prevGroups, [newGroupName, [newProperty]]]);
+
+    // Schedule scroll and animation for next frame
+    requestAnimationFrame(() => {
+      scrollToBottom();
+    });
   };
 
   const handleDeletePropertyGroup = (propertyName: string) => {
@@ -284,7 +304,6 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
 
   const renderPropertyGroup = ({ item: [propertyName, properties], index }: any) => {
     const isDeleted = properties?.[0]?.isDeletedGroup || !properties?.length;
-
     return (
       <View style={[styles.propertyGroup, isDeleted && styles.deletedPropertyGroup]}>
         <View style={styles.propertyGroupHeader}>
@@ -385,10 +404,22 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
       <>
         <View style={{ flex: 1 }}>
           <FlatList
+            ref={flatListRef}
             data={propertyGroups}
             renderItem={renderPropertyGroup}
             keyExtractor={(item, index) => `group-${item[0]}-${index}`}
             contentContainerStyle={{ paddingBottom: 50 }}
+            onScrollToIndexFailed={(info) => {
+              // Handle scroll failure by trying again after a delay
+              setTimeout(() => {
+                if (flatListRef.current && propertyGroups.length > 0) {
+                  flatListRef.current.scrollToIndex({
+                    index: propertyGroups.length - 1,
+                    animated: true,
+                  });
+                }
+              }, 100);
+            }}
           />
           <FAB icon="plus" style={styles.fab} onPress={handleAddPropertyGroup} />
         </View>
