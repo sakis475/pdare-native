@@ -16,7 +16,6 @@ class SocketEventSubscriber {
   // Handler for "itemsUpdated" event
   private static async handleItemsUpdate(items: ItemReq[]): Promise<void> {
     console.log('Socket Event: handleItemsUpdate');
-    console.log(items);
     setStorage('items', items);
     storageInitGroupedItems();
   }

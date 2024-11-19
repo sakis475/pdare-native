@@ -67,7 +67,6 @@ const NewOrderScreen = ({ route, navigation }: any) => {
   };
 
   useEffect(() => {
-    console.log(route.params?.table?.occupiedByOrder, 'new table!');
     fetchItems();
   }, [route.params?.table?.id]);
 

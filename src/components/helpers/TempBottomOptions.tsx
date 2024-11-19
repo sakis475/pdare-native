@@ -14,12 +14,14 @@ interface TempBottomOptionsProps {
   table: Table;
   handleOpenSelectTableModal: () => void;
   handleTempOrderPress: () => void;
+  overrideOrderView?: boolean;
 }
 
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   table,
   handleOpenSelectTableModal, //opens table modal
   handleTempOrderPress, //opens additems screen
+  overrideOrderView,
 }) => {
   const [noTable, setNoTable] = useState(!table?.tableName);
   const [tempOrder, setTempOrder] = useState<Order>();
@@ -41,7 +43,9 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     const lastItem = order?.orderItems?.slice(-1)?.[0];
 
     const isAnyItemMarkedAsDeleted = order?.orderItems?.some((e) => e.markForDelete);
-    setIsOrderView(lastItem?.alreadySend && !isAnyItemMarkedAsDeleted);
+    setIsOrderView(overrideOrderView || (lastItem?.alreadySend && !isAnyItemMarkedAsDeleted));
+
+    console.log(order, 'order');
     setTempOrder(order);
   };
   useEffect(() => {
@@ -63,7 +67,6 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       return;
     }
     const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
-    console.log(JSON.stringify(convertedServerOrder, null, 2), 'convertedServerOrder');
     let result;
     if (convertedServerOrder?.orderId) {
       const itemsRemainingLength = newOrder.orderItems.filter((e) => !e.markForDelete)?.length;
@@ -99,12 +102,16 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       order = await getTempOrder();
     }
     const orderId = order.id;
-    console.log(orderId);
     AlertWithOptions(
       'Κλείσιμο Παραγγελίας',
       'Είστε σίγουροι ότι θέλετε να κλείσετε την παραγγελία;',
       async () => {
         await patchRequest(`/orders/close/${orderId}`);
+
+        //Clear order only if its temp
+        if (order?.id === (await getTempOrder())?.id) {
+          await clearNewOrder();
+        }
         toast('success', 'Deleted', '', 1000);
         navigateToTables();
       },

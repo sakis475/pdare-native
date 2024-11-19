@@ -15,7 +15,6 @@ import {
   setTableTempOrder,
 } from '../helpers/storage/orderStorage';
 import { CatalogItemAdded } from '../components/itemComponents/CatalogItemAdded';
-import TempBottomOptions from '../components/helpers/TempBottomOptions';
 import { HeaderBar } from '../components/helpers/HeaderBar';
 import { strings } from '../core/strings';
 import { CatalogItemDisabled } from '../components/itemComponents/CatalogItemDisabled';
@@ -197,18 +196,6 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
         ) : (
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
         )}
-        {/* {!bottomSheetMode ? (
-          <View>
-            <TempBottomOptions
-              table={table}
-              handleOpenSelectTableModal={handleOpenSelectTableModal}
-              handleTempOrderPress={handleTempOrderPress}
-            />
-            <Portal>
-              <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
-            </Portal>
-          </View>
-        ) : null} */}
       </View>
     </SafeAreaView>
   );

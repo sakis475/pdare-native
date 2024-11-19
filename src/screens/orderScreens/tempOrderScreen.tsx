@@ -9,10 +9,12 @@ import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import {
+  convertNewOrderToRequestObject,
   createNewOrder,
   getTempOrder,
   markActiveItemForDelete,
   setTableTempOrder,
+  updateTableOfOrder,
 } from '../../helpers/storage/orderStorage';
 import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdded';
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
@@ -20,7 +22,8 @@ import { HeaderBar } from '../../components/helpers/HeaderBar';
 import { strings } from '../../core/strings';
 import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
 import { useIsFocused } from '@react-navigation/native';
-import { AlertWithOptions } from '../../core/utils';
+import { AlertWithOptions, toast } from '../../core/utils';
+import { patchRequest } from '../../helpers/requests';
 const TempOrderScreen = ({
   currentIndex,
   route,
@@ -48,9 +51,20 @@ const TempOrderScreen = ({
   }, [route, isSheetOpen, isFocused, currentIndex]);
 
   const handleSelectTable = async (newTable: Table) => {
+    const tempOrder: Order = await getTempOrder();
     let clearTable = newTable;
+
+    //In Case of new order start a new order
     if (!items.length && newTable?.id) {
       clearTable = (await createNewOrder(newTable))?.table;
+    } else if (tempOrder.id) {
+      //update existing order table
+      const updatedOrder = await updateTableOfOrder(tempOrder, newTable);
+      if (!updatedOrder?.id) {
+        return;
+      } else {
+        toast('success', 'Επιτυχία Αλλαγής Τραπεζιού');
+      }
     }
 
     setTable(clearTable);

@@ -14,11 +14,14 @@ import {
   markActiveItemForDelete,
   setTableTempOrder,
   setTempOrder,
+  updateTableOfOrder,
 } from '../../../helpers/storage/orderStorage';
 import { CatalogItemAdded } from '../../../components/itemComponents/CatalogItemAdded';
 import TempBottomOptions from '../../../components/helpers/TempBottomOptions';
 import { CatalogItemDisabled } from '../../../components/itemComponents/CatalogItemDisabled';
-import { AlertWithOptions } from '../../../core/utils';
+import { AlertWithOptions, toast } from '../../../core/utils';
+import { useNavigation } from '@react-navigation/native';
+import CustomNavigationScreenHeaderTitle from '../../../components/basic/CustomNavigationScreenHeaderTitle';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -27,6 +30,8 @@ const ActiveOrderScreen = ({
 }: any) => {
   const [items, setItems] = useState<ItemReq[]>();
   const [table, setTable] = useState<Table>(route.params?.tableParam);
+
+  const navigation = useNavigation();
 
   const fetchItems = async () => {
     const tempOrder: Order = table.occupiedByOrder;
@@ -37,12 +42,30 @@ const ActiveOrderScreen = ({
     fetchItems();
   }, [route, isSheetOpen]);
 
-  const handleSelectTable = async (table: Table) => {
-    if (!items.length && table?.id) {
-      await createNewOrder(table);
+  const handleSelectTable = async (newTable: Table) => {
+    const tempOrder: Order = await getTempOrder();
+
+    if (table?.occupiedByOrder?.id) {
+      //update existing order table
+      const updatedOrder: Order = await updateTableOfOrder(table.occupiedByOrder, newTable);
+
+      if (!updatedOrder?.id) {
+        return;
+      } else {
+        newTable = updatedOrder.table;
+        newTable.occupiedByOrder = updatedOrder;
+        toast('success', 'Επιτυχία Αλλαγής Τραπεζιού');
+      }
     }
-    setTable(table);
-    setTableTempOrder(table);
+
+    setTable(newTable);
+    navigation.setOptions({
+      headerTitle: () => <CustomNavigationScreenHeaderTitle title={newTable.tableName} />,
+    });
+
+    if (table.occupiedByOrder.id === tempOrder.id) {
+      setTableTempOrder(newTable);
+    }
   };
 
   const handleTempOrderPress = async () => {
@@ -193,6 +216,7 @@ const ActiveOrderScreen = ({
               table={table}
               handleOpenSelectTableModal={handleOpenSelectTableModal}
               handleTempOrderPress={handleTempOrderPress}
+              overrideOrderView={true}
             />
             <Portal>
               <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />

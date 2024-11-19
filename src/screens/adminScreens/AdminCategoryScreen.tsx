@@ -31,8 +31,7 @@ import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 const GRID_SIZE = 4;
 const MARGIN = 4;
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const TOTAL_MARGIN = MARGIN * (GRID_SIZE + 1);
-const BOX_SIZE = (SCREEN_WIDTH - TOTAL_MARGIN) / GRID_SIZE;
+const BOX_SIZE = Math.floor((SCREEN_WIDTH - MARGIN * 2) / GRID_SIZE) - MARGIN;
 const GRID_WIDTH = BOX_SIZE * GRID_SIZE + MARGIN * (GRID_SIZE - 1);
 const DRAG_HANDLE_SIZE = 20;
 
@@ -220,7 +219,7 @@ const CategoryBox: React.FC<Category & { onEdit?: () => void }> = (category) => 
         <TouchableOpacity style={styles.editButton} onPress={category.onEdit}>
           <FontAwesome6 name="pencil" size={16} color={textColor} />
         </TouchableOpacity>
-        <Text style={{ color: textColor, fontWeight: 'bold' }}>{category.title}</Text>
+        <Text style={{ color: textColor, fontWeight: 'bold', padding: 3 }}>{category.title}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -465,19 +464,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingHorizontal: MARGIN,
     paddingTop: MARGIN,
   },
   grid: {
     width: GRID_WIDTH,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    gap: MARGIN, // This ensures even spacing between items
   },
   boxWrapper: {
     width: BOX_SIZE,
     height: BOX_SIZE,
-    marginBottom: MARGIN,
   },
   buttonContainer: {
     width: BOX_SIZE,

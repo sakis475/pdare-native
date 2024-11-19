@@ -27,6 +27,7 @@ import AdminItemListScreen from '../screens/adminScreens/AdminItemListScreen';
 import AdminItemDetailsScreen from '../screens/adminScreens/AdminItemDetailsScreen';
 import AdminItemDetailsPatternScreen from '../screens/adminScreens/AdminItemDetailsPatternScreen';
 import AdminItemDetailsPatternEditScreen from '../screens/adminScreens/AdminItemDetailsPatternEditScreen';
+import ExpoScreen from '../screens/ExpoScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -423,6 +424,8 @@ const MainTabs = ({ route }: any) => {
         return <TempOrderScreen currentIndex={index} />;
       case strings.History:
         return <HistoryOrdersScreen currentIndex={index} />;
+      case strings.Expo:
+        return <ExpoScreen currentIndex={index} />;
       default:
         return null;
     }

@@ -253,8 +253,8 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
       order.orderItems.push(originalItem);
     } catch (error) {
       console.log(error);
-      console.log(orderItem, 'orderItem');
-      console.log(items, 'items');
+      // console.log(orderItem, 'orderItem');
+      // console.log(items, 'items');
     }
   }
   return order;
@@ -311,4 +311,14 @@ export const getItemPropertyPatterns = async () => {
 
 export const setItemPropertyPatterns = async (itemPropertyPatterns: PropertyPattern[]) => {
   return await setStorage('propertyPatterns', itemPropertyPatterns);
+};
+
+export const updateTableOfOrder = async (order: Order, newTable: Table) => {
+  order.table = newTable;
+  const convertedServerOrder = convertNewOrderToRequestObject(order);
+
+  return await Requests.patchRequest(
+    `/orders/${convertedServerOrder?.orderId}`,
+    convertedServerOrder
+  );
 };

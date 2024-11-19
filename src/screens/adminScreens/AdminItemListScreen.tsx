@@ -189,7 +189,6 @@ const AdminItemListScreen = ({ route }: any) => {
       for (const [index, updatedItem] of updatedItems.entries()) {
         updatedItem.orderItem = index;
       }
-      console.log(updatedItems, 'updatedItems');
       // Send to server
       const response = await patchRequest('/items/save', updatedItems);
       if (!Array.isArray(response)) {

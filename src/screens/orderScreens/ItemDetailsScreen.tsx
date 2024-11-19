@@ -27,17 +27,31 @@ const UnifiedSelect = ({
   const styles = StyleSheet.create({
     container: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    optionContainer: {
+      flexDirection: 'row',
       alignItems: 'center',
-      marginVertical: 4,
-      marginLeft: 20, // Indentation for the options
+      backgroundColor: colors.slightlyDarkerGrey,
+      borderRadius: 8,
+      paddingRight: 12,
+      marginBottom: 8,
+    },
+    optionText: {
+      color: '#ffffff',
+      fontSize: 14,
+    },
+    radioButton: {
+      margin: 0,
+      padding: 0,
     },
   });
 
-  const [selectedId, setSelectedId] = useState<number | null>(null); // For radio buttons
-  const [checkedStates, setCheckedStates] = useState<{ [key: number]: boolean }>({}); // For checkboxes
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [checkedStates, setCheckedStates] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
-    // if (isUpdate) {
     const multiCheckedStates: any = {};
     for (const itemProperty of itemPropertiesGrouped) {
       if (itemProperty.propertyType === 'singleselect') {
@@ -51,7 +65,6 @@ const UnifiedSelect = ({
       }
     }
     setCheckedStates(multiCheckedStates);
-    // }
   }, []);
 
   const handleRadioSelectChange = (property: ItemProperty) => {
@@ -84,14 +97,13 @@ const UnifiedSelect = ({
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       {itemPropertiesGrouped.map((property) => (
         <TouchableOpacity
           key={property.id}
-          style={styles.container}
+          style={styles.optionContainer}
           onPress={() => {
             setSelectedId(property.id);
-
             property.propertyType === 'singleselect'
               ? handleRadioSelectChange(property)
               : handleMultiSelectChange(property);
@@ -104,6 +116,7 @@ const UnifiedSelect = ({
               status={selectedId === property.id ? 'checked' : 'unchecked'}
               color={'#6495ED'}
               uncheckedColor={'#ffffff'}
+              style={styles.radioButton}
               onPress={() => {
                 setSelectedId(property.id);
                 handleRadioSelectChange(property);
@@ -114,10 +127,11 @@ const UnifiedSelect = ({
               status={checkedStates[property.id] ? 'checked' : 'unchecked'}
               color={'#6495ED'}
               uncheckedColor={'#ffffff'}
+              style={styles.radioButton}
               onPress={() => handleMultiSelectChange(property)}
             />
           )}
-          <Text style={{ color: '#ffffff' }}>{property.propertyValue}</Text>
+          <Text style={styles.optionText}>{property.propertyValue}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -151,8 +165,6 @@ const ItemDetailsScreen = ({ route }: any) => {
     const deepCopy = JSON.parse(JSON.stringify(route.params.item));
 
     setItem(deepCopy);
-
-    console.log(JSON.stringify(deepCopy), 'item');
   }, [route.params.item]);
 
   const handleSelectChange = (updatedProperty: ItemProperty) => {

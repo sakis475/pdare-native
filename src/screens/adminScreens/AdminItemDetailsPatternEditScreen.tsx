@@ -64,7 +64,6 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
 
   useEffect(() => {
     getStorageItemPropertyPattern();
-    console.log('trigger', route.params.pattern.id);
   }, [route.params.pattern]);
 
   const groupPropertiesByName = (properties: ItemProperty[]): ItemPropertiesGrouped => {
