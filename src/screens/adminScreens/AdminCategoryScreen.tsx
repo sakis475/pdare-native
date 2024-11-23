@@ -403,37 +403,45 @@ const AdminCategoryScreen = () => {
 
   return (
     <>
-      {categories?.length ? (
-        <View style={styles.mainContainer}>
-          <ScrollView
-            style={styles.scrollViewContainer}
-            contentContainerStyle={styles.scrollViewContent}
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.container}>
-              <View style={styles.grid}>
-                {categories
-                  .filter((category) => category.isEnabled !== false)
-                  .map((category) => (
-                    <Box
-                      key={`category-${category.id}`}
-                      item={{
-                        ...category,
-                        onEdit: () => handleEditPress(category),
-                      }}
-                      onDragEnd={onDragEnd}
-                      categoriesLength={categories.length}
-                    />
-                  ))}
+      <View style={styles.mainContainer}>
+        {categories?.length ? (
+          <>
+            <ScrollView
+              style={styles.scrollViewContainer}
+              contentContainerStyle={styles.scrollViewContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.container}>
+                <View style={styles.grid}>
+                  {categories
+                    .filter((category) => category.isEnabled !== false)
+                    .map((category) => (
+                      <Box
+                        key={`category-${category.id}`}
+                        item={{
+                          ...category,
+                          onEdit: () => handleEditPress(category),
+                        }}
+                        onDragEnd={onDragEnd}
+                        categoriesLength={categories.length}
+                      />
+                    ))}
+                </View>
               </View>
-            </View>
-          </ScrollView>
+            </ScrollView>
 
-          <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
-        </View>
-      ) : (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-      )}
+            <FAB
+              icon="plus"
+              style={styles.fab}
+              onPress={handleCreatePress}
+              color={colors.darkGrey}
+              animated={false}
+            />
+          </>
+        ) : (
+          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        )}
+      </View>
 
       <EditModal
         visible={modalVisible}
@@ -456,6 +464,7 @@ const styles = StyleSheet.create({
   scrollViewContainer: {
     flex: 1,
     paddingTop: 10,
+    paddingBottom: 100,
     backgroundColor: '#2F2F2F',
   },
   scrollViewContent: {
@@ -465,6 +474,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: MARGIN,
+    paddingBottom: 80,
+    backgroundColor: '#2F2F2F',
   },
   grid: {
     width: GRID_WIDTH,
@@ -577,6 +588,9 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2F2F2F',
   },
   fab: {
     position: 'absolute',

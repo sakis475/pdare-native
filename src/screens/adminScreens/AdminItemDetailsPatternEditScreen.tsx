@@ -420,7 +420,13 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
               }, 100);
             }}
           />
-          <FAB icon="plus" style={styles.fab} onPress={handleAddPropertyGroup} />
+          <FAB
+            icon="plus"
+            style={styles.fab}
+            onPress={handleAddPropertyGroup}
+            color={colors.darkGrey}
+            animated={false}
+          />
         </View>
 
         <View style={styles.addItemContainer}>

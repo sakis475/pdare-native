@@ -58,6 +58,7 @@ interface StorageTypes {
   categories: Category[];
   currentUser: User;
   propertyPatterns: PropertyPattern[];
+  tables: Table[];
 }
 
 // Type for storage keys

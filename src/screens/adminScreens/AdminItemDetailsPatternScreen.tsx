@@ -360,7 +360,13 @@ const AdminItemDetailsPatternScreen = () => {
           </View>
         )}
 
-        <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
+        <FAB
+          icon="plus"
+          style={styles.fab}
+          onPress={handleCreatePress}
+          color={colors.darkGrey}
+          animated={false}
+        />
 
         <EditPatternModal
           visible={modalVisible && !isSelectingCategory}

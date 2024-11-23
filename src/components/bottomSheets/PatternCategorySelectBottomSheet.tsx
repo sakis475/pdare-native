@@ -10,7 +10,6 @@ import React, {
 } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, List } from 'react-native-paper';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { getStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import { FlatList } from 'react-native-gesture-handler';

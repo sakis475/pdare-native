@@ -16,6 +16,7 @@ export const DEFAULT_SOCKET_CONNECTIONS = ['testio'];
 3.1. Item Details Pattern Screen ✅
     - Add -Item Details Pattern Screen- that user can create a list of Item Details and name them, then everytime that adds a new item it can assign pattern. 
 4. Add re-ordering system for categories, items, item details ✅
+14. Create Table screen Manage✅
 5. History tab: Add the ability to re-open orders that has closed and edit them. (Add them to tempOrder screen/storage)
 6. Expo Tab: Make a view that lists open orders in a scrollable horizontal (2 columns) make it snappable. Each list should scroll vertically too. 
     Add the ability to mark items with colors

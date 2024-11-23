@@ -297,7 +297,13 @@ const AdminItemListScreen = ({ route }: any) => {
             />
           </View>
 
-          <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
+          <FAB
+            icon="plus"
+            style={styles.fab}
+            onPress={handleCreatePress}
+            color={colors.darkGrey}
+            animated={false}
+          />
         </>
       ) : items === null ? (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
@@ -315,7 +321,13 @@ const AdminItemListScreen = ({ route }: any) => {
             <Text style={{ textAlign: 'center', color: colors.white }}>
               Προιόντα που προστέθετε θα εμφανίζονται εδώ.
             </Text>
-            <FAB icon="plus" style={styles.fab} onPress={handleCreatePress} />
+            <FAB
+              icon="plus"
+              style={styles.fab}
+              onPress={handleCreatePress}
+              color={colors.darkGrey}
+              animated={false}
+            />
           </View>
         </>
       )}

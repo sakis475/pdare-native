@@ -35,34 +35,57 @@ export function toast(type: ToastType, title: string, text: string = '', visibil
     visibilityTime,
   });
 }
+
+export function normalizeString(str: string) {
+  // Remove leading/trailing spaces and convert to lowercase
+  return (
+    str
+      .trim()
+      // Convert Greek uppercase to lowercase
+      .toLowerCase()
+      // Normalize Greek characters
+      .normalize('NFKD')
+      // Convert Α (Greek) to a (Latin)
+      .replace(/α|ά/gi, 'a')
+      // Remove any remaining diacritics
+      .replace(/[\u0300-\u036f]/g, '')
+  );
+}
+
 /**
  * If text is number sort by number and not string, example 1, 2, 10 and not 1, 10, 2
  */
-export function sortNumberAndStrings(a: any, b: any, ascending = true) {
-  const typeA = typeof a;
-  const typeB = typeof b;
 
-  const ascendingMultiplier = ascending === true ? 1 : -1;
+export function naturalSort(a: string, b: string) {
+  const aNorm = normalizeString(a);
+  const bNorm = normalizeString(b);
 
-  // Handle numeric types first (numbers and strings representing numbers)
-  if (typeA === 'number' || !isNaN(Number(a))) {
-    const numA = Number(a);
-    if (typeB === 'number' || !isNaN(Number(b))) {
-      const numB = Number(b);
-      return (numA - numB) * ascendingMultiplier; // Sort numbers in ascending order
+  // Split into parts (letters and numbers)
+  const splitPattern = /(\d+|\D+)/g;
+  const aParts = aNorm.match(splitPattern) || [];
+  const bParts = bNorm.match(splitPattern) || [];
+
+  for (let i = 0; i < Math.min(aParts.length, bParts.length); i++) {
+    const aValue = aParts[i];
+    const bValue = bParts[i];
+
+    // If both parts are numbers
+    const aNum = parseInt(aValue);
+    const bNum = parseInt(bValue);
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      if (aNum !== bNum) {
+        return aNum - bNum;
+      }
     } else {
-      return -1 * ascendingMultiplier; // Numbers come before strings
+      // Compare as strings
+      const comparison = aValue.localeCompare(bValue);
+      if (comparison !== 0) {
+        return comparison;
+      }
     }
-  } else if (typeB === 'number' || !isNaN(Number(b))) {
-    return 1 * ascendingMultiplier; // Strings representing numbers come after numbers
   }
 
-  const compare = ascendingMultiplier * a.localeCompare(b);
-  return compare;
-}
-
-export function normalizeGreek(str: string) {
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return aParts.length - bParts.length;
 }
 
 export function AlertWithOptions(

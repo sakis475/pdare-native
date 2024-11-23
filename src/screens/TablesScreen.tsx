@@ -137,7 +137,7 @@ const TablesScreen = ({ currentIndex }: any) => {
             renderItem={({ item, index }) => renderItems(item, index)}
             keyExtractor={(item) => item.tableName + item.id}
             estimatedItemSize={20}
-            numColumns={3}
+            numColumns={4}
           />
         </View>
 

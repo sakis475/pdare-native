@@ -1,6 +1,13 @@
 import { getStorage, setStorage } from '../../storage/store';
 import * as Requests from '../requests';
 
+// active tables
+async function storageInitTables() {
+  const tables = await Requests.getRequest('/tables/active');
+  await setStorage('tables', tables);
+  return tables;
+}
+
 // items
 async function storageInitItems() {
   const items = await Requests.getRequest('/items');
@@ -8,7 +15,7 @@ async function storageInitItems() {
   return items;
 }
 
-//categories
+// categories
 async function storageInitCategories() {
   const categories: Category[] = await Requests.getRequest('/categories/active');
 
@@ -38,6 +45,7 @@ export async function storageInitGroupedItems() {
 }
 
 export async function storageInitData() {
+  await storageInitTables();
   await storageInitItems();
   await storageInitCategories();
   await storageInitGroupedItems();

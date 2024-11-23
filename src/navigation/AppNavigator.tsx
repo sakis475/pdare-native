@@ -28,6 +28,7 @@ import AdminItemDetailsScreen from '../screens/adminScreens/AdminItemDetailsScre
 import AdminItemDetailsPatternScreen from '../screens/adminScreens/AdminItemDetailsPatternScreen';
 import AdminItemDetailsPatternEditScreen from '../screens/adminScreens/AdminItemDetailsPatternEditScreen';
 import ExpoScreen from '../screens/ExpoScreen';
+import AdminTableScreen from '../screens/adminScreens/AdminTableScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -317,6 +318,25 @@ const AppNavigator = () => {
       />
 
       <Stack.Screen
+        name={ScreenNames.ManageTableScreen}
+        component={AdminTableScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Διαχείριση Τραπεζιών'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+      <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
         component={ItemDetailsScreen}
         options={({ route }: any) => ({
@@ -466,6 +486,7 @@ export enum ScreenNames {
   RestaurantSettingsScreen = 'restaurantSettingsScreen',
   AdminProductsScreen = 'AdminProductsScreen',
   ManageCategoriesScreen = 'manageCategoriesScreen',
+  ManageTableScreen = 'manageTableScreen',
   ManageItemsScreen = 'manageItemsScreen',
   ManageItemDetailsScreen = 'manageItemsDetailsScreen',
   ManageItemDetailsPatternScreen = 'manageItemDetailsPatternScreen',

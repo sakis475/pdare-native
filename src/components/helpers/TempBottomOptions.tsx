@@ -45,7 +45,6 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     const isAnyItemMarkedAsDeleted = order?.orderItems?.some((e) => e.markForDelete);
     setIsOrderView(overrideOrderView || (lastItem?.alreadySend && !isAnyItemMarkedAsDeleted));
 
-    console.log(order, 'order');
     setTempOrder(order);
   };
   useEffect(() => {

@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, View, Dimensions } from 'react-native';
 import { colors } from '../../core/theme';
 import dayjs, { datetimeDiff } from '../../core/dayjs';
 import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
+
+// Dynamic size calculations
+const GRID_SIZE = 4; // Number of columns
+const MARGIN = 8; // Space between boxes
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+// Calculate box size: (screen width - padding on both sides - total margin space between boxes) / number of columns
+const BOX_SIZE = Math.floor((SCREEN_WIDTH - MARGIN * 2 - MARGIN * (GRID_SIZE - 1)) / GRID_SIZE);
 
 export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
   const [elapsedTime, setElapsedTime] = useState('');
@@ -26,15 +33,10 @@ export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
   };
 
   useEffect(() => {
-    // Initial calculation
     calculateElapsedTime();
-
-    // Update elapsed time every minute
-    const interval = setInterval(calculateElapsedTime, 60000); // Update every minute
-
-    // Cleanup interval on component unmount
+    const interval = setInterval(calculateElapsedTime, 60000);
     return () => clearInterval(interval);
-  }, [table.occupiedByOrder?.createdAt]); // Recalculate if createdAt changes
+  }, [table.occupiedByOrder?.createdAt]);
 
   return (
     <TouchableOpacity
@@ -44,14 +46,16 @@ export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
       onPress={() => onPress(table)}
     >
       <View style={styles.content}>
-        <Text style={styles.tableName}>{table.tableName}</Text>
-        {elapsedTime ? <Text style={styles.elapsedTime}>{elapsedTime}</Text> : null}
+        <Text style={[styles.tableName, { fontSize: BOX_SIZE * 0.18 }]}>{table.tableName}</Text>
         {elapsedTime ? (
-          <View style={[styles.personsCount, { flexDirection: 'row' }]}>
-            <FeatherIcons name="users" size={13} color={colors.veryLighterGrey}></FeatherIcons>
-            <Text style={{ fontSize: 13, color: colors.white }}>
-              {table.occupiedByOrder.couvert}
-            </Text>
+          <Text style={[styles.elapsedTime, { fontSize: BOX_SIZE * 0.14 }]}>{elapsedTime}</Text>
+        ) : null}
+        {elapsedTime ? (
+          <View style={styles.personsCount}>
+            <View style={styles.personsCountContent}>
+              <FeatherIcons name="users" size={BOX_SIZE * 0.14} color={colors.veryLighterGrey} />
+              <Text style={styles.personsCountText}>{table.occupiedByOrder.couvert || 2}</Text>
+            </View>
           </View>
         ) : null}
       </View>
@@ -61,12 +65,13 @@ export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
 
 const styles = StyleSheet.create({
   table: {
-    width: 100,
-    height: 100,
+    width: BOX_SIZE,
+    height: BOX_SIZE,
     borderRadius: 8,
     backgroundColor: colors.blue,
-    paddingVertical: 4,
-    paddingHorizontal: 6,
+    paddingVertical: MARGIN / 2,
+    paddingHorizontal: MARGIN / 2,
+    margin: MARGIN / 2,
   },
   content: {
     flex: 1,
@@ -75,28 +80,46 @@ const styles = StyleSheet.create({
   },
   tableName: {
     color: colors.white,
-    fontSize: 16,
   },
   elapsedTime: {
     position: 'absolute',
     top: 0,
     left: 0,
     color: colors.white,
-    fontSize: 14,
     backgroundColor: colors.black,
-    padding: 4,
+    padding: MARGIN / 2,
     borderRadius: 4,
   },
   personsCount: {
-    backgroundColor: colors.darkBlue,
-    borderRadius: 4,
-    paddingVertical: 1,
-    paddingHorizontal: 4,
     position: 'absolute',
     top: 0,
     right: 0,
-    justifyContent: 'center',
+    backgroundColor: colors.darkBlue,
+    borderRadius: 4,
+    padding: 4,
+    minWidth: BOX_SIZE * 0.3, // Ensure minimum width for content
+  },
+  personsCountContent: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    justifyContent: 'center',
+    gap: 4, // Consistent gap between icon and number
+  },
+  personsCountText: {
+    fontSize: BOX_SIZE * 0.14,
+    color: colors.white,
+    textAlignVertical: 'center',
+    includeFontPadding: false, // Removes extra padding around text
+    marginTop: 1, // Fine-tune vertical alignment
+  },
+});
+
+// You'll need to wrap these boxes in a container with this style:
+export const containerStyles = StyleSheet.create({
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    padding: MARGIN / 2,
   },
 });

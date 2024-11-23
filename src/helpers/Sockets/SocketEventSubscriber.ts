@@ -8,9 +8,10 @@ class SocketEventSubscriber {
     socketManager.on(EventId.itemsUpdated, SocketEventSubscriber.handleItemsUpdate);
     socketManager.on(EventId.categoriesUpdated, SocketEventSubscriber.handleCategoriesUpdated);
     socketManager.on(
-      EventId.itemPropertyPatternsPattern,
+      EventId.itemPropertyPatternsUpdated,
       SocketEventSubscriber.handleItemPropertiesPatternUpdated
     );
+    socketManager.on(EventId.tablesUpdated, SocketEventSubscriber.handleTablesUpdated);
   }
 
   // Handler for "itemsUpdated" event
@@ -30,6 +31,11 @@ class SocketEventSubscriber {
   ): Promise<void> {
     console.log('Socket Event: handleItemPropertiesPatternUpdated');
     setStorage('propertyPatterns', propertyPatterns);
+  }
+
+  private static async handleTablesUpdated(tables: Table[]): Promise<void> {
+    console.log('Socket Event: handleTablesUpdated');
+    setStorage('tables', tables);
   }
 }
 

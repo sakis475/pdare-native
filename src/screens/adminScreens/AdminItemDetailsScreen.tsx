@@ -534,13 +534,21 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               contentContainerStyle={{ paddingBottom: 50 }}
             />
             {Object.keys(item.itemPropertiesGrouped).length > 0 ? (
-              <FAB icon="plus" style={styles.fab} onPress={handleAddPropertyGroup} />
+              <FAB
+                icon="plus"
+                style={styles.fab}
+                onPress={handleAddPropertyGroup}
+                color={colors.darkGrey}
+                animated={false}
+              />
             ) : (
               <>
                 <FAB
                   icon="plus"
                   style={styles.fab}
                   onPress={() => setIsPatternModalVisible(true)}
+                  color={colors.darkGrey}
+                  animated={false}
                 />
 
                 <SelectPatternModal
