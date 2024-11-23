@@ -114,6 +114,11 @@ export const ClipboardIcon = ({ size = 24, color = colors.white, style }: IconPr
 
 export const ClipboardMultipleIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
   return (
-    <IoniconsIcons name="clipboard-multiple-outline" size={size} color={color} style={style} />
+    <MaterialCommunityIcons
+      name="clipboard-multiple-outline"
+      size={size}
+      color={color}
+      style={style}
+    />
   );
 };

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { toast } from '../../../core/utils';
 import { getItemPropertyPatterns } from '../../../helpers/storage/orderStorage';
 import { useNavigation } from '@react-navigation/native';
-import { navigate, ScreenNames } from '../../../navigation/AppNavigator';
+import { navigate, ScreenNames } from '../../../navigation/navigationUtils';
 
 interface SelectPatternModalProps {
   visible: boolean;

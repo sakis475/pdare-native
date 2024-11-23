@@ -6,7 +6,7 @@ import { Divider, Portal } from 'react-native-paper';
 import { colors } from '../../core/theme';
 
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate } from '../../navigation/AppNavigator';
+import { ScreenNames, navigate } from '../../navigation/navigationUtils';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import {
   convertNewOrderToRequestObject,
@@ -137,65 +137,82 @@ const TempOrderScreen = ({
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      {!bottomSheetMode ? <HeaderBar headerTitle={headerTitle}></HeaderBar> : null}
+    <View style={styles.mainContainer}>
+      {!bottomSheetMode && <HeaderBar headerTitle={headerTitle} />}
 
-      <View style={styles.container}>
+      <View style={styles.contentContainer}>
         {items && items.length > 0 ? (
-          <>
-            <View style={styles.categoriesContainer}>
-              <FlashList
-                data={items}
-                keyExtractor={(item) => {
-                  const uniqueId = item.newItemId;
-                  return uniqueId;
-                }}
-                renderItem={({ item }) => renderItems(item)}
-                estimatedItemSize={50}
-                contentContainerStyle={styles.categoryFlashListContainer}
-                showsVerticalScrollIndicator={true}
-                persistentScrollbar={true}
-                ItemSeparatorComponent={Divider}
-              />
-            </View>
-          </>
-        ) : items?.length === 0 ? (
-          <>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                Προϊόντα που θα προσθέσετε
-              </Text>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>θα εμφανιστούν εδώ.</Text>
-            </View>
-          </>
-        ) : (
-          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-        )}
-        {!bottomSheetMode ? (
-          <View>
-            <TempBottomOptions
-              table={table}
-              handleOpenSelectTableModal={handleOpenSelectTableModal}
-              handleTempOrderPress={handleTempOrderPress}
+          <View style={styles.listContainer}>
+            <FlashList
+              data={items}
+              keyExtractor={(item) => item.newItemId}
+              renderItem={({ item }) => renderItems(item)}
+              estimatedItemSize={50}
+              contentContainerStyle={styles.categoryFlashListContainer}
+              showsVerticalScrollIndicator={true}
+              persistentScrollbar={true}
+              ItemSeparatorComponent={Divider}
             />
-            <Portal>
-              <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
-            </Portal>
           </View>
-        ) : null}
+        ) : items?.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Προϊόντα που θα προσθέσετε</Text>
+            <Text style={styles.emptyText}>θα εμφανιστούν εδώ.</Text>
+          </View>
+        ) : (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+          </View>
+        )}
       </View>
-    </SafeAreaView>
+
+      {!bottomSheetMode && (
+        <>
+          <TempBottomOptions
+            table={table}
+            handleOpenSelectTableModal={handleOpenSelectTableModal}
+            handleTempOrderPress={handleTempOrderPress}
+          />
+          <Portal>
+            <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
+          </Portal>
+        </>
+      )}
+    </View>
   );
 };
+
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
+    flex: 1,
+    backgroundColor: '#2F2F2F',
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: '#2F2F2F',
+  },
+  listContainer: {
     flex: 1,
     paddingTop: 20,
-    backgroundColor: '#2F2F2F',
+  },
+  loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
-    alignContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#ffffff',
+  },
+  categoryFlashListContainer: {
     paddingHorizontal: 0,
   },
+
   categoriesContainer: {
     // height: 50, // Set a fixed height for the container of the FlatList
     // backgroundColor: 'red',
@@ -263,6 +280,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  categoryFlashListContainer: { paddingHorizontal: 0 },
 });
 export default TempOrderScreen;

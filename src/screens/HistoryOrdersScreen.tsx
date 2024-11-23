@@ -6,7 +6,6 @@ import { Divider, Portal } from 'react-native-paper';
 import { colors } from '../core/theme';
 
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate, navigationRef } from '../navigation/AppNavigator';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
 import {
   createNewOrder,

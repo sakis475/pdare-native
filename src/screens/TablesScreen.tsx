@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   Keyboard,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import { TableBox } from '../components/helpers/TableBox';
 
@@ -26,12 +27,12 @@ import {
   updateActiveOrdersStorage,
 } from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
-import { ScreenNames, navigate, navigateToDraft } from '../navigation/AppNavigator';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import _ from 'lodash';
 import { FlashList } from '@shopify/flash-list';
 import { EventId, socketManager } from '../helpers/Sockets/SocketManager';
 import { getStorage } from '../storage/store';
+import { navigate, navigateToDraft, ScreenNames } from '../navigation/navigationUtils';
 
 const TablesScreen = ({ currentIndex }: any) => {
   const fetchInitialTables = async (): Promise<void> => {
@@ -81,13 +82,13 @@ const TablesScreen = ({ currentIndex }: any) => {
   }, []);
 
   //This propably is not needed because every component mounts it will listen for socket emitter
-  // useEffect(() => {
-  //   if (currentIndex && currentIndex !== 0) return;
-  //   // Fetch initial data
-  //   fetchInitialTables();
-  // }, [currentIndex]);
+  useEffect(() => {
+    if (currentIndex && currentIndex !== 0) return;
+    // Fetch initial data
+    fetchInitialTables();
+  }, [currentIndex]);
 
-  const [activeTables, setActiveTables] = useState<Table[]>([]);
+  const [activeTables, setActiveTables] = useState<Table[]>(undefined);
 
   //START TABLE MODAL LOGIC
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
@@ -131,19 +132,33 @@ const TablesScreen = ({ currentIndex }: any) => {
     <SafeAreaView style={{ flex: 1 }}>
       <HeaderBar headerTitle={strings.Tables}></HeaderBar>
       <View style={styles.container}>
-        <View style={styles.tableContainer}>
-          <FlashList
-            data={activeTables}
-            renderItem={({ item, index }) => renderItems(item, index)}
-            keyExtractor={(item) => item.tableName + item.id}
-            estimatedItemSize={20}
-            numColumns={4}
-          />
-        </View>
+        {activeTables && activeTables.length > 0 ? (
+          <>
+            <View style={styles.tableContainer}>
+              <FlashList
+                data={activeTables}
+                renderItem={({ item, index }) => renderItems(item, index)}
+                keyExtractor={(item) => item.tableName + item.id}
+                estimatedItemSize={20}
+                numColumns={4}
+              />
+            </View>
 
-        <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
-          <Text style={styles.selectTableBtnText}>{strings.NewOrderBtn}</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
+              <Text style={styles.selectTableBtnText}>{strings.NewOrderBtn}</Text>
+            </TouchableOpacity>
+          </>
+        ) : activeTables && activeTables?.length === 0 ? (
+          <>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
+                Δεν υπάρχουν ενεργά Τραπέζια
+              </Text>
+            </View>
+          </>
+        ) : (
+          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        )}
         <Portal>
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
         </Portal>
@@ -156,6 +171,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#2F2F2F',
+    justifyContent: 'center',
+    alignContent: 'center',
   },
   tableContainer: {
     flex: 1,

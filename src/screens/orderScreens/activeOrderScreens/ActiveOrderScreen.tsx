@@ -6,7 +6,6 @@ import { Divider, Portal } from 'react-native-paper';
 import { colors } from '../../../core/theme';
 
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate, navigateToDraft } from '../../../navigation/AppNavigator';
 import TableSelectBottomSheet from '../../../components/bottomSheets/TableSelectBottomSheet';
 import {
   createNewOrder,
@@ -22,6 +21,7 @@ import { CatalogItemDisabled } from '../../../components/itemComponents/CatalogI
 import { AlertWithOptions, toast } from '../../../core/utils';
 import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../../../components/basic/CustomNavigationScreenHeaderTitle';
+import { navigate, navigateToDraft, ScreenNames } from '../../../navigation/navigationUtils';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,

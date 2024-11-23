@@ -1,7 +1,7 @@
 import { AppLanguage } from '../core/strings';
 
 export const ENV_TYPE: 'PROD' | 'DEV' = 'DEV';
-export const BASE_DOMAIN = 'https://fae5-2a10-9300-400-e40-5a93-a70e-2908-b2e.ngrok-free.app';
+export const BASE_DOMAIN = 'https://2845-2a10-9300-400-e40-5a93-a70e-2908-b2e.ngrok-free.app';
 export const BASE_URL = BASE_DOMAIN + '/api/v1';
 export const DEFAULT_APP_LANGUAGE: AppLanguage = 'lang_en';
 export const REQ_TIMEOUT = 60000;
@@ -18,7 +18,7 @@ export const DEFAULT_SOCKET_CONNECTIONS = ['testio'];
 4. Add re-ordering system for categories, items, item details ✅
 14. Create Table screen Manage✅
 5. History tab: Add the ability to re-open orders that has closed and edit them. (Add them to tempOrder screen/storage)
-6. Expo Tab: Make a view that lists open orders in a scrollable horizontal (2 columns) make it snappable. Each list should scroll vertically too. 
+6. Expo Tab: Make a view that lists open orders in a scrollable horizontal (1 columns) make it snappable. Each list should scroll vertically too. 
     Add the ability to mark items with colors
     Add the ability to mark items as finished (Strikethrough)
     Add the ability to mark list as finished

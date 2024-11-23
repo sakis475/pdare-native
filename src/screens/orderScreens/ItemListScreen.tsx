@@ -13,7 +13,7 @@ import { Divider } from 'react-native-paper';
 import { getStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate, navigateToDraft } from '../../navigation/AppNavigator';
+import { ScreenNames, navigate, navigateToDraft } from '../../navigation/navigationUtils';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';

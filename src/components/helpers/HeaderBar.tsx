@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../core/theme';
-import { ScreenNames, navigate } from '../../navigation/AppNavigator';
+import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 
 export function HeaderBar({ headerTitle }: { headerTitle?: string }) {
   return (

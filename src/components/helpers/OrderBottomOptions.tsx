@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet, Keyboard } from 'react-native
 import { colors } from '../../core/theme';
 import TempOrderBottomSheet from '../../components/bottomSheets/TempOrderBottomSheet';
 import { Portal } from '@gorhom/portal';
-import { navigateToDraft } from '../../navigation/AppNavigator';
+import { navigateToDraft } from '../../navigation/navigationUtils';
 
 interface OrderBottomOptionsProps {
   tableName: string;

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
-import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import QuantitySelector from '../helpers/QuantitySelector';
 import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/storage/orderStorage';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';

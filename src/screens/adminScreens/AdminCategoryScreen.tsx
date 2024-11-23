@@ -20,13 +20,13 @@ import { AlertWithOptions, getTextColorBasedOnLuminance, toast } from '../../cor
 import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { getStorage, setStorage } from '../../storage/store';
-import { navigate, ScreenNames } from '../../navigation/AppNavigator';
 import { TextInput, Button } from 'react-native-paper';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { getItemsOfCategory } from '../../helpers/storage/orderStorage';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
+import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;

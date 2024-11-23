@@ -130,6 +130,6 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role: 'owner' | 'waiter' | 'guest';
   restaurant?: Restaurant;
 }

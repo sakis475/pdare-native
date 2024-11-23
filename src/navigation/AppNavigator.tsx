@@ -15,7 +15,7 @@ import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
 import AdminProductsScreen from '../screens/adminScreens/AdminProductsScreen';
 import Tooltip from 'rn-tooltip';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
@@ -29,50 +29,10 @@ import AdminItemDetailsPatternScreen from '../screens/adminScreens/AdminItemDeta
 import AdminItemDetailsPatternEditScreen from '../screens/adminScreens/AdminItemDetailsPatternEditScreen';
 import ExpoScreen from '../screens/ExpoScreen';
 import AdminTableScreen from '../screens/adminScreens/AdminTableScreen';
+import { navigateBack, ScreenNames } from './navigationUtils';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
-
-export function navigate(name: ScreenNames, params?: {}) {
-  if (name === ScreenNames.LoginScreen) {
-    navigateReset(ScreenNames.LoginScreen);
-  }
-
-  if (navigationRef.current) {
-    navigationRef.current.navigate(name, params);
-  }
-}
-
-export function navigateReset(initialScreen: ScreenNames) {
-  if (navigationRef.current) {
-    navigationRef.current.reset({
-      index: 0,
-      routes: [{ name: initialScreen }],
-    });
-  }
-}
-
-export function navigateBack() {
-  if (navigationRef.current) {
-    navigationRef.current.goBack();
-  }
-}
-
-export function navigateToDraft() {
-  if (navigationRef.current) {
-    navigationRef.current.navigate('MainTabs', {
-      screenIndex: 1,
-    });
-  }
-}
-
-export function navigateToTables() {
-  if (navigationRef.current) {
-    navigationRef.current.navigate('MainTabs', {
-      screenIndex: 0,
-    });
-  }
-}
 
 const AppNavigator = () => {
   return (
@@ -86,13 +46,13 @@ const AppNavigator = () => {
         options={{ headerShown: false }}
       />
 
-      <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
-
       <Stack.Screen
         name={ScreenNames.LoginScreen}
         component={LoginScreen}
         options={{ headerShown: false }}
       />
+
+      <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
 
       <Stack.Screen
         name={ScreenNames.RegisterScreen}
@@ -396,19 +356,10 @@ const AppNavigator = () => {
 };
 
 const MainTabs = ({ route }: any) => {
-  const [index, setIndex] = useState(0);
-
-  // useEffect(
-  //   useCallback(() => {
-  //     if (route.params?.screenIndex !== undefined) {
-  //       setIndex(route.params.screenIndex);
-  //     }
-
-  //   }, [route.params?.screenIndex])
-  // );
+  const [index, setIndex] = useState(route?.params?.screenIndex ?? 0);
 
   useEffect(() => {
-    if (route.params?.screenIndex !== undefined) {
+    if (typeof route.params?.screenIndex === 'number') {
       setIndex(route.params.screenIndex);
     }
   }, [route]);
@@ -476,24 +427,4 @@ const styles = StyleSheet.create({
   toolTipText: { color: colors.white, fontSize: 16 },
 });
 
-export enum ScreenNames {
-  MainTabs = 'MainTabs',
-  NewOrderScreen = 'newOrderScreen',
-  ItemListScreen = 'itemListScreen',
-  TempOrderScreen = 'tempOrderScreen',
-  ProfileScreen = 'profileScreen',
-  ItemDetailsScreen = 'itemDetailsScreen',
-  RestaurantSettingsScreen = 'restaurantSettingsScreen',
-  AdminProductsScreen = 'AdminProductsScreen',
-  ManageCategoriesScreen = 'manageCategoriesScreen',
-  ManageTableScreen = 'manageTableScreen',
-  ManageItemsScreen = 'manageItemsScreen',
-  ManageItemDetailsScreen = 'manageItemsDetailsScreen',
-  ManageItemDetailsPatternScreen = 'manageItemDetailsPatternScreen',
-  ManageItemDetailsPatternEditScreen = 'manageItemDetailsPatternEditScreen',
-  LoginScreen = 'loginScreen',
-  StartLoadingScreen = 'startLoadingScreen',
-  RegisterScreen = 'registerScreen',
-  ActiveOrderScreen = 'activeOrderScreen',
-}
 export default AppNavigator;

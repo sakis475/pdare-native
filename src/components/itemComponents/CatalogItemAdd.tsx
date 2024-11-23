@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
-import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import { colors } from '../../core/theme';
+import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 
 export function CatalogItemAdd({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);

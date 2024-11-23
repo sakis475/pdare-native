@@ -19,7 +19,6 @@ import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-g
 import { AlertWithOptions, naturalSort, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import { navigate, ScreenNames } from '../../navigation/AppNavigator';
 import { TextInput, Button } from 'react-native-paper';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';

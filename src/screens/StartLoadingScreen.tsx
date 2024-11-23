@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, Text, Animated } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { colors } from '../core/theme';
 import { refreshToken } from '../helpers/requests';
-import { navigate, navigateReset, ScreenNames } from '../navigation/AppNavigator';
+import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUtils';
 
 const logoImage = require('../../assets/mywaitericon.png');
 

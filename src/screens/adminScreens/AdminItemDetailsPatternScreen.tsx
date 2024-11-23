@@ -15,12 +15,12 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
-import { navigate, ScreenNames } from '../../navigation/AppNavigator';
 import { useIsFocused } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { CategoryBottomSheet } from '../../components/bottomSheets/PatternCategorySelectBottomSheet';
 import { Portal } from 'react-native-paper';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 
 interface EditPatternModalProps {
   visible: boolean;

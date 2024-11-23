@@ -8,7 +8,7 @@ import {
 } from '../../helpers/storage/orderStorage';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest, postRequest } from '../../helpers/requests';
-import { navigateToTables } from '../../navigation/AppNavigator';
+import { navigateToTables } from '../../navigation/navigationUtils';
 
 interface TempBottomOptionsProps {
   table: Table;
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   noTableText: {
-    fontSize: 15,
+    fontSize: 10,
   },
   noTableBorder: {
     borderWidth: 2,

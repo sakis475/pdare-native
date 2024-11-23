@@ -7,6 +7,7 @@ import { HelperStorage } from '../helpers/storage/helpersStorage';
 // Function to set item in AsyncStorage
 export async function setStorage<K extends StorageKey>(key: K, value: StorageTypes[K] | null) {
   try {
+    console.log(key, value);
     await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
     console.log(error);
@@ -59,6 +60,7 @@ interface StorageTypes {
   currentUser: User;
   propertyPatterns: PropertyPattern[];
   tables: Table[];
+  lastestMainTabIndex: number;
 }
 
 // Type for storage keys

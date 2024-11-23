@@ -4,7 +4,7 @@ import { Divider, Portal } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
 import { useIsFocused } from '@react-navigation/native';
 import { colors } from '../core/theme';
-import { ScreenNames, navigate } from '../navigation/AppNavigator';
+import { ScreenNames, navigate } from '../navigation/navigationUtils';
 import { AlertWithOptions } from '../core/utils';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
 import {

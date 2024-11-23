@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, TextInput, Button, Divider } from 'react-native-paper';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,6 +15,7 @@ const LoginScreen: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const emailValidator = (email: string) => {
     if (!email) return 'Πρέπει να εισάγεται το Email σας';
@@ -47,7 +48,14 @@ const LoginScreen: React.FC = () => {
       return;
     }
 
-    await login(email, password);
+    setIsLoading(true);
+    try {
+      await login(email, password);
+    } catch (error) {
+      // Handle error if needed
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Shared value for rotation
@@ -65,6 +73,25 @@ const LoginScreen: React.FC = () => {
     rotateValue.value = withSpring(360, { damping: 6, stiffness: 100 }, () => {
       rotateValue.value = 0; // Reset to 0 after the rotation
     });
+  };
+
+  const customTheme = {
+    ...MD3LightTheme,
+    dark: true,
+    colors: {
+      ...MD3LightTheme.colors,
+      primary: colors.white,
+      onPrimary: colors.white,
+      surface: colors.darkerGrey,
+      onSurface: colors.white,
+      surfaceVariant: colors.darkerGrey,
+      onSurfaceVariant: colors.white,
+      surfaceDisabled: colors.darkerGrey,
+      onSurfaceDisabled: colors.white,
+      outline: colors.lighterGrey,
+      outlineVariant: colors.lighterGrey,
+      backdrop: colors.darkerGrey,
+    },
   };
 
   return (
@@ -113,6 +140,8 @@ const LoginScreen: React.FC = () => {
                 textColor={colors.white}
                 underlineColor={colors.lighterGrey}
                 activeUnderlineColor={colors.white}
+                disabled={isLoading}
+                theme={customTheme}
               />
               {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
             </View>
@@ -128,6 +157,8 @@ const LoginScreen: React.FC = () => {
                   textColor={colors.white}
                   underlineColor={colors.lightGrey}
                   activeUnderlineColor={colors.white}
+                  disabled={isLoading}
+                  theme={customTheme}
                 />
                 <TouchableOpacity
                   onPress={() => setIsPasswordVisible(!isPasswordVisible)}
@@ -149,8 +180,16 @@ const LoginScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={_onLoginPressed} style={styles.button}>
-            <Text style={styles.text}>Σύνδεση</Text>
+          <TouchableOpacity
+            onPress={_onLoginPressed}
+            style={[styles.button, isLoading && styles.buttonDisabled]}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={colors.white} size="small" />
+            ) : (
+              <Text style={styles.text}>Σύνδεση</Text>
+            )}
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={{ marginTop: 10 }}>
@@ -225,6 +264,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     height: 60,
     marginTop: 16,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+    backgroundColor: colors.grey,
   },
   error: {
     fontSize: 14,

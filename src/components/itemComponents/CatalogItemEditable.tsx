@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
-import { ScreenNames, navigate } from '../../navigation/AppNavigator';
 import { colors } from '../../core/theme';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 
 export function CatalogItemEditable({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);

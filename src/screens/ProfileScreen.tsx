@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { ScreenNames, navigate } from '../navigation/AppNavigator';
+import { ScreenNames, navigate } from '../navigation/navigationUtils';
 import { colors } from '../core/theme';
 import { removeAllStorage } from '../storage/store';
 

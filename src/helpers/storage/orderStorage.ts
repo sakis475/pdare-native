@@ -71,7 +71,8 @@ export const createNewOrder = async (table: Table): Promise<Order> => {
   };
 
   await setStorage('newOrder', newOrder);
-
+  //Set the index to point to tempOrder
+  setStorage('lastestMainTabIndex', 1);
   return newOrder;
 };
 
@@ -252,7 +253,7 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
       }
       order.orderItems.push(originalItem);
     } catch (error) {
-      console.log(error);
+      console.log(error, 'convertOccupiedOrderToOrder');
       // console.log(orderItem, 'orderItem');
       // console.log(items, 'items');
     }
