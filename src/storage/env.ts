@@ -17,13 +17,13 @@ export const DEFAULT_SOCKET_CONNECTIONS = ['testio'];
     - Add -Item Details Pattern Screen- that user can create a list of Item Details and name them, then everytime that adds a new item it can assign pattern. 
 4. Add re-ordering system for categories, items, item details ✅
 14. Create Table screen Manage✅
+8. Add Personel Screen, that can invite users, give them roles, delete them from restaurant, change display name.
 5. History tab: Add the ability to re-open orders that has closed and edit them. (Add them to tempOrder screen/storage)
 6. Expo Tab: Make a view that lists open orders in a scrollable horizontal (1 columns) make it snappable. Each list should scroll vertically too. 
     Add the ability to mark items with colors
     Add the ability to mark items as finished (Strikethrough)
     Add the ability to mark list as finished
 7. Make all static text to json and use strings.ts, make two versions greek/english, add an option to change language to profile screen.
-8. Add Personel Screen, that can invite users, give them roles, delete them from restaurant, change display name.
 9. Finish Register Screen, Login Screen (implement Forget password).
 10. Profile Screen, change name, password, first name, last name, leave restaurant option, some other personalize options like language
 11. "Restaurant Invites will appear here" create screen for users without restaurant.

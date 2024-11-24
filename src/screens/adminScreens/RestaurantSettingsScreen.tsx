@@ -49,7 +49,7 @@ const settingsOptions = [
     id: '5',
     title: 'Προσωπικό',
     icon: 'account-group',
-    screen: ScreenNames.AdminProductsScreen,
+    screen: ScreenNames.AdminPersonelScreen,
     allowedRoles: ['owner'],
   },
   {

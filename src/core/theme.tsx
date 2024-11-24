@@ -30,6 +30,7 @@ export const colors = {
   darkerBlue: '#153ac2',
   darkBlue: '#1844e2',
   blue: '#3058E9',
+  veryLighterBlue: '#8ea3f3',
 
   lightBlack: '#333',
   black: '#06090D',

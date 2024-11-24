@@ -58,6 +58,7 @@ interface StorageTypes {
   items: ItemReq[];
   categories: Category[];
   currentUser: User;
+  personelUsers: User[];
   propertyPatterns: PropertyPattern[];
   tables: Table[];
   lastestMainTabIndex: number;

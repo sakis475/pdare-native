@@ -9,6 +9,7 @@ export enum ScreenNames {
   ItemDetailsScreen = 'itemDetailsScreen',
   RestaurantSettingsScreen = 'restaurantSettingsScreen',
   AdminProductsScreen = 'AdminProductsScreen',
+  AdminPersonelScreen = 'AdminPersonelScreen',
   ManageCategoriesScreen = 'manageCategoriesScreen',
   ManageTableScreen = 'manageTableScreen',
   ManageItemsScreen = 'manageItemsScreen',

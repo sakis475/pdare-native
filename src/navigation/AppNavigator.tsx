@@ -30,6 +30,7 @@ import AdminItemDetailsPatternEditScreen from '../screens/adminScreens/AdminItem
 import ExpoScreen from '../screens/ExpoScreen';
 import AdminTableScreen from '../screens/adminScreens/AdminTableScreen';
 import { navigateBack, ScreenNames } from './navigationUtils';
+import AdminPersonelScreen from '../screens/adminScreens/AdminPersonelScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -244,6 +245,25 @@ const AppNavigator = () => {
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
               title={'Πρότυπα Ιδιοτήτων'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+      <Stack.Screen
+        name={ScreenNames.AdminPersonelScreen}
+        component={AdminPersonelScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Προσωπικό'}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),

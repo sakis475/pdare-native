@@ -40,7 +40,7 @@ class SocketManager {
     });
 
     this.socket.on('connect_error', (err: any) => {
-      console.error('Connection error:', err);
+      // console.error('Connection error:', err);
     });
   }
 
@@ -91,6 +91,7 @@ export enum EventId {
   categoriesUpdated = 'categoriesUpdated',
   itemPropertyPatternsUpdated = 'itemPropertyPatternsUpdated',
   tablesUpdated = 'tablesUpdated',
+  usersUpdated = 'usersUpdated',
 }
 
 export type EventString<ID extends string | number> = `${EventId}:${ID}`;

@@ -55,7 +55,7 @@ export const EditIcon = ({ size = 24, color = '#c8c6ff', style }: IconProps = {}
 };
 
 export const TrashIcon = ({ size = 24, color = '#ffc4c4', style }: IconProps = {}) => {
-  return <MaterialIcons name="delete" size={size} color={color} style={style} />;
+  return <FontAwesome6 name="trash" size={size} color={color} style={style} />;
 };
 
 export const ChevronUpIcon = ({ size = 24, color = '#fff', style }: IconProps = {}) => {
@@ -80,6 +80,10 @@ export const DoubleDownIcon = ({ size = 20, color = colors.white, style }: IconP
 
 export const DoubleRightIcon = ({ size = 20, color = colors.white, style }: IconProps = {}) => {
   return <FontAwesomeIcon name="angle-double-right" size={size} color={color} style={style} />;
+};
+
+export const DoubleLeftIcon = ({ size = 20, color = colors.white, style }: IconProps = {}) => {
+  return <FontAwesomeIcon name="angle-double-left" size={size} color={color} style={style} />;
 };
 
 export const UsersIcon = ({ size = 13, color = colors.veryLighterGrey, style }: IconProps = {}) => {
@@ -121,4 +125,12 @@ export const ClipboardMultipleIcon = ({ size = 24, color = colors.white, style }
       style={style}
     />
   );
+};
+
+export const SearchIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return <FontAwesome5 name="search" size={size} color={color} style={style} />;
+};
+
+export const PlusIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return <FontAwesome5 name="plus" size={size} color={color} style={style} />;
 };
