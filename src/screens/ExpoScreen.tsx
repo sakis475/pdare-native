@@ -79,11 +79,11 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
   // Fetch items when screen is focused or route changes
   useEffect(() => {
     if (currentIndex && currentIndex !== 1) return;
-    fetchItems();
+    // fetchItems();
   }, [isFocused, currentIndex]);
 
   const refreshTempList = async () => {
-    await fetchItems();
+    // await fetchItems();
   };
 
   const renderItems = (item: ItemReq) => {

@@ -10,16 +10,16 @@ interface EventListener {
 
 class SocketManager {
   private socket: Socket | null = null;
-  private user: User;
+  private user: User | null = null;
   private eventListeners: Map<EventId, Set<EventListener>> = new Map();
   private static instance: SocketManager | null = null;
   private initialized: boolean = false;
+  private pendingEventSubscriptions: Map<EventId, Set<EventCallback>> = new Map();
 
   private constructor() {
     this.loadCurrentUser();
   }
 
-  // Singleton getInstance method
   public static getInstance(): SocketManager {
     if (!SocketManager.instance) {
       SocketManager.instance = new SocketManager();
@@ -29,35 +29,73 @@ class SocketManager {
 
   private async loadCurrentUser(): Promise<void> {
     try {
-      this.user = await getStorage('currentUser');
-      console.log('Current user loaded:', this.user);
+      const user = await getStorage('currentUser');
+      if (this.isValidUser(user)) {
+        this.user = user;
+        console.log('Current user loaded:', this.user);
+        // Handle any pending subscriptions if user is now available
+        await this.handlePendingSubscriptions();
+      } else {
+        this.user = null;
+        this.handleNoUser();
+      }
     } catch (error) {
       console.error('Error loading current user:', error);
+      this.user = null;
+      this.handleNoUser();
     }
+  }
+
+  private isValidUser(user: any): user is User {
+    return user && user.restaurant && typeof user.restaurant.id === 'number';
+  }
+
+  private handleNoUser(): void {
+    console.warn('No valid user found. Socket functionality is disabled.');
+    this.disconnect();
+    // Store current subscriptions as pending
+    this.eventListeners.forEach((listeners, eventId) => {
+      const callbacks = new Set(Array.from(listeners).map((l) => l.callback));
+      this.pendingEventSubscriptions.set(eventId, callbacks);
+    });
+    this.eventListeners.clear();
+  }
+
+  private async handlePendingSubscriptions(): Promise<void> {
+    if (!this.user || !this.socket) return;
+
+    // Resubscribe pending listeners
+    for (const [eventId, callbacks] of this.pendingEventSubscriptions) {
+      for (const callback of callbacks) {
+        await this.on(eventId, callback);
+      }
+    }
+    this.pendingEventSubscriptions.clear();
   }
 
   public async updateUserInstance(): Promise<void> {
     try {
       const user = await getStorage('currentUser');
-      this.user = user;
-
-      // Resubscribe all existing listeners with new user context
-      await this.resubscribeAllListeners();
+      if (this.isValidUser(user)) {
+        this.user = user;
+        await this.resubscribeAllListeners();
+      } else {
+        this.user = null;
+        this.handleNoUser();
+      }
     } catch (error) {
       console.error('Error updating user instance:', error);
+      this.user = null;
+      this.handleNoUser();
     }
   }
 
   private async resubscribeAllListeners(): Promise<void> {
-    if (!this.socket) return;
+    if (!this.socket || !this.user) return;
 
-    // Remove all existing listeners
     this.socket.removeAllListeners();
-
-    // Reattach core socket listeners
     this.attachCoreSocketListeners();
 
-    // Resubscribe all event listeners with new user context
     for (const [eventId, listeners] of this.eventListeners) {
       for (const listener of listeners) {
         const newEventString = this.generateEventString(eventId);
@@ -88,24 +126,31 @@ class SocketManager {
   }
 
   public connect(url: string, options?: any): void {
+    if (!this.user) {
+      console.warn('Cannot connect: No user authenticated');
+      return;
+    }
+
     if (this.socket?.connected) {
       console.warn('Socket already connected.');
       return;
     }
 
-    // Cleanup existing socket if it exists
     if (this.socket) {
       this.socket.removeAllListeners();
       this.socket.disconnect();
     }
 
-    // Create new socket connection
     this.socket = io(url, {
       ...options,
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: 5,
+      auth: {
+        userId: this.user.id,
+        restaurantId: this.user.restaurant.id,
+      },
     });
 
     this.attachCoreSocketListeners();
@@ -126,19 +171,27 @@ class SocketManager {
   }
 
   public async on(eventId: EventId, callback: EventCallback): Promise<void> {
+    if (!this.user) {
+      console.warn('Cannot add listener: No user authenticated');
+      // Store as pending subscription
+      if (!this.pendingEventSubscriptions.has(eventId)) {
+        this.pendingEventSubscriptions.set(eventId, new Set());
+      }
+      this.pendingEventSubscriptions.get(eventId)!.add(callback);
+      return;
+    }
+
     if (!this.socket) {
-      console.warn('Cannot add listener, no active socket connection.');
+      console.warn('Cannot add listener: No active socket connection');
       return;
     }
 
     const eventString = this.generateEventString(eventId);
 
-    // Initialize Set for this eventId if it doesn't exist
     if (!this.eventListeners.has(eventId)) {
       this.eventListeners.set(eventId, new Set());
     }
 
-    // Check for duplicate callback
     const listeners = this.eventListeners.get(eventId)!;
     for (const listener of listeners) {
       if (listener.callback === callback) {
@@ -147,7 +200,6 @@ class SocketManager {
       }
     }
 
-    // Add new listener
     const listener: EventListener = { eventString, callback };
     listeners.add(listener);
     this.socket.on(eventString, callback);
@@ -158,11 +210,23 @@ class SocketManager {
   public async off(eventId: EventId, callback?: EventCallback): Promise<void> {
     if (!this.socket) return;
 
+    // Remove from pending subscriptions if exists
+    if (this.pendingEventSubscriptions.has(eventId)) {
+      const pendingCallbacks = this.pendingEventSubscriptions.get(eventId)!;
+      if (callback) {
+        pendingCallbacks.delete(callback);
+      } else {
+        pendingCallbacks.clear();
+      }
+      if (pendingCallbacks.size === 0) {
+        this.pendingEventSubscriptions.delete(eventId);
+      }
+    }
+
     const listeners = this.eventListeners.get(eventId);
     if (!listeners) return;
 
     if (callback) {
-      // Remove specific callback
       for (const listener of listeners) {
         if (listener.callback === callback) {
           this.socket.off(listener.eventString, listener.callback);
@@ -171,7 +235,6 @@ class SocketManager {
         }
       }
     } else {
-      // Remove all callbacks for this eventId
       for (const listener of listeners) {
         this.socket.off(listener.eventString, listener.callback);
       }
@@ -184,33 +247,30 @@ class SocketManager {
   }
 
   public generateEventString(eventId: EventId): EventString<number> {
-    if (!this.user?.restaurant?.id) {
+    if (!this.isValidUser(this.user)) {
       throw new Error('User or restaurant ID not available');
     }
     return `${eventId}:${this.user.restaurant.id}`;
   }
 
-  // Method to check if specific event listener exists
-  public hasListener(eventId: EventId, callback: EventCallback): boolean {
-    const listeners = this.eventListeners.get(eventId);
-    if (!listeners) return false;
-
-    for (const listener of listeners) {
-      if (listener.callback === callback) return true;
-    }
-    return false;
+  public isAuthenticated(): boolean {
+    return this.isValidUser(this.user);
   }
 
-  // Method to get count of listeners for an event
-  public getListenerCount(eventId: EventId): number {
-    return this.eventListeners.get(eventId)?.size || 0;
+  public getUser(): User | null {
+    return this.user;
   }
 
-  // Debug method to log current listeners
   public debugListeners(): void {
-    console.log('Current event listeners:');
-    this.eventListeners.forEach((listeners, eventId) => {
-      console.log(`${eventId}: ${listeners.size} listeners`);
+    console.log('Current event listeners:', {
+      active: Array.from(this.eventListeners.entries()).map(([eventId, listeners]) => ({
+        eventId,
+        count: listeners.size,
+      })),
+      pending: Array.from(this.pendingEventSubscriptions.entries()).map(([eventId, callbacks]) => ({
+        eventId,
+        count: callbacks.size,
+      })),
     });
   }
 }

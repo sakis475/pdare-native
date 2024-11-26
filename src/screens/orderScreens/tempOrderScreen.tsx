@@ -23,7 +23,6 @@ import { strings } from '../../core/strings';
 import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
 import { useIsFocused } from '@react-navigation/native';
 import { AlertWithOptions, toast } from '../../core/utils';
-import { patchRequest } from '../../helpers/requests';
 const TempOrderScreen = ({
   currentIndex,
   route,

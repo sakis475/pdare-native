@@ -24,7 +24,6 @@ import {
   convertOccupiedOrderToOrder,
   createNewOrder,
   getTempOrder,
-  updateActiveOrdersStorage,
 } from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -51,7 +50,7 @@ const TablesScreen = ({ currentIndex }: any) => {
 
   // Function to handle updates from socket
   const handleTableUpdates = async (): Promise<void> => {
-    const updatedTables = await getStorage('activeTables');
+    const updatedTables = await getStorage('tableOrders');
     setActiveTables(updatedTables);
   };
 

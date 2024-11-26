@@ -58,7 +58,23 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ScreenNames.RegisterScreen}
         component={RegisterScreen}
-        options={{ headerShown: false }}
+        options={({ route }: any) => ({
+          // title: strings.Categories,
+          headerTitle: () => {
+            return (
+              <CustomNavigationScreenHeaderTitle
+                title={'Εγγραφή'}
+              ></CustomNavigationScreenHeaderTitle>
+            );
+          },
+          animation: 'slide_from_right',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
       />
 
       <Stack.Screen

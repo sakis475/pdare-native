@@ -261,10 +261,6 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
   return order;
 };
 
-export const updateActiveOrdersStorage = async (activeOrders: Order[]) => {
-  return await setStorage('activeOrders', activeOrders);
-};
-
 export const getItems = async () => {
   const items: ItemReq[] = await getStorage('items');
   return items;

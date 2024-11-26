@@ -30,7 +30,7 @@ class SocketEventSubscriber {
   static async handleTableOrdersUpdates(tables: TableIO[]): Promise<void> {
     console.log('Socket Event: XXXXhandleTableOrdersUpdatesXXXX');
     const updatedTables = await processTables(tables);
-    await setStorage('activeTables', updatedTables);
+    await setStorage('tableOrders', updatedTables);
     EventEmitter.emit(ORDERS_UPDATED, updatedTables);
   }
 

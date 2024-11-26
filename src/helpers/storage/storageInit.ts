@@ -1,13 +1,6 @@
-import { getStorage, setStorage } from '../../storage/store';
+import { clearRestaurantStorageRelatedKeys, getStorage, setStorage } from '../../storage/store';
 import * as Requests from '../requests';
 import { processTables } from './tablesStorage';
-
-// active tables
-async function storageInitTableOrders() {
-  const tables: TableIO[] = await Requests.getRequest('/tables');
-  const updatedTables = await processTables(tables);
-  await setStorage('activeTables', updatedTables);
-}
 
 // active tables
 async function storageInitTables() {
@@ -52,10 +45,31 @@ export async function storageInitGroupedItems() {
   return groupedByCategory;
 }
 
+// active order tables
+async function storageInitTableOrders() {
+  const tables: TableIO[] = await Requests.getRequest('/tables');
+  const updatedTables = await processTables(tables);
+  await setStorage('tableOrders', updatedTables);
+}
+
+async function storageInitPersonelUsers() {
+  const users: User[] = await Requests.getRequest('/user');
+  await setStorage('personelUsers', users);
+}
+
+async function storageInitPropertyPatterns() {
+  const itemPropertyPatterns: PropertyPattern[] = await Requests.getRequest(
+    '/itemPropertyPatterns'
+  );
+  await setStorage('propertyPatterns', itemPropertyPatterns);
+}
+
 export async function storageInitData() {
   await storageInitTables();
   await storageInitItems();
   await storageInitCategories();
   await storageInitGroupedItems();
   await storageInitTableOrders();
+  await storageInitPersonelUsers();
+  await storageInitPropertyPatterns();
 }

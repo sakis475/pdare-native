@@ -64,11 +64,6 @@ export async function setBearer(sessionBearer: SessionBearer) {
   console.log(sessionBearer, 'sessionBearer');
   if (sessionBearer) {
     try {
-      // if (sessionBearer === null) {
-      //   await setStorage('session_bearer', null);
-      //   await setStorage('currentUser', null);
-      //   await socketManager.updateUserInstance();
-      // }
       await setStorage('session_bearer', sessionBearer);
       await setStorage('currentUser', sessionBearer.user);
       await socketManager.updateUserInstance();

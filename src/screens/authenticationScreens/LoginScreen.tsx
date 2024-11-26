@@ -6,6 +6,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-na
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
 import { login } from '../../helpers/storage/tokenRequests';
+import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 
 const logoImage = require('../../../assets/mywaitericon.png');
 
@@ -73,6 +74,9 @@ const LoginScreen: React.FC = () => {
     rotateValue.value = withSpring(360, { damping: 6, stiffness: 100 }, () => {
       rotateValue.value = 0; // Reset to 0 after the rotation
     });
+  };
+  const handlePressRegister = () => {
+    navigate(ScreenNames.RegisterScreen);
   };
 
   const customTheme = {
@@ -192,7 +196,7 @@ const LoginScreen: React.FC = () => {
             )}
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={{ marginTop: 10 }}>
+        <TouchableOpacity style={{ marginTop: 10 }} onPress={handlePressRegister}>
           <Text style={{ textAlign: 'center', fontSize: 14, color: colors.veryLighterGrey }}>
             Δημιουργία Καινούργιου Λογαριασμού
           </Text>
