@@ -30,9 +30,10 @@ import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottom
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import _ from 'lodash';
 import { FlashList } from '@shopify/flash-list';
-import { EventId, socketManager } from '../helpers/Sockets/SocketManager';
 import { getStorage } from '../storage/store';
 import { navigate, navigateToDraft, ScreenNames } from '../navigation/navigationUtils';
+import { ORDERS_UPDATED, EventEmitter } from '../helpers/Sockets/EventEmitter';
+import { processTables } from '../helpers/storage/tablesStorage';
 
 const TablesScreen = ({ currentIndex }: any) => {
   const fetchInitialTables = async (): Promise<void> => {
@@ -49,43 +50,21 @@ const TablesScreen = ({ currentIndex }: any) => {
   };
 
   // Function to handle updates from socket
-  const handleTableUpdates = async (updatedTablesIO: TableIO[]): Promise<void> => {
-    const updatedTables = await processTables(updatedTablesIO);
+  const handleTableUpdates = async (): Promise<void> => {
+    const updatedTables = await getStorage('activeTables');
     setActiveTables(updatedTables);
   };
 
-  // Function to process table data
-  const processTables = async (tablesIO: TableIO[]): Promise<Table[]> => {
-    const items: ItemReq[] = await getStorage('items');
-
-    return tablesIO.reduce((acc: Table[], table: TableIO) => {
-      if (table.occupiedByOrder) {
-        const occupiedByOrder = convertOccupiedOrderToOrder(table, items);
-        acc.push({
-          id: table.id,
-          tableName: table.tableName,
-          isEnabled: table.isEnabled,
-          tableOrder: table.tableOrder,
-          occupiedByOrder: occupiedByOrder,
-        });
-      }
-      return acc;
-    }, []);
-  };
-
-  useEffect(() => {
-    socketManager.on(EventId.tableOrdersUpdated, handleTableUpdates);
-    fetchInitialTables();
-    return () => {
-      socketManager.off(EventId.tableOrdersUpdated);
-    };
-  }, []);
-
   //This propably is not needed because every component mounts it will listen for socket emitter
   useEffect(() => {
-    if (currentIndex && currentIndex !== 0) return;
-    // Fetch initial data
-    fetchInitialTables();
+    handleTableUpdates();
+    // Subscribe to table updates
+    EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
+
+    // Initial fetch
+    if (currentIndex === undefined || currentIndex === 0) {
+      // fetchInitialTables();
+    }
   }, [currentIndex]);
 
   const [activeTables, setActiveTables] = useState<Table[]>(undefined);

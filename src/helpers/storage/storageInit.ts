@@ -1,5 +1,13 @@
 import { getStorage, setStorage } from '../../storage/store';
 import * as Requests from '../requests';
+import { processTables } from './tablesStorage';
+
+// active tables
+async function storageInitTableOrders() {
+  const tables: TableIO[] = await Requests.getRequest('/tables');
+  const updatedTables = await processTables(tables);
+  await setStorage('activeTables', updatedTables);
+}
 
 // active tables
 async function storageInitTables() {
@@ -49,4 +57,5 @@ export async function storageInitData() {
   await storageInitItems();
   await storageInitCategories();
   await storageInitGroupedItems();
+  await storageInitTableOrders();
 }

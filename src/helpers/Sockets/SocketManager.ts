@@ -1,87 +1,217 @@
 import { io, Socket } from 'socket.io-client';
 import { getStorage } from '../../storage/store';
 
+type EventCallback = (data: any) => void;
+
+interface EventListener {
+  eventString: string;
+  callback: EventCallback;
+}
+
 class SocketManager {
   private socket: Socket | null = null;
   private user: User;
-  constructor() {
-    this.loadCurrentUser(); // Load subscribed events when the class is instantiated
+  private eventListeners: Map<EventId, Set<EventListener>> = new Map();
+  private static instance: SocketManager | null = null;
+  private initialized: boolean = false;
+
+  private constructor() {
+    this.loadCurrentUser();
+  }
+
+  // Singleton getInstance method
+  public static getInstance(): SocketManager {
+    if (!SocketManager.instance) {
+      SocketManager.instance = new SocketManager();
+    }
+    return SocketManager.instance;
   }
 
   private async loadCurrentUser(): Promise<void> {
-    this.user = await getStorage('currentUser');
-    console.log(this.user, 'this.user');
-  }
-
-  // Static method to get the singleton instance
-  public async updateUserInstance() {
-    const user = await getStorage('currentUser'); // Fetch user data
-    this.user = user;
-  }
-
-  // Connect to the socket server and re-subscribe to stored events
-  public connect(url: string, options?: any): void {
-    if (this.socket) {
-      console.warn('Socket already connected.');
-      return;
+    try {
+      this.user = await getStorage('currentUser');
+      console.log('Current user loaded:', this.user);
+    } catch (error) {
+      console.error('Error loading current user:', error);
     }
+  }
 
-    this.socket = io(url, options);
+  public async updateUserInstance(): Promise<void> {
+    try {
+      const user = await getStorage('currentUser');
+      this.user = user;
 
-    // Clear any previous connect listeners to prevent duplicates
-    this.socket.off('connect');
+      // Resubscribe all existing listeners with new user context
+      await this.resubscribeAllListeners();
+    } catch (error) {
+      console.error('Error updating user instance:', error);
+    }
+  }
+
+  private async resubscribeAllListeners(): Promise<void> {
+    if (!this.socket) return;
+
+    // Remove all existing listeners
+    this.socket.removeAllListeners();
+
+    // Reattach core socket listeners
+    this.attachCoreSocketListeners();
+
+    // Resubscribe all event listeners with new user context
+    for (const [eventId, listeners] of this.eventListeners) {
+      for (const listener of listeners) {
+        const newEventString = this.generateEventString(eventId);
+        this.socket.off(listener.eventString);
+        this.socket.on(newEventString, listener.callback);
+        listener.eventString = newEventString;
+      }
+    }
+  }
+
+  private attachCoreSocketListeners(): void {
+    if (!this.socket) return;
 
     this.socket.on('connect', () => {
       console.log('Connected to socket server:', this.socket?.id);
+      this.initialized = true;
     });
 
     this.socket.on('disconnect', () => {
       console.log('Disconnected from socket server.');
+      this.initialized = false;
     });
 
     this.socket.on('connect_error', (err: any) => {
-      // console.error('Connection error:', err);
+      console.error('Connection error:', err);
+      this.initialized = false;
     });
   }
 
-  // Disconnect the socket connection
-  public disconnect(): void {
+  public connect(url: string, options?: any): void {
+    if (this.socket?.connected) {
+      console.warn('Socket already connected.');
+      return;
+    }
+
+    // Cleanup existing socket if it exists
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.disconnect();
-      console.log('Socket connection closed.');
-      this.socket = null;
-    } else {
+    }
+
+    // Create new socket connection
+    this.socket = io(url, {
+      ...options,
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+    });
+
+    this.attachCoreSocketListeners();
+  }
+
+  public disconnect(): void {
+    if (!this.socket) {
       console.warn('No active socket connection to close.');
+      return;
     }
+
+    this.eventListeners.clear();
+    this.socket.removeAllListeners();
+    this.socket.disconnect();
+    this.socket = null;
+    this.initialized = false;
+    console.log('Socket connection closed and listeners cleared.');
   }
 
-  // Emit an event to the server
-  // public emit(event: string, data: any): void {
-  //   if (this.socket) {
-  //     this.socket.emit(event, data);
-  //   } else {
-  //     console.warn('Cannot emit, no active socket connection.');
-  //   }
-  // }
+  public async on(eventId: EventId, callback: EventCallback): Promise<void> {
+    if (!this.socket) {
+      console.warn('Cannot add listener, no active socket connection.');
+      return;
+    }
 
-  // Listen for a specific event with a specified callback and track it
-  public async on(event: EventId, callback: (data: any) => void): Promise<void> {
-    if (this.socket) {
-      this.socket.on(this.generateEventString(event), callback);
+    const eventString = this.generateEventString(eventId);
+
+    // Initialize Set for this eventId if it doesn't exist
+    if (!this.eventListeners.has(eventId)) {
+      this.eventListeners.set(eventId, new Set());
+    }
+
+    // Check for duplicate callback
+    const listeners = this.eventListeners.get(eventId)!;
+    for (const listener of listeners) {
+      if (listener.callback === callback) {
+        console.warn('Duplicate event listener prevented:', eventId);
+        return;
+      }
+    }
+
+    // Add new listener
+    const listener: EventListener = { eventString, callback };
+    listeners.add(listener);
+    this.socket.on(eventString, callback);
+
+    console.log(`Event listener added for ${eventString}`);
+  }
+
+  public async off(eventId: EventId, callback?: EventCallback): Promise<void> {
+    if (!this.socket) return;
+
+    const listeners = this.eventListeners.get(eventId);
+    if (!listeners) return;
+
+    if (callback) {
+      // Remove specific callback
+      for (const listener of listeners) {
+        if (listener.callback === callback) {
+          this.socket.off(listener.eventString, listener.callback);
+          listeners.delete(listener);
+          break;
+        }
+      }
     } else {
-      console.warn(`Cannot listen, no active socket connection.`);
+      // Remove all callbacks for this eventId
+      for (const listener of listeners) {
+        this.socket.off(listener.eventString, listener.callback);
+      }
+      listeners.clear();
     }
-  }
 
-  // Remove listener for a specific event and stop tracking it
-  public async off(event: EventId): Promise<void> {
-    if (this.socket) {
-      this.socket.off(this.generateEventString(event));
+    if (listeners.size === 0) {
+      this.eventListeners.delete(eventId);
     }
   }
 
   public generateEventString(eventId: EventId): EventString<number> {
+    if (!this.user?.restaurant?.id) {
+      throw new Error('User or restaurant ID not available');
+    }
     return `${eventId}:${this.user.restaurant.id}`;
+  }
+
+  // Method to check if specific event listener exists
+  public hasListener(eventId: EventId, callback: EventCallback): boolean {
+    const listeners = this.eventListeners.get(eventId);
+    if (!listeners) return false;
+
+    for (const listener of listeners) {
+      if (listener.callback === callback) return true;
+    }
+    return false;
+  }
+
+  // Method to get count of listeners for an event
+  public getListenerCount(eventId: EventId): number {
+    return this.eventListeners.get(eventId)?.size || 0;
+  }
+
+  // Debug method to log current listeners
+  public debugListeners(): void {
+    console.log('Current event listeners:');
+    this.eventListeners.forEach((listeners, eventId) => {
+      console.log(`${eventId}: ${listeners.size} listeners`);
+    });
   }
 }
 
@@ -96,6 +226,5 @@ export enum EventId {
 
 export type EventString<ID extends string | number> = `${EventId}:${ID}`;
 
-// Export a singleton instance to manage the socket connection
-
-export const socketManager = new SocketManager();
+// Export singleton instance
+export const socketManager = SocketManager.getInstance();

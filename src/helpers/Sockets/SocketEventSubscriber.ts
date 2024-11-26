@@ -1,5 +1,16 @@
-import { setStorage } from '../../storage/store';
+import { getStorage, setStorage } from '../../storage/store';
+import { convertOccupiedOrderToOrder } from '../storage/orderStorage';
 import { storageInitGroupedItems } from '../storage/storageInit';
+import { processTables } from '../storage/tablesStorage';
+import {
+  CATEGORIES_UPDATED,
+  ITEMS_UPDATED,
+  ORDERS_UPDATED,
+  PROPERTY_PATTERNS_UPDATED,
+  EventEmitter,
+  TABLES_UPDATED,
+  USERS_UPDATED,
+} from './EventEmitter';
 import { EventId, socketManager } from './SocketManager';
 
 class SocketEventSubscriber {
@@ -13,35 +24,47 @@ class SocketEventSubscriber {
     );
     socketManager.on(EventId.tablesUpdated, SocketEventSubscriber.handleTablesUpdated);
     socketManager.on(EventId.usersUpdated, SocketEventSubscriber.handleUsersUpdated);
+    socketManager.on(EventId.tableOrdersUpdated, SocketEventSubscriber.handleTableOrdersUpdates);
   }
 
-  // Handler for "itemsUpdated" event
-  private static async handleItemsUpdate(items: ItemReq[]): Promise<void> {
+  static async handleTableOrdersUpdates(tables: TableIO[]): Promise<void> {
+    console.log('Socket Event: XXXXhandleTableOrdersUpdatesXXXX');
+    const updatedTables = await processTables(tables);
+    await setStorage('activeTables', updatedTables);
+    EventEmitter.emit(ORDERS_UPDATED, updatedTables);
+  }
+
+  static async handleItemsUpdate(items: ItemReq[]): Promise<void> {
     console.log('Socket Event: handleItemsUpdate');
-    setStorage('items', items);
-    storageInitGroupedItems();
+    await setStorage('items', items);
+    await storageInitGroupedItems();
+    EventEmitter.emit(ITEMS_UPDATED, []);
   }
 
-  private static async handleCategoriesUpdated(categories: Category[]): Promise<void> {
+  static async handleCategoriesUpdated(categories: Category[]): Promise<void> {
     console.log('Socket Event: categoriesUpdated');
     setStorage('categories', categories);
+    EventEmitter.emit(CATEGORIES_UPDATED, []);
   }
 
-  private static async handleItemPropertiesPatternUpdated(
+  static async handleItemPropertiesPatternUpdated(
     propertyPatterns: PropertyPattern[]
   ): Promise<void> {
     console.log('Socket Event: handleItemPropertiesPatternUpdated');
     setStorage('propertyPatterns', propertyPatterns);
+    EventEmitter.emit(PROPERTY_PATTERNS_UPDATED, []);
   }
 
-  private static async handleTablesUpdated(tables: Table[]): Promise<void> {
+  static async handleTablesUpdated(tables: Table[]): Promise<void> {
     console.log('Socket Event: handleTablesUpdated');
-    setStorage('tables', tables);
+    await setStorage('tables', tables);
+    EventEmitter.emit(TABLES_UPDATED, []);
   }
 
-  private static async handleUsersUpdated(users: User[]): Promise<void> {
+  static async handleUsersUpdated(users: User[]): Promise<void> {
     console.log('Socket Event: handleUsersUpdated');
     setStorage('personelUsers', users);
+    EventEmitter.emit(USERS_UPDATED, []);
   }
 }
 

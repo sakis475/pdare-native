@@ -18,8 +18,9 @@ import { CatalogItemAdded } from '../components/itemComponents/CatalogItemAdded'
 import { CatalogItemDisabled } from '../components/itemComponents/CatalogItemDisabled';
 import { HeaderBar } from '../components/helpers/HeaderBar';
 import * as Requests from '../helpers/requests';
-import { EventId, socketManager } from '../helpers/Sockets/SocketManager';
 import { getStorage } from '../storage/store';
+import { EventEmitter, ORDERS_UPDATED } from '../helpers/Sockets/EventEmitter';
+import { processTables } from '../helpers/storage/tablesStorage';
 
 interface ExpoScreenProps {
   currentIndex?: number;
@@ -30,28 +31,8 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
   const [items, setItems] = useState<ItemReq[]>();
   const isFocused = useIsFocused();
 
-  // Process tables function
-  const processTables = async (tablesIO: TableIO[]): Promise<Table[]> => {
-    const items: ItemReq[] = await getStorage('items');
-
-    return tablesIO.reduce((acc: Table[], table: TableIO) => {
-      if (table.occupiedByOrder) {
-        const occupiedByOrder = convertOccupiedOrderToOrder(table, items);
-        acc.push({
-          id: table.id,
-          tableName: table.tableName,
-          isEnabled: table.isEnabled,
-          tableOrder: table.tableOrder,
-          occupiedByOrder: occupiedByOrder,
-        });
-      }
-      return acc;
-    }, []);
-  };
-
   // Handle socket updates
-  const handleTableUpdates = async (updatedTablesIO: TableIO[]): Promise<void> => {
-    const updatedTables = await processTables(updatedTablesIO);
+  const handleTableUpdates = async (updatedTables: Table[]): Promise<void> => {
     // Update current table if it exists in updates
     const currentTableUpdate = updatedTables.find((t) => t.id === table?.id);
     if (currentTableUpdate) {
@@ -92,11 +73,8 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
 
   // Set up socket listener
   useEffect(() => {
-    socketManager.on(EventId.tableOrdersUpdated, handleTableUpdates);
-    return () => {
-      socketManager.off(EventId.tableOrdersUpdated);
-    };
-  }, [table]); // Depend on table to ensure we have latest table reference in handleTableUpdates
+    EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
+  }, []); // Depend on table to ensure we have latest table reference in handleTableUpdates
 
   // Fetch items when screen is focused or route changes
   useEffect(() => {
