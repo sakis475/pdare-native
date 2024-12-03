@@ -7,6 +7,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { colors } from '../../core/theme';
 import { login } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 
 const logoImage = require('../../../assets/mywaitericon.png');
 
@@ -34,6 +35,17 @@ const LoginScreen: React.FC = () => {
     return '';
   };
 
+  const handleGetLastCredentials = async () => {
+    const credentials = await getStorageLastCredentials();
+    if (!credentials) return;
+    setEmail(credentials.email);
+    setPassword(credentials.password);
+  };
+
+  useEffect(() => {
+    handleGetLastCredentials();
+  }, []);
+
   useEffect(() => {
     setEmailError('');
     setPasswordError('');
@@ -53,6 +65,7 @@ const LoginScreen: React.FC = () => {
     try {
       await login(email, password);
     } catch (error) {
+      console.log(error);
       // Handle error if needed
     } finally {
       setIsLoading(false);

@@ -127,6 +127,7 @@ interface NewOrderRequestItem {
 
 interface User {
   id?: number;
+  active?: boolean;
   username: string;
   email: string;
   firstName: string;
@@ -134,4 +135,9 @@ interface User {
   displayName?: string;
   role: 'owner' | 'waiter' | 'guest';
   restaurant?: Restaurant;
+}
+
+interface LastCredentialsStorage {
+  email: string;
+  password: string;
 }

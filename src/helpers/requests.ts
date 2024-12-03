@@ -1,5 +1,5 @@
-import axios, { AxiosError } from 'axios';
-import { BASE_URL, REQ_TIMEOUT } from '../storage/env';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { BASE_DOMAIN, BASE_URL, REQ_TIMEOUT } from '../storage/env';
 
 import { SessionBearer } from '../types/requests.types';
 import { getStorage, setStorage } from '../storage/store';
@@ -9,6 +9,7 @@ import dayjs, { datetimeDiff } from '../core/dayjs';
 import { socketManager } from './Sockets/SocketManager';
 import { storageInitData } from './storage/storageInit';
 import { navigate, ScreenNames } from '../navigation/navigationUtils';
+import { socketEventSubscriber } from './Sockets/SocketEventSubscriber';
 
 export async function refreshToken() {
   const bearer: SessionBearer | null = await getStorage('session_bearer');
@@ -64,9 +65,12 @@ export async function setBearer(sessionBearer: SessionBearer) {
   console.log(sessionBearer, 'sessionBearer');
   if (sessionBearer) {
     try {
+      socketManager.disconnect();
       await setStorage('session_bearer', sessionBearer);
       await setStorage('currentUser', sessionBearer.user);
       await socketManager.updateUserInstance();
+      socketManager.connect(BASE_DOMAIN, {});
+      socketEventSubscriber.initialize();
       await storageInitData();
     } catch (error) {
       console.log();
@@ -97,28 +101,29 @@ export async function getRequest(url: string) {
   }
 }
 
-export async function postRequest(url: string, body?: any) {
+export async function postRequest(url: string, body?: any, timeout = REQ_TIMEOUT) {
   try {
-    checkInternetConnectivity();
-    let options = {};
+    await checkInternetConnectivity();
 
-    if (!['/login', '/login/session'].includes(url)) {
-      const auth = await getBearer();
+    const options: AxiosRequestConfig = {
+      timeout: timeout,
+      timeoutErrorMessage: 'Το αίτημα έληξε. Παρακαλώ δοκιμάστε ξανά.',
+    };
 
-      if (auth) {
-        options = {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
-          timeout: REQ_TIMEOUT,
-        };
-      }
-    }
-    console.log('POST ' + BASE_URL + url);
+    // if (!['/login', '/login/session'].includes(url)) {
+    //   const auth = await getBearer();
+    //   if (auth) {
+    //     options.headers = {
+    //       Authorization: `Bearer ${auth.token}`,
+    //     };
+    //   }
+    // }
+
+    console.log('POST ' + BASE_URL + url, 'timeout:', timeout);
     const response = await axios.post(BASE_URL + url, body, options);
     return response.data;
   } catch (error) {
-    handleAxiosError(error as AxiosError);
+    // handleAxiosError(error as AxiosError);
   }
 }
 
@@ -141,6 +146,28 @@ export async function patchRequest(url: string, body?: any) {
     }
     console.log('PATCH ' + BASE_URL + url);
     const response = await axios.patch(BASE_URL + url, body, options);
+    return response.data;
+  } catch (error) {
+    handleAxiosError(error as AxiosError);
+  }
+}
+
+export async function deleteRequest(url: string) {
+  try {
+    checkInternetConnectivity();
+    const auth = await getBearer();
+    if (!auth) {
+      return;
+    }
+    const options = {
+      headers: {
+        Authorization: `Bearer ${auth?.token}`,
+      },
+      timeout: REQ_TIMEOUT,
+    };
+
+    console.log('DELETE ' + BASE_URL + url);
+    const response = await axios.delete(BASE_URL + url, options);
     return response.data;
   } catch (error) {
     handleAxiosError(error as AxiosError);

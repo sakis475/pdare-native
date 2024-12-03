@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { View, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Keyboard, Text } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { getStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
@@ -22,12 +22,12 @@ import { setTableTempOrder } from '../../helpers/storage/orderStorage';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
-  const [items, setItems] = useState<ItemReq[]>([]);
+  const [items, setItems] = useState<ItemReq[]>(null);
 
   const fetchItems = async () => {
     const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
     console.log('ItemListScreen fetch items ');
-    const categoryItems = fetchedItems[categoryTitle];
+    const categoryItems = fetchedItems[categoryTitle] ?? [];
 
     setItems(categoryItems);
   };
@@ -99,6 +99,10 @@ const ItemListScreen = ({ route }: any) => {
           />
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
         </>
+      ) : items?.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Δεν βρέθηκαν προιόντα.</Text>
+        </View>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       )}
@@ -184,5 +188,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryFlashListContainer: { paddingHorizontal: 20 },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    color: colors.white,
+    textAlign: 'center',
+  },
 });
 export default ItemListScreen;

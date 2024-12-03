@@ -175,7 +175,7 @@ const AdminItemListScreen = ({ route }: any) => {
 
   const fetchItems = async () => {
     const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
-    const categoryItems = fetchedItems[categoryTitle];
+    const categoryItems = fetchedItems[categoryTitle] ?? [];
     setItems(categoryItems);
   };
 
@@ -305,9 +305,7 @@ const AdminItemListScreen = ({ route }: any) => {
             animated={false}
           />
         </>
-      ) : items === null ? (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-      ) : (
+      ) : items?.length === 0 ? (
         <>
           {categoryTitle ? <CategoryHeader title={categoryTitle} /> : null}
           <View
@@ -330,6 +328,8 @@ const AdminItemListScreen = ({ route }: any) => {
             />
           </View>
         </>
+      ) : (
+        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       )}
 
       <EditItemModal

@@ -4,6 +4,9 @@ import { ActivityIndicator } from 'react-native-paper';
 import { colors } from '../core/theme';
 import { refreshToken } from '../helpers/requests';
 import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUtils';
+import { handleNoRestaurantUser, logout } from '../helpers/storage/tokenRequests';
+import { getStorage } from '../storage/store';
+import dayjs from '../core/dayjs';
 
 const logoImage = require('../../assets/mywaitericon.png');
 
@@ -36,10 +39,36 @@ const StartLoadingScreen: React.FC = () => {
   }, [fadeAnim]);
 
   const handleRedirect = async () => {
-    const newToken = await refreshToken();
-    if (newToken) {
-      navigateReset(ScreenNames.MainTabs);
-      navigate(ScreenNames.MainTabs);
+    // Create a timeout promise that rejects after 20 seconds
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Redirect timeout')), 5000);
+    });
+
+    try {
+      // Race between your logic and the timeout
+      await Promise.race([
+        (async () => {
+          const currentUser = await getStorage('currentUser');
+          const sessionBearer = await getStorage('session_bearer');
+          if (currentUser?.restaurant?.id) {
+            const newToken = await refreshToken();
+            if (newToken?.user?.restaurant) {
+              navigateReset(ScreenNames.MainTabs);
+              navigate(ScreenNames.MainTabs);
+            }
+          } else if (currentUser) {
+            await handleNoRestaurantUser(sessionBearer);
+          } else {
+            throw new Error('No Current User');
+          }
+        })(),
+        timeoutPromise,
+      ]);
+    } catch (error) {
+      console.log(error);
+      await logout();
+      navigateReset(ScreenNames.LoginScreen);
+      navigate(ScreenNames.LoginScreen);
     }
   };
 

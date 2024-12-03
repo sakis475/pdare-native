@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BottomNavigation, Text } from 'react-native-paper';
+import { BottomNavigation, DefaultTheme, Text } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import TablesScreen from '../screens/TablesScreen';
@@ -31,6 +31,7 @@ import ExpoScreen from '../screens/ExpoScreen';
 import AdminTableScreen from '../screens/adminScreens/AdminTableScreen';
 import { navigateBack, ScreenNames } from './navigationUtils';
 import AdminPersonelScreen from '../screens/adminScreens/AdminPersonelScreen';
+import NewUserSetupScreen from '../screens/authenticationScreens/NewUserSetupScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -44,6 +45,12 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}
         component={StartLoadingScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name={ScreenNames.NewUserSetupScreen}
+        component={NewUserSetupScreen}
         options={{ headerShown: false }}
       />
 
@@ -67,7 +74,7 @@ const AppNavigator = () => {
               ></CustomNavigationScreenHeaderTitle>
             );
           },
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -93,7 +100,7 @@ const AppNavigator = () => {
               ></CustomNavigationScreenHeaderTitle>
             );
           },
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -111,7 +118,7 @@ const AppNavigator = () => {
               title={route.params?.tableParam?.tableName}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -168,7 +175,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -177,6 +184,27 @@ const AppNavigator = () => {
           headerBackVisible: false,
         })}
       />
+
+      <Stack.Screen
+        name={ScreenNames.ProfileScreen}
+        component={ProfileScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Προφίλ'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'none',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+
       <Stack.Screen
         name={ScreenNames.AdminProductsScreen}
         component={AdminProductsScreen}
@@ -187,7 +215,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -206,7 +234,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -225,7 +253,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -244,7 +272,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -264,7 +292,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -283,7 +311,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -303,7 +331,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -323,7 +351,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'slide_from_right',
+          animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -446,7 +474,7 @@ const MainTabs = ({ route }: any) => {
       barStyle={{ backgroundColor: colors.darkerGrey, height: 70 }}
       activeColor="#147eb8"
       inactiveColor="#FFFFFF"
-      sceneAnimationEnabled={true}
+      sceneAnimationEnabled={false}
     />
   );
 };

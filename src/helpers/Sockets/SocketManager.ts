@@ -77,6 +77,7 @@ class SocketManager {
     try {
       const user = await getStorage('currentUser');
       if (this.isValidUser(user)) {
+        console.log('user is valid');
         this.user = user;
         await this.resubscribeAllListeners();
       } else {

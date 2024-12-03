@@ -6,6 +6,7 @@ import { colors } from '../../core/theme';
 import { strings } from '../../core/strings';
 import { postRequest, setBearer } from '../../helpers/requests';
 import { clearRestaurantStorageRelatedKeys } from '../../storage/store';
+import { register, RegisterData } from '../../helpers/storage/tokenRequests';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -14,7 +15,7 @@ interface FormField {
   error: string;
 }
 
-interface FormState {
+export interface FormState {
   username: FormField;
   email: FormField;
   password: FormField;
@@ -209,14 +210,9 @@ const RegisterScreen: React.FC = () => {
             [key]: field.value,
           }),
           {}
-        );
+        ) as RegisterData;
 
-        console.log('Form submitted:', formData);
-
-        //Clear all storage first.
-        clearRestaurantStorageRelatedKeys();
-        const session_bearer = await postRequest('/register', formData);
-        await setBearer(session_bearer);
+        await register(formData);
       }
     } finally {
       setIsSubmitting(false);

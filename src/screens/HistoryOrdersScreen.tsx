@@ -187,9 +187,8 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                Προϊόντα που θα προσθέσετε
+                Δεν βρέθηκε καμία παραγγελία.
               </Text>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>θα εμφανιστούν εδώ.</Text>
             </View>
           </>
         ) : (

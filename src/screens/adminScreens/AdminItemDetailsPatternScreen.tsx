@@ -355,7 +355,7 @@ const AdminItemDetailsPatternScreen = () => {
         ) : (
           <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20 }}>
             <Text style={{ textAlign: 'center', color: colors.white }}>
-              Πρότυπα που προστέθηκαν θα εμφανίζονται εδώ.
+              Πρότυπα που προστίθενται θα εμφανίζονται εδώ.
             </Text>
           </View>
         )}

@@ -20,6 +20,7 @@ export enum ScreenNames {
   StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',
   ActiveOrderScreen = 'activeOrderScreen',
+  NewUserSetupScreen = 'newUserSetupScreen',
 }
 
 export function navigate(name: ScreenNames, params?: {}) {

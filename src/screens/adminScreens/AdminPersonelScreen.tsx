@@ -419,7 +419,8 @@ const AdminPersonelScreen = () => {
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Δεν υπάρχουν χρήστες.</Text>
+          <Text style={styles.emptyText}>Δεν βρέθηκαν χρήστες</Text>
+          <Text style={styles.emptyText}>Αναζητήστε για να προσθέσετε καινούργιους.</Text>
         </View>
       )}
 

@@ -21,7 +21,7 @@ const settingsOptions = [
     id: '1',
     title: 'Προφίλ',
     icon: 'account',
-    screen: ScreenNames.AdminProductsScreen,
+    screen: ScreenNames.ProfileScreen,
     allowedRoles: ['owner', 'waiter', 'guest'],
   },
   {
@@ -52,13 +52,13 @@ const settingsOptions = [
     screen: ScreenNames.AdminPersonelScreen,
     allowedRoles: ['owner'],
   },
-  {
-    id: '6',
-    title: 'Στατιστικά',
-    icon: 'chart-bar',
-    screen: ScreenNames.AdminProductsScreen,
-    allowedRoles: ['owner'],
-  },
+  // {
+  //   id: '6',
+  //   title: 'Στατιστικά',
+  //   icon: 'chart-bar',
+  //   screen: ScreenNames.AdminProductsScreen,
+  //   allowedRoles: ['owner'],
+  // },
 ];
 const RestaurantSettingsScreen = ({ route }: any) => {
   const [filteredOptions, setFilteredOptions] = useState<SettingOption[]>([]);

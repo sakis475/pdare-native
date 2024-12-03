@@ -1,26 +1,51 @@
 import { toast } from '../../core/utils';
 import { navigate, navigateReset, ScreenNames } from '../../navigation/navigationUtils';
-import { clearRestaurantStorageRelatedKeys, setStorage } from '../../storage/store';
+import { FormState } from '../../screens/authenticationScreens/RegisterScreen';
+import { BASE_DOMAIN } from '../../storage/env';
+import { clearRestaurantStorageRelatedKeys, getStorage, setStorage } from '../../storage/store';
 import { SessionBearer } from '../../types/requests.types';
 import { postRequest, setBearer } from '../requests';
 import { socketManager } from '../Sockets/SocketManager';
+import { setStorageLastCredentials } from './otherStorage';
+
+export type RegisterData = {
+  username: string;
+  email: string;
+  password: string;
+};
+
+export async function handleUserLogin(sessionBearer: SessionBearer) {
+  try {
+    console.log(sessionBearer, 'sessionBearer');
+    if (sessionBearer?.user?.restaurant?.active === true && sessionBearer?.user?.active === true) {
+      await setBearer(sessionBearer);
+      navigateReset(ScreenNames.MainTabs);
+      navigate(ScreenNames.MainTabs);
+    } else if (sessionBearer.user) {
+      handleNoRestaurantUser(sessionBearer);
+    } else {
+      return false;
+    }
+
+    return true;
+  } catch (error: any) {
+    return false;
+  }
+}
 
 export async function login(username: string, password: string) {
   try {
-    const res: SessionBearer = await postRequest('/login', { username, password });
-    if (res) {
-      await setBearer(res);
-      navigateReset(ScreenNames.MainTabs);
-      navigate(ScreenNames.MainTabs);
-      return true;
+    setStorageLastCredentials({ email: username, password });
+    const res: SessionBearer = await postRequest('/login', { username, password }, 20000);
+    console.log(res, 'login Reponse');
+    if (!res?.token) {
+      toast('error', `No response from server`);
+      return;
     }
 
-    return false;
+    await handleUserLogin(res);
   } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ?? 'Κάτι πήγε λάθος, δεν μπορέσατε να συνδεθείτε.';
     console.log(error.response?.data);
-    toast('error', `${errorMessage}`);
   }
 }
 
@@ -28,8 +53,10 @@ export async function logout() {
   try {
     //TODO: send to request also to log logged out event
     await setStorage('session_bearer', null);
-    await setStorage('currentUser', null);
     await clearRestaurantStorageRelatedKeys();
+
+    socketManager.disconnect();
+
     await socketManager.updateUserInstance();
 
     navigateReset(ScreenNames.LoginScreen);
@@ -42,4 +69,23 @@ export async function logout() {
     console.log(error.response?.data);
     toast('error', `${errorMessage}`);
   }
+}
+
+export async function register(registerData: RegisterData) {
+  clearRestaurantStorageRelatedKeys();
+  const sessionBearer: SessionBearer = await postRequest('/register', registerData);
+  setStorageLastCredentials({ email: registerData.username, password: registerData.password });
+
+  if (sessionBearer.user.restaurant) {
+    await setBearer(sessionBearer);
+  } else if (sessionBearer.user) {
+    handleNoRestaurantUser(sessionBearer);
+  }
+}
+
+export async function handleNoRestaurantUser(sessionBearer: SessionBearer) {
+  await setStorage('session_bearer', sessionBearer);
+  await setStorage('currentUser', sessionBearer?.user);
+  navigateReset(ScreenNames.NewUserSetupScreen);
+  navigate(ScreenNames.NewUserSetupScreen);
 }

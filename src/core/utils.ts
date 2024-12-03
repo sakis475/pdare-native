@@ -6,15 +6,18 @@ import { colors } from './theme';
 export const emailValidator = (email: string) => {
   const re = /\S+@\S+\.\S+/;
 
-  if (!email || email.length <= 0) return 'Email cannot be empty.';
+  if (!email || email.length <= 0) return `Email can't be empty.`;
   if (!re.test(email)) return 'Ooops! We need a valid email address.';
 
   return '';
 };
 
 export const passwordValidator = (password: string) => {
-  if (!password || password.length <= 0) return 'Password cannot be empty.';
+  const re = /^(?=.*[0-9])(?=.{8,})/;
 
+  if (!password || password.length <= 0) return 'Password cannot be empty.';
+  if (password.length < 8) return 'Password must be at least 8 characters long.';
+  if (!re.test(password)) return 'Password must contain at least 1 number.';
   return '';
 };
 

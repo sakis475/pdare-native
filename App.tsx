@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, PaperProvider } from 'react-native-paper';
-import { NavigationContainer } from '@react-navigation/native';
+import { ActivityIndicator, DefaultTheme, PaperProvider } from 'react-native-paper';
+import { NavigationContainer, Theme } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { setLocalizedStrings } from './src/core/strings';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -12,6 +12,7 @@ import { socketManager } from './src/helpers/Sockets/SocketManager';
 import { socketEventSubscriber } from './src/helpers/Sockets/SocketEventSubscriber';
 import { getStorage } from './src/storage/store';
 import AppNavigator, { navigationRef } from './src/navigation/AppNavigator';
+import { colors } from './src/core/theme';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);

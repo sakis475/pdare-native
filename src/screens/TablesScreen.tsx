@@ -133,6 +133,9 @@ const TablesScreen = ({ currentIndex }: any) => {
                 Δεν υπάρχουν ενεργά Τραπέζια
               </Text>
             </View>
+            <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
+              <Text style={styles.selectTableBtnText}>{strings.NewOrderBtn}</Text>
+            </TouchableOpacity>
           </>
         ) : (
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />

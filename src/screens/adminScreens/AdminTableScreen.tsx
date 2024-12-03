@@ -251,7 +251,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, tablesLength }) => {
 };
 
 const AdminTableScreen = () => {
-  const [tables, setTables] = useState<BoxData[]>();
+  const [tables, setTables] = useState<BoxData[]>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [modalMode, setModalMode] = useState<'edit' | 'create'>('edit');
@@ -416,8 +416,22 @@ const AdminTableScreen = () => {
               animated={false}
             />
           </>
-        ) : (
+        ) : tables === null ? (
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        ) : (
+          <>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Τραπέζια που προστίθενται</Text>
+              <Text style={styles.emptyText}>θα εμφανίζονται εδώ</Text>
+            </View>
+            <FAB
+              icon="plus"
+              style={styles.createFab}
+              onPress={handleCreatePress}
+              color={colors.darkGrey}
+              animated={false}
+            />
+          </>
         )}
       </View>
 
@@ -605,6 +619,16 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontWeight: 'bold',
     padding: 3,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    color: colors.white,
+    textAlign: 'center',
   },
 });
 

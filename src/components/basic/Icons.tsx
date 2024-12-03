@@ -8,6 +8,7 @@ import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 
 import { colors } from '../../core/theme';
 import { StyleProp, ViewStyle } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface IconProps {
   size?: number;
@@ -56,6 +57,10 @@ export const EditIcon = ({ size = 24, color = '#c8c6ff', style }: IconProps = {}
 
 export const TrashIcon = ({ size = 24, color = '#ffc4c4', style }: IconProps = {}) => {
   return <FontAwesome6 name="trash" size={size} color={color} style={style} />;
+};
+
+export const WarningIcon = ({ size = 24, color = '#ffc4c4', style }: IconProps = {}) => {
+  return <Ionicons name="warning" size={size} color={color} style={style} />;
 };
 
 export const ChevronUpIcon = ({ size = 24, color = '#fff', style }: IconProps = {}) => {

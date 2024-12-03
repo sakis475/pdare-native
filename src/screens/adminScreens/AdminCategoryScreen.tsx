@@ -17,7 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { AlertWithOptions, getTextColorBasedOnLuminance, toast } from '../../core/utils';
-import { colors } from '../../core/theme';
+import { colors, getRandomColor } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { getStorage, setStorage } from '../../storage/store';
 import { TextInput, Button } from 'react-native-paper';
@@ -78,9 +78,17 @@ const EditModal: React.FC<EditModalProps> = ({
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   useEffect(() => {
-    setTitle(category?.title || '');
-    setColor(category?.color || colors.darkGrey);
-  }, [category]);
+    if (visible) {
+      // When modal opens, set initial values
+      setTitle(category?.title || '');
+      setColor(category?.color || getRandomColor());
+    } else {
+      // When modal closes, reset to default values
+      setTitle('');
+      setColor(colors.darkGrey);
+      setShowColorPicker(false);
+    }
+  }, [visible, category]);
 
   const handleSave = () => {
     if (!title.trim()) {
@@ -438,6 +446,20 @@ const AdminCategoryScreen = () => {
               animated={false}
             />
           </>
+        ) : categories?.length === 0 ? (
+          <>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Κατηγορίες που προστίθενται</Text>
+              <Text style={styles.emptyText}>θα εμφανίζονται εδώ</Text>
+            </View>
+            <FAB
+              icon="plus"
+              style={styles.fab}
+              onPress={handleCreatePress}
+              color={colors.darkGrey}
+              animated={false}
+            />
+          </>
         ) : (
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
         )}
@@ -598,6 +620,16 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: colors.primary,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    color: colors.white,
+    textAlign: 'center',
   },
 });
 

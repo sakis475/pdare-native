@@ -31,7 +31,7 @@ function ProfileButton({ handlePress }: any) {
 
 const styles = StyleSheet.create({
   headerBarContainer: {
-    height: 50,
+    height: 60,
     backgroundColor: colors.darkerGrey,
     justifyContent: 'center',
   },
