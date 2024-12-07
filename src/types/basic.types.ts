@@ -73,7 +73,6 @@ interface ItemReq {
   oItemId?: number;
   markForDelete?: boolean;
 }
-
 interface catGroupedItems {
   [key: string]: ItemReq[];
 }
@@ -135,9 +134,27 @@ interface User {
   displayName?: string;
   role: 'owner' | 'waiter' | 'guest';
   restaurant?: Restaurant;
+  invitations?: InvitationRequest[];
+  markForDelete?: boolean;
 }
 
 interface LastCredentialsStorage {
   email: string;
   password: string;
+}
+
+interface InvitationRequest {
+  id?: number;
+  inviteFrom: User;
+  inviteTo: User;
+  invitationStatus?: InvitationRequestStatus;
+  restaurant: Restaurant;
+  createdAt: Date;
+
+}
+
+enum InvitationRequestStatus {
+  ACCEPTED = 'accepted',
+  CANCELLED = 'cancelled',
+  AWAITING = 'awaiting',
 }

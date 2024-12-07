@@ -62,7 +62,6 @@ export async function getBearer() {
 }
 
 export async function setBearer(sessionBearer: SessionBearer) {
-  console.log(sessionBearer, 'sessionBearer');
   if (sessionBearer) {
     try {
       socketManager.disconnect();
@@ -73,7 +72,6 @@ export async function setBearer(sessionBearer: SessionBearer) {
       socketEventSubscriber.initialize();
       await storageInitData();
     } catch (error) {
-      console.log();
       toast('error', 'Something bad happened...');
     }
   }
@@ -110,20 +108,20 @@ export async function postRequest(url: string, body?: any, timeout = REQ_TIMEOUT
       timeoutErrorMessage: 'Το αίτημα έληξε. Παρακαλώ δοκιμάστε ξανά.',
     };
 
-    // if (!['/login', '/login/session'].includes(url)) {
-    //   const auth = await getBearer();
-    //   if (auth) {
-    //     options.headers = {
-    //       Authorization: `Bearer ${auth.token}`,
-    //     };
-    //   }
-    // }
+    if (!['/login', '/login/session'].includes(url)) {
+      const auth = await getBearer();
+      if (auth) {
+        options.headers = {
+          Authorization: `Bearer ${auth.token}`,
+        };
+      }
+    }
 
     console.log('POST ' + BASE_URL + url, 'timeout:', timeout);
     const response = await axios.post(BASE_URL + url, body, options);
     return response.data;
   } catch (error) {
-    // handleAxiosError(error as AxiosError);
+    handleAxiosError(error as AxiosError);
   }
 }
 

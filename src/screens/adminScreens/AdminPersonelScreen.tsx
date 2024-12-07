@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,128 +7,96 @@ import {
   TouchableOpacity,
   FlatList,
   ListRenderItem,
+  RefreshControl,
 } from 'react-native';
 import { Button, Divider, FAB, Text, Searchbar, TextInput } from 'react-native-paper';
 import { getStorage, setStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
-import { AlertWithOptions, toast } from '../../core/utils';
-import { patchRequest, getRequest, postRequest } from '../../helpers/requests';
+import { AlertWithOptions, emailValidator, toast } from '../../core/utils';
+import { patchRequest, getRequest, postRequest, deleteRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import {
   DoubleLeftIcon,
   DoubleRightIcon,
-  PlusIcon,
   SearchIcon,
   TrashIcon,
 } from '../../components/basic/Icons';
+import dayjs from '../../core/dayjs';
+import { storageInitPersonelUsers } from '../../helpers/storage/storageInit';
 
 interface SearchUserModalProps {
   visible: boolean;
   onDismiss: () => void;
+  onInviteSuccess?: () => void;  // Add this line
 }
 
-interface SearchResult {
-  id: number;
-  username: string;
-  email: string;
-  role: string;
-  active: boolean;
-  isInvited?: boolean;
-}
 
-interface PaginatedSearchResults {
-  data: SearchResult[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss }) => {
+const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, onInviteSuccess }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResult, setSearchResult] = useState<User & { isInvited: boolean } | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalResults, setTotalResults] = useState(0);
   const searchTimeout = useRef<NodeJS.Timeout>();
-  const ITEMS_PER_PAGE = 5;
 
-  const searchUsers = async (query: string, page: number = 1) => {
+  useEffect(() => {
+    if (visible) {
+      // Reset all states when modal opens
+      setSearchQuery('');
+      setSearchResult(null);
+      setIsSearching(false);
+
+      // Clear any pending search timeout
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+    }
+  }, [visible]);
+
+  const searchUsers = async (query: string) => {
     if (query.length < 3) {
-      setSearchResults([]);
-      setTotalPages(0);
-      setTotalResults(0);
+      setSearchResult(null);
+      return;
+    }
+
+    if (emailValidator(query)) {
       return;
     }
 
     setIsSearching(true);
     try {
-      const response: PaginatedSearchResults = await getRequest(
-        `/user/search?username=${encodeURIComponent(query)}&page=${page}&limit=${ITEMS_PER_PAGE}`
+      const currentUser = await getStorage('currentUser');
+      const result: User = await getRequest(
+        `/user/search?email=${encodeURIComponent(query)}`
       );
-
-      const resultsWithInviteState = response.data.map((result) => ({
-        ...result,
-        isInvited: false,
-      }));
-
-      setSearchResults(resultsWithInviteState);
-      setTotalPages(response.totalPages);
-      setTotalResults(response.total);
-      setCurrentPage(response.page);
+      if (result) {
+        const resultWithInviteState = {
+          ...result,
+          isInvited: !!result?.invitations?.find(
+            e => e.invitationStatus === 'awaiting' &&
+              e.restaurant?.id === currentUser.restaurant.id
+          ),
+        };
+        setSearchResult(resultWithInviteState);
+      } else {
+        setSearchResult(null);
+      }
     } catch (error) {
-      console.error('Error searching users:', error);
+      console.error('Error searching user:', error);
       toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αναζήτηση');
-      setSearchResults([]);
+      setSearchResult(null);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-    searchUsers(searchQuery, newPage);
-  };
-
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-
-    return (
-      <View style={styles.paginationContainer}>
-        <View style={styles.paginationButtonContainer}>
-          {currentPage > 1 && (
-            <Button mode="text" onPress={() => handlePageChange(currentPage - 1)}>
-              <DoubleLeftIcon color={colors.black} />
-            </Button>
-          )}
-        </View>
-
-        <Text style={styles.paginationText}>
-          Page {currentPage} of {totalPages}
-        </Text>
-
-        <View style={styles.paginationButtonContainer}>
-          {currentPage < totalPages && (
-            <Button mode="text" onPress={() => handlePageChange(currentPage + 1)}>
-              <DoubleRightIcon color={colors.black} />
-            </Button>
-          )}
-        </View>
-      </View>
-    );
-  };
-
   const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1); // Reset to first page on new search
+    setSearchQuery(query.trim());
 
     if (searchTimeout.current) {
       clearTimeout(searchTimeout.current);
     }
 
     searchTimeout.current = setTimeout(() => {
-      searchUsers(query, 1);
+      searchUsers(query);
     }, 700);
   };
 
@@ -142,46 +110,70 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss })
 
   const handleInvite = async (email: string) => {
     try {
-      await postRequest('/user/invite', { email });
-      setSearchResults(
-        searchResults.map((result) =>
-          result.email === email ? { ...result, isInvited: true } : result
-        )
-      );
+      const invitationRequest = await postRequest('/user/invite', { email });
+      if (!invitationRequest?.id) {
+        onDismiss();
+        return;
+      }
+      if (searchResult) {
+        setSearchResult({
+          ...searchResult,
+          isInvited: true
+        });
+      }
       toast('success', 'Επιτυχία', 'Η πρόσκληση στάλθηκε επιτυχώς');
+      if (onInviteSuccess) {
+        onInviteSuccess();  // Call the callback to refresh the parent
+      }
+      onDismiss();
     } catch (error) {
       console.error('Error inviting user:', error);
       toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποστολή της πρόσκλησης');
     }
   };
 
-  const renderItem = useCallback(
-    ({ item }: { item: SearchResult }) => (
-      <View style={styles.searchResultItem}>
-        <View>
-          <Text style={styles.searchResultEmail}>{item.email}</Text>
-          <Text style={styles.searchResultName}>@{item.username}</Text>
+  const renderSearchResult = () => {
+    // If no search has been performed yet, return nothing
+    if (searchQuery.length === 0) {
+      return null;
+    }
+
+    // If there's no search result after searching
+    if (!searchResult && !isSearching) {
+      return <Text style={styles.noResults}>Δεν βρέθηκαν χρήστες</Text>;
+    }
+
+    if (searchResult) {
+      return (
+        <View style={styles.searchResultItem}>
+          <View style={styles.userInfoContainer}>
+            <View style={styles.textContainer}>
+              <Text style={styles.searchResultEmail}>{searchResult.email}</Text>
+              {searchResult.firstName && searchResult.lastName && (
+                <Text style={styles.searchResultName}>
+                  <Text>{searchResult.firstName} {searchResult.lastName}</Text>
+                </Text>
+              )}
+            </View>
+          </View>
+          <Button
+            mode="contained"
+            onPress={() => handleInvite(searchResult.email)}
+            disabled={searchResult.isInvited}
+          >
+            <Text style={{ color: colors.white }}>
+              {searchResult.isInvited ? 'Προσκλήθηκε' : 'Πρόσκληση'}
+            </Text>
+          </Button>
         </View>
-        <Button mode="contained" onPress={() => handleInvite(item.email)} disabled={item.isInvited}>
-          {item.isInvited ? 'Προσκλήθηκε' : 'Πρόσκληση'}
-        </Button>
-      </View>
-    ),
-    []
-  );
+      );
+    }
 
-  const keyExtractor = useCallback((item: SearchResult) => item.email, []);
-
-  const ListEmptyComponent = useCallback(
-    () =>
-      searchQuery.length >= 3 && !isSearching ? (
-        <Text style={styles.noResults}>Δεν βρέθηκαν χρήστες</Text>
-      ) : null,
-    [searchQuery, isSearching]
-  );
+    return <Text style={styles.noResults}>Αναζήτηση...</Text>;
+  };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss} >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Αναζήτηση Χρήστη</Text>
@@ -196,20 +188,9 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss })
           {isSearching ? (
             <ActivityIndicator style={styles.searchLoading} color={colors.primary} />
           ) : (
-            <>
-              <FlatList
-                data={searchResults}
-                renderItem={renderItem}
-                keyExtractor={keyExtractor}
-                ItemSeparatorComponent={Divider}
-                ListEmptyComponent={ListEmptyComponent}
-                style={styles.searchResults}
-                contentContainerStyle={styles.searchResultsContent}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-              />
-              {renderPagination()}
-            </>
+            <View style={styles.searchResults}>
+              {renderSearchResult()}
+            </View>
           )}
 
           <View style={styles.buttonContainer}>
@@ -223,12 +204,13 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss })
   );
 };
 
+
 interface EditUserModalProps {
   visible: boolean;
   user: User;
   onDismiss: () => void;
   onSave: (updatedUser: User) => void;
-  onDelete?: (email: string) => void;
+  onDelete?: (user: User) => void;
 }
 
 const EditUserModal: React.FC<EditUserModalProps> = ({
@@ -242,7 +224,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const [displayName, setDisplayName] = useState(user?.displayName || '');
 
   useEffect(() => {
-    setRole(user?.role || 'guest');
+    setRole(user?.role || 'waiter');
     setDisplayName(user?.displayName || '');
   }, [user]);
 
@@ -262,9 +244,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
     AlertWithOptions(
       'Επιβεβαίωση Διαγραφής',
-      `Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη "${user.username}";`,
+      `Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη "${user.email}";`,
       () => {
-        onDelete(user.email);
+        onDelete(user);
         onDismiss();
       },
       undefined,
@@ -277,8 +259,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Ενημέρωση Χρήστη</Text>
-          <Text style={styles.username}>@{user?.username}</Text>
-
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Εμφανιζόμενο Όνομα</Text>
             <TextInput
@@ -288,19 +268,6 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
               placeholder="Εισάγετε εμφανιζόμενο όνομα"
               style={styles.input}
             />
-          </View>
-
-          <View style={styles.roleContainer}>
-            {(['owner', 'waiter', 'guest'] as const).map((roleOption) => (
-              <Button
-                key={roleOption}
-                mode={role === roleOption ? 'contained' : 'outlined'}
-                onPress={() => setRole(roleOption)}
-                style={styles.roleButton}
-              >
-                {roleOption.charAt(0).toUpperCase() + roleOption.slice(1)}
-              </Button>
-            ))}
           </View>
 
           <View style={styles.buttonContainer}>
@@ -332,24 +299,41 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
 const AdminPersonelScreen = () => {
   const [users, setUsers] = useState<User[]>(null);
+  const [invitations, setInvitations] = useState<InvitationRequest[]>(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchData = async () => {
     const fetchedUsers: User[] = (await getStorage('personelUsers')) || [];
+    const activeInvitations: InvitationRequest[] = (await getStorage('activeInvitations')) || [];
+
+
     setUsers(fetchedUsers);
+    setInvitations(activeInvitations);
+  };
+
+  const fetchLiveData = async () => {
+    await storageInitPersonelUsers()
+    fetchData();
+  }
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchLiveData();
+    setRefreshing(false);
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchData();
   }, []);
 
-  const handleUserUpdate = async (updatedUsers: User[]) => {
+  const handleUserUpdate = async (updatedUser: User) => {
     setIsLoading(true);
     try {
-      const response = await patchRequest('/user/save', updatedUsers);
+      const response = await patchRequest('/user/admin', updatedUser);
       if (!Array.isArray(response)) {
         return;
       }
@@ -365,16 +349,62 @@ const AdminPersonelScreen = () => {
   };
 
   const handleEditUser = async (updatedUser: User) => {
-    const newUsers = users.map((user) => (user.email === updatedUser.email ? updatedUser : user));
-    await handleUserUpdate(newUsers);
+    await handleUserUpdate(updatedUser);
   };
 
-  const handleDelete = async (email: string) => {
-    const newUsers = users.filter((user) => user.email !== email);
-    await handleUserUpdate(newUsers);
+  const handleDelete = async (userToDelete: User) => {
+    userToDelete.markForDelete = true;
+    await handleUserUpdate(userToDelete);
   };
 
-  const renderUserCard: ListRenderItem<User> = ({ item: user }) => {
+  const handleCancelInvitation = (invitation: InvitationRequest) => {
+    AlertWithOptions(
+      'Επιβεβαίωση Διαγραφής',
+      'Είστε σίγουροι ότι θέλετε να διαγράψετε την πρόσκληση;',
+      async () => {
+        try {
+          setIsLoading(true);
+          await deleteRequest(`/user/invite/${invitation.id}`);
+          setInvitations(prev => prev.filter(inv => inv.id !== invitation.id));
+          toast('success', 'Επιτυχία', 'Η πρόσκληση διαγράφηκε');
+        } catch (error) {
+          console.error('Error deleting invitation:', error);
+          toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την διαγραφή');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    );
+  };
+
+  const renderInvitationCard = (invitation: InvitationRequest) => (
+    <View style={[styles.userCard, styles.invitationCard]}>
+      <View style={styles.userInfo}>
+        <Text style={styles.pendingLabel}>Εκκρεμής Πρόσκληση</Text>
+        <Text style={styles.userName}>{invitation.inviteTo.email}</Text>
+        <Text style={styles.dateText}>
+          Στάλθηκε: {dayjs(invitation.createdAt).format('DD/MM/YY HH:mm:ss')}
+        </Text>
+      </View>
+      <Button
+        mode="outlined"
+        onPress={() => handleCancelInvitation(invitation)}
+        style={styles.deleteButton}
+        textColor={colors.lightRed}
+      >
+        <TrashIcon size={15} color={colors.lightRed} />
+      </Button>
+    </View>
+  );
+
+
+  const renderUserCard = ({ item }: { item: User | InvitationRequest }) => {
+    // Check if item is an invitation by looking for invitationStatus property
+    if ('invitationStatus' in item) {
+      return renderInvitationCard(item as InvitationRequest);
+    }
+
+    const user = item as User;
     return (
       <TouchableOpacity
         style={styles.userCard}
@@ -384,11 +414,14 @@ const AdminPersonelScreen = () => {
         }}
       >
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>
-            {user.firstName} {user.lastName}
-          </Text>
-          <Text style={styles.userEmail}>{user.displayName}</Text>
-          <Text style={styles.username}>{user.username}</Text>
+          <Text style={styles.userName}>{user.displayName}</Text>
+          {
+            user.firstName || user.lastName ? <Text style={styles.userEmail}>
+              {user.firstName} {user.lastName}
+            </Text> : null
+          }
+
+          <Text style={styles.userName}>{user.email}</Text>
         </View>
         <View style={styles.roleTag}>
           <Text style={styles.roleText}>{user.role}</Text>
@@ -397,31 +430,50 @@ const AdminPersonelScreen = () => {
     );
   };
 
-  const ListEmptyComponent = () => <Text style={styles.noResults}>Δεν βρέθηκαν χρήστες</Text>;
+  const combinedData = useMemo(() => {
+    const pendingInvitations = Array.isArray(invitations) ? invitations : [];
+    const currentUsers = Array.isArray(users) ? users : [];
+    return [...pendingInvitations, ...currentUsers];
+  }, [users, invitations]);
 
+  const ListEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>Δεν βρέθηκαν χρήστες ή προσκλήσεις</Text>
+      <Text style={styles.emptyText}>Αναζητήστε για να προσθέσετε καινούργιους.</Text>
+    </View>
+  );
   return (
     <View style={styles.container}>
-      {users?.length > 0 ? (
+      {combinedData.length > 0 ? (
         <View style={styles.usersContainer}>
           <FlatList
-            data={users}
+            data={combinedData}
             renderItem={renderUserCard}
-            keyExtractor={(user: User) => user.email}
+            keyExtractor={(item) => {
+              if ('invitationStatus' in item) {
+                return `invitation-${item.id}`;
+              }
+              return `user-${(item as User).email}`;
+            }}
             ItemSeparatorComponent={Divider}
-            ListEmptyComponent={ListEmptyComponent}
             style={styles.searchResults}
             contentContainerStyle={styles.searchResultsContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.primary]}
+                tintColor={colors.primary}
+              />
+            }
           />
         </View>
-      ) : users === null ? (
+      ) : users === null || invitations === null ? (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       ) : (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Δεν βρέθηκαν χρήστες</Text>
-          <Text style={styles.emptyText}>Αναζητήστε για να προσθέσετε καινούργιους.</Text>
-        </View>
+        <ListEmptyComponent />
       )}
 
       <FAB
@@ -448,11 +500,13 @@ const AdminPersonelScreen = () => {
       <SearchUserModal
         visible={searchModalVisible}
         onDismiss={() => setSearchModalVisible(false)}
+        onInviteSuccess={fetchLiveData}
       />
 
       {isLoading && <LoadingOverlay />}
     </View>
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -490,7 +544,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 14,
-    color: colors.white,
+    color: colors.black,
     opacity: 0.8,
   },
   roleTag: {
@@ -533,6 +587,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '90%',
     maxWidth: 400,
+    gap: 5
   },
   modalTitle: {
     fontSize: 20,
@@ -553,8 +608,7 @@ const styles = StyleSheet.create({
     marginVertical: 4, // Add some vertical spacing between items
   },
   searchResultEmail: {
-    flex: 1,
-    marginRight: 10,
+    color: colors.black,
   },
   searchLoading: {
     padding: 20,
@@ -595,6 +649,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.grey,
     marginTop: 4,
+    textAlign: 'center'
   },
   divider: {
     backgroundColor: colors.lightGrey,
@@ -633,6 +688,30 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: 'white',
   },
+  invitationCard: {
+    backgroundColor: colors.darkerGrey,
+  },
+  pendingLabel: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  dateText: {
+    fontSize: 12,
+    color: colors.white,
+    opacity: 0.7,
+    marginTop: 4,
+  },
+  userInfoContainer: {
+    flex: 1,
+    marginRight: 10,
+    justifyContent: 'center'
+  },
+  textContainer: {
+    alignItems: 'center',  // Center the text components
+  },
+
 });
 
 export default AdminPersonelScreen;

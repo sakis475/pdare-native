@@ -40,7 +40,7 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}
-      // initialRouteName={ScreenNames.ManageItemsScreen}
+    // initialRouteName={ScreenNames.ManageItemsScreen}
     >
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}
@@ -192,6 +192,26 @@ const AppNavigator = () => {
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
               title={'Προφίλ'}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'none',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+
+      <Stack.Screen
+        name={ScreenNames.HistoryOrdersScreen}
+        component={HistoryOrdersScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={'Ιστορικό Παραγγελιών'}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -439,11 +459,7 @@ const MainTabs = ({ route }: any) => {
       title: strings.Draft,
       focusedIcon: 'clipboard-outline',
     },
-    {
-      key: strings.History,
-      title: strings.History,
-      focusedIcon: 'history',
-    },
+
     {
       key: strings.Expo,
       title: strings.Expo,
@@ -457,8 +473,6 @@ const MainTabs = ({ route }: any) => {
         return <TablesScreen currentIndex={index} />;
       case strings.Draft:
         return <TempOrderScreen currentIndex={index} />;
-      case strings.History:
-        return <HistoryOrdersScreen currentIndex={index} />;
       case strings.Expo:
         return <ExpoScreen currentIndex={index} />;
       default:

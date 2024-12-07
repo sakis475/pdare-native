@@ -25,6 +25,13 @@ const settingsOptions = [
     allowedRoles: ['owner', 'waiter', 'guest'],
   },
   {
+    id: '1',
+    title: 'Ιστορικό Παραγγελιών',
+    icon: 'history',
+    screen: ScreenNames.HistoryOrdersScreen,
+    allowedRoles: ['owner', 'waiter'],
+  },
+  {
     id: '2',
     title: 'Προϊόντα',
     icon: 'shape-outline',

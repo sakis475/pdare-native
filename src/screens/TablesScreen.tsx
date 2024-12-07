@@ -1,33 +1,25 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
-  ScrollView,
   SafeAreaView,
   Keyboard,
-  FlatList,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { TableBox } from '../components/helpers/TableBox';
-
 import { strings } from '../core/strings';
 import { HeaderBar } from '../components/helpers/HeaderBar';
-
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
 import { Portal } from '@gorhom/portal';
 import {
-  convertOccupiedOrderToOrder,
   createNewOrder,
   getTempOrder,
 } from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-import _ from 'lodash';
 import { FlashList } from '@shopify/flash-list';
 import { getStorage } from '../storage/store';
 import { navigate, navigateToDraft, ScreenNames } from '../navigation/navigationUtils';
@@ -35,6 +27,9 @@ import { ORDERS_UPDATED, EventEmitter } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
 
 const TablesScreen = ({ currentIndex }: any) => {
+  const [activeTables, setActiveTables] = useState<Table[]>(undefined);
+  const [refreshing, setRefreshing] = useState(false);
+
   const fetchInitialTables = async (): Promise<void> => {
     try {
       const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
@@ -48,13 +43,19 @@ const TablesScreen = ({ currentIndex }: any) => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchInitialTables();
+    setRefreshing(false);
+  };
+
   // Function to handle updates from socket
   const handleTableUpdates = async (): Promise<void> => {
+    console.log('ORDERS_UPDATED')
     const updatedTables = await getStorage('tableOrders');
     setActiveTables(updatedTables);
   };
 
-  //This propably is not needed because every component mounts it will listen for socket emitter
   useEffect(() => {
     handleTableUpdates();
     // Subscribe to table updates
@@ -65,8 +66,6 @@ const TablesScreen = ({ currentIndex }: any) => {
       // fetchInitialTables();
     }
   }, [currentIndex]);
-
-  const [activeTables, setActiveTables] = useState<Table[]>(undefined);
 
   //START TABLE MODAL LOGIC
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
@@ -79,8 +78,6 @@ const TablesScreen = ({ currentIndex }: any) => {
     bottomSheetRef.current?.closeModal();
     Keyboard.dismiss();
   };
-
-  //END TABLE MODAL LOGIC
 
   const handleSelectTable = async (table: Table) => {
     const newTable = await createNewOrder(table);
@@ -96,6 +93,7 @@ const TablesScreen = ({ currentIndex }: any) => {
       navigate(ScreenNames.ActiveOrderScreen, { tableParam: table });
     }
   };
+
   const renderItems = (table: Table, index: number) => (
     <View style={styles.tableItem} key={table.id}>
       <TableBox
@@ -103,12 +101,13 @@ const TablesScreen = ({ currentIndex }: any) => {
         onPress={(table: Table) => {
           handleExistingTable(table);
         }}
-      ></TableBox>
+      />
     </View>
   );
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <HeaderBar headerTitle={strings.Tables}></HeaderBar>
+      <HeaderBar headerTitle={strings.Tables} />
       <View style={styles.container}>
         {activeTables && activeTables.length > 0 ? (
           <>
@@ -119,6 +118,14 @@ const TablesScreen = ({ currentIndex }: any) => {
                 keyExtractor={(item) => item.tableName + item.id}
                 estimatedItemSize={20}
                 numColumns={4}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[colors.primary]} // Android
+                    tintColor={colors.primary} // iOS
+                  />
+                }
               />
             </View>
 
@@ -158,7 +165,6 @@ const styles = StyleSheet.create({
   tableContainer: {
     flex: 1,
   },
-
   tableItem: {
     flex: 1,
     alignItems: 'center',
@@ -168,24 +174,14 @@ const styles = StyleSheet.create({
   selectTableBtn: {
     backgroundColor: 'blue',
     borderRadius: 8,
-    padding: 20,
-    marginVertical: 10,
+    padding: 15,
+    marginVertical: 5,
     alignItems: 'center',
   },
   selectTableBtnText: {
     fontWeight: 'bold',
     fontSize: 16,
     color: colors.white,
-  },
-  tableChangeContainer: {
-    paddingTop: 20,
-    paddingHorizontal: 2,
-    justifyContent: 'center',
-    height: 300,
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Adjust color and opacity as needed
   },
 });
 

@@ -37,9 +37,7 @@ export async function login(username: string, password: string) {
   try {
     setStorageLastCredentials({ email: username, password });
     const res: SessionBearer = await postRequest('/login', { username, password }, 20000);
-    console.log(res, 'login Reponse');
-    if (!res?.token) {
-      toast('error', `No response from server`);
+    if (!res) {
       return;
     }
 

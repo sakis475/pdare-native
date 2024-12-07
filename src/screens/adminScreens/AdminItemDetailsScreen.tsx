@@ -58,10 +58,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     getItemStorage();
   }, [route.params.item]);
 
-  // useEffect(() => {
-  //   console.log(JSON.stringify(item), 'item');
-  // }, [item]);
-
   const handleSelectChange = (propertyName: string, updatedProperties: ItemProperty[]) => {
     if (!item) return;
 

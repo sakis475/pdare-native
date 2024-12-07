@@ -6,7 +6,6 @@ import { toast } from '../core/utils';
 // Function to set item in AsyncStorage
 export async function setStorage<K extends StorageKey>(key: K, value: StorageTypes[K] | null) {
   try {
-    console.log(key, value);
     await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
     console.log(error);
@@ -57,6 +56,7 @@ export async function clearRestaurantStorageRelatedKeys() {
     await setStorage('propertyPatterns', null);
     await setStorage('tables', null);
     await setStorage('tableOrders', null);
+    await setStorage('activeInvitations', null)
   } catch (error) {
     console.log(error, 'clearRestaurantStorageRelatedKeys');
   }
@@ -77,6 +77,7 @@ interface StorageTypes {
   tableOrders: Table[];
   lastestMainTabIndex: number;
   lastCredentials: LastCredentialsStorage;
+  activeInvitations: InvitationRequest[];
 }
 
 // Type for storage keys

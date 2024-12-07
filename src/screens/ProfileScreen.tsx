@@ -5,8 +5,8 @@ import { getStorage, setStorage } from '../storage/store';
 import { colors } from '../core/theme';
 import { TrashIcon, WarningIcon } from '../components/basic/Icons';
 import CustomTextInput from '../components/basic/CustomTextInput';
-import { emailValidator, passwordValidator } from '../core/utils';
-import { deleteRequest, patchRequest, setBearer } from '../helpers/requests';
+import { AlertWithOptions, emailValidator, passwordValidator, toast } from '../core/utils';
+import { deleteRequest, patchRequest, postRequest, setBearer } from '../helpers/requests';
 import { SessionBearer } from '../types/requests.types';
 import { logout } from '../helpers/storage/tokenRequests';
 
@@ -36,10 +36,6 @@ const ProfileScreen = ({ route }: any) => {
   };
 
   useEffect(() => {
-    console.log(passwordData);
-  }, [passwordData]);
-
-  useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         setIsInitializing(true);
@@ -56,7 +52,7 @@ const ProfileScreen = ({ route }: any) => {
         });
       } catch (error) {
         console.error('Error fetching user:', error);
-        Alert.alert('Error', 'Failed to load user data');
+        toast('error', `Failed to load user data`)
       } finally {
         setIsInitializing(false);
       }
@@ -69,12 +65,12 @@ const ProfileScreen = ({ route }: any) => {
     const { username, firstName, lastName, email } = formData;
 
     if (!username.trim()) {
-      Alert.alert('Error', `Username can't be empty`);
+      toast('error', `Username can't be empty`)
       return;
     }
 
     if (emailValidator(email)) {
-      Alert.alert('Error', emailValidator(email));
+      toast('error', emailValidator(email))
       return;
     }
 
@@ -90,9 +86,10 @@ const ProfileScreen = ({ route }: any) => {
       // Update local storage with new user data
       await setStorage('currentUser', response.user);
       await setBearer(response);
-      Alert.alert('Success', 'Profile updated successfully');
+
+      toast('success', 'Profile updated successfully')
     } catch (error) {
-      Alert.alert('Error', 'Failed to update profile');
+      toast('error', 'Failed to update profile')
     } finally {
       setIsLoading(false);
     }
@@ -102,17 +99,17 @@ const ProfileScreen = ({ route }: any) => {
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all password fields');
+      toast('error', `Please fill in all password fields`)
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'New passwords do not match');
+      toast('error', `New passwords do not match`)
       return;
     }
 
     if (passwordValidator(newPassword)) {
-      Alert.alert('Error', passwordValidator(newPassword));
+      toast('error', passwordValidator(newPassword))
       return;
     }
 
@@ -133,9 +130,9 @@ const ProfileScreen = ({ route }: any) => {
         newPassword: '',
         confirmPassword: '',
       });
-      Alert.alert('Success', 'Password updated successfully');
+      toast('success', 'Password updated successfully')
     } catch (error) {
-      Alert.alert('Error', 'Failed to update password');
+      toast('error', 'Failed to update password')
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +140,7 @@ const ProfileScreen = ({ route }: any) => {
 
   const handleUpdateRestaurantName = async () => {
     if (!formData.restaurantName.trim()) {
-      Alert.alert('Error', 'Please enter a restaurant name');
+      toast('error', 'Please enter a restaurant name')
       return;
     }
 
@@ -153,84 +150,71 @@ const ProfileScreen = ({ route }: any) => {
         restaurantDisplayName: formData.restaurantName.trim(),
       });
       if (response) {
-        Alert.alert('Success', 'Restaurant Display Name updated successfully');
+        toast('success', 'Restaurant Display Name updated successfully')
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to update restaurant name');
+      toast('error', 'Failed to update restaurant name')
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
+    AlertWithOptions(
       'Delete Account',
       'This action is permanent. Are you sure you want your account to be deleted?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setIsLoading(true);
-            try {
-              await deleteRequest('/user/delete');
-              await logout();
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete account');
-            } finally {
-              setIsLoading(false);
-            }
-          },
-        },
-      ]
+      async () => {
+        setIsLoading(true);
+        try {
+          await deleteRequest('/user/delete');
+          await logout();
+        } catch (error) {
+          toast('error', 'Failed to delete account')
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      , () => { }
     );
   };
 
   const handleDeleteRestaurant = () => {
-    Alert.alert(
+    AlertWithOptions(
       'Delete Restaurant',
       'Are you sure you want to delete this restaurant? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setIsLoading(true);
-            try {
-              await postRequest('/user/restaurant/delete');
-              await logout();
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete restaurant');
-            } finally {
-              setIsLoading(false);
-            }
-          },
-        },
-      ]
+      async () => {
+        setIsLoading(true);
+        try {
+          await postRequest('/user/restaurant/delete');
+          await logout();
+        } catch (error) {
+          toast('error', 'Failed to delete restaurant')
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      , () => { }
     );
   };
 
   const handleLeaveRestaurant = () => {
-    Alert.alert('Leave Restaurant', 'Are you sure you want to leave this restaurant?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Leave',
-        style: 'destructive',
-        onPress: async () => {
-          setIsLoading(true);
-          try {
-            // await leaveRestaurant();
-            // await logout();
-          } catch (error) {
-            Alert.alert('Error', 'Failed to leave restaurant');
-          } finally {
-            setIsLoading(false);
-          }
-        },
-      },
-    ]);
+
+    AlertWithOptions(
+      'Leave Restaurant',
+      'Are you sure you want to leave this restaurant?',
+      async () => {
+        setIsLoading(true);
+        try {
+          // await leaveRestaurant();
+          // await logout();
+        } catch (error) {
+          toast('error', 'Failed to leave restaurant')
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      , () => { }
+    );
   };
 
   const DeleteRestaurantButton = useMemo(
@@ -270,11 +254,6 @@ const ProfileScreen = ({ route }: any) => {
         <View style={styles.content}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Profile Information</Text>
-            <CustomTextInput
-              label="Username"
-              value={formData.username}
-              onChangeText={updateFormField('username')}
-            />
             <CustomTextInput
               label="First Name"
               value={formData.firstName}

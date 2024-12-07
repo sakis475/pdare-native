@@ -9,7 +9,6 @@ import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate } from '../../navigation/navigationUtils';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import {
-  convertNewOrderToRequestObject,
   createNewOrder,
   getTempOrder,
   markActiveItemForDelete,
@@ -19,7 +18,6 @@ import {
 import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdded';
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
 import { HeaderBar } from '../../components/helpers/HeaderBar';
-import { strings } from '../../core/strings';
 import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
 import { useIsFocused } from '@react-navigation/native';
 import { AlertWithOptions, toast } from '../../core/utils';

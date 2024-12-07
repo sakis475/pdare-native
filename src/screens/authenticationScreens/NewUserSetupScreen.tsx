@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Modal, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Modal, ActivityIndicator, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
 import { Button, Text, TextInput, FAB } from 'react-native-paper';
-import { postRequest } from '../../helpers/requests';
+import { getRequest, postRequest } from '../../helpers/requests';
 import { colors } from '../../core/theme';
 import { TrashIcon } from '../../components/basic/Icons';
 import { toast } from '../../core/utils';
@@ -9,6 +9,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { handleUserLogin, logout } from '../../helpers/storage/tokenRequests';
 import { SessionBearer } from '../../types/requests.types';
 import { clearRestaurantStorageRelatedKeys, getStorage } from '../../storage/store';
+import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 
 const LogoutFAB: React.FC = () => {
   return (
@@ -26,6 +27,20 @@ const NewUserSetupScreen = () => {
   const [restaurantName, setRestaurantName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User>(undefined);
+
+  const fetchData = async () => {
+    const fetchUserWithInvitations: User = await getRequest('/user/invite');
+
+    if (!fetchUserWithInvitations.id) {
+      return;
+    }
+
+    setCurrentUser(fetchUserWithInvitations);
+  }
+  useEffect(() => {
+    fetchData();
+  }, [])
 
   const handleCreateRestaurant = async () => {
     if (!restaurantName.trim()) {
@@ -72,24 +87,141 @@ const NewUserSetupScreen = () => {
           >
             Δημιουργία Εστιατορίου
           </Button>
-          <Button
-            mode="contained"
-            onPress={() => setSelectedOption('join')}
-            style={styles.optionButton}
-          >
-            Σύνδεση με Εστιατόριο
-          </Button>
+          <View style={styles.buttonWithBadge}>
+            <Button
+              mode="contained"
+              onPress={() => setSelectedOption('join')}
+              style={styles.optionButton}
+            >
+              Σύνδεση με Εστιατόριο
+            </Button>
+            {currentUser?.invitations?.length > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{currentUser.invitations.length}</Text>
+              </View>
+            )}
+          </View>
+
+          <LogoutFAB />
         </View>
       );
     }
 
     if (selectedOption === 'join') {
+      const renderInvitationItem = ({ item: invitation }: { item: InvitationRequest }) => (
+        <View style={styles.invitationCard}>
+          <View style={styles.invitationInfo}>
+            <Text style={styles.restaurantName}>
+              {invitation.restaurant.restaurantName}
+            </Text>
+            <Text style={styles.inviteFrom}>
+              Από: {invitation.inviteFrom.email}
+            </Text>
+          </View>
+
+          <View style={styles.invitationActions}>
+            <Button
+              mode="contained"
+              onPress={async () => {
+                setIsLoading(true);
+                try {
+                  const sessionBearer: SessionBearer = await postRequest(
+                    `/user/invite/response/${invitation.id}`,
+                    { response: true }
+                  );
+                  if (sessionBearer?.user?.restaurant) {
+                    await clearRestaurantStorageRelatedKeys();
+                    const userLogin = await handleUserLogin(sessionBearer);
+                    if (userLogin) {
+                      toast('success', 'Επιτυχία', 'Συνδεθήκατε με το κατάστημα.');
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error accepting invitation:', error);
+                  toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποδοχή της πρόσκλησης');
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              style={styles.acceptButton}
+            >
+              Αποδοχή
+            </Button>
+
+            <Button
+              mode="outlined"
+              onPress={async () => {
+                setIsLoading(true);
+                try {
+                  await postRequest(
+                    `/user/invite/response/${invitation.id}`,
+                    { response: false }
+                  );
+                  await fetchData();
+                  toast('success', 'Επιτυχία', 'Η πρόσκληση απορρίφθηκε');
+                } catch (error) {
+                  console.error('Error denying invitation:', error);
+                  toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την απόρριψη της πρόσκλησης');
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              style={styles.denyButton}
+              textColor={colors.lightRed}
+            >
+              Απόρριψη
+            </Button>
+          </View>
+        </View>
+      );
+
+      if (currentUser?.invitations?.length > 0) {
+        return (
+          <View style={styles.invitationsContainer}>
+            <Text style={styles.invitationsTitle}>Προσκλήσεις σε Εστιατόρια</Text>
+
+            <FlatList
+              data={currentUser.invitations}
+              renderItem={renderInvitationItem}
+              keyExtractor={(item) => item.id?.toString()}
+              contentContainerStyle={styles.listContainer}
+              refreshControl={
+                <RefreshControl
+                  refreshing={isLoading}
+                  onRefresh={fetchData}
+                  colors={[colors.primary]}
+                  tintColor={colors.primary}
+                />
+              }
+              ListEmptyComponent={() => (
+                <Text style={styles.emptyText}>
+                  Δεν έχετε λάβει ακόμη πρόσκληση από κάποιο εστιατόριο.
+                </Text>
+              )}
+            />
+
+            <Button
+              mode="outlined"
+              onPress={() => setSelectedOption(null)}
+              style={styles.backButton}
+              textColor={colors.white}
+            >
+              Επιστροφή
+            </Button>
+          </View>
+        );
+      }
+
       return (
         <View style={styles.waitingContainer}>
           <Text style={styles.waitingText}>
             Δεν έχετε λάβει ακόμη πρόσκληση από κάποιο εστιατόριο.
           </Text>
-          <Button mode="outlined" onPress={() => setSelectedOption(null)} style={styles.backButton}>
+          <Button
+            mode="outlined"
+            onPress={() => setSelectedOption(null)}
+            style={styles.backButton}
+          >
             Επιστροφή
           </Button>
         </View>
@@ -101,7 +233,7 @@ const NewUserSetupScreen = () => {
 
   return (
     <View style={styles.container}>
-      {renderContent()}
+      {currentUser === undefined ? <ActivityIndicator size={'large'} animating={true} color={colors.primary} /> : renderContent()}
       <Modal
         visible={createModalVisible}
         transparent
@@ -122,7 +254,7 @@ const NewUserSetupScreen = () => {
                 style={styles.input}
                 returnKeyType="done"
                 blurOnSubmit={false}
-                onSubmitEditing={() => {}}
+                onSubmitEditing={() => { }}
                 keyboardType="default"
               />
             </View>
@@ -152,7 +284,6 @@ const NewUserSetupScreen = () => {
           </View>
         </View>
       </Modal>
-      <LogoutFAB />
     </View>
   );
 };
@@ -162,6 +293,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#2F2F2F',
     padding: 20,
+    justifyContent: 'center'
   },
   optionsContainer: {
     flex: 1,
@@ -257,6 +389,85 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 12,
     marginTop: 2,
+  },
+  invitationsContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 600,
+    alignSelf: 'center',
+    justifyContent: 'center'
+  },
+  invitationsTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.white,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  invitationCard: {
+    backgroundColor: colors.grey,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  invitationInfo: {
+    marginBottom: 12,
+  },
+  restaurantName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.white,
+    marginBottom: 4,
+  },
+  inviteFrom: {
+    fontSize: 14,
+    color: colors.white,
+    opacity: 0.8,
+  },
+  invitationActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  acceptButton: {
+    flex: 1,
+    maxWidth: 120,
+  },
+  denyButton: {
+    flex: 1,
+    maxWidth: 120,
+    borderColor: colors.lightRed,
+  },
+  listContainer: {
+    flexGrow: 1,
+    padding: 16,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: colors.white,
+    fontSize: 16,
+    opacity: 0.8,
+  },
+  buttonWithBadge: {
+    position: 'relative',
+    width: '100%',
+    maxWidth: 300,
+  },
+  badge: {
+    position: 'absolute',
+    right: -10,
+    top: -10,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  badgeText: {
+    color: colors.white,
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 

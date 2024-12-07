@@ -16,7 +16,6 @@ interface FormField {
 }
 
 export interface FormState {
-  username: FormField;
   email: FormField;
   password: FormField;
   passwordRepeat: FormField;
@@ -65,11 +64,7 @@ export const validationRules: Record<keyof FormState, ValidationRule> = {
       return value !== state.password.value ? 'Οι κωδικός επαλήθευσης δεν ταιριάζει.' : '';
     },
     fieldName: 'passwordRepeat',
-  },
-  username: {
-    validate: (value) => (!value ? 'Πρέπει να συμπληρώσετε Όνομα Χρήστη' : ''),
-    fieldName: 'username',
-  },
+  }
 };
 
 const PrivacyPolicyDialog: React.FC<PrivacyPolicyDialogProps> = ({ visible, onDismiss }) => (
@@ -90,7 +85,6 @@ const PrivacyPolicyDialog: React.FC<PrivacyPolicyDialogProps> = ({ visible, onDi
   </Portal>
 );
 export const initialFormState: FormState = {
-  username: { value: '', error: '' },
   email: { value: '', error: '' },
   password: { value: '', error: '' },
   passwordRepeat: { value: '', error: '' },
@@ -228,13 +222,6 @@ const RegisterScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.fieldsContainer}>
-            <FormField
-              label="Όνομα Χρήστη"
-              value={formState.username.value}
-              error={formState.username.error}
-              onChangeText={(text) => handleFieldChange('username', text)}
-              onBlur={() => handleFieldBlur('username')}
-            />
             <FormField
               label="Email"
               value={formState.email.value}

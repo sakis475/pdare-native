@@ -52,9 +52,11 @@ async function storageInitTableOrders() {
   await setStorage('tableOrders', updatedTables);
 }
 
-async function storageInitPersonelUsers() {
-  const users: User[] = await Requests.getRequest('/user');
-  await setStorage('personelUsers', users);
+export async function storageInitPersonelUsers() {
+  const usersAndInvitations: { users: User[], activeInvitations: InvitationRequest[] } = await Requests.getRequest('/user');
+
+  await setStorage('personelUsers', usersAndInvitations.users);
+  await setStorage('activeInvitations', usersAndInvitations.activeInvitations);
 }
 
 async function storageInitPropertyPatterns() {

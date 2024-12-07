@@ -1,72 +1,39 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Keyboard, SafeAreaView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Keyboard, SafeAreaView, RefreshControl } from 'react-native';
 
-import { Divider, Portal } from 'react-native-paper';
+import { Divider, } from 'react-native-paper';
 
 import { colors } from '../core/theme';
 
 import { FlashList } from '@shopify/flash-list';
-import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
-import {
-  createNewOrder,
-  getTempOrder,
-  markActiveItemForDelete,
-  setTableTempOrder,
-} from '../helpers/storage/orderStorage';
-import { CatalogItemAdded } from '../components/itemComponents/CatalogItemAdded';
 import { HeaderBar } from '../components/helpers/HeaderBar';
-import { strings } from '../core/strings';
-import { CatalogItemDisabled } from '../components/itemComponents/CatalogItemDisabled';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+
 import { AlertWithOptions } from '../core/utils';
 import { getRequest } from '../helpers/requests';
 import dayjs from '../core/dayjs';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
 import { CurrencyFormat } from '../components/helpers/CurrencyFormat';
 
 const HistoryOrdersScreen = ({ currentIndex }: any) => {
   const [table, setTable] = useState<Table>();
   const [orders, setOrders] = useState<Order[]>();
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchOrders = async () => {
     const orders: Order[] = await getRequest('/orders');
-
     setOrders(orders ?? []);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchOrders();
+    setRefreshing(false);
+  };
+
   useEffect(() => {
-    if (currentIndex !== 2) return;
     fetchOrders();
   }, [currentIndex]);
 
-  //START TABLE MODAL LOGIC
-  const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
-
-  const handleOpenSelectTableModal = () => {
-    if (table) {
-      AlertWithOptions(
-        'Αλλαγή Τραπεζιού',
-        'Είστε σίγουροι ότι θέλετε να αλλάξετε τραπέζι;',
-        () => {
-          bottomSheetRef.current?.openModal();
-        },
-        () => {}
-      );
-    } else {
-      bottomSheetRef.current?.openModal();
-    }
-  };
-
-  const handleCloseModal = () => {
-    bottomSheetRef.current?.closeModal();
-    Keyboard.dismiss();
-  };
-
-  const refreshTempList = async (updatedItems?: ItemReq[]) => {
-    await fetchOrders();
-  };
-  //END TABLE MODAL LOGIC
 
   const calculateDuration = (createdAt: string, closedAt: string) => {
     const durationInSeconds = dayjs(closedAt ?? undefined).diff(dayjs(createdAt), 'second'); // Difference in seconds
@@ -104,26 +71,19 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
   };
 
   const renderOrderItem = (order: Order) => {
-    // Extract values safely using optional chaining and default values
     const startedAt = dayjs(order.createdAt);
     const closedAt = dayjs(order.closedAt ?? new Date());
-    const couvert = order.couvert ?? ' -'; // Default to 0 if undefined
-
-    // Calculate the duration in hours and minutes
+    const couvert = order.couvert ?? ' -';
     const durationString = calculateDuration(order.createdAt, order.closedAt);
-
-    // Format the closedAt date
     const formattedStartedAt = startedAt.format('DD/MM/YY HH:mm');
     const formattedClosedAt = closedAt.format('DD/MM/YY HH:mm');
 
     return (
       <View style={styles.rowContainer}>
-        {/* Table Name */}
         <View style={[styles.column, { width: '15%' }]}>
           <Text style={styles.tableName}>{order.table?.tableName ?? '?'}</Text>
         </View>
 
-        {/* Couvert (Persons Count) */}
         <View style={[styles.column, { width: '15%', minWidth: 20 }]}>
           <View style={styles.personsCount}>
             <FeatherIcons name="users" size={13} color={colors.veryLighterGrey} />
@@ -132,17 +92,15 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
         </View>
 
         <View style={[styles.column, { width: '25%' }]}>
-          <CurrencyFormat value={order.finalCost} currency={'€'} fontSize={13}></CurrencyFormat>
+          <CurrencyFormat value={order.finalCost} currency={'€'} fontSize={13} />
         </View>
 
-        {/* Duration */}
         <View style={[styles.column, { width: '20%' }]}>
           <Text style={styles.durationText}>
             <FeatherIcons name="clock" size={13} color={colors.veryLighterGrey} /> {durationString}
           </Text>
         </View>
 
-        {/* Status (Active or Closed) */}
         <View style={[styles.column, { width: '25%' }]}>
           {!order.closedAt ? (
             <>
@@ -162,24 +120,27 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <HeaderBar headerTitle={'Όλες Οι Παραγγελίες'}></HeaderBar>
-
       <View style={styles.container}>
         {orders && orders.length > 0 ? (
           <>
             <View style={styles.categoriesContainer}>
               <FlashList
                 data={orders}
-                keyExtractor={(item) => {
-                  const uniqueId = item.id.toString();
-                  return uniqueId;
-                }}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => renderOrderItem(item)}
                 estimatedItemSize={15}
                 contentContainerStyle={styles.categoryFlashListContainer}
                 showsVerticalScrollIndicator={true}
                 persistentScrollbar={true}
                 ItemSeparatorComponent={Divider}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={[colors.primary]} // Android
+                    tintColor={colors.primary} // iOS
+                  />
+                }
               />
             </View>
           </>
@@ -197,6 +158,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
       </View>
     </SafeAreaView>
   );
+
 };
 const styles = StyleSheet.create({
   container: {

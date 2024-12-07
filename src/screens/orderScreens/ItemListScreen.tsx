@@ -26,7 +26,6 @@ const ItemListScreen = ({ route }: any) => {
 
   const fetchItems = async () => {
     const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
-    console.log('ItemListScreen fetch items ');
     const categoryItems = fetchedItems[categoryTitle] ?? [];
 
     setItems(categoryItems);
