@@ -9,7 +9,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { TableBox } from '../components/helpers/TableBox';
-import { strings } from '../core/strings';
 import { HeaderBar } from '../components/helpers/HeaderBar';
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
@@ -22,10 +21,12 @@ import { navigate, navigateToDraft, ScreenNames } from '../navigation/navigation
 import { ORDERS_UPDATED, EventEmitter } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
 import { SCREEN_HEIGHT } from '@gorhom/bottom-sheet';
+import { useStrings } from '../core/localization/languageContext';
 
 const TablesScreen = ({ currentIndex }: any) => {
   const [activeTables, setActiveTables] = useState<Table[]>(undefined);
   const [refreshing, setRefreshing] = useState(false);
+  const strings = useStrings();
 
   const fetchInitialTables = async (): Promise<void> => {
     try {
@@ -106,7 +107,7 @@ const TablesScreen = ({ currentIndex }: any) => {
   const ListEmptyComponent = () => {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Δεν υπάρχουν ενεργά Τραπέζια</Text>
+        <Text style={styles.emptyText}>{strings.NO_ACTIVE_TABLE}</Text>
       </View>
     );
   };

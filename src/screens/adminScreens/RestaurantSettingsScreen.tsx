@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, FlatList, StyleSheet, View, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
@@ -7,6 +7,7 @@ import { getStorage } from '../../storage/store';
 import { ActivityIndicator } from 'react-native-paper';
 import { logout } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface SettingOption {
   id: string;
@@ -16,61 +17,58 @@ interface SettingOption {
   allowedRoles: string[];
 }
 
-const settingsOptions = [
-  {
-    id: '1',
-    title: 'Προφίλ',
-    icon: 'account',
-    screen: ScreenNames.ProfileScreen,
-    allowedRoles: ['owner', 'waiter', 'guest'],
-  },
-  {
-    id: '1',
-    title: 'Ιστορικό Παραγγελιών',
-    icon: 'history',
-    screen: ScreenNames.HistoryOrdersScreen,
-    allowedRoles: ['owner', 'waiter'],
-  },
-  {
-    id: '2',
-    title: 'Προϊόντα',
-    icon: 'shape-outline',
-    screen: ScreenNames.ManageCategoriesScreen,
-    allowedRoles: ['owner'],
-  },
-  {
-    id: '3',
-    title: 'Τραπέζια',
-    icon: 'apps',
-    screen: ScreenNames.ManageTableScreen,
-    allowedRoles: ['owner'],
-  },
-  {
-    id: '4',
-    title: 'Πρότυπα Ιδιοτήτων',
-    icon: 'cards-variant',
-    screen: ScreenNames.ManageItemDetailsPatternScreen,
-    allowedRoles: ['owner'],
-  },
-  {
-    id: '5',
-    title: 'Προσωπικό',
-    icon: 'account-group',
-    screen: ScreenNames.AdminPersonelScreen,
-    allowedRoles: ['owner'],
-  },
-  // {
-  //   id: '6',
-  //   title: 'Στατιστικά',
-  //   icon: 'chart-bar',
-  //   screen: ScreenNames.AdminProductsScreen,
-  //   allowedRoles: ['owner'],
-  // },
-];
 const RestaurantSettingsScreen = ({ route }: any) => {
   const [filteredOptions, setFilteredOptions] = useState<SettingOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const strings = useStrings();
+  const settingsOptions = useMemo(
+    () => [
+      {
+        id: '0',
+        title: strings.PROFILE,
+        icon: 'account',
+        screen: ScreenNames.ProfileScreen,
+        allowedRoles: ['owner', 'waiter', 'guest'],
+      },
+      {
+        id: '1',
+        title: 'Ιστορικό Παραγγελιών',
+        icon: 'history',
+        screen: ScreenNames.HistoryOrdersScreen,
+        allowedRoles: ['owner', 'waiter'],
+      },
+      {
+        id: '2',
+        title: 'Προϊόντα',
+        icon: 'shape-outline',
+        screen: ScreenNames.ManageCategoriesScreen,
+        allowedRoles: ['owner'],
+      },
+      {
+        id: '3',
+        title: 'Τραπέζια',
+        icon: 'apps',
+        screen: ScreenNames.ManageTableScreen,
+        allowedRoles: ['owner'],
+      },
+      {
+        id: '4',
+        title: 'Πρότυπα Ιδιοτήτων',
+        icon: 'cards-variant',
+        screen: ScreenNames.ManageItemDetailsPatternScreen,
+        allowedRoles: ['owner'],
+      },
+      {
+        id: '5',
+        title: 'Προσωπικό',
+        icon: 'account-group',
+        screen: ScreenNames.AdminPersonelScreen,
+        allowedRoles: ['owner'],
+      },
+    ],
+    [strings]
+  );
   useEffect(() => {
     const loadUserOptions = async () => {
       try {
@@ -88,7 +86,7 @@ const RestaurantSettingsScreen = ({ route }: any) => {
     };
 
     loadUserOptions();
-  }, []);
+  }, [settingsOptions]);
 
   const renderItem = useCallback(
     ({ item }: { item: SettingOption }) => (

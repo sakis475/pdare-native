@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import { Button, RadioButton, Text } from 'react-native-paper';
 import { getStorage, setStorage } from '../storage/store';
 import { colors } from '../core/theme';
 import { TrashIcon, WarningIcon } from '../components/basic/Icons';
@@ -9,11 +9,14 @@ import { AlertWithOptions, emailValidator, passwordValidator, toast } from '../c
 import { deleteRequest, patchRequest, postRequest, setBearer } from '../helpers/requests';
 import { SessionBearer } from '../types/requests.types';
 import { logout } from '../helpers/storage/tokenRequests';
+import { AppLanguage, setLocalizedStrings, strings } from '../core/strings';
+import { EventEmitter } from '../helpers/Sockets/EventEmitter';
 
 const ProfileScreen = ({ route }: any) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<AppLanguage>('lang_en');
   const [formData, setFormData] = useState({
     username: '',
     firstName: '',
@@ -26,6 +29,11 @@ const ProfileScreen = ({ route }: any) => {
     newPassword: '',
     confirmPassword: '',
   });
+
+  const languageOptions: { id: number; value: AppLanguage; label: string }[] = [
+    { id: 1, value: 'lang_en', label: 'English' },
+    { id: 2, value: 'lang_el', label: 'Ελληνικά' },
+  ];
 
   const updateFormField = (field: string) => (value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -40,25 +48,48 @@ const ProfileScreen = ({ route }: any) => {
       try {
         setIsInitializing(true);
         const currentUser = await getStorage('currentUser');
-        if (!currentUser) return;
+        const savedLanguage = await getStorage('app_language');
 
-        setUser(currentUser);
-        setFormData({
-          username: currentUser.username || '',
-          firstName: currentUser.firstName || '',
-          lastName: currentUser.lastName || '',
-          email: currentUser.email || '',
-          restaurantName: currentUser.restaurant?.restaurantName || '',
-        });
+        if (currentUser) {
+          setUser(currentUser);
+          setFormData({
+            username: currentUser.username || '',
+            firstName: currentUser.firstName || '',
+            lastName: currentUser.lastName || '',
+            email: currentUser.email || '',
+            restaurantName: currentUser.restaurant?.restaurantName || '',
+          });
+        }
+
+        if (savedLanguage) {
+          setSelectedLanguage(savedLanguage);
+        }
       } catch (error) {
         console.error('Error fetching user:', error);
-        toast('error', `Failed to load user data`);
+        toast('error', 'Failed to load user data');
       } finally {
         setIsInitializing(false);
       }
     };
 
     fetchCurrentUser();
+  }, []);
+
+  const handleLanguageChange = useCallback(async (language: AppLanguage) => {
+    try {
+      await setStorage('app_language', language);
+      await setLocalizedStrings();
+      setSelectedLanguage(language);
+      // Emit language change event if you're using event system
+      EventEmitter.emit('LANGUAGE_CHANGED');
+
+      toast(
+        'success',
+        language === 'lang_en' ? 'Language updated to English' : 'Η γλώσσα άλλαξε σε Ελληνικά'
+      );
+    } catch (error) {
+      toast('error', 'Failed to update language');
+    }
   }, []);
 
   const handleUpdateProfile = async () => {
@@ -252,6 +283,25 @@ const ProfileScreen = ({ route }: any) => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{strings.LANGUAGE_SETTINGS}</Text>
+
+            {languageOptions.map((option) => (
+              <View key={option.id} style={styles.languageOption}>
+                <RadioButton.Android
+                  value={option.value}
+                  status={selectedLanguage === option.value ? 'checked' : 'unchecked'}
+                  color={colors.primary}
+                  uncheckedColor={colors.white}
+                  onPress={() => {
+                    handleLanguageChange(option.value);
+                  }}
+                />
+                <Text style={styles.languageLabel}>{option.label}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.section}>
             <Text style={styles.sectionTitle}>Profile Information</Text>
             <CustomTextInput
               label="First Name"
@@ -423,6 +473,20 @@ const styles = StyleSheet.create({
   restaurantName: {
     color: colors.white,
     fontWeight: 'bold',
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.slightlyLighterGrey,
+    borderRadius: 8,
+    marginVertical: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  languageLabel: {
+    color: colors.white,
+    fontSize: 16,
+    marginLeft: 8,
   },
 });
 

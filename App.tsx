@@ -13,6 +13,7 @@ import { socketEventSubscriber } from './src/helpers/Sockets/SocketEventSubscrib
 import { getStorage } from './src/storage/store';
 import AppNavigator, { navigationRef } from './src/navigation/AppNavigator';
 import { colors } from './src/core/theme';
+import { LanguageProvider } from './src/core/localization/languageContext';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -46,7 +47,9 @@ const App = () => {
           <NavigationContainer ref={navigationRef}>
             <PaperProvider>
               <PortalProvider>
-                <AppNavigator />
+                <LanguageProvider>
+                  <AppNavigator />
+                </LanguageProvider>
               </PortalProvider>
               <Toast />
             </PaperProvider>

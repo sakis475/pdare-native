@@ -3,15 +3,16 @@ import { getStorage, setStorage } from '../storage/store';
 import { DEFAULT_APP_LANGUAGE } from '../storage/env';
 
 import lang_el from './locales/lang_el.json';
+import lang_en from './locales/lang_en.json';
 
 export const strings = new LocalizedStrings({
-  // lang_en,
   lang_el,
+  lang_en,
 });
 
 export async function getLanguage() {
   const appLanguage = await getStorage('app_language');
-
+  console.log(appLanguage, 'appLanguage');
   if (!appLanguage) {
     return DEFAULT_APP_LANGUAGE;
   }
@@ -24,7 +25,8 @@ export async function setLanguage(language: AppLanguage) {
 
 export async function setLocalizedStrings() {
   const appLanguage = await getLanguage();
+  console.log(appLanguage, 'appLanguage');
   strings.setLanguage(appLanguage);
 }
 
-export type AppLanguage = 'lang_el' | 'lang_en' | 'lang_fr';
+export type AppLanguage = 'lang_el' | 'lang_en';
