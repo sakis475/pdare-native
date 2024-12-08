@@ -40,7 +40,7 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}
-    // initialRouteName={ScreenNames.ManageItemsScreen}
+      // initialRouteName={ScreenNames.ManageItemsScreen}
     >
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}

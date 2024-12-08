@@ -56,7 +56,7 @@ export async function clearRestaurantStorageRelatedKeys() {
     await setStorage('propertyPatterns', null);
     await setStorage('tables', null);
     await setStorage('tableOrders', null);
-    await setStorage('activeInvitations', null)
+    await setStorage('activeInvitations', null);
   } catch (error) {
     console.log(error, 'clearRestaurantStorageRelatedKeys');
   }

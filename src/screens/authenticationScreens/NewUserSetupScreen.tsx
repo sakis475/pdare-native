@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Modal, ActivityIndicator, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Modal,
+  ActivityIndicator,
+  TouchableOpacity,
+  FlatList,
+  RefreshControl,
+} from 'react-native';
 import { Button, Text, TextInput, FAB } from 'react-native-paper';
 import { getRequest, postRequest } from '../../helpers/requests';
 import { colors } from '../../core/theme';
@@ -37,10 +45,10 @@ const NewUserSetupScreen = () => {
     }
 
     setCurrentUser(fetchUserWithInvitations);
-  }
+  };
   useEffect(() => {
     fetchData();
-  }, [])
+  }, []);
 
   const handleCreateRestaurant = async () => {
     if (!restaurantName.trim()) {
@@ -111,12 +119,8 @@ const NewUserSetupScreen = () => {
       const renderInvitationItem = ({ item: invitation }: { item: InvitationRequest }) => (
         <View style={styles.invitationCard}>
           <View style={styles.invitationInfo}>
-            <Text style={styles.restaurantName}>
-              {invitation.restaurant.restaurantName}
-            </Text>
-            <Text style={styles.inviteFrom}>
-              Από: {invitation.inviteFrom.email}
-            </Text>
+            <Text style={styles.restaurantName}>{invitation.restaurant.restaurantName}</Text>
+            <Text style={styles.inviteFrom}>Από: {invitation.inviteFrom.email}</Text>
           </View>
 
           <View style={styles.invitationActions}>
@@ -153,10 +157,7 @@ const NewUserSetupScreen = () => {
               onPress={async () => {
                 setIsLoading(true);
                 try {
-                  await postRequest(
-                    `/user/invite/response/${invitation.id}`,
-                    { response: false }
-                  );
+                  await postRequest(`/user/invite/response/${invitation.id}`, { response: false });
                   await fetchData();
                   toast('success', 'Επιτυχία', 'Η πρόσκληση απορρίφθηκε');
                 } catch (error) {
@@ -217,11 +218,7 @@ const NewUserSetupScreen = () => {
           <Text style={styles.waitingText}>
             Δεν έχετε λάβει ακόμη πρόσκληση από κάποιο εστιατόριο.
           </Text>
-          <Button
-            mode="outlined"
-            onPress={() => setSelectedOption(null)}
-            style={styles.backButton}
-          >
+          <Button mode="outlined" onPress={() => setSelectedOption(null)} style={styles.backButton}>
             Επιστροφή
           </Button>
         </View>
@@ -233,7 +230,11 @@ const NewUserSetupScreen = () => {
 
   return (
     <View style={styles.container}>
-      {currentUser === undefined ? <ActivityIndicator size={'large'} animating={true} color={colors.primary} /> : renderContent()}
+      {currentUser === undefined ? (
+        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+      ) : (
+        renderContent()
+      )}
       <Modal
         visible={createModalVisible}
         transparent
@@ -254,7 +255,7 @@ const NewUserSetupScreen = () => {
                 style={styles.input}
                 returnKeyType="done"
                 blurOnSubmit={false}
-                onSubmitEditing={() => { }}
+                onSubmitEditing={() => {}}
                 keyboardType="default"
               />
             </View>
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#2F2F2F',
     padding: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   optionsContainer: {
     flex: 1,
@@ -395,7 +396,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 600,
     alignSelf: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   invitationsTitle: {
     fontSize: 24,

@@ -61,10 +61,13 @@ class SocketEventSubscriber {
     EventEmitter.emit(TABLES_UPDATED, []);
   }
 
-  static async handleUsersUpdated(usersAndInvitations: { users: User[], activeInvitations: InvitationRequest[] }): Promise<void> {
+  static async handleUsersUpdated(usersAndInvitations: {
+    users: User[];
+    activeInvitations: InvitationRequest[];
+  }): Promise<void> {
     console.log('Socket Event: handleUsersUpdated');
     await setStorage('personelUsers', usersAndInvitations.users);
-    await setStorage('activeInvitations', usersAndInvitations.activeInvitations)
+    await setStorage('activeInvitations', usersAndInvitations.activeInvitations);
     EventEmitter.emit(USERS_UPDATED, []);
   }
 }

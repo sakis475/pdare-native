@@ -150,7 +150,6 @@ interface InvitationRequest {
   invitationStatus?: InvitationRequestStatus;
   restaurant: Restaurant;
   createdAt: Date;
-
 }
 
 enum InvitationRequestStatus {

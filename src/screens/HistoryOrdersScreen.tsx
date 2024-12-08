@@ -1,7 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Keyboard, SafeAreaView, RefreshControl } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Keyboard,
+  SafeAreaView,
+  RefreshControl,
+} from 'react-native';
 
-import { Divider, } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
 
 import { colors } from '../core/theme';
 
@@ -33,7 +41,6 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
   useEffect(() => {
     fetchOrders();
   }, [currentIndex]);
-
 
   const calculateDuration = (createdAt: string, closedAt: string) => {
     const durationInSeconds = dayjs(closedAt ?? undefined).diff(dayjs(createdAt), 'second'); // Difference in seconds
@@ -158,7 +165,6 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
       </View>
     </SafeAreaView>
   );
-
 };
 const styles = StyleSheet.create({
   container: {

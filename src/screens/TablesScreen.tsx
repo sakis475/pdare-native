@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Keyboard,
   ActivityIndicator,
   RefreshControl,
@@ -15,16 +14,14 @@ import { HeaderBar } from '../components/helpers/HeaderBar';
 import { colors } from '../core/theme';
 import * as Requests from '../helpers/requests';
 import { Portal } from '@gorhom/portal';
-import {
-  createNewOrder,
-  getTempOrder,
-} from '../helpers/storage/orderStorage';
+import { createNewOrder, getTempOrder } from '../helpers/storage/orderStorage';
 import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
 import { FlashList } from '@shopify/flash-list';
-import { getStorage } from '../storage/store';
+import { getStorage, setStorage } from '../storage/store';
 import { navigate, navigateToDraft, ScreenNames } from '../navigation/navigationUtils';
 import { ORDERS_UPDATED, EventEmitter } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
+import { SCREEN_HEIGHT } from '@gorhom/bottom-sheet';
 
 const TablesScreen = ({ currentIndex }: any) => {
   const [activeTables, setActiveTables] = useState<Table[]>(undefined);
@@ -37,6 +34,7 @@ const TablesScreen = ({ currentIndex }: any) => {
         return;
       }
       const allTables = await processTables(allTablesIO);
+      await setStorage('tableOrders', allTables);
       setActiveTables(allTables);
     } catch (error) {
       console.error('Error fetching initial table data:', error);
@@ -51,7 +49,7 @@ const TablesScreen = ({ currentIndex }: any) => {
 
   // Function to handle updates from socket
   const handleTableUpdates = async (): Promise<void> => {
-    console.log('ORDERS_UPDATED')
+    console.log('ORDERS_UPDATED');
     const updatedTables = await getStorage('tableOrders');
     setActiveTables(updatedTables);
   };
@@ -105,11 +103,23 @@ const TablesScreen = ({ currentIndex }: any) => {
     </View>
   );
 
+  const ListEmptyComponent = () => {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>Δεν υπάρχουν ενεργά Τραπέζια</Text>
+      </View>
+    );
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
       <HeaderBar headerTitle={strings.Tables} />
       <View style={styles.container}>
-        {activeTables && activeTables.length > 0 ? (
+        {activeTables !== undefined ? (
           <>
             <View style={styles.tableContainer}>
               <FlashList
@@ -118,28 +128,18 @@ const TablesScreen = ({ currentIndex }: any) => {
                 keyExtractor={(item) => item.tableName + item.id}
                 estimatedItemSize={20}
                 numColumns={4}
+                ListEmptyComponent={ListEmptyComponent}
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
                     onRefresh={onRefresh}
-                    colors={[colors.primary]} // Android
-                    tintColor={colors.primary} // iOS
+                    colors={[colors.primary]}
+                    tintColor={colors.primary}
                   />
                 }
               />
             </View>
 
-            <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
-              <Text style={styles.selectTableBtnText}>{strings.NewOrderBtn}</Text>
-            </TouchableOpacity>
-          </>
-        ) : activeTables && activeTables?.length === 0 ? (
-          <>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                Δεν υπάρχουν ενεργά Τραπέζια
-              </Text>
-            </View>
             <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
               <Text style={styles.selectTableBtnText}>{strings.NewOrderBtn}</Text>
             </TouchableOpacity>
@@ -151,7 +151,7 @@ const TablesScreen = ({ currentIndex }: any) => {
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
         </Portal>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -182,6 +182,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: colors.white,
+  },
+  emptyContainer: {
+    height: SCREEN_HEIGHT / 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: colors.white,
+    textAlign: 'center',
+    fontSize: 14,
   },
 });
 

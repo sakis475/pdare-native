@@ -54,7 +54,7 @@ export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
           <View style={styles.personsCount}>
             <View style={styles.personsCountContent}>
               <FeatherIcons name="users" size={BOX_SIZE * 0.14} color={colors.veryLighterGrey} />
-              <Text style={styles.personsCountText}>{table.occupiedByOrder.couvert || 2}</Text>
+              <Text style={styles.personsCountText}>{table?.occupiedByOrder?.couvert || 0}</Text>
             </View>
           </View>
         ) : null}

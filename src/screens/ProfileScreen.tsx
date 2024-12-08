@@ -52,7 +52,7 @@ const ProfileScreen = ({ route }: any) => {
         });
       } catch (error) {
         console.error('Error fetching user:', error);
-        toast('error', `Failed to load user data`)
+        toast('error', `Failed to load user data`);
       } finally {
         setIsInitializing(false);
       }
@@ -65,12 +65,12 @@ const ProfileScreen = ({ route }: any) => {
     const { username, firstName, lastName, email } = formData;
 
     if (!username.trim()) {
-      toast('error', `Username can't be empty`)
+      toast('error', `Username can't be empty`);
       return;
     }
 
     if (emailValidator(email)) {
-      toast('error', emailValidator(email))
+      toast('error', emailValidator(email));
       return;
     }
 
@@ -87,9 +87,9 @@ const ProfileScreen = ({ route }: any) => {
       await setStorage('currentUser', response.user);
       await setBearer(response);
 
-      toast('success', 'Profile updated successfully')
+      toast('success', 'Profile updated successfully');
     } catch (error) {
-      toast('error', 'Failed to update profile')
+      toast('error', 'Failed to update profile');
     } finally {
       setIsLoading(false);
     }
@@ -99,17 +99,17 @@ const ProfileScreen = ({ route }: any) => {
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast('error', `Please fill in all password fields`)
+      toast('error', `Please fill in all password fields`);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast('error', `New passwords do not match`)
+      toast('error', `New passwords do not match`);
       return;
     }
 
     if (passwordValidator(newPassword)) {
-      toast('error', passwordValidator(newPassword))
+      toast('error', passwordValidator(newPassword));
       return;
     }
 
@@ -130,9 +130,9 @@ const ProfileScreen = ({ route }: any) => {
         newPassword: '',
         confirmPassword: '',
       });
-      toast('success', 'Password updated successfully')
+      toast('success', 'Password updated successfully');
     } catch (error) {
-      toast('error', 'Failed to update password')
+      toast('error', 'Failed to update password');
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +140,7 @@ const ProfileScreen = ({ route }: any) => {
 
   const handleUpdateRestaurantName = async () => {
     if (!formData.restaurantName.trim()) {
-      toast('error', 'Please enter a restaurant name')
+      toast('error', 'Please enter a restaurant name');
       return;
     }
 
@@ -150,10 +150,10 @@ const ProfileScreen = ({ route }: any) => {
         restaurantDisplayName: formData.restaurantName.trim(),
       });
       if (response) {
-        toast('success', 'Restaurant Display Name updated successfully')
+        toast('success', 'Restaurant Display Name updated successfully');
       }
     } catch (error) {
-      toast('error', 'Failed to update restaurant name')
+      toast('error', 'Failed to update restaurant name');
     } finally {
       setIsLoading(false);
     }
@@ -169,12 +169,12 @@ const ProfileScreen = ({ route }: any) => {
           await deleteRequest('/user/delete');
           await logout();
         } catch (error) {
-          toast('error', 'Failed to delete account')
+          toast('error', 'Failed to delete account');
         } finally {
           setIsLoading(false);
         }
-      }
-      , () => { }
+      },
+      () => {}
     );
   };
 
@@ -188,17 +188,16 @@ const ProfileScreen = ({ route }: any) => {
           await postRequest('/user/restaurant/delete');
           await logout();
         } catch (error) {
-          toast('error', 'Failed to delete restaurant')
+          toast('error', 'Failed to delete restaurant');
         } finally {
           setIsLoading(false);
         }
-      }
-      , () => { }
+      },
+      () => {}
     );
   };
 
   const handleLeaveRestaurant = () => {
-
     AlertWithOptions(
       'Leave Restaurant',
       'Are you sure you want to leave this restaurant?',
@@ -208,12 +207,12 @@ const ProfileScreen = ({ route }: any) => {
           // await leaveRestaurant();
           // await logout();
         } catch (error) {
-          toast('error', 'Failed to leave restaurant')
+          toast('error', 'Failed to leave restaurant');
         } finally {
           setIsLoading(false);
         }
-      }
-      , () => { }
+      },
+      () => {}
     );
   };
 

@@ -64,7 +64,7 @@ export const validationRules: Record<keyof FormState, ValidationRule> = {
       return value !== state.password.value ? 'Οι κωδικός επαλήθευσης δεν ταιριάζει.' : '';
     },
     fieldName: 'passwordRepeat',
-  }
+  },
 };
 
 const PrivacyPolicyDialog: React.FC<PrivacyPolicyDialogProps> = ({ visible, onDismiss }) => (

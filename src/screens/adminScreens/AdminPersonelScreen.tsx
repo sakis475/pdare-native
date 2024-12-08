@@ -27,13 +27,16 @@ import { storageInitPersonelUsers } from '../../helpers/storage/storageInit';
 interface SearchUserModalProps {
   visible: boolean;
   onDismiss: () => void;
-  onInviteSuccess?: () => void;  // Add this line
+  onInviteSuccess?: () => void; // Add this line
 }
 
-
-const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, onInviteSuccess }) => {
+const SearchUserModal: React.FC<SearchUserModalProps> = ({
+  visible,
+  onDismiss,
+  onInviteSuccess,
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResult, setSearchResult] = useState<User & { isInvited: boolean } | null>(null);
+  const [searchResult, setSearchResult] = useState<(User & { isInvited: boolean }) | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout>();
 
@@ -64,15 +67,13 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, o
     setIsSearching(true);
     try {
       const currentUser = await getStorage('currentUser');
-      const result: User = await getRequest(
-        `/user/search?email=${encodeURIComponent(query)}`
-      );
+      const result: User = await getRequest(`/user/search?email=${encodeURIComponent(query)}`);
       if (result) {
         const resultWithInviteState = {
           ...result,
           isInvited: !!result?.invitations?.find(
-            e => e.invitationStatus === 'awaiting' &&
-              e.restaurant?.id === currentUser.restaurant.id
+            (e) =>
+              e.invitationStatus === 'awaiting' && e.restaurant?.id === currentUser.restaurant.id
           ),
         };
         setSearchResult(resultWithInviteState);
@@ -118,12 +119,12 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, o
       if (searchResult) {
         setSearchResult({
           ...searchResult,
-          isInvited: true
+          isInvited: true,
         });
       }
       toast('success', 'Επιτυχία', 'Η πρόσκληση στάλθηκε επιτυχώς');
       if (onInviteSuccess) {
-        onInviteSuccess();  // Call the callback to refresh the parent
+        onInviteSuccess(); // Call the callback to refresh the parent
       }
       onDismiss();
     } catch (error) {
@@ -151,7 +152,9 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, o
               <Text style={styles.searchResultEmail}>{searchResult.email}</Text>
               {searchResult.firstName && searchResult.lastName && (
                 <Text style={styles.searchResultName}>
-                  <Text>{searchResult.firstName} {searchResult.lastName}</Text>
+                  <Text>
+                    {searchResult.firstName} {searchResult.lastName}
+                  </Text>
                 </Text>
               )}
             </View>
@@ -173,7 +176,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, o
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss} >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Αναζήτηση Χρήστη</Text>
@@ -188,9 +191,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, o
           {isSearching ? (
             <ActivityIndicator style={styles.searchLoading} color={colors.primary} />
           ) : (
-            <View style={styles.searchResults}>
-              {renderSearchResult()}
-            </View>
+            <View style={styles.searchResults}>{renderSearchResult()}</View>
           )}
 
           <View style={styles.buttonContainer}>
@@ -203,7 +204,6 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({ visible, onDismiss, o
     </Modal>
   );
 };
-
 
 interface EditUserModalProps {
   visible: boolean;
@@ -310,15 +310,14 @@ const AdminPersonelScreen = () => {
     const fetchedUsers: User[] = (await getStorage('personelUsers')) || [];
     const activeInvitations: InvitationRequest[] = (await getStorage('activeInvitations')) || [];
 
-
     setUsers(fetchedUsers);
     setInvitations(activeInvitations);
   };
 
   const fetchLiveData = async () => {
-    await storageInitPersonelUsers()
+    await storageInitPersonelUsers();
     fetchData();
-  }
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -365,7 +364,7 @@ const AdminPersonelScreen = () => {
         try {
           setIsLoading(true);
           await deleteRequest(`/user/invite/${invitation.id}`);
-          setInvitations(prev => prev.filter(inv => inv.id !== invitation.id));
+          setInvitations((prev) => prev.filter((inv) => inv.id !== invitation.id));
           toast('success', 'Επιτυχία', 'Η πρόσκληση διαγράφηκε');
         } catch (error) {
           console.error('Error deleting invitation:', error);
@@ -397,7 +396,6 @@ const AdminPersonelScreen = () => {
     </View>
   );
 
-
   const renderUserCard = ({ item }: { item: User | InvitationRequest }) => {
     // Check if item is an invitation by looking for invitationStatus property
     if ('invitationStatus' in item) {
@@ -415,11 +413,11 @@ const AdminPersonelScreen = () => {
       >
         <View style={styles.userInfo}>
           <Text style={styles.userName}>{user.displayName}</Text>
-          {
-            user.firstName || user.lastName ? <Text style={styles.userEmail}>
+          {user.firstName || user.lastName ? (
+            <Text style={styles.userEmail}>
               {user.firstName} {user.lastName}
-            </Text> : null
-          }
+            </Text>
+          ) : null}
 
           <Text style={styles.userName}>{user.email}</Text>
         </View>
@@ -444,7 +442,9 @@ const AdminPersonelScreen = () => {
   );
   return (
     <View style={styles.container}>
-      {combinedData.length > 0 ? (
+      {users === null || invitations === null ? (
+        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+      ) : (
         <View style={styles.usersContainer}>
           <FlatList
             data={combinedData}
@@ -470,10 +470,6 @@ const AdminPersonelScreen = () => {
             }
           />
         </View>
-      ) : users === null || invitations === null ? (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-      ) : (
-        <ListEmptyComponent />
       )}
 
       <FAB
@@ -506,7 +502,6 @@ const AdminPersonelScreen = () => {
       {isLoading && <LoadingOverlay />}
     </View>
   );
-
 };
 
 const styles = StyleSheet.create({
@@ -587,7 +582,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '90%',
     maxWidth: 400,
-    gap: 5
+    gap: 5,
   },
   modalTitle: {
     fontSize: 20,
@@ -649,7 +644,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.grey,
     marginTop: 4,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   divider: {
     backgroundColor: colors.lightGrey,
@@ -706,12 +701,11 @@ const styles = StyleSheet.create({
   userInfoContainer: {
     flex: 1,
     marginRight: 10,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   textContainer: {
-    alignItems: 'center',  // Center the text components
+    alignItems: 'center', // Center the text components
   },
-
 });
 
 export default AdminPersonelScreen;

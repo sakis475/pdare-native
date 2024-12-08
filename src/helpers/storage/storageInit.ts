@@ -53,7 +53,8 @@ async function storageInitTableOrders() {
 }
 
 export async function storageInitPersonelUsers() {
-  const usersAndInvitations: { users: User[], activeInvitations: InvitationRequest[] } = await Requests.getRequest('/user');
+  const usersAndInvitations: { users: User[]; activeInvitations: InvitationRequest[] } =
+    await Requests.getRequest('/user');
 
   await setStorage('personelUsers', usersAndInvitations.users);
   await setStorage('activeInvitations', usersAndInvitations.activeInvitations);
