@@ -21,6 +21,7 @@ import * as Requests from '../helpers/requests';
 import { getStorage } from '../storage/store';
 import { EventEmitter, ORDERS_UPDATED } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
+import { useStrings } from '../core/localization/languageContext';
 
 interface ExpoScreenProps {
   currentIndex?: number;
@@ -30,6 +31,8 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
   const [table, setTable] = useState<Table>();
   const [items, setItems] = useState<ItemReq[]>();
   const isFocused = useIsFocused();
+
+  const strings = useStrings();
 
   // Handle socket updates
   const handleTableUpdates = async (updatedTables: Table[]): Promise<void> => {
@@ -109,7 +112,7 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <HeaderBar headerTitle={'Πάσο'} />
+      <HeaderBar headerTitle={strings.EXPO} />
 
       <View style={styles.container}>
         {items && items.length > 0 ? (

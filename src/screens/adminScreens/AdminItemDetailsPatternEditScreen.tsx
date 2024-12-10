@@ -14,7 +14,7 @@ import { colors } from '../../core/theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
 import { AlertWithOptions, toast } from '../../core/utils';
-import { Checkbox, FAB, RadioButton } from 'react-native-paper';
+import { FAB } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { UnifiedSelect } from './AdminItemDetailsScreen';
@@ -22,7 +22,7 @@ import {
   getItemPropertyPatterns,
   setItemPropertyPatterns,
 } from '../../helpers/storage/orderStorage';
-import { random } from 'lodash';
+import { strings } from '../../core/localization/strings';
 
 const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
   const [propertyGroups, setPropertyGroups] = useState<[string, ItemProperty[]][]>([]);
@@ -146,8 +146,8 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
 
       if (duplicateNames.length) {
         AlertWithOptions(
-          'Duplicate Name',
-          'A property with this name already exists. Please choose a different name.',
+          strings.DUPLICATE_NAME_TITLE,
+          strings.DUPLICATE_NAME_MESSAGE,
           ...[, , ,],
           ''
         );
@@ -201,26 +201,26 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
   };
 
   const handleAddPropertyGroup = () => {
-    let newGroupName = 'Επιλογή';
+    let newGroupName = strings.DEFAULT_PROPERTY_NAME;
     let counter = 1;
 
     while (propertyGroups.some(([key]) => key === newGroupName)) {
       counter++;
-      newGroupName = `Επιλογή ${counter}`;
+      newGroupName = `${strings.DEFAULT_PROPERTY_NAME} ${counter}`;
     }
 
     const newId = generateRandomId();
     const newProperty: ItemProperty = {
       id: newId,
       propertyName: newGroupName,
-      propertyValue: 'Επιλογή',
+      propertyValue: strings.DEFAULT_PROPERTY_VALUE,
       propertyType: 'singleselect',
       selected: false,
       required: false,
       dependsOn: null,
       orderGroup: propertyGroups.length,
       orderItem: 0,
-      originalPropertyValue: 'Επιλογή',
+      originalPropertyValue: strings.DEFAULT_PROPERTY_VALUE,
       isEdited: false,
     };
 
@@ -282,7 +282,7 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
         patternToSave,
       ]);
       if (!response) {
-        throw new Error('Failed to save pattern');
+        return;
       }
 
       // Update local storage
@@ -292,10 +292,10 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
       getStorageItemPropertyPattern();
       // // Process the response data
 
-      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
+      toast('success', strings.SUCCESS, strings.CHANGES_SAVED);
     } catch (error) {
       console.error('Save error:', error);
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+      toast('error', strings.ERROR, strings.SAVE_ERROR);
     } finally {
       setIsSaving(false);
     }
@@ -431,7 +431,7 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
 
         <View style={styles.addItemContainer}>
           <TouchableOpacity style={styles.addItemBtn} onPress={handleSave}>
-            <Text style={styles.addItemBtnText}>Αποθήκευση Όλων</Text>
+            <Text style={styles.addItemBtnText}>{strings.SAVE_ALL}</Text>
           </TouchableOpacity>
           <PropertyTypeBottomSheet
             ref={propertyTypeBottomSheetRef}

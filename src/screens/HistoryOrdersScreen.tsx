@@ -21,11 +21,14 @@ import { getRequest } from '../helpers/requests';
 import dayjs from '../core/dayjs';
 import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
 import { CurrencyFormat } from '../components/helpers/CurrencyFormat';
+import { useStrings } from '../core/localization/languageContext';
 
 const HistoryOrdersScreen = ({ currentIndex }: any) => {
   const [table, setTable] = useState<Table>();
   const [orders, setOrders] = useState<Order[]>();
   const [refreshing, setRefreshing] = useState(false);
+
+  const strings = useStrings();
 
   const fetchOrders = async () => {
     const orders: Order[] = await getRequest('/orders');
@@ -56,21 +59,21 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
     const maxUnitsDisplay = 2;
     let unitsCount = 0;
     if (months > 0) {
-      durationString += `${months}mo `;
+      durationString += `${months}${strings.MONTH_ABBR} `;
       unitsCount++;
     }
     if (days > 0) {
-      durationString += `${days}d `;
+      durationString += `${days}${strings.DAY_ABBR} `;
       unitsCount++;
     }
 
     if (unitsCount < maxUnitsDisplay) {
-      durationString += `${hours}h `;
+      durationString += `${hours}${strings.HOUR_ABBR} `;
       unitsCount++;
     }
     if (unitsCount < maxUnitsDisplay) {
       // Show minutes if it's the smallest unit
-      durationString += `${minutes}m `;
+      durationString += `${minutes}${strings.MINUTE_ABBR} `;
       unitsCount++;
     }
 
@@ -111,13 +114,17 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
         <View style={[styles.column, { width: '25%' }]}>
           {!order.closedAt ? (
             <>
-              <Text style={styles.activeTag}>Active</Text>
-              <Text style={styles.startedAtText}>Άνοιξε: {formattedStartedAt}</Text>
+              <Text style={styles.activeTag}>{strings.ACTIVE}</Text>
+              <Text style={styles.startedAtText}>
+                {strings.OPENED_AT}: {formattedStartedAt}
+              </Text>
             </>
           ) : (
             <>
-              <Text style={styles.closedTag}>Closed</Text>
-              <Text style={styles.closedAtText}>Έκλεισε: {formattedClosedAt}</Text>
+              <Text style={styles.closedTag}>{strings.CLOSED}</Text>
+              <Text style={styles.closedAtText}>
+                {strings.CLOSED_AT}: {formattedClosedAt}
+              </Text>
             </>
           )}
         </View>
@@ -155,7 +162,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                Δεν βρέθηκε καμία παραγγελία.
+                {strings.NO_ORDERS_FOUND}
               </Text>
             </View>
           </>

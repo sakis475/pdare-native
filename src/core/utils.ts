@@ -2,28 +2,29 @@ import { Alert } from 'react-native';
 import Toast, { ToastType } from 'react-native-toast-message';
 import NetInfo from '@react-native-community/netinfo';
 import { colors } from './theme';
+import { strings as defaultStrings } from './localization/strings';
+import { LocalizedStrings } from 'react-native-localization';
 
-export const emailValidator = (email: string) => {
+export const emailValidator = (email: string, strings: LocalizedStrings<any>) => {
   const re = /\S+@\S+\.\S+/;
 
-  if (!email || email.length <= 0) return `Email can't be empty.`;
-  if (!re.test(email)) return 'Ooops! We need a valid email address.';
+  if (!email || email.length <= 0) return strings.ERROR_EMAIL_EMPTY;
+  if (!re.test(email)) return strings.ERROR_EMAIL_INVALID;
 
   return '';
 };
 
-export const passwordValidator = (password: string) => {
+export const passwordValidator = (password: string, strings: LocalizedStrings<any>) => {
   const re = /^(?=.*[0-9])(?=.{8,})/;
 
-  if (!password || password.length <= 0) return 'Password cannot be empty.';
-  if (password.length < 8) return 'Password must be at least 8 characters long.';
-  if (!re.test(password)) return 'Password must contain at least 1 number.';
+  if (!password || password.length <= 0) return strings.ERROR_PASSWORD;
+  if (password.length < 8) return strings.ERROR_PASSWORD_LENGTH;
+  if (!re.test(password)) return strings.ERROR_PASSWORD_NUMBER;
   return '';
 };
 
-export const nameValidator = (name: string) => {
-  if (!name || name.length <= 0) return 'Name cannot be empty.';
-
+export const nameValidator = (name: string, strings: LocalizedStrings<any>) => {
+  if (!name || name.length <= 0) return strings.ERROR_NAME;
   return '';
 };
 
@@ -33,37 +34,24 @@ export function toast(type: ToastType, title: string, text: string = '', visibil
     text1: title,
     text2: text,
     position: 'top',
-    // bottomOffset: 60,
     topOffset: 10,
     visibilityTime,
   });
 }
 
 export function normalizeString(str: string) {
-  // Remove leading/trailing spaces and convert to lowercase
-  return (
-    str
-      .trim()
-      // Convert Greek uppercase to lowercase
-      .toLowerCase()
-      // Normalize Greek characters
-      .normalize('NFKD')
-      // Convert Α (Greek) to a (Latin)
-      .replace(/α|ά/gi, 'a')
-      // Remove any remaining diacritics
-      .replace(/[\u0300-\u036f]/g, '')
-  );
+  return str
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/α|ά/gi, 'a')
+    .replace(/[\u0300-\u036f]/g, '');
 }
-
-/**
- * If text is number sort by number and not string, example 1, 2, 10 and not 1, 10, 2
- */
 
 export function naturalSort(a: string, b: string) {
   const aNorm = normalizeString(a);
   const bNorm = normalizeString(b);
 
-  // Split into parts (letters and numbers)
   const splitPattern = /(\d+|\D+)/g;
   const aParts = aNorm.match(splitPattern) || [];
   const bParts = bNorm.match(splitPattern) || [];
@@ -72,7 +60,6 @@ export function naturalSort(a: string, b: string) {
     const aValue = aParts[i];
     const bValue = bParts[i];
 
-    // If both parts are numbers
     const aNum = parseInt(aValue);
     const bNum = parseInt(bValue);
     if (!isNaN(aNum) && !isNaN(bNum)) {
@@ -80,7 +67,6 @@ export function naturalSort(a: string, b: string) {
         return aNum - bNum;
       }
     } else {
-      // Compare as strings
       const comparison = aValue.localeCompare(bValue);
       if (comparison !== 0) {
         return comparison;
@@ -96,24 +82,24 @@ export function AlertWithOptions(
   message: string,
   onOK: any = () => {},
   onCancel: any = () => {},
-  okTitle: string = 'OK',
-  cancelTitle: string = 'Cancel'
+  okTitle: string = defaultStrings.OK,
+  cancelTitle: string = defaultStrings.CANCEL
 ) {
   Alert.alert(
-    title, // Title of the alert
-    message, // Message shown in the alert
+    title,
+    message,
     [
       {
         text: cancelTitle,
-        onPress: onCancel, // Do nothing on cancel
+        onPress: onCancel,
         style: 'cancel',
       },
-      { text: okTitle, onPress: onOK }, // Go back if OK pressed
+      { text: okTitle, onPress: onOK },
     ],
-    { cancelable: false } // Prevents the alert from being dismissed on tapping outside
+    { cancelable: false }
   );
 
-  return true; // This prevents the default behavior
+  return true;
 }
 
 export const checkInternetConnectivity = async () => {
@@ -121,7 +107,7 @@ export const checkInternetConnectivity = async () => {
     const state = await NetInfo.fetch();
 
     if (!state.isConnected || !state.isInternetReachable) {
-      toast('error', 'No internet connection');
+      toast('error', defaultStrings.ERROR_NO_INTERNET);
       return false;
     }
     return true;
@@ -135,15 +121,12 @@ export const getTextColorBasedOnLuminance = (hexColor: string) => {
   if (!hexColor) {
     return '';
   }
-  // Extract the R, G, B values from the hex color
-  const rgb = parseInt(hexColor.slice(1), 16); // Convert hex to integer
-  const r = (rgb >> 16) & 0xff; // Extract the red value
-  const g = (rgb >> 8) & 0xff; // Extract the green value
-  const b = (rgb >> 0) & 0xff; // Extract the blue value
+  const rgb = parseInt(hexColor.slice(1), 16);
+  const r = (rgb >> 16) & 0xff;
+  const g = (rgb >> 8) & 0xff;
+  const b = (rgb >> 0) & 0xff;
 
-  // Calculate luminance
   const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
 
-  // Return black or white based on luminance
   return luminance > 128 ? colors.black : colors.white;
 };

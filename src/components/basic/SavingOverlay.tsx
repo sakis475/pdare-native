@@ -1,13 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { colors } from '../../core/theme';
+import { useStrings } from '../../core/localization/languageContext';
 
 export const LoadingOverlay: React.FC = () => {
+  const strings = useStrings();
   return (
     <View style={styles.loadingOverlay}>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Αποθήκευση αλλαγών...</Text>
+        <Text style={styles.loadingText}>{strings.SAVING}</Text>
       </View>
     </View>
   );

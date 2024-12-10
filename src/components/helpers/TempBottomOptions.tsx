@@ -9,6 +9,7 @@ import {
 import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/navigationUtils';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface TempBottomOptionsProps {
   table: Table;
@@ -29,6 +30,8 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   const [isOrderView, setIsOrderView] = useState(true);
 
   const [tableChanged, setTableChanged] = useState(false);
+
+  const strings = useStrings();
 
   const fetchTempOrder = async () => {
     let order = table?.occupiedByOrder;
@@ -54,7 +57,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
 
   const handleOrderSendSuccess = async (request: any) => {
     if (request?.id) {
-      toast('success', 'Success', '', 1000);
+      toast('success', strings.SUCCESS, '', 1000);
       await clearNewOrder();
       navigateToTables();
     }
@@ -62,7 +65,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   const handleOrderSend = async () => {
     const newOrder = await getTempOrder();
     if (!newOrder?.orderItems?.length || newOrder?.orderItems?.length === 0) {
-      toast('info', 'Add Items First', '', 1600);
+      toast('info', strings.ADD_ITEMS_FIRST, '', 1600);
       return;
     }
     const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
@@ -71,8 +74,8 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       const itemsRemainingLength = newOrder.orderItems.filter((e) => !e.markForDelete)?.length;
       if (itemsRemainingLength === 0) {
         AlertWithOptions(
-          'Κλείσιμο Παραγγελίας',
-          'Η παραγγελία θα κλείσει γιατί δεν έχει κανένα προιόν.',
+          strings.CLOSE_ORDER,
+          strings.CLOSE_ORDER_NO_ITEMS,
           async () => {
             result = await patchRequest(
               `/orders/${convertedServerOrder?.orderId}`,
@@ -102,8 +105,8 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     }
     const orderId = order.id;
     AlertWithOptions(
-      'Κλείσιμο Παραγγελίας',
-      'Είστε σίγουροι ότι θέλετε να κλείσετε την παραγγελία;',
+      strings.CLOSE_ORDER,
+      strings.CLOSE_ORDER_CONFIRM,
       async () => {
         await patchRequest(`/orders/close/${orderId}`);
 
@@ -111,7 +114,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
         if (order?.id === (await getTempOrder())?.id) {
           await clearNewOrder();
         }
-        toast('success', 'Deleted', '', 1000);
+        toast('success', strings.DELETED, '', 1000);
         navigateToTables();
       },
       () => {}
@@ -129,7 +132,9 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
         onPress={handleOrderSend}
         disabled={noTable || isOrderView}
       >
-        <Text style={[styles.buttonText, noTable ? styles.noTableOtherText : null]}>Αποστολή</Text>
+        <Text style={[styles.buttonText, noTable ? styles.noTableOtherText : null]}>
+          {strings.SEND}
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.actionsContainer}>
@@ -138,7 +143,9 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
             style={[styles.button, styles.closeButton, noTable ? styles.noTableBorder : null]}
             onPress={handleCloseOrder}
           >
-            <Text style={[styles.buttonText, noTable ? styles.noTableText : null]}>Κλείσιμο</Text>
+            <Text style={[styles.buttonText, noTable ? styles.noTableText : null]}>
+              {strings.CLOSE}
+            </Text>
           </TouchableOpacity>
         ) : null}
 
@@ -151,7 +158,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           onPress={handleOpenSelectTableModal}
         >
           <Text style={[styles.buttonText, noTable ? styles.noTableText : null]}>
-            {table?.tableName ?? 'Επιλογή Τραπεζιού'}
+            {table?.tableName ?? strings.SELECT_TABLE}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -160,7 +167,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           disabled={noTable}
         >
           <Text style={[styles.buttonText, noTable ? styles.noTableOtherText : null]}>
-            Προσθήκη
+            {strings.ADD}
           </Text>
         </TouchableOpacity>
       </View>

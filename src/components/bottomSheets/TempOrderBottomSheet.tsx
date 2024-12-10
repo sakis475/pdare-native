@@ -14,12 +14,15 @@ import TempOrderScreen from '../../screens/orderScreens/tempOrderScreen';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../core/theme';
+import { useStrings } from '../../core/localization/languageContext';
 
 const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['85%', '85%'], []);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const strings = useStrings();
 
   const handleOpenModal = useCallback(async () => {
     setIsSheetOpen(true);
@@ -83,7 +86,8 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
               onPress={handleCloseModal}
             >
               <Text style={{ textAlign: 'center', color: colors.white }}>
-                Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color="#fff" />
+                {strings.CLOSE}{' '}
+                <FontAwesomeIcon name={'angle-double-down'} size={20} color="#fff" />
               </Text>
             </TouchableOpacity>
           </View>

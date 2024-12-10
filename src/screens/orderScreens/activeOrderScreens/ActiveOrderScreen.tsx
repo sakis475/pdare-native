@@ -22,6 +22,7 @@ import { AlertWithOptions, toast } from '../../../core/utils';
 import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../../../components/basic/CustomNavigationScreenHeaderTitle';
 import { navigate, navigateToDraft, ScreenNames } from '../../../navigation/navigationUtils';
+import { useStrings } from '../../../core/localization/languageContext';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -32,6 +33,8 @@ const ActiveOrderScreen = ({
   const [table, setTable] = useState<Table>(route.params?.tableParam);
 
   const navigation = useNavigation();
+
+  const strings = useStrings();
 
   const fetchItems = async () => {
     const tempOrder: Order = table.occupiedByOrder;
@@ -54,7 +57,7 @@ const ActiveOrderScreen = ({
       } else {
         newTable = updatedOrder.table;
         newTable.occupiedByOrder = updatedOrder;
-        toast('success', 'Επιτυχία Αλλαγής Τραπεζιού');
+        toast('success', strings.TABLE_CHANGE_SUCCESS);
       }
     }
 
@@ -73,8 +76,8 @@ const ActiveOrderScreen = ({
 
     if (tempOrder?.table && tempOrder?.table?.id !== table.id) {
       AlertWithOptions(
-        'Παραγγελία σε Εξέλιξη',
-        'Έχετε άλλη παραγγελία σε εξέλιξη, διαγραφή των αλλαγών σας;',
+        strings.ONGOING_ORDER,
+        strings.DISCARD_CHANGES_CONFIRM,
         () => {
           navigate(ScreenNames.NewOrderScreen, { table: table });
         },
@@ -89,8 +92,8 @@ const ActiveOrderScreen = ({
     const tempOrder = await getTempOrder();
     if (tempOrder?.table && tempOrder?.table?.id !== table.id) {
       AlertWithOptions(
-        'Παραγγελία σε Εξέλιξη',
-        'Έχετε άλλη παραγγελία σε εξέλιξη, διαγραφή των αλλαγών σας;',
+        strings.ONGOING_ORDER,
+        strings.DISCARD_CHANGES_CONFIRM,
         async () => {
           // navigate(ScreenNames.NewOrderScreen, { table: table });
           await setTempOrder(table.occupiedByOrder);
@@ -111,8 +114,8 @@ const ActiveOrderScreen = ({
 
   const handleOpenSelectTableModal = () => {
     AlertWithOptions(
-      'Αλλαγή Τραπεζιού',
-      'Είστε σίγουροι ότι θέλετε να αλλάξετε τραπέζι;',
+      strings.CHANGE_TABLE,
+      strings.CHANGE_TABLE_CONFIRM,
       () => {
         bottomSheetRef.current?.openModal();
       },
@@ -202,9 +205,8 @@ const ActiveOrderScreen = ({
           <>
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                Προϊόντα που θα προσθέσετε
+                {strings.PRODUCTS_WILL_APPEAR}
               </Text>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>θα εμφανιστούν εδώ.</Text>
             </View>
           </>
         ) : (

@@ -18,6 +18,7 @@ import { patchRequest } from '../../helpers/requests';
 import { getItem, updateItem } from '../../helpers/storage/orderStorage';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { SelectPatternModal } from './popupModals/SelectPatternModal';
+import { useStrings } from '../../core/localization/languageContext';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -30,6 +31,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
   const [editingPropertyType, setEditingPropertyType] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isPatternModalVisible, setIsPatternModalVisible] = useState(false);
+
+  const strings = useStrings();
 
   const getItemStorage = async () => {
     const deepCopy: any = await getItem(route.params.item.id);
@@ -127,8 +130,8 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
       if (duplicatePropertyNames.length) {
         AlertWithOptions(
-          'Duplicate Name',
-          'A property with this name already exists. Please choose a different name.',
+          strings.DUPLICATE_NAME_TITLE,
+          strings.DUPLICATE_NAME_MESSAGE,
           ...[, , ,],
           ''
         );
@@ -199,19 +202,19 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     if (!item) return;
 
     // Create a default name for the new group
-    let newGroupName = 'Επιλογή';
+    let newGroupName = strings.CHOICE;
     let counter = 1;
 
     // Check if name exists and increment counter until we find a unique name
     while ((item.itemPropertiesGrouped as any).some(([key]: any) => key === newGroupName)) {
       counter++;
-      newGroupName = `Επιλογή ${counter}`;
+      newGroupName = `${strings.CHOICE} ${counter}`;
     }
 
     // Create a new property with default values
     const newProperty: ItemProperty = {
       propertyName: newGroupName,
-      propertyValue: 'Επιλογή',
+      propertyValue: strings.CHOICE,
       propertyType: 'singleselect',
       selected: false,
       required: false,
@@ -219,7 +222,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       isEnabled: true,
       orderGroup: (item.itemPropertiesGrouped as any).length,
       orderItem: 0,
-      originalPropertyValue: 'Επιλογή',
+      originalPropertyValue: strings.CHOICE,
       isEdited: false,
     };
 
@@ -505,13 +508,13 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       // // Process the response data
 
       // Show success message
-      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
+      toast('success', strings.SUCCESS, strings.CHANGES_SAVED);
 
       // Optionally navigate back
       // navigateBack();
     } catch (error) {
       console.error('Save error:', error);
-      toast('error', 'Κάτι πήγε λάθος', 'Ξαναπροσπαθήστε αργότερα');
+      toast('error', strings.ERROR, strings.SAVE_ERROR);
     } finally {
       setIsSaving(false); // Hide loading overlay
     }
@@ -558,7 +561,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
 
           <View style={styles.addItemContainer}>
             <TouchableOpacity style={styles.addItemBtn} onPress={() => handleSave()}>
-              <Text style={styles.addItemBtnText}>Αποθήκευση Όλων</Text>
+              <Text style={styles.addItemBtnText}>{strings.SAVE_ALL}</Text>
             </TouchableOpacity>
             <PropertyTypeBottomSheet
               ref={propertyTypeBottomSheetRef}
@@ -591,6 +594,8 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
   const [editingValue, setEditingValue] = useState('');
   const [newItemCounter, setNewItemCounter] = useState(0); // Add counter for generating unique IDs
   const inputRef = useRef<TextInput>(null);
+
+  const strings = useStrings();
 
   // Reset counter when itemPropertiesGrouped changes completely
   useEffect(() => {
@@ -633,11 +638,9 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
       );
 
       if (isDuplicate) {
-        Alert.alert(
-          'Duplicate Name',
-          'A property with this name already exists. Please choose a different name.',
-          [{ text: 'OK' }]
-        );
+        Alert.alert(strings.DUPLICATE_NAME_TITLE, strings.DUPLICATE_NAME_MESSAGE, [
+          { text: strings.OK },
+        ]);
         return;
       }
 
@@ -664,7 +667,7 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
 
   const handleAddNew = () => {
     // Base name for new property
-    let baseName = 'Επιλογή';
+    let baseName = strings.CHOICE;
     let counter = 1;
     let newPropertyValue = baseName;
 
@@ -838,7 +841,7 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
         }}
       />
       <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
-        <Text style={styles.addButtonText}>Προσθήκη Νέου</Text>
+        <Text style={styles.addButtonText}>{strings.ADD_NEW}</Text>
       </TouchableOpacity>
     </View>
   );

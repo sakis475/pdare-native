@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, DefaultTheme, PaperProvider } from 'react-native-paper';
 import { NavigationContainer, Theme } from '@react-navigation/native';
 import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
-import { setLocalizedStrings } from './src/core/strings';
+import { setLocalizedStrings } from './src/core/localization/strings';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';

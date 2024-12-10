@@ -7,11 +7,14 @@ import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUt
 import { handleNoRestaurantUser, logout } from '../helpers/storage/tokenRequests';
 import { getStorage } from '../storage/store';
 import dayjs from '../core/dayjs';
+import { useStrings } from '../core/localization/languageContext';
 
 const logoImage = require('../../assets/mywaitericon.png');
 
 const StartLoadingScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(1)).current; // Start with full opacity
+
+  const strings = useStrings();
 
   useEffect(() => {
     // Continuous fade in and fade out loop
@@ -84,13 +87,13 @@ const StartLoadingScreen: React.FC = () => {
         <Text style={styles.appTitle}>OrderPOS</Text>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
-            Advanced Ordering App for Food and Beverages Services
+            {strings.APP_DESCRIPTION}
           </Text>
         </View>
 
         <View style={{ marginTop: 10, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" />
-          <Text style={styles.text}>Loading</Text>
+          <Text style={styles.text}>{strings.LOADING}</Text>
         </View>
       </Animated.View>
     </View>

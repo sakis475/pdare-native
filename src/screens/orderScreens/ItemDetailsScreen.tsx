@@ -14,6 +14,7 @@ import { colors } from '../../core/theme';
 import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/storage/orderStorage';
 import CommentBottomSheet from '../../components/bottomSheets/CommentBottomSheet';
 import { navigateBack } from '../../navigation/navigationUtils';
+import { useStrings } from '../../core/localization/languageContext';
 
 const UnifiedSelect = ({
   itemPropertiesGrouped,
@@ -142,8 +143,10 @@ const ItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
   const isUpdate = Boolean(route.params.isUpdate);
 
+  const strings = useStrings();
+
   const [commentText, setCommentText] = useState(
-    route.params.item?.comment ? route.params.item.comment : 'Γράψε σχόλιο για το προϊόν'
+    route.params.item?.comment ? route.params.item.comment : strings.WRITE_PRODUCT_COMMENT
   );
 
   //START COMMENT MODAL LOGIC
@@ -194,7 +197,7 @@ const ItemDetailsScreen = ({ route }: any) => {
   };
 
   const handleCommentUpdate = (itemComment: string) => {
-    setCommentText(itemComment ? itemComment : 'Γράψε σχόλιο για το προϊόν');
+    setCommentText(itemComment ? itemComment : strings.WRITE_PRODUCT_COMMENT);
 
     setItem((prevItem: any) => ({
       ...prevItem,
@@ -221,7 +224,7 @@ const ItemDetailsScreen = ({ route }: any) => {
                 <Divider style={{ marginVertical: 8 }}></Divider>
               </View>
             ))}
-            <Text style={styles.header}>Σχόλιο</Text>
+            <Text style={styles.header}>{strings.COMMENT}</Text>
             <TouchableOpacity
               onPress={handleOpenModal}
               style={{
@@ -248,7 +251,7 @@ const ItemDetailsScreen = ({ route }: any) => {
               }}
             >
               <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#ffffff' }}>
-                {isUpdate ? 'Ενημέρωση' : 'Προσθήκη'}
+                {isUpdate ? strings.UPDATE : strings.ADD}
               </Text>
             </TouchableOpacity>
           </View>

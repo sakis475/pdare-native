@@ -27,6 +27,7 @@ import { ActivityIndicator, FAB } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import { useStrings } from '../../core/localization/languageContext';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -77,6 +78,8 @@ const EditModal: React.FC<EditModalProps> = ({
   const [color, setColor] = useState(category?.color || colors.darkGrey);
   const [showColorPicker, setShowColorPicker] = useState(false);
 
+  const strings = useStrings();
+
   useEffect(() => {
     if (visible) {
       // When modal opens, set initial values
@@ -92,14 +95,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   const handleSave = () => {
     if (!title.trim()) {
-      AlertWithOptions(
-        '',
-        `Ο τίτλος της κατηγορίας είναι κενός`,
-        undefined,
-        undefined,
-        undefined,
-        ''
-      );
+      AlertWithOptions('', strings.EMPTY_TITLE_ERROR, undefined, undefined, undefined, '');
       return;
     }
 
@@ -126,19 +122,19 @@ const EditModal: React.FC<EditModalProps> = ({
 
     if (await isCategoryEmpty(category)) {
       AlertWithOptions(
-        'Επιβεβαίωση Διαγραφής',
-        `Είστε σίγουροι ότι θέλετε να διαγράψετε την κατηγορία "${category.title}";`,
+        strings.DELETE_CONFIRMATION,
+        `${strings.DELETE_CATEGORY_CONFIRM} "${category.title}"${strings.QUESTION_MARK}`,
         () => {
           onDelete(category.id);
           onDismiss();
         },
         undefined,
-        'Διαγραφή'
+        strings.DELETE
       );
     } else {
       AlertWithOptions(
-        'Η διαγραφή δεν επιτρέπεται',
-        `Πρέπει πρώτα να διαγράψετε όλα τα προιόντα της κατηγορίας`,
+        strings.DELETE_NOT_ALLOWED,
+        strings.DELETE_PRODUCTS_FIRST,
         undefined,
         undefined,
         undefined,
@@ -152,11 +148,11 @@ const EditModal: React.FC<EditModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>
-            {mode === 'create' ? 'Δημιουργία Κατηγορίας' : 'Ενημέρωση Κατηγορίας'}
+            {mode === 'create' ? strings.CREATE_CATEGORY : strings.UPDATE_CATEGORY}
           </Text>
 
           <TextInput
-            label="Τίτλος Κατηγορίας"
+            label={strings.CATEGORY_TITLE}
             value={title}
             onChangeText={setTitle}
             style={styles.input}
@@ -168,7 +164,7 @@ const EditModal: React.FC<EditModalProps> = ({
             onPress={() => setShowColorPicker(!showColorPicker)}
           >
             <Text style={{ color: getTextColorBasedOnLuminance(color) }}>
-              Επιλογή Χρώματος Κατηγορίας
+              {strings.SELECT_CATEGORY_COLOR}
             </Text>
           </TouchableOpacity>
 
@@ -197,12 +193,12 @@ const EditModal: React.FC<EditModalProps> = ({
             )}
 
             <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? 'Δημιουργία' : 'Αποθήκευση'}
+              {mode === 'create' ? strings.CREATE : strings.SAVE}
             </Button>
           </View>
           <View style={styles.buttonUpdateContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              Ακύρωση
+              {strings.CANCEL}
             </Button>
           </View>
         </View>
@@ -340,6 +336,7 @@ const AdminCategoryScreen = () => {
   }, []);
 
   const handleCategoryUpdate = async (boxData: BoxData[]) => {
+    const strings = useStrings();
     setIsLoading(true);
     try {
       for (const [index, category] of boxData.entries()) {
@@ -352,9 +349,9 @@ const AdminCategoryScreen = () => {
       await setStorage('categories', allCategoriesResult);
       setCategories(allCategoriesResult);
 
-      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς', 1100);
+      toast('success', strings.SUCCESS, strings.CHANGES_SAVED, 1100);
     } catch (error) {
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+      toast('error', strings.ERROR, strings.SAVE_ERROR);
     } finally {
       setIsLoading(false);
     }
@@ -408,7 +405,7 @@ const AdminCategoryScreen = () => {
     },
     [categories, handleCategoryUpdate]
   );
-
+  const strings = useStrings();
   return (
     <>
       <View style={styles.mainContainer}>
@@ -449,8 +446,8 @@ const AdminCategoryScreen = () => {
         ) : categories?.length === 0 ? (
           <>
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Κατηγορίες που προστίθενται</Text>
-              <Text style={styles.emptyText}>θα εμφανίζονται εδώ</Text>
+              <Text style={styles.emptyText}>{strings.CATEGORIES_WILL_APPEAR}</Text>
+              <Text style={styles.emptyText}>{strings.CATEGORIES_WILL_APPEAR_HERE}</Text>
             </View>
             <FAB
               icon="plus"

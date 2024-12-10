@@ -21,6 +21,7 @@ import { HeaderBar } from '../../components/helpers/HeaderBar';
 import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
 import { useIsFocused } from '@react-navigation/native';
 import { AlertWithOptions, toast } from '../../core/utils';
+import { useStrings } from '../../core/localization/languageContext';
 const TempOrderScreen = ({
   currentIndex,
   route,
@@ -32,10 +33,12 @@ const TempOrderScreen = ({
   const [items, setItems] = useState<ItemReq[]>();
   const [headerTitle, setHeaderTitle] = useState('');
 
+  const strings = useStrings();
+
   const fetchItems = async () => {
     const tempOrder: Order = await getTempOrder();
     setHeaderTitle(
-      tempOrder?.orderItems?.[0]?.alreadySend ? 'Ενημέρωση παραγγελίας' : 'Καινούργια Παραγγελία'
+      tempOrder?.orderItems?.[0]?.alreadySend ? strings.UPDATE_ORDER : strings.NEW_ORDER
     );
 
     setTable(tempOrder?.table);
@@ -60,7 +63,7 @@ const TempOrderScreen = ({
       if (!updatedOrder?.id) {
         return;
       } else {
-        toast('success', 'Επιτυχία Αλλαγής Τραπεζιού');
+        toast('success', strings.TABLE_CHANGE_SUCCESS);
       }
     }
 
@@ -78,8 +81,8 @@ const TempOrderScreen = ({
   const handleOpenSelectTableModal = () => {
     if (table) {
       AlertWithOptions(
-        'Αλλαγή Τραπεζιού',
-        'Είστε σίγουροι ότι θέλετε να αλλάξετε τραπέζι;',
+        strings.CHANGE_TABLE,
+        strings.CHANGE_TABLE_CONFIRM,
         () => {
           bottomSheetRef.current?.openModal();
         },
@@ -153,8 +156,8 @@ const TempOrderScreen = ({
           </View>
         ) : items?.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Προϊόντα που θα προσθέσετε</Text>
-            <Text style={styles.emptyText}>θα εμφανιστούν εδώ.</Text>
+            <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_ADD}</Text>
+            <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_APPEAR_HERE}</Text>
           </View>
         ) : (
           <View style={styles.loadingContainer}>

@@ -8,6 +8,7 @@ import { colors } from '../../core/theme';
 import { login } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
+import { useStrings } from '../../core/localization/languageContext';
 
 const logoImage = require('../../../assets/mywaitericon.png');
 
@@ -19,19 +20,21 @@ const LoginScreen: React.FC = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const strings = useStrings();
+
   const emailValidator = (email: string) => {
-    if (!email) return 'Πρέπει να εισάγεται το Email σας';
+    if (!email) return strings.EMAIL_REQUIRED;
 
     if (email.includes('@')) {
       const re = /\S+@\S+\.\S+/;
-      if (!re.test(email)) return 'Ουυπς.Το Email δεν είναι έγκυρο';
+      if (!re.test(email)) return strings.ERROR_EMAIL_INVALID;
     }
     return '';
   };
 
   const passwordValidator = (password: string) => {
-    if (!password) return 'Πρέπει να εισάγεται τον Κωδικό σας';
-    if (password.length < 5) return 'Ο κωδικός πρέπει να είναι τουλάχιστον 5 χαρακτήρες μεγάλος';
+    if (!password) return strings.PASSWORD_REQUIRED;
+    if (password.length < 5) return strings.PASSWORD_LENGTH;
     return '';
   };
 
@@ -126,7 +129,7 @@ const LoginScreen: React.FC = () => {
         <Text style={styles.appTitle}>OrderPOS</Text>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
-            Advanced Ordering App for Food and Beverages Services
+            {strings.APP_DESCRIPTION}
           </Text>
         </View>
         <Divider style={styles.divider} />
@@ -141,12 +144,12 @@ const LoginScreen: React.FC = () => {
             borderColor: colors.black,
           }}
         >
-          <Text style={styles.header}>Σύνδεση</Text>
+          <Text style={styles.header}>{strings.LOGIN}</Text>
 
           <View style={{ gap: 15 }}>
             <View>
               <TextInput
-                label="Email"
+                label={strings.EMAIL}
                 value={email}
                 onChangeText={(text) => setEmail(text)}
                 error={!!emailError}
@@ -165,7 +168,7 @@ const LoginScreen: React.FC = () => {
             <View>
               <View style={[styles.passwordInputContainer]}>
                 <TextInput
-                  label="Κωδικός"
+                  label={strings.PASSWORD}
                   value={password}
                   onChangeText={(text) => setPassword(text)}
                   error={!!passwordError}
@@ -193,7 +196,7 @@ const LoginScreen: React.FC = () => {
           </View>
           <TouchableOpacity style={{ marginTop: 2 }}>
             <Text style={{ textAlign: 'right', fontSize: 12, color: colors.veryLighterGrey }}>
-              Επαναφορά κωδικού πρόσβασης
+              {strings.RESET_PASSWORD}
             </Text>
           </TouchableOpacity>
 
@@ -205,13 +208,13 @@ const LoginScreen: React.FC = () => {
             {isLoading ? (
               <ActivityIndicator color={colors.white} size="small" />
             ) : (
-              <Text style={styles.text}>Σύνδεση</Text>
+              <Text style={styles.text}>{strings.LOGIN}</Text>
             )}
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={{ marginTop: 10 }} onPress={handlePressRegister}>
           <Text style={{ textAlign: 'center', fontSize: 14, color: colors.veryLighterGrey }}>
-            Δημιουργία Καινούργιου Λογαριασμού
+            {strings.CREATE_NEW_ACCOUNT}
           </Text>
         </TouchableOpacity>
       </View>

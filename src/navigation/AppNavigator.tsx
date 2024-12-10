@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { BottomNavigation, DefaultTheme, Text } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import TablesScreen from '../screens/TablesScreen';
 import LoginScreen from '../screens/authenticationScreens/LoginScreen';
-import { strings } from '../core/strings';
+import { strings } from '../core/localization/strings';
 import ProfileScreen from '../screens/ProfileScreen';
 import { colors } from '../core/theme';
 import RestaurantSettingsScreen from '../screens/adminScreens/RestaurantSettingsScreen';
@@ -13,7 +13,6 @@ import { NavigationContainerRef, Route } from '@react-navigation/native';
 import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
-import AdminProductsScreen from '../screens/adminScreens/AdminProductsScreen';
 import Tooltip from 'rn-tooltip';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -32,6 +31,7 @@ import AdminTableScreen from '../screens/adminScreens/AdminTableScreen';
 import { navigateBack, ScreenNames } from './navigationUtils';
 import AdminPersonelScreen from '../screens/adminScreens/AdminPersonelScreen';
 import NewUserSetupScreen from '../screens/authenticationScreens/NewUserSetupScreen';
+import { useStrings } from '../core/localization/languageContext';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -70,7 +70,7 @@ const AppNavigator = () => {
           headerTitle: () => {
             return (
               <CustomNavigationScreenHeaderTitle
-                title={'Εγγραφή'}
+                title={strings.REGISTER}
               ></CustomNavigationScreenHeaderTitle>
             );
           },
@@ -93,9 +93,7 @@ const AppNavigator = () => {
             return (
               <CustomNavigationScreenHeaderTitle
                 title={
-                  !!route.params?.table?.occupiedByOrder
-                    ? 'Ενημέρωση Παραγγελίας'
-                    : 'Καινούργια Παραγγελία'
+                  !!route.params?.table?.occupiedByOrder ? strings.UPDATE_ORDER : strings.NEW_ORDER
                 }
               ></CustomNavigationScreenHeaderTitle>
             );
@@ -131,7 +129,7 @@ const AppNavigator = () => {
         name={ScreenNames.ItemListScreen}
         component={ItemListScreen}
         options={({ route }: any) => ({
-          title: strings.AddItems,
+          title: strings.ADD_ITEMS,
           animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
@@ -149,9 +147,7 @@ const AppNavigator = () => {
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
               title={
-                !!route.params?.table?.occupiedByOrder
-                  ? 'Ενημέρωση Παραγγελίας'
-                  : 'Καινούργια Παραγγελία'
+                !!route.params?.table?.occupiedByOrder ? strings.UPDATE_ORDER : strings.NEW_ORDER
               }
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -171,7 +167,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Λογαριασμός'}
+              title={strings.ACCOUNT}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -191,7 +187,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Προφίλ'}
+              title={strings.PROFILE}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -211,7 +207,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Ιστορικό Παραγγελιών'}
+              title={strings.ORDER_HISTORY}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -226,31 +222,12 @@ const AppNavigator = () => {
       />
 
       <Stack.Screen
-        name={ScreenNames.AdminProductsScreen}
-        component={AdminProductsScreen}
-        options={({ route }: any) => ({
-          headerTitle: () => (
-            <CustomNavigationScreenHeaderTitle
-              title={'Προϊόντα'}
-              bold={true}
-            ></CustomNavigationScreenHeaderTitle>
-          ),
-          animation: 'none',
-          headerStyle: {
-            backgroundColor: colors.darkerGrey,
-          },
-          headerTintColor: 'white',
-          headerLeft: navigateBackBtn,
-          headerBackVisible: false,
-        })}
-      />
-      <Stack.Screen
         name={ScreenNames.ManageCategoriesScreen}
         component={AdminCategoryScreen}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Διαχείριση Κατηγορίας'}
+              title={strings.MANAGE_CATEGORY}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -269,7 +246,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Διαχείριση Προϊόντων'}
+              title={strings.MANAGE_PRODUCTS}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -308,7 +285,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Πρότυπα Ιδιοτήτων'}
+              title={strings.PROPERTY_TEMPLATES}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -327,7 +304,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Προσωπικό'}
+              title={strings.STAFF}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -347,7 +324,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Pattern: ' + route.params?.pattern?.propertyPatternTitle}
+              title={strings.PATTERN_PREFIX + ' ' + route.params?.pattern?.propertyPatternTitle}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -367,7 +344,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={'Διαχείριση Τραπεζιών'}
+              title={strings.MANAGE_TABLES}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -403,17 +380,17 @@ const AppNavigator = () => {
                     >
                       <Text style={styles.toolTipText}>
                         {route.params?.item?.category?.title
-                          ? `Κατηγορία: ${route.params.item.category.title}`
+                          ? `${strings.CATEGORY_LABEL} ${route.params.item.category.title}`
                           : null}
                       </Text>
                       <Text style={styles.toolTipText}>
                         {route.params?.item?.cost
-                          ? `Κόστος: ${route.params?.item?.cost.toFixed(2)}`
+                          ? `${strings.COST_LABEL} ${route.params?.item?.cost.toFixed(2)}`
                           : null}
                       </Text>
                       <Text style={styles.toolTipText}>
                         {route.params?.item?.description
-                          ? `Περιγραφή: ${route.params.item.description}`
+                          ? `${strings.DESCRIPTION_LABEL} ${route.params.item.description}`
                           : null}
                       </Text>
                       {/* Make tooltip content go to flex-start */}
@@ -440,6 +417,7 @@ const AppNavigator = () => {
 };
 
 const MainTabs = ({ route }: any) => {
+  const strings = useStrings(); // Make sure you have this
   const [index, setIndex] = useState(route?.params?.screenIndex ?? 0);
 
   useEffect(() => {
@@ -448,32 +426,35 @@ const MainTabs = ({ route }: any) => {
     }
   }, [route]);
 
-  const [routes, setRoutes] = useState<any[]>([
-    {
-      key: strings.Tables,
-      title: strings.Tables,
-      focusedIcon: 'apps',
-    },
-    {
-      key: strings.Draft,
-      title: strings.Draft,
-      focusedIcon: 'clipboard-outline',
-    },
-
-    {
-      key: strings.Expo,
-      title: strings.Expo,
-      focusedIcon: 'clipboard-multiple-outline',
-    },
-  ]);
+  // Move routes to useMemo to update when strings change
+  const routes = useMemo(
+    () => [
+      {
+        key: 'tables',
+        title: strings.TABLES,
+        focusedIcon: 'apps',
+      },
+      {
+        key: 'draft',
+        title: strings.DRAFT,
+        focusedIcon: 'clipboard-outline',
+      },
+      {
+        key: 'expo',
+        title: strings.EXPO,
+        focusedIcon: 'clipboard-multiple-outline',
+      },
+    ],
+    [strings]
+  ); // Depend on strings to update when language changes
 
   const renderScene = ({ route }: any) => {
     switch (route.key) {
-      case strings.Tables:
+      case 'tables':
         return <TablesScreen currentIndex={index} />;
-      case strings.Draft:
+      case 'draft':
         return <TempOrderScreen currentIndex={index} />;
-      case strings.Expo:
+      case 'expo':
         return <ExpoScreen currentIndex={index} />;
       default:
         return null;
@@ -492,7 +473,6 @@ const MainTabs = ({ route }: any) => {
     />
   );
 };
-
 function navigateBackBtn() {
   return (
     <TouchableOpacity onPress={() => navigateBack()}>

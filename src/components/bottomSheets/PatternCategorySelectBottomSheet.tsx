@@ -13,6 +13,7 @@ import { Text, List } from 'react-native-paper';
 import { getStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import { FlatList } from 'react-native-gesture-handler';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface CategoryBottomSheetProps {
   currentCategory?: Category | null;
@@ -32,6 +33,8 @@ export const CategoryBottomSheet = forwardRef<CategoryBottomSheetRef, CategoryBo
 
     // Variables
     const snapPoints = useMemo(() => ['55%', '55%'], []);
+
+    const strings = useStrings();
 
     // Callbacks
     const handlePresentModalPress = useCallback(() => {
@@ -101,7 +104,7 @@ export const CategoryBottomSheet = forwardRef<CategoryBottomSheetRef, CategoryBo
         handleIndicatorStyle={{ backgroundColor: '#fff' }}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Επιλογή Κατηγορίας Προτύπου</Text>
+          <Text style={styles.title}>{strings.CATEGORY_PATTERN_SELECT}</Text>
         </View>
 
         <FlatList

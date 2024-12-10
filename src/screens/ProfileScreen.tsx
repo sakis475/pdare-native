@@ -1,22 +1,25 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { Button, RadioButton, Text } from 'react-native-paper';
 import { getStorage, setStorage } from '../storage/store';
 import { colors } from '../core/theme';
-import { TrashIcon, WarningIcon } from '../components/basic/Icons';
+import { WarningIcon } from '../components/basic/Icons';
 import CustomTextInput from '../components/basic/CustomTextInput';
 import { AlertWithOptions, emailValidator, passwordValidator, toast } from '../core/utils';
 import { deleteRequest, patchRequest, postRequest, setBearer } from '../helpers/requests';
 import { SessionBearer } from '../types/requests.types';
 import { logout } from '../helpers/storage/tokenRequests';
-import { AppLanguage, setLocalizedStrings, strings } from '../core/strings';
+import { AppLanguage, setLocalizedStrings } from '../core/localization/strings';
 import { EventEmitter } from '../helpers/Sockets/EventEmitter';
+import { useStrings } from '../core/localization/languageContext';
+import { useNavigation } from '@react-navigation/native';
+import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 
 const ProfileScreen = ({ route }: any) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<AppLanguage>('lang_en');
+  const [selectedLanguage, setSelectedLanguage] = useState<AppLanguage>('lang_el');
   const [formData, setFormData] = useState({
     username: '',
     firstName: '',
@@ -34,6 +37,9 @@ const ProfileScreen = ({ route }: any) => {
     { id: 1, value: 'lang_en', label: 'English' },
     { id: 2, value: 'lang_el', label: 'Ελληνικά' },
   ];
+
+  const strings = useStrings();
+  const navigation = useNavigation();
 
   const updateFormField = (field: string) => (value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -66,7 +72,7 @@ const ProfileScreen = ({ route }: any) => {
         }
       } catch (error) {
         console.error('Error fetching user:', error);
-        toast('error', 'Failed to load user data');
+        toast('error', strings.ERROR, strings.ERROR_FAILED_TO_LOAD_USER_DATA);
       } finally {
         setIsInitializing(false);
       }
@@ -75,33 +81,38 @@ const ProfileScreen = ({ route }: any) => {
     fetchCurrentUser();
   }, []);
 
-  const handleLanguageChange = useCallback(async (language: AppLanguage) => {
-    try {
-      await setStorage('app_language', language);
-      await setLocalizedStrings();
-      setSelectedLanguage(language);
-      // Emit language change event if you're using event system
-      EventEmitter.emit('LANGUAGE_CHANGED');
+  const handleLanguageChange = useCallback(
+    async (language: AppLanguage) => {
+      try {
+        await setStorage('app_language', language);
+        await setLocalizedStrings();
+        setSelectedLanguage(language);
+        // Emit language change event if you're using event system
+        EventEmitter.emit('LANGUAGE_CHANGED');
+        toast('success', strings.SUCCESS, strings.LANGUAGE_UPDATED);
+      } catch (error) {
+        toast('error', strings.ERROR);
+      }
+    },
+    [strings]
+  );
 
-      toast(
-        'success',
-        language === 'lang_en' ? 'Language updated to English' : 'Η γλώσσα άλλαξε σε Ελληνικά'
-      );
-    } catch (error) {
-      toast('error', 'Failed to update language');
-    }
-  }, []);
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => <CustomNavigationScreenHeaderTitle title={strings.PROFILE} bold={true} />,
+    });
+  }, [strings]);
 
   const handleUpdateProfile = async () => {
     const { username, firstName, lastName, email } = formData;
 
     if (!username.trim()) {
-      toast('error', `Username can't be empty`);
+      toast('error', strings.ERROR, strings.ERROR_USERNAME_EMPTY);
       return;
     }
 
-    if (emailValidator(email)) {
-      toast('error', emailValidator(email));
+    if (emailValidator(email, strings)) {
+      toast('error', strings.ERROR, emailValidator(email, strings));
       return;
     }
 
@@ -118,9 +129,9 @@ const ProfileScreen = ({ route }: any) => {
       await setStorage('currentUser', response.user);
       await setBearer(response);
 
-      toast('success', 'Profile updated successfully');
+      toast('success', strings.SUCCESS, strings.PROFILE_UPDATE_SUCCESS);
     } catch (error) {
-      toast('error', 'Failed to update profile');
+      toast('error', strings.ERROR, strings.PROFILE_UPDATE_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -130,17 +141,17 @@ const ProfileScreen = ({ route }: any) => {
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      toast('error', `Please fill in all password fields`);
+      toast('error', strings.ERROR, strings.ERROR_FILL_ALL_PASSWORD_FIELDS);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast('error', `New passwords do not match`);
+      toast('error', strings.ERROR, strings.PASSWORDS_DO_NOT_MATCH);
       return;
     }
 
-    if (passwordValidator(newPassword)) {
-      toast('error', passwordValidator(newPassword));
+    if (passwordValidator(newPassword, strings)) {
+      toast('error', passwordValidator(newPassword, strings));
       return;
     }
 
@@ -161,9 +172,9 @@ const ProfileScreen = ({ route }: any) => {
         newPassword: '',
         confirmPassword: '',
       });
-      toast('success', 'Password updated successfully');
+      toast('success', strings.SUCCESS, strings.PASSWORD_UPDATE_SUCCESS);
     } catch (error) {
-      toast('error', 'Failed to update password');
+      toast('error', strings.ERROR, strings.PASSWORD_UPDATE_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -171,7 +182,7 @@ const ProfileScreen = ({ route }: any) => {
 
   const handleUpdateRestaurantName = async () => {
     if (!formData.restaurantName.trim()) {
-      toast('error', 'Please enter a restaurant name');
+      toast('error', strings.RESTAURANT_NAME_EMPTY);
       return;
     }
 
@@ -181,10 +192,10 @@ const ProfileScreen = ({ route }: any) => {
         restaurantDisplayName: formData.restaurantName.trim(),
       });
       if (response) {
-        toast('success', 'Restaurant Display Name updated successfully');
+        toast('success', strings.RESTAURANT_NAME_UPDATE_SUCCESS);
       }
     } catch (error) {
-      toast('error', 'Failed to update restaurant name');
+      toast('error', strings.RESTAURANT_NAME_UPDATE_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -192,15 +203,15 @@ const ProfileScreen = ({ route }: any) => {
 
   const handleDeleteAccount = () => {
     AlertWithOptions(
-      'Delete Account',
-      'This action is permanent. Are you sure you want your account to be deleted?',
+      strings.DELETE_ACCOUNT,
+      strings.DELETE_ACCOUNT_CONFIRM,
       async () => {
         setIsLoading(true);
         try {
           await deleteRequest('/user/delete');
           await logout();
         } catch (error) {
-          toast('error', 'Failed to delete account');
+          toast('error', strings.DELETE_ACCOUNT_FAILED);
         } finally {
           setIsLoading(false);
         }
@@ -211,15 +222,15 @@ const ProfileScreen = ({ route }: any) => {
 
   const handleDeleteRestaurant = () => {
     AlertWithOptions(
-      'Delete Restaurant',
-      'Are you sure you want to delete this restaurant? This action cannot be undone.',
+      strings.DELETE_RESTAURANT,
+      strings.DELETE_RESTAURANT_CONFIRM,
       async () => {
         setIsLoading(true);
         try {
           await postRequest('/user/restaurant/delete');
           await logout();
         } catch (error) {
-          toast('error', 'Failed to delete restaurant');
+          toast('error', strings.DELETE_RESTAURANT_FAILED);
         } finally {
           setIsLoading(false);
         }
@@ -230,8 +241,8 @@ const ProfileScreen = ({ route }: any) => {
 
   const handleLeaveRestaurant = () => {
     AlertWithOptions(
-      'Leave Restaurant',
-      'Are you sure you want to leave this restaurant?',
+      strings.LEAVE_RESTAURANT,
+      strings.LEAVE_RESTAURANT_CONFIRM,
       async () => {
         setIsLoading(true);
         try {
@@ -258,7 +269,7 @@ const ProfileScreen = ({ route }: any) => {
       >
         <View style={styles.buttonInner}>
           <WarningIcon size={20} color={colors.veryLighterRed} />
-          <Text style={styles.buttonText}>Delete Restaurant</Text>
+          <Text style={styles.buttonText}>{strings.DELETE_RESTAURANT}</Text>
           <WarningIcon size={20} color={colors.veryLighterRed} />
         </View>
       </Button>
@@ -302,21 +313,21 @@ const ProfileScreen = ({ route }: any) => {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Profile Information</Text>
+            <Text style={styles.sectionTitle}>{strings.PROFILE_INFORMATION}</Text>
             <CustomTextInput
-              label="First Name"
+              label={strings.FIRST_NAME}
               value={formData.firstName}
               onChangeText={updateFormField('firstName')}
               autoCapitalize="words"
             />
             <CustomTextInput
-              label="Last Name"
+              label={strings.LAST_NAME}
               value={formData.lastName}
               onChangeText={updateFormField('lastName')}
               autoCapitalize="words"
             />
             <CustomTextInput
-              label="Email"
+              label={strings.EMAIL}
               value={formData.email}
               onChangeText={updateFormField('email')}
               keyboardType="email-address"
@@ -327,26 +338,26 @@ const ProfileScreen = ({ route }: any) => {
               loading={isLoading}
               style={styles.button}
             >
-              Update Profile
+              {strings.UPDATE_PROFILE}
             </Button>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Change Password</Text>
+            <Text style={styles.sectionTitle}>{strings.CHANGE_PASSWORD}</Text>
             <CustomTextInput
-              label="Current Password"
+              label={strings.CURRENT_PASSWORD}
               value={passwordData.currentPassword}
               onChangeText={updatePasswordField('currentPassword')}
               secureTextEntry
             />
             <CustomTextInput
-              label="New Password"
+              label={strings.NEW_PASSWORD}
               value={passwordData.newPassword}
               onChangeText={updatePasswordField('newPassword')}
               secureTextEntry
             />
             <CustomTextInput
-              label="Confirm New Password"
+              label={strings.CONFIRM_NEW_PASSWORD}
               value={passwordData.confirmPassword}
               onChangeText={updatePasswordField('confirmPassword')}
               secureTextEntry
@@ -357,15 +368,15 @@ const ProfileScreen = ({ route }: any) => {
               loading={isLoading}
               style={styles.button}
             >
-              Update Password
+              {strings.UPDATE_PASSWORD}
             </Button>
           </View>
 
           {user.role === 'owner' && user.restaurant && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Restaurant Settings</Text>
+              <Text style={styles.sectionTitle}>{strings.RESTAURANT_SETTINGS}</Text>
               <CustomTextInput
-                label="Restaurant Name"
+                label={strings.RESTAURANT_NAME}
                 value={formData.restaurantName}
                 onChangeText={updateFormField('restaurantName')}
               />
@@ -375,7 +386,7 @@ const ProfileScreen = ({ route }: any) => {
                 loading={isLoading}
                 style={styles.button}
               >
-                Update Restaurant Name
+                {strings.UPDATE_RESTAURANT_NAME}
               </Button>
               {DeleteRestaurantButton}
             </View>
@@ -383,9 +394,9 @@ const ProfileScreen = ({ route }: any) => {
 
           {user.role === 'waiter' && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Restaurant Settings</Text>
+              <Text style={styles.sectionTitle}>{strings.RESTAURANT_SETTINGS}</Text>
               <Text style={styles.restaurantText}>
-                Είστε μέλος στο:{' '}
+                {strings.YOU_ARE_MEMBER_OF}{' '}
                 <Text style={styles.restaurantName}>{user.restaurant.restaurantName}</Text>
               </Text>
               <Button
@@ -395,7 +406,7 @@ const ProfileScreen = ({ route }: any) => {
                 style={[styles.button, styles.leaveButton]}
                 textColor={colors.lightRed}
               >
-                Leave Restaurant
+                {strings.LEAVE_RESTAURANT}
               </Button>
             </View>
           )}
@@ -408,7 +419,7 @@ const ProfileScreen = ({ route }: any) => {
               style={[styles.button, styles.deleteAccountButton]}
               textColor={colors.white}
             >
-              Διαγραφή Λογαριασμού
+              {strings.DELETE_ACCOUNT_BUTTON}
             </Button>
           </View>
         </View>

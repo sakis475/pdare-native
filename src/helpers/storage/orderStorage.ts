@@ -3,31 +3,6 @@ import * as Requests from '../requests';
 import { getStorage, setStorage } from '../../storage/store';
 import uuid from 'react-native-uuid';
 
-/* Fetches all items of the catalogue and stores them in a custom format */
-export const reqFetchItems = async () => {
-  // let items: ItemReq[];
-  // items = await getStorage('items');
-  // if (!items) {
-  //   items = await Requests.getRequest('/items');
-  //   await setStorage('items', items);
-  //   const categoriesAll = items.map((e) => e.category);
-  //   const uniqueCategories = categoriesAll
-  //     ?.filter((item, index, self) => index === self.findIndex((t) => t.id === item.id))
-  //     ?.sort((a, b) => a.orderCategory - b.orderCategory);
-  //   setStorage('categories', uniqueCategories);
-  // }
-  // const groupedByCategory: catGroupedItems = items.reduce((acc: any, item: any) => {
-  //   const categoryTitle = item.category.title;
-  //   if (!acc[categoryTitle]) {
-  //     acc[categoryTitle] = [];
-  //   }
-  //   acc[categoryTitle].push(item);
-  //   return acc;
-  // }, {});
-  // await setStorage('groupedItems', groupedByCategory);
-  // return groupedByCategory;
-};
-
 export const getGroupedItems = async () => {
   const groupedByCategory: catGroupedItems | null = await getStorage('groupedItems');
   return groupedByCategory;

@@ -1,6 +1,6 @@
 // languageContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { setLocalizedStrings, strings } from '../strings';
+import { setLocalizedStrings, strings } from './strings';
 import { getStorage } from '../../storage/store';
 import { EventEmitter } from '../../helpers/Sockets/EventEmitter';
 

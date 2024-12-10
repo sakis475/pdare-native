@@ -3,10 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AlertWithOptions } from '../../core/utils';
+import { useStrings } from '../../core/localization/languageContext';
 
 const QuantitySelector = (props: any) => {
   const [quantity, setQuantity] = useState(props.quantity || 1); // Assuming the initial quantity is 2 as in the image
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
+
+  const strings = useStrings();
 
   let trashIconTimer: NodeJS.Timeout;
 
@@ -27,8 +30,8 @@ const QuantitySelector = (props: any) => {
       clearTimeout(trashIconTimer);
 
       AlertWithOptions(
-        'Remove',
-        'Remove Item From List?',
+        strings.REMOVE,
+        strings.REMOVE_ITEM,
         () => {
           props.removeItem();
           setShowDeleteBtn(false);

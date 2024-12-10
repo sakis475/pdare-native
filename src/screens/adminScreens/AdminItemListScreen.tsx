@@ -19,6 +19,7 @@ import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { findCategoryByTitle } from '../../helpers/storage/orderStorage';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface EditItemModalProps {
   visible: boolean;
@@ -41,6 +42,8 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   const [description, setDescription] = useState(item?.description || '');
   const [cost, setCost] = useState(item?.cost?.toString() || '');
 
+  const strings = useStrings();
+
   useEffect(() => {
     setTitle(item?.title || '');
     setDescription(item?.description || '');
@@ -49,19 +52,12 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
   const handleSave = () => {
     if (!title.trim()) {
-      AlertWithOptions(
-        '',
-        `Ο τίτλος του προϊόντος είναι κενός`,
-        undefined,
-        undefined,
-        undefined,
-        ''
-      );
+      AlertWithOptions('', strings.EMPTY_PRODUCT_TITLE_ERROR, undefined, undefined, undefined, '');
       return;
     }
 
     if (!cost || isNaN(Number(cost))) {
-      AlertWithOptions('', `Η τιμή πρέπει να είναι αριθμός`, undefined, undefined, undefined, '');
+      AlertWithOptions('', strings.PRICE_NUMBER_ERROR, undefined, undefined, undefined, '');
       return;
     }
 
@@ -92,8 +88,8 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
     if (!item || !onDelete) return;
 
     AlertWithOptions(
-      'Επιβεβαίωση Διαγραφής',
-      `Είστε σίγουροι ότι θέλετε να διαγράψετε το "${item.title}";`,
+      strings.DELETE_CONFIRMATION,
+      `${strings.DELETE_PATTERN_CONFIRM} "${item.title}"${strings.QUESTION_MARK}`,
       () => {
         onDelete(item.id);
         onDismiss();
@@ -108,11 +104,11 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>
-            {mode === 'create' ? 'Δημιουργία Προϊόντος' : 'Ενημέρωση Προϊόντος'}
+            {mode === 'create' ? `${strings.CREATE_PRODUCT}` : `${strings.UPDATE_PRODUCT}`}
           </Text>
 
           <TextInput
-            label="Τίτλος Προϊόντος"
+            label={strings.PRODUCT_TITLE}
             value={title}
             onChangeText={setTitle}
             style={styles.input}
@@ -120,7 +116,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
           />
 
           <TextInput
-            label="Περιγραφή"
+            label={strings.DESCRIPTION}
             value={description}
             onChangeText={setDescription}
             style={styles.input}
@@ -130,7 +126,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
           />
 
           <TextInput
-            label="Τιμή"
+            label={strings.PRICE}
             value={cost}
             onChangeText={setCost}
             style={styles.input}
@@ -151,12 +147,12 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             )}
 
             <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? 'Δημιουργία' : 'Αποθήκευση'}
+              {mode === 'create' ? strings.CREATE : strings.SAVE}
             </Button>
           </View>
           <View style={styles.buttonContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              Ακύρωση
+              {strings.CANCEL}
             </Button>
           </View>
         </View>
@@ -172,6 +168,8 @@ const AdminItemListScreen = ({ route }: any) => {
   const [selectedItem, setSelectedItem] = useState<ItemReq | null>(null);
   const [modalMode, setModalMode] = useState<'edit' | 'create'>('edit');
   const [isLoading, setIsLoading] = useState(false);
+
+  const strings = useStrings();
 
   const fetchItems = async () => {
     const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
@@ -202,10 +200,10 @@ const AdminItemListScreen = ({ route }: any) => {
       // Update state
       setItems(response);
 
-      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
+      toast('success', strings.SUCCESS, strings.CHANGES_SAVED);
     } catch (error) {
       console.error('Error updating items:', error);
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+      toast('error', strings.ERROR, strings.SAVE_ERROR);
     } finally {
       setIsLoading(false);
     }
@@ -317,7 +315,7 @@ const AdminItemListScreen = ({ route }: any) => {
             }}
           >
             <Text style={{ textAlign: 'center', color: colors.white }}>
-              Προιόντα που προστέθετε θα εμφανίζονται εδώ.
+              {strings.PRODUCTS_WILL_APPEAR}
             </Text>
             <FAB
               icon="plus"

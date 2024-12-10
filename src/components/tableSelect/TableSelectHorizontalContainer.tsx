@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { colors } from '../../core/theme';
+import { useStrings } from '../../core/localization/languageContext';
 
 const boxSize = 80;
 
@@ -24,7 +25,7 @@ const TableSelectHorizontalContainer = ({
 }) => {
   //TODO: pass search key, filter allTables by search key, sort by name
   const [allTables, setAllTables] = useState<Table[]>(tables?.length ? tables : []);
-
+  const strings = useStrings();
   useEffect(() => {
     filterTable(searchWord);
   }, [searchWord]);
@@ -71,16 +72,14 @@ const TableSelectHorizontalContainer = ({
     <View style={{ marginTop: 5 }}>
       {searchWord?.length && allTables.length === 0 ? (
         <View>
-          <Text style={styles.boxText}>
-            Δεν βρέθηκε τραπέζι με αυτό το όνομα, δημιουργία καινούργιου.
-          </Text>
+          <Text style={styles.boxText}>{strings.NO_TABLE_FOUND_CREATE_NEW}</Text>
           <TableBox
             table={{ id: -1, isEnabled: false, tableOrder: -1, tableName: searchWord }}
             newBox={true}
           ></TableBox>
         </View>
       ) : allTables.length === 0 ? (
-        <Text style={styles.boxText}>Δεν βρέθηκε διαθέσιμο τραπέζι.</Text>
+        <Text style={styles.boxText}>{strings.NO_TABLE_AVAILABLE}</Text>
       ) : allTables?.length ? (
         contentWidth > screenWidth ? (
           <ScrollView

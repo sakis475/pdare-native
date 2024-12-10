@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../core/theme';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import { UserIcon } from '../basic/Icons';
 
 export function HeaderBar({ headerTitle }: { headerTitle?: string }) {
   return (
@@ -23,7 +24,7 @@ function ProfileButton({ handlePress }: any) {
   return (
     <TouchableOpacity onPress={handlePress}>
       <Text style={{ color: colors.veryLighterGrey }}>
-        <IoniconsIcons name="person-circle-outline" size={40}></IoniconsIcons>
+        <UserIcon></UserIcon>
       </Text>
     </TouchableOpacity>
   );

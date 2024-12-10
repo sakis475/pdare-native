@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppLanguage } from '../core/strings';
+import { AppLanguage } from '../core/localization/strings';
 import { SessionBearer } from '../types/requests.types';
 import { toast } from '../core/utils';
 

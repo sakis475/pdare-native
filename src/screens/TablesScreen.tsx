@@ -118,7 +118,7 @@ const TablesScreen = ({ currentIndex }: any) => {
         flex: 1,
       }}
     >
-      <HeaderBar headerTitle={strings.Tables} />
+      <HeaderBar headerTitle={strings.TABLES} />
       <View style={styles.container}>
         {activeTables !== undefined ? (
           <>
@@ -142,7 +142,7 @@ const TablesScreen = ({ currentIndex }: any) => {
             </View>
 
             <TouchableOpacity style={styles.selectTableBtn} onPress={handleOpenModal}>
-              <Text style={styles.selectTableBtnText}>{strings.NewOrderBtn}</Text>
+              <Text style={styles.selectTableBtnText}>{strings.NEW_ORDER_BTN}</Text>
             </TouchableOpacity>
           </>
         ) : (

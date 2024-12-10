@@ -21,6 +21,7 @@ import { CategoryBottomSheet } from '../../components/bottomSheets/PatternCatego
 import { Portal } from 'react-native-paper';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface EditPatternModalProps {
   visible: boolean;
@@ -47,21 +48,15 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
   title,
   onTitleChange,
 }) => {
+  const strings = useStrings();
   const handleSave = () => {
     if (!title.trim()) {
-      AlertWithOptions(
-        '',
-        'Ο τίτλος του προτύπου είναι κενός',
-        undefined,
-        undefined,
-        undefined,
-        ''
-      );
+      AlertWithOptions('', strings.PATTERN_TITLE_EMPTY, undefined, undefined, undefined, '');
       return;
     }
 
     if (!selectedCategory) {
-      AlertWithOptions('', 'Παρακαλώ επιλέξτε κατηγορία', undefined, undefined, undefined, '');
+      AlertWithOptions('', strings.PLEASE_SELECT_CATEGORY, undefined, undefined, undefined, '');
       return;
     }
 
@@ -86,8 +81,8 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
     if (!pattern || !onDelete) return;
 
     AlertWithOptions(
-      'Επιβεβαίωση Διαγραφής',
-      `Είστε σίγουροι ότι θέλετε να διαγράψετε το "${pattern.propertyPatternTitle}";`,
+      strings.DELETE_CONFIRMATION,
+      `${strings.DELETE_PATTERN_CONFIRM} "${pattern.propertyPatternTitle}"${strings.QUESTION_MARK}`,
       () => {
         onDelete(pattern.propertyPatternTitle);
         onDismiss();
@@ -96,14 +91,13 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
       'Διαγραφή'
     );
   };
-
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           {/* ... */}
           <TextInput
-            label="Τίτλος Προτύπου"
+            label={strings.PATTERN_TITLE}
             value={title}
             onChangeText={onTitleChange}
             style={styles.input}
@@ -111,10 +105,10 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
           />
 
           <TouchableOpacity style={styles.categorySelector} onPress={onCategoryPress}>
-            <Text style={styles.categorySelectorLabel}>Κατηγορία</Text>
+            <Text style={styles.categorySelectorLabel}>{strings.CATEGORY}</Text>
             <View style={styles.categorySelectorContent}>
               <Text style={styles.selectedCategory}>
-                {selectedCategory?.title || 'Επιλέξτε Κατηγορία'}
+                {selectedCategory?.title || `${strings.SELECT_CATEGORY}`}
               </Text>
               <MaterialIcons name="keyboard-arrow-down" size={24} color={colors.grey} />
             </View>
@@ -133,13 +127,13 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
             )}
 
             <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? 'Δημιουργία' : 'Αποθήκευση'}
+              {mode === 'create' ? strings.CREATE : strings.SAVE}
             </Button>
           </View>
 
           <View style={styles.buttonContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              Ακύρωση
+              {strings.CANCEL}
             </Button>
           </View>
         </View>
@@ -162,6 +156,7 @@ const AdminItemDetailsPatternScreen = () => {
   const categoryBottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
   const [patternTitle, setPatternTitle] = useState('');
 
+  const strings = useStrings();
   const handleSheetClose = () => {
     setIsSelectingCategory(false); // Show modal again when sheet closes
   };
@@ -187,7 +182,7 @@ const AdminItemDetailsPatternScreen = () => {
       setPatterns(fetchedPatterns.filter((pattern) => !pattern.markAsDelete));
     } catch (error) {
       console.error('Error fetching patterns:', error);
-      toast('error', 'Error', 'Failed to load property patterns');
+      toast('error', strings.ERROR, strings.LOAD_ERROR);
     }
   };
 
@@ -216,10 +211,10 @@ const AdminItemDetailsPatternScreen = () => {
       // Update state with only non-deleted patterns
       setPatterns(response.filter((pattern) => !pattern.markAsDelete));
 
-      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
+      toast('success', strings.SUCCESS, strings.CHANGES_SAVED);
     } catch (error) {
       console.error('Error updating patterns:', error);
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+      toast('error', strings.ERROR, strings.SAVE_ERROR);
     } finally {
       setIsLoading(false);
     }
@@ -235,7 +230,7 @@ const AdminItemDetailsPatternScreen = () => {
       .filter((p) => !p.markAsDelete)
       .map((p) => p.propertyPatternTitle);
     if (new Set(activeTitles).size !== activeTitles.length) {
-      toast('error', 'Σφάλμα', 'Υπάρχει ήδη πρότυπο με αυτό το όνομα');
+      toast('error', strings.ERROR, strings.DUPLICATE_PATTERN_ERROR);
       return;
     }
     await handlePatternsUpdate(newPatterns);
@@ -248,7 +243,7 @@ const AdminItemDetailsPatternScreen = () => {
         (p) => !p.markAsDelete && p.propertyPatternTitle === newPattern.propertyPatternTitle
       )
     ) {
-      toast('error', 'Σφάλμα', 'Υπάρχει ήδη πρότυπο με αυτό το όνομα');
+      toast('error', strings.ERROR, strings.DUPLICATE_PATTERN_ERROR);
       return;
     }
 
@@ -318,7 +313,8 @@ const AdminItemDetailsPatternScreen = () => {
               {pattern.propertyPatternTitle}
             </Text>
             <Text style={{ color: colors.white, fontSize: 12 }}>
-              {new Set(pattern.itemProperties.map((prop) => prop.propertyName)).size} properties
+              {new Set(pattern.itemProperties.map((prop) => prop.propertyName)).size}{' '}
+              {strings.PROPERTIES}
             </Text>
           </View>
           <FontAwesome6 name="chevron-right" size={20} color="#fff" style={{ marginRight: 10 }} />
@@ -355,7 +351,7 @@ const AdminItemDetailsPatternScreen = () => {
         ) : (
           <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20 }}>
             <Text style={{ textAlign: 'center', color: colors.white }}>
-              Πρότυπα που προστίθενται θα εμφανίζονται εδώ.
+              {strings.PATTERNS_WILL_APPEAR}
             </Text>
           </View>
         )}

@@ -1,4 +1,4 @@
-import { clearRestaurantStorageRelatedKeys, getStorage, setStorage } from '../../storage/store';
+import { getStorage, setStorage } from '../../storage/store';
 import * as Requests from '../requests';
 import { processTables } from './tablesStorage';
 

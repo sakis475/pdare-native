@@ -22,6 +22,7 @@ import {
 import { getTextColorBasedOnLuminance } from '../../core/utils';
 import { getStorage } from '../../storage/store';
 import { storageInitData } from '../../helpers/storage/storageInit';
+import { useStrings } from '../../core/localization/languageContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const COLUMN_COUNT = 4;
@@ -33,6 +34,8 @@ const NewOrderScreen = ({ route, navigation }: any) => {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [headerTitle, setHeaderTitle] = useState('');
+
+  const strings = useStrings();
 
   const fetchItems = async () => {
     let newOrder = await getStorage('groupedItems');
@@ -56,8 +59,8 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     const tempOrder = await getTempOrder();
 
     const newTitle = !!tempOrder?.orderItems?.[0]?.alreadySend
-      ? 'Ενημέρωση Παραγγελίας'
-      : 'Καινούργια Παραγγελία';
+      ? strings.UPDATE_ORDER
+      : strings.NEW_ORDER;
 
     setHeaderTitle(newTitle); // Update the title in state
 

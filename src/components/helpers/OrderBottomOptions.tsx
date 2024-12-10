@@ -4,6 +4,7 @@ import { colors } from '../../core/theme';
 import TempOrderBottomSheet from '../../components/bottomSheets/TempOrderBottomSheet';
 import { Portal } from '@gorhom/portal';
 import { navigateToDraft } from '../../navigation/navigationUtils';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface OrderBottomOptionsProps {
   tableName: string;
@@ -19,6 +20,7 @@ const OrderBottomOptions: React.FC<OrderBottomOptionsProps> = ({
   // START TEMP ORDER MODAL LOGIC
   const bottomTempOrderSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
+  const strings = useStrings();
   const handleTempOrderOpenModal = () => {
     bottomTempOrderSheetRef.current?.openModal();
   };
@@ -39,14 +41,14 @@ const OrderBottomOptions: React.FC<OrderBottomOptionsProps> = ({
         style={[styles.button, styles.tempOrderScreenBtn]}
         onPress={handleGoToTempOrderScreen}
       >
-        <Text style={styles.buttonText}>Παραγγελία </Text>
+        <Text style={styles.buttonText}>{strings.ORDER}</Text>
       </TouchableOpacity>
       <View style={styles.actionsContainer}>
         <TouchableOpacity
           style={[styles.button, styles.previewTempOrderBtn]}
           onPress={handleTempOrderOpenModal}
         >
-          <Text style={styles.buttonText}>Προεσκόπιση</Text>
+          <Text style={styles.buttonText}>{strings.PREVIEW}</Text>
         </TouchableOpacity>
       </View>
       <Portal>

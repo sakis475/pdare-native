@@ -3,14 +3,16 @@ import { TextInput } from 'react-native-paper';
 import TableSelectHorizontalContainer from './TableSelectHorizontalContainer';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '../../core/theme';
+import { useStrings } from '../../core/localization/languageContext';
 
 export function SelectTable({ allTables, onTableSelect }: any) {
   const [text, setText] = useState('');
+  const strings = useStrings();
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="Search/New Table"
+          placeholder={strings.SEARCH_NEW_TABLE}
           placeholderTextColor="#fff"
           textColor="#fff"
           value={text}

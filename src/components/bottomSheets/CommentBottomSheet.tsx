@@ -14,6 +14,7 @@ import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../core/theme';
 import { TextInput } from 'react-native-paper';
 import { CategoryHeader } from '../helpers/CategoryHeader';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface CommentBottomSheetProps {
   item: ItemReq;
@@ -27,6 +28,8 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
     const snapPoints = useMemo(() => ['80%', '80%'], []);
 
     const [commentText, setCommentText] = useState(item.comment ? item.comment : '');
+
+    const strings = useStrings();
 
     const handleOpenModal = useCallback(async () => {
       bottomSheetRef.current?.expand();
@@ -55,7 +58,8 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
           }}
         >
           <Text style={styles.closeButtonText}>
-            Κλείσιμο <FontAwesomeIcon name={'angle-double-down'} size={20} color={colors.white} />
+            {strings.CLOSE}{' '}
+            <FontAwesomeIcon name={'angle-double-down'} size={20} color={colors.white} />
           </Text>
         </TouchableOpacity>
       </View>
@@ -85,18 +89,18 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
         >
           <BottomSheetView style={styles.tableChangeContainer}>
             <View style={{ flex: 1, gap: 3 }}>
-              <CategoryHeader title="Σχόλιο"></CategoryHeader>
+              <CategoryHeader title={strings.COMMENT}></CategoryHeader>
               <TextInput
                 mode={'flat'}
                 value={commentText}
-                placeholder="Γράψε σχόλιο για το προϊόν"
+                placeholder={strings.COMMENT_PLACEHOLDER}
                 onChangeText={(changedText) => {
                   setCommentText(changedText);
                 }}
                 contentStyle={{ backgroundColor: colors.white }}
                 style={{ backgroundColor: colors.white, minHeight: 100, fontSize: 20 }}
                 textColor={colors.black}
-                ref={textInputRef} // Set ref here
+                ref={textInputRef}
                 multiline={true}
               />
               {Platform.OS === 'ios' ? <CloseModalBtn></CloseModalBtn> : null}
@@ -118,8 +122,8 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 20,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center', // Center align the text horizontally
-    justifyContent: 'center', // Center align the text vertically
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   closeButtonText: {
     color: colors.white,

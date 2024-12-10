@@ -49,6 +49,7 @@ export async function login(username: string, password: string) {
 
 export async function logout() {
   try {
+    console.log('logout!!!!!!!!!!!!!!!!!!!!!!!!!11');
     //TODO: send to request also to log logged out event
     await setStorage('session_bearer', null);
     await clearRestaurantStorageRelatedKeys();
@@ -82,6 +83,7 @@ export async function register(registerData: RegisterData) {
 }
 
 export async function handleNoRestaurantUser(sessionBearer: SessionBearer) {
+  console.log('Handle No USER RESTAURANT USER!!!!!!!!!!!!!!!!!!!!!!!!!11');
   await setStorage('session_bearer', sessionBearer);
   await setStorage('currentUser', sessionBearer?.user);
   navigateReset(ScreenNames.NewUserSetupScreen);

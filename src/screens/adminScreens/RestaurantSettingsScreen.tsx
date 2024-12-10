@@ -2,12 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, TouchableOpacity, FlatList, StyleSheet, View, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { getStorage } from '../../storage/store';
 import { ActivityIndicator } from 'react-native-paper';
-import { logout } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
+import { LogoutFAB } from '../../components/LogoutFab';
 
 interface SettingOption {
   id: string;
@@ -33,35 +32,35 @@ const RestaurantSettingsScreen = ({ route }: any) => {
       },
       {
         id: '1',
-        title: 'Ιστορικό Παραγγελιών',
+        title: strings.ORDER_HISTORY,
         icon: 'history',
         screen: ScreenNames.HistoryOrdersScreen,
         allowedRoles: ['owner', 'waiter'],
       },
       {
         id: '2',
-        title: 'Προϊόντα',
+        title: strings.PRODUCTS,
         icon: 'shape-outline',
         screen: ScreenNames.ManageCategoriesScreen,
         allowedRoles: ['owner'],
       },
       {
         id: '3',
-        title: 'Τραπέζια',
+        title: strings.TABLES,
         icon: 'apps',
         screen: ScreenNames.ManageTableScreen,
         allowedRoles: ['owner'],
       },
       {
         id: '4',
-        title: 'Πρότυπα Ιδιοτήτων',
+        title: strings.PROPERTY_TEMPLATES,
         icon: 'cards-variant',
         screen: ScreenNames.ManageItemDetailsPatternScreen,
         allowedRoles: ['owner'],
       },
       {
         id: '5',
-        title: 'Προσωπικό',
+        title: strings.STAFF,
         icon: 'account-group',
         screen: ScreenNames.AdminPersonelScreen,
         allowedRoles: ['owner'],
@@ -124,17 +123,6 @@ const RestaurantSettingsScreen = ({ route }: any) => {
   );
 };
 
-const LogoutFAB: React.FC = () => {
-  return (
-    <TouchableOpacity style={styles.fabContainer} onPress={logout}>
-      <View style={styles.fab}>
-        <MaterialIcons name="logout" size={24} color={colors.white} />
-        <Text style={styles.fabText}>Logout</Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
 const styles = StyleSheet.create({
   centerContent: {
     justifyContent: 'center',
@@ -164,27 +152,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     lineHeight: 20,
-  },
-  fabContainer: {
-    position: 'absolute',
-    right: 16,
-    bottom: 16,
-  },
-  fab: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: colors.slightlyDarkerGrey,
-    borderColor: colors.slightlyLighterGrey,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 8,
-  },
-  fabText: {
-    color: colors.white,
-    fontSize: 12,
-    marginTop: 2,
   },
 });
 

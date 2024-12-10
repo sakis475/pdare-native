@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-nati
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Portal } from '@gorhom/portal';
 import { colors } from '../../core/theme';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface PropertyTypeBottomSheetProps {
   currentType: string;
@@ -13,6 +14,8 @@ const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
   ({ currentType, onTypeChange }, ref) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => [280, 340], []);
+
+    const strings = useStrings();
 
     const handleOpenModal = useCallback(() => {
       bottomSheetRef.current?.expand();
@@ -61,22 +64,20 @@ const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
         >
           <BottomSheetView style={styles.container}>
             <View style={styles.contentContainer}>
-              <Text style={styles.title}>Αλλαγή Τύπου Επιλογής</Text>
-              <Text style={styles.subtitle}>
-                Επιλέξτε αν θέλετε να έχετε πολλαπλή επιλογή ιδιοτήτων ή μονή
-              </Text>
+              <Text style={styles.title}>{strings.CHANGE_SELECTION_TYPE}</Text>
+              <Text style={styles.subtitle}>{strings.SELECTION_TYPE_DESCRIPTION}</Text>
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={[styles.button, currentType === 'singleselect' && styles.selectedButton]}
                   onPress={() => handleTypeSelection('singleselect')}
                 >
-                  <Text style={styles.buttonText}>Μονή</Text>
+                  <Text style={styles.buttonText}>{strings.SINGLE}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.button, currentType === 'multiselect' && styles.selectedButton]}
                   onPress={() => handleTypeSelection('multiselect')}
                 >
-                  <Text style={styles.buttonText}>Πολλαπλή</Text>
+                  <Text style={styles.buttonText}>{strings.MULTIPLE}</Text>
                 </TouchableOpacity>
               </View>
             </View>

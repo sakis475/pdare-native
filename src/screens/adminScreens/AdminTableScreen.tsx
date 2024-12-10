@@ -26,6 +26,7 @@ import { reqFetchTables } from '../../helpers/storage/tablesStorage';
 import { patchRequest } from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useStrings } from '../../core/localization/languageContext';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -64,20 +65,15 @@ const EditModal: React.FC<EditModalProps> = ({
 }) => {
   const [tableName, setTableName] = useState(table?.tableName || '');
 
+  const strings = useStrings();
+
   useEffect(() => {
     setTableName(table?.tableName || '');
   }, [table]);
 
   const handleSave = () => {
     if (!tableName.trim()) {
-      AlertWithOptions(
-        '',
-        'Το όνομα του τραπεζιού είναι κενό',
-        undefined,
-        undefined,
-        undefined,
-        ''
-      );
+      AlertWithOptions('', strings.EMPTY_TABLE_NAME, undefined, undefined, undefined, '');
       return;
     }
 
@@ -102,14 +98,14 @@ const EditModal: React.FC<EditModalProps> = ({
     if (!table || !onDelete) return;
 
     AlertWithOptions(
-      'Επιβεβαίωση Διαγραφής',
-      `Είστε σίγουροι ότι θέλετε να διαγράψετε το τραπέζι "${table.tableName}";`,
+      strings.DELETE_CONFIRMATION,
+      `${strings.DELETE_TABLE_CONFIRM}" ${table.tableName}"${strings.QUESTION_MARK}`,
       () => {
         onDelete(table.id);
         onDismiss();
       },
       undefined,
-      'Διαγραφή'
+      strings.DELETE
     );
   };
 
@@ -118,11 +114,11 @@ const EditModal: React.FC<EditModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>
-            {mode === 'create' ? 'Δημιουργία Τραπεζιού' : 'Ενημέρωση Τραπεζιού'}
+            {mode === 'create' ? strings.CREATE_TABLE : strings.UPDATE_TABLE}
           </Text>
 
           <TextInput
-            label="Όνομα Τραπεζιού"
+            label={strings.TABLE_NAME}
             value={tableName}
             onChangeText={setTableName}
             style={styles.input}
@@ -142,12 +138,12 @@ const EditModal: React.FC<EditModalProps> = ({
             )}
 
             <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? 'Δημιουργία' : 'Αποθήκευση'}
+              {mode === 'create' ? strings.CREATE : strings.SAVE}
             </Button>
           </View>
           <View style={styles.buttonUpdateContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              Ακύρωση
+              {strings.CANCEL}
             </Button>
           </View>
         </View>
@@ -257,6 +253,8 @@ const AdminTableScreen = () => {
   const [modalMode, setModalMode] = useState<'edit' | 'create'>('edit');
   const [isLoading, setIsLoading] = useState(false);
 
+  const strings = useStrings();
+
   const fetchTables = async () => {
     const allTables = await getStorage('tables');
     if (!allTables) {
@@ -288,9 +286,9 @@ const AdminTableScreen = () => {
 
       setTables(allTablesResult);
 
-      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς', 1100);
+      toast('success', strings.SUCCESS, strings.CHANGES_SAVED, 1100);
     } catch (error) {
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+      toast('error', strings.ERROR, strings.SAVE_ERROR);
     } finally {
       setIsLoading(false);
     }
@@ -346,8 +344,8 @@ const AdminTableScreen = () => {
     if (!tables?.length) return;
 
     AlertWithOptions(
-      'Αυτόματη Ταξινόμηση Τραπεζιών',
-      'Η ενέργεια αυτή θα αναδιατάξει τα τραπέζια με αλφαβητική σειρά. Θέλετε να συνεχίσετε;',
+      strings.AUTO_SORT_TABLES,
+      strings.AUTO_SORT_CONFIRM,
       async () => {
         setIsLoading(true);
         try {
@@ -360,9 +358,9 @@ const AdminTableScreen = () => {
           }));
 
           await handleTableUpdate(tablesWithNewIndexes);
-          toast('success', 'Επιτυχία', 'Τα τραπέζια ταξινομήθηκαν επιτυχώς', 1100);
+          toast('success', strings.SUCCESS, strings.SORT_SUCCESS, 1100);
         } catch (error) {
-          toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την ταξινόμηση');
+          toast('error', strings.ERROR, strings.SORT_ERROR);
         } finally {
           setIsLoading(false);
         }
@@ -421,8 +419,8 @@ const AdminTableScreen = () => {
         ) : (
           <>
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Τραπέζια που προστίθενται</Text>
-              <Text style={styles.emptyText}>θα εμφανίζονται εδώ</Text>
+              <Text style={styles.emptyText}>{strings.TABLES_WILL_APPEAR}</Text>
+              <Text style={styles.emptyText}>{strings.TABLES_WILL_APPEAR_HERE}</Text>
             </View>
             <FAB
               icon="plus"

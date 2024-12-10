@@ -7,6 +7,7 @@ import { toast } from '../../../core/utils';
 import { getItemPropertyPatterns } from '../../../helpers/storage/orderStorage';
 import { useNavigation } from '@react-navigation/native';
 import { navigate, ScreenNames } from '../../../navigation/navigationUtils';
+import { useStrings } from '../../../core/localization/languageContext';
 
 interface SelectPatternModalProps {
   visible: boolean;
@@ -23,6 +24,7 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
 
   const [patterns, setPatterns] = useState<PropertyPattern[]>([]);
   const [loading, setLoading] = useState(false);
+  const strings = useStrings();
 
   useEffect(() => {
     if (visible) {
@@ -37,7 +39,7 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
       setPatterns(fetchedPatterns);
     } catch (error) {
       console.error('Error loading patterns:', error);
-      toast('error', 'Error', 'Failed to load patterns');
+      toast('error', strings.ERROR, strings.FAILED_TO_LOAD_PATTERNS);
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,7 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
     >
       <Text style={styles.patternTitle}>{item.propertyPatternTitle}</Text>
       <Text style={styles.patternCount}>
-        {new Set(item.itemProperties.map((prop) => prop.propertyName)).size} properties
+        {new Set(item.itemProperties.map((prop) => prop.propertyName)).size} {strings.PROPERTIES}
       </Text>
     </TouchableOpacity>
   );
@@ -68,7 +70,7 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Επιλογή Μοτίβου</Text>
+            <Text style={styles.modalTitle}>{strings.SELECT_PATTERN}</Text>
             <TouchableOpacity onPress={onDismiss}>
               <MaterialIcons name="close" size={24} color={colors.white} />
             </TouchableOpacity>
@@ -83,7 +85,9 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
                 renderItem={renderPattern}
                 keyExtractor={(item) => item.id?.toString() || item.propertyPatternTitle}
                 contentContainerStyle={styles.patternList}
-                ListEmptyComponent={<Text style={styles.emptyText}>No patterns available</Text>}
+                ListEmptyComponent={
+                  <Text style={styles.emptyText}>{strings.NO_PATTERNS_AVAILABLE}</Text>
+                }
               />
 
               <View style={styles.footer}>
@@ -93,7 +97,7 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
                   style={styles.createButton}
                   icon="plus"
                 >
-                  Δημιουργία Νέου Μοτίβου
+                  {strings.CREATE_NEW_PATTERN}
                 </Button>
               </View>
             </>

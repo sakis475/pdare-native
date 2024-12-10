@@ -18,17 +18,8 @@ import { handleUserLogin, logout } from '../../helpers/storage/tokenRequests';
 import { SessionBearer } from '../../types/requests.types';
 import { clearRestaurantStorageRelatedKeys, getStorage } from '../../storage/store';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
-
-const LogoutFAB: React.FC = () => {
-  return (
-    <TouchableOpacity style={styles.fabContainer} onPress={logout}>
-      <View style={styles.fab}>
-        <MaterialIcons name="logout" size={24} color={colors.white} />
-        <Text style={styles.fabText}>Logout</Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
+import { LogoutFAB } from '../../components/LogoutFab';
+import { useStrings } from '../../core/localization/languageContext';
 
 const NewUserSetupScreen = () => {
   const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
@@ -36,6 +27,8 @@ const NewUserSetupScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>(undefined);
+
+  const strings = useStrings();
 
   const fetchData = async () => {
     const fetchUserWithInvitations: User = await getRequest('/user/invite');
@@ -52,7 +45,7 @@ const NewUserSetupScreen = () => {
 
   const handleCreateRestaurant = async () => {
     if (!restaurantName.trim()) {
-      toast('error', 'Σφάλμα', 'Παρακαλώ εισάγετε όνομα εστιατορίου');
+      toast('error', strings.ERROR, strings.ENTER_RESTAURANT_NAME);
       return;
     }
 
@@ -68,12 +61,12 @@ const NewUserSetupScreen = () => {
       const userLogin = await handleUserLogin(sessionBearer);
       if (userLogin) {
         console.log(restaurantName, 'restaurantName');
-        toast('success', 'Επιτυχία', 'Το εστιατόριο δημιουργήθηκε επιτυχώς');
+        toast('success', strings.SUCCESS, strings.RESTAURANT_CREATED);
       }
       // Navigate to next screen or refresh app state here
     } catch (error) {
       console.error('Error creating restaurant:', error);
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά τη δημιουργία του εστιατορίου');
+      toast('error', strings.ERROR, strings.CREATION_ERROR);
     } finally {
       setIsLoading(false);
       setCreateModalVisible(false);
@@ -84,7 +77,7 @@ const NewUserSetupScreen = () => {
     if (!selectedOption) {
       return (
         <View style={styles.optionsContainer}>
-          <Text style={styles.welcomeText}>Καλώς ήρθατε! Τι θα θέλατε να κάνετε;</Text>
+          <Text style={styles.welcomeText}>{strings.WELCOME_MESSAGE}</Text>
           <Button
             mode="contained"
             onPress={() => {
@@ -93,7 +86,7 @@ const NewUserSetupScreen = () => {
             }}
             style={styles.optionButton}
           >
-            Δημιουργία Εστιατορίου
+            {strings.CREATE_RESTAURANT}
           </Button>
           <View style={styles.buttonWithBadge}>
             <Button
@@ -101,7 +94,7 @@ const NewUserSetupScreen = () => {
               onPress={() => setSelectedOption('join')}
               style={styles.optionButton}
             >
-              Σύνδεση με Εστιατόριο
+              {strings.JOIN_RESTAURANT}
             </Button>
             {currentUser?.invitations?.length > 0 && (
               <View style={styles.badge}>
@@ -120,7 +113,9 @@ const NewUserSetupScreen = () => {
         <View style={styles.invitationCard}>
           <View style={styles.invitationInfo}>
             <Text style={styles.restaurantName}>{invitation.restaurant.restaurantName}</Text>
-            <Text style={styles.inviteFrom}>Από: {invitation.inviteFrom.email}</Text>
+            <Text style={styles.inviteFrom}>
+              {strings.FROM} {invitation.inviteFrom.email}
+            </Text>
           </View>
 
           <View style={styles.invitationActions}>
@@ -137,12 +132,12 @@ const NewUserSetupScreen = () => {
                     await clearRestaurantStorageRelatedKeys();
                     const userLogin = await handleUserLogin(sessionBearer);
                     if (userLogin) {
-                      toast('success', 'Επιτυχία', 'Συνδεθήκατε με το κατάστημα.');
+                      toast('success', strings.SUCCESS, strings.JOINED_SUCCESS);
                     }
                   }
                 } catch (error) {
                   console.error('Error accepting invitation:', error);
-                  toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποδοχή της πρόσκλησης');
+                  toast('error', strings.ERROR, strings.ACCEPT_ERROR);
                 } finally {
                   setIsLoading(false);
                 }
@@ -159,10 +154,10 @@ const NewUserSetupScreen = () => {
                 try {
                   await postRequest(`/user/invite/response/${invitation.id}`, { response: false });
                   await fetchData();
-                  toast('success', 'Επιτυχία', 'Η πρόσκληση απορρίφθηκε');
+                  toast('success', strings.SUCCESS, strings.INVITATION_DENIED);
                 } catch (error) {
                   console.error('Error denying invitation:', error);
-                  toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την απόρριψη της πρόσκλησης');
+                  toast('error', strings.ERROR, strings.DENY_ERROR);
                 } finally {
                   setIsLoading(false);
                 }
@@ -170,7 +165,7 @@ const NewUserSetupScreen = () => {
               style={styles.denyButton}
               textColor={colors.lightRed}
             >
-              Απόρριψη
+              {strings.DENY}
             </Button>
           </View>
         </View>
@@ -179,7 +174,7 @@ const NewUserSetupScreen = () => {
       if (currentUser?.invitations?.length > 0) {
         return (
           <View style={styles.invitationsContainer}>
-            <Text style={styles.invitationsTitle}>Προσκλήσεις σε Εστιατόρια</Text>
+            <Text style={styles.invitationsTitle}>{strings.RESTAURANT_INVITATIONS}</Text>
 
             <FlatList
               data={currentUser.invitations}
@@ -195,9 +190,7 @@ const NewUserSetupScreen = () => {
                 />
               }
               ListEmptyComponent={() => (
-                <Text style={styles.emptyText}>
-                  Δεν έχετε λάβει ακόμη πρόσκληση από κάποιο εστιατόριο.
-                </Text>
+                <Text style={styles.emptyText}>{strings.NO_INVITATIONS}</Text>
               )}
             />
 
@@ -207,7 +200,7 @@ const NewUserSetupScreen = () => {
               style={styles.backButton}
               textColor={colors.white}
             >
-              Επιστροφή
+              {strings.BACK}
             </Button>
           </View>
         );
@@ -215,11 +208,9 @@ const NewUserSetupScreen = () => {
 
       return (
         <View style={styles.waitingContainer}>
-          <Text style={styles.waitingText}>
-            Δεν έχετε λάβει ακόμη πρόσκληση από κάποιο εστιατόριο.
-          </Text>
+          <Text style={styles.waitingText}>{strings.NO_INVITATIONS}</Text>
           <Button mode="outlined" onPress={() => setSelectedOption(null)} style={styles.backButton}>
-            Επιστροφή
+            {strings.BACK}
           </Button>
         </View>
       );
@@ -243,15 +234,15 @@ const NewUserSetupScreen = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Δημιουργία Εστιατορίου</Text>
+            <Text style={styles.modalTitle}>{strings.CREATE_RESTAURANT}</Text>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Όνομα Εστιατορίου</Text>
+              <Text style={styles.inputLabel}>{strings.RESTAURANT_NAME}</Text>
               <TextInput
                 mode="outlined"
                 value={restaurantName}
                 onChangeText={setRestaurantName}
-                placeholder="Εισάγετε όνομα εστιατορίου"
+                placeholder={strings.ENTER_RESTAURANT_NAME_PLACEHOLDER}
                 style={styles.input}
                 returnKeyType="done"
                 blurOnSubmit={false}
@@ -270,7 +261,7 @@ const NewUserSetupScreen = () => {
                 }}
                 style={styles.cancelButton}
               >
-                Ακύρωση
+                {strings.CANCEL}
               </Button>
               <Button
                 mode="contained"
@@ -279,7 +270,7 @@ const NewUserSetupScreen = () => {
                 loading={isLoading}
                 disabled={isLoading}
               >
-                Δημιουργία
+                {strings.CREATE}
               </Button>
             </View>
           </View>

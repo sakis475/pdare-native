@@ -19,10 +19,13 @@ import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
 import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
 import { setTableTempOrder } from '../../helpers/storage/orderStorage';
+import { useStrings } from '../../core/localization/languageContext';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>(null);
+
+  const strings = useStrings();
 
   const fetchItems = async () => {
     const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
@@ -100,7 +103,7 @@ const ItemListScreen = ({ route }: any) => {
         </>
       ) : items?.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Δεν βρέθηκαν προιόντα.</Text>
+          <Text style={styles.emptyText}>{strings.NO_PRODUCTS_FOUND}</Text>
         </View>
       ) : (
         <ActivityIndicator size={'large'} animating={true} color={colors.primary} />

@@ -23,6 +23,7 @@ import {
 } from '../../components/basic/Icons';
 import dayjs from '../../core/dayjs';
 import { storageInitPersonelUsers } from '../../helpers/storage/storageInit';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface SearchUserModalProps {
   visible: boolean;
@@ -39,6 +40,8 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
   const [searchResult, setSearchResult] = useState<(User & { isInvited: boolean }) | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeout = useRef<NodeJS.Timeout>();
+
+  const strings = useStrings();
 
   useEffect(() => {
     if (visible) {
@@ -60,7 +63,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
       return;
     }
 
-    if (emailValidator(query)) {
+    if (emailValidator(query, strings)) {
       return;
     }
 
@@ -82,7 +85,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
       }
     } catch (error) {
       console.error('Error searching user:', error);
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αναζήτηση');
+      toast('error', strings.ERROR, strings.SEARCH_ERROR);
       setSearchResult(null);
     } finally {
       setIsSearching(false);
@@ -122,14 +125,14 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
           isInvited: true,
         });
       }
-      toast('success', 'Επιτυχία', 'Η πρόσκληση στάλθηκε επιτυχώς');
+      toast('success', strings.SUCCESS, strings.INVITATION_SENT);
       if (onInviteSuccess) {
         onInviteSuccess(); // Call the callback to refresh the parent
       }
       onDismiss();
     } catch (error) {
       console.error('Error inviting user:', error);
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποστολή της πρόσκλησης');
+      toast('error', strings.ERROR, strings.INVITATION_ERROR);
     }
   };
 
@@ -141,7 +144,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
 
     // If there's no search result after searching
     if (!searchResult && !isSearching) {
-      return <Text style={styles.noResults}>Δεν βρέθηκαν χρήστες</Text>;
+      return <Text style={styles.noResults}>{strings.NO_USERS_FOUND}</Text>;
     }
 
     if (searchResult) {
@@ -165,24 +168,24 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
             disabled={searchResult.isInvited}
           >
             <Text style={{ color: colors.white }}>
-              {searchResult.isInvited ? 'Προσκλήθηκε' : 'Πρόσκληση'}
+              {searchResult.isInvited ? strings.INVITED : strings.INVITE}
             </Text>
           </Button>
         </View>
       );
     }
 
-    return <Text style={styles.noResults}>Αναζήτηση...</Text>;
+    return <Text style={styles.noResults}>{strings.SEARCHING}</Text>;
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Αναζήτηση Χρήστη</Text>
+          <Text style={styles.modalTitle}>{strings.SEARCH_USER}</Text>
 
           <Searchbar
-            placeholder="Αναζήτηση με email"
+            placeholder={strings.SEARCH_BY_EMAIL}
             onChangeText={handleSearchChange}
             value={searchQuery}
             style={styles.searchBar}
@@ -196,7 +199,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
 
           <View style={styles.buttonContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              Ακύρωση
+              {strings.CANCEL}
             </Button>
           </View>
         </View>
@@ -223,6 +226,8 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   const [role, setRole] = useState<'owner' | 'waiter' | 'guest'>(user?.role || 'guest');
   const [displayName, setDisplayName] = useState(user?.displayName || '');
 
+  const strings = useStrings();
+
   useEffect(() => {
     setRole(user?.role || 'waiter');
     setDisplayName(user?.displayName || '');
@@ -243,14 +248,14 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     if (!user || !onDelete) return;
 
     AlertWithOptions(
-      'Επιβεβαίωση Διαγραφής',
-      `Είστε σίγουροι ότι θέλετε να διαγράψετε τον χρήστη "${user.email}";`,
+      strings.DELETE_CONFIRMATION,
+      `${strings.DELETE_USER_CONFIRM} "${user.email}"${strings.QUESTION_MARK}`,
       () => {
         onDelete(user);
         onDismiss();
       },
       undefined,
-      'Διαγραφή'
+      strings.DELETE
     );
   };
 
@@ -258,14 +263,14 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Ενημέρωση Χρήστη</Text>
+          <Text style={styles.modalTitle}>{strings.UPDATE_USER}</Text>
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Εμφανιζόμενο Όνομα</Text>
+            <Text style={styles.inputLabel}>{strings.DISPLAY_NAME}</Text>
             <TextInput
               mode="outlined"
               value={displayName}
               onChangeText={setDisplayName}
-              placeholder="Εισάγετε εμφανιζόμενο όνομα"
+              placeholder={strings.ENTER_DISPLAY_NAME}
               style={styles.input}
             />
           </View>
@@ -283,12 +288,12 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
             )}
 
             <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              Αποθήκευση
+              {strings.SAVE}
             </Button>
           </View>
           <View style={styles.buttonContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              Ακύρωση
+              {strings.CANCEL}
             </Button>
           </View>
         </View>
@@ -305,6 +310,8 @@ const AdminPersonelScreen = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
+  const strings = useStrings();
 
   const fetchData = async () => {
     const fetchedUsers: User[] = (await getStorage('personelUsers')) || [];
@@ -338,10 +345,10 @@ const AdminPersonelScreen = () => {
       }
       await setStorage('personelUsers', response);
       setUsers(response);
-      toast('success', 'Επιτυχία', 'Οι αλλαγές αποθηκεύτηκαν επιτυχώς');
+      toast('success', strings.SUCCESS, strings.CHANGES_SAVED);
     } catch (error) {
       console.error('Error updating users:', error);
-      toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την αποθήκευση');
+      toast('error', strings.ERROR, strings.SAVE_ERROR);
     } finally {
       setIsLoading(false);
     }
@@ -357,32 +364,28 @@ const AdminPersonelScreen = () => {
   };
 
   const handleCancelInvitation = (invitation: InvitationRequest) => {
-    AlertWithOptions(
-      'Επιβεβαίωση Διαγραφής',
-      'Είστε σίγουροι ότι θέλετε να διαγράψετε την πρόσκληση;',
-      async () => {
-        try {
-          setIsLoading(true);
-          await deleteRequest(`/user/invite/${invitation.id}`);
-          setInvitations((prev) => prev.filter((inv) => inv.id !== invitation.id));
-          toast('success', 'Επιτυχία', 'Η πρόσκληση διαγράφηκε');
-        } catch (error) {
-          console.error('Error deleting invitation:', error);
-          toast('error', 'Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την διαγραφή');
-        } finally {
-          setIsLoading(false);
-        }
+    AlertWithOptions(strings.DELETE_CONFIRMATION, strings.DELETE_INVITATION_CONFIRM, async () => {
+      try {
+        setIsLoading(true);
+        await deleteRequest(`/user/invite/${invitation.id}`);
+        setInvitations((prev) => prev.filter((inv) => inv.id !== invitation.id));
+        toast('success', strings.SUCCESS, strings.INVITATION_DELETED);
+      } catch (error) {
+        console.error('Error deleting invitation:', error);
+        toast('error', strings.ERROR, strings.DELETE_ERROR);
+      } finally {
+        setIsLoading(false);
       }
-    );
+    });
   };
 
   const renderInvitationCard = (invitation: InvitationRequest) => (
     <View style={[styles.userCard, styles.invitationCard]}>
       <View style={styles.userInfo}>
-        <Text style={styles.pendingLabel}>Εκκρεμής Πρόσκληση</Text>
+        <Text style={styles.pendingLabel}>{strings.PENDING_INVITATION}</Text>
         <Text style={styles.userName}>{invitation.inviteTo.email}</Text>
         <Text style={styles.dateText}>
-          Στάλθηκε: {dayjs(invitation.createdAt).format('DD/MM/YY HH:mm:ss')}
+          {strings.SENT_ON} {dayjs(invitation.createdAt).format('DD/MM/YY HH:mm:ss')}
         </Text>
       </View>
       <Button
@@ -436,8 +439,8 @@ const AdminPersonelScreen = () => {
 
   const ListEmptyComponent = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>Δεν βρέθηκαν χρήστες ή προσκλήσεις</Text>
-      <Text style={styles.emptyText}>Αναζητήστε για να προσθέσετε καινούργιους.</Text>
+      <Text style={styles.emptyText}>{strings.NO_USERS_OR_INVITATIONS}</Text>
+      <Text style={styles.emptyText}>{strings.SEARCH_TO_ADD}</Text>
     </View>
   );
   return (
@@ -460,6 +463,7 @@ const AdminPersonelScreen = () => {
             contentContainerStyle={styles.searchResultsContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={ListEmptyComponent}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}

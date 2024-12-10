@@ -3,10 +3,10 @@ import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Text, TextInput, Button, Divider, Portal, Dialog, Checkbox } from 'react-native-paper';
 import { ScrollView, State } from 'react-native-gesture-handler';
 import { colors } from '../../core/theme';
-import { strings } from '../../core/strings';
 import { postRequest, setBearer } from '../../helpers/requests';
 import { clearRestaurantStorageRelatedKeys } from '../../storage/store';
 import { register, RegisterData } from '../../helpers/storage/tokenRequests';
+import { useStrings } from '../../core/localization/languageContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -41,49 +41,6 @@ export interface ValidationRule {
   fieldName: keyof FormState;
 }
 
-export const validationRules: Record<keyof FormState, ValidationRule> = {
-  email: {
-    validate: (value) => {
-      if (!value) return 'Πρέπει να εισάγεται το Email σας';
-      const re = /\S+@\S+\.\S+/;
-      return !re.test(value) ? 'Ουυπς.Το Email δεν είναι έγκυρο' : '';
-    },
-    fieldName: 'email',
-  },
-  password: {
-    validate: (value, state) => {
-      if (!value) return 'Πρέπει να εισάγεται τον Κωδικό σας';
-      if (value.length < 5) return 'Ο κωδικός πρέπει να είναι τουλάχιστον 5 χαρακτήρες μεγάλος';
-
-      return '';
-    },
-    fieldName: 'password',
-  },
-  passwordRepeat: {
-    validate: (value, state) => {
-      return value !== state.password.value ? 'Οι κωδικός επαλήθευσης δεν ταιριάζει.' : '';
-    },
-    fieldName: 'passwordRepeat',
-  },
-};
-
-const PrivacyPolicyDialog: React.FC<PrivacyPolicyDialogProps> = ({ visible, onDismiss }) => (
-  <Portal>
-    <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
-      <Dialog.Title style={styles.dialogTitle}>Πολιτική Απορρήτου</Dialog.Title>
-      <Dialog.ScrollArea style={styles.dialogScrollArea}>
-        <ScrollView>
-          <Text style={styles.policyText}>{strings.PRIVACY_POLICY_TEXT}</Text>
-        </ScrollView>
-      </Dialog.ScrollArea>
-      <Dialog.Actions>
-        <Button onPress={onDismiss} textColor={colors.white}>
-          Κλείσιμο
-        </Button>
-      </Dialog.Actions>
-    </Dialog>
-  </Portal>
-);
 export const initialFormState: FormState = {
   email: { value: '', error: '' },
   password: { value: '', error: '' },
@@ -134,6 +91,52 @@ const RegisterScreen: React.FC = () => {
   const [showPolicyError, setShowPolicyError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const strings = useStrings();
+
+  const validationRules: Record<keyof FormState, ValidationRule> = {
+    email: {
+      validate: (value) => {
+        if (!value) return strings.EMAIL_REQUIRED;
+        const re = /\S+@\S+\.\S+/;
+        return !re.test(value) ? strings.ERROR_EMAIL_INVALID : '';
+      },
+      fieldName: 'email',
+    },
+    password: {
+      validate: (value, state) => {
+        if (!value) return strings.PASSWORD_REQUIRED;
+        if (value.length < 5) return strings.PASSWORD_LENGTH;
+
+        return '';
+      },
+      fieldName: 'password',
+    },
+    passwordRepeat: {
+      validate: (value, state) => {
+        return value !== state.password.value ? strings.PASSWORDS_DO_NOT_MATCH : '';
+      },
+      fieldName: 'passwordRepeat',
+    },
+  };
+
+  const PrivacyPolicyDialog: React.FC<PrivacyPolicyDialogProps> = ({ visible, onDismiss }) => (
+    <Portal>
+      <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
+        <Dialog.Title style={styles.dialogTitle}>{strings.PRIVACY_POLICY}</Dialog.Title>
+        <Dialog.ScrollArea style={styles.dialogScrollArea}>
+          <ScrollView>
+            <Text style={styles.policyText}>{strings.PRIVACY_POLICY_TEXT}</Text>
+          </ScrollView>
+        </Dialog.ScrollArea>
+        <Dialog.Actions>
+          <Button onPress={onDismiss} textColor={colors.white}>
+            {strings.CLOSE}
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  );
+
   const handleFieldChange = useCallback((fieldName: keyof FormState, value: string) => {
     setFormState((prev) => ({
       ...prev,
@@ -183,7 +186,6 @@ const RegisterScreen: React.FC = () => {
   }, [formState]);
 
   const handleSubmit = useCallback(async () => {
-    console.log('Form submitting');
     if (isSubmitting) return;
 
     setIsSubmitting(true);
@@ -216,14 +218,14 @@ const RegisterScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.mainContent}>
-        <Text style={styles.header}>Δημιουργία Λογαριασμού</Text>
+        <Text style={styles.header}>{strings.CREATE_ACCOUNT}</Text>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.fieldsContainer}>
             <FormField
-              label="Email"
+              label={strings.EMAIL}
               value={formState.email.value}
               error={formState.email.error}
               onChangeText={(text) => handleFieldChange('email', text)}
@@ -231,7 +233,7 @@ const RegisterScreen: React.FC = () => {
               keyboardType="email-address"
             />
             <FormField
-              label="Κωδικός"
+              label={strings.PASSWORD}
               value={formState.password.value}
               error={formState.password.error}
               onChangeText={(text) => handleFieldChange('password', text)}
@@ -239,7 +241,7 @@ const RegisterScreen: React.FC = () => {
               secureTextEntry
             />
             <FormField
-              label="Επαλήθευση Κωδικού"
+              label={strings.PASSWORD_CONFIRMATION}
               value={formState.passwordRepeat.value}
               error={formState.passwordRepeat.error}
               onChangeText={(text) => handleFieldChange('passwordRepeat', text)}
@@ -259,24 +261,20 @@ const RegisterScreen: React.FC = () => {
                 color={colors.white}
               />
               <Text style={styles.policyText}>
-                Συμφωνώ με την{' '}
+                {strings.AGREE_TO_PRIVACY}{' '}
                 <Text style={styles.policyLink} onPress={() => setPolicyDialogVisible(true)}>
-                  πολιτική απορρήτου
+                  {strings.PRIVACY_POLICY_LINK}
                 </Text>
               </Text>
             </View>
-            {showPolicyError && (
-              <Text style={styles.error}>
-                Πρέπει να αποδεχτείτε την πολιτική απορρήτου για να συνεχίσετε
-              </Text>
-            )}
+            {showPolicyError && <Text style={styles.error}>{strings.PRIVACY_POLICY_REQUIRED}</Text>}
           </View>
         </ScrollView>
       </View>
 
       <View style={styles.bottomContainer}>
         <TouchableOpacity onPress={handleSubmit} style={styles.button} disabled={isSubmitting}>
-          <Text style={styles.buttonText}>Εγγραφή</Text>
+          <Text style={styles.buttonText}>{strings.REGISTER}</Text>
         </TouchableOpacity>
       </View>
 
