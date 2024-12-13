@@ -1,7 +1,7 @@
 import { AppLanguage } from '../core/localization/strings';
 
 export const ENV_TYPE: 'PROD' | 'DEV' = 'DEV';
-export const BASE_DOMAIN = 'https://d1fe-2a10-9300-400-e40-64c5-2f7d-dd71-4ae5.ngrok-free.app';
+export const BASE_DOMAIN = 'https://c6b4-2a10-9300-400-e40-fbde-dae0-9e3-4106.ngrok-free.app';
 export const BASE_URL = BASE_DOMAIN + '/api/v1';
 export const DEFAULT_APP_LANGUAGE: AppLanguage = 'lang_en';
 export const REQ_TIMEOUT = 60000;
@@ -23,6 +23,15 @@ export const DEFAULT_SOCKET_CONNECTIONS = ['testio'];
     Add the ability to mark items with colors
     Add the ability to mark items as finished (Strikethrough)
     Add the ability to mark list as finished
+    
+    One button for Expo order that will make orderReady and all items of it itemReady.
+    When new items are added to order, make the orderReady false so it will reappear at expo. But dont list the previous itemReady->true items. 
+    order -> orderReady
+    item -> itemReady
+
+    
+
+
 7. Make all static text to json and use strings.ts, make two versions greek/english, add an option to change language to profile screen.
 9. Finish Register Screen, Login Screen (implement Forget password).
 10. Profile Screen, change name, password, first name, last name, leave restaurant option, some other personalize options like language

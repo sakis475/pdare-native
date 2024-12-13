@@ -126,7 +126,7 @@ const TablesScreen = ({ currentIndex }: any) => {
               <FlashList
                 data={activeTables}
                 renderItem={({ item, index }) => renderItems(item, index)}
-                keyExtractor={(item) => item.tableName + item.id}
+                keyExtractor={(item) => `table-${item.id}`}
                 estimatedItemSize={20}
                 numColumns={4}
                 ListEmptyComponent={ListEmptyComponent}

@@ -1,138 +1,259 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Keyboard, SafeAreaView } from 'react-native';
-import { Divider, Portal } from 'react-native-paper';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  SafeAreaView,
+  Dimensions,
+  FlatList,
+  RefreshControl,
+  TouchableOpacity,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
+import { Divider } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
 import { useIsFocused } from '@react-navigation/native';
 import { colors } from '../core/theme';
-import { ScreenNames, navigate } from '../navigation/navigationUtils';
-import { AlertWithOptions } from '../core/utils';
-import TableSelectBottomSheet from '../components/bottomSheets/TableSelectBottomSheet';
-import {
-  createNewOrder,
-  getTempOrder,
-  markActiveItemForDelete,
-  setTableTempOrder,
-  convertOccupiedOrderToOrder,
-} from '../helpers/storage/orderStorage';
-import { CatalogItemAdded } from '../components/itemComponents/CatalogItemAdded';
-import { CatalogItemDisabled } from '../components/itemComponents/CatalogItemDisabled';
 import { HeaderBar } from '../components/helpers/HeaderBar';
+import { CatalogItemDisabled } from '../components/itemComponents/CatalogItemDisabled';
 import * as Requests from '../helpers/requests';
-import { getStorage } from '../storage/store';
+import { getStorage, setStorage } from '../storage/store';
 import { EventEmitter, ORDERS_UPDATED } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
 import { useStrings } from '../core/localization/languageContext';
+import { CatalogItemViewOnly } from '../components/itemComponents/CatalogItemViewOnly';
+import dayjs from '../core/dayjs';
+import { AppsIcon, ClockIcon, TableIcon } from '../components/basic/Icons';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface ExpoScreenProps {
   currentIndex?: number;
 }
 
-const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
-  const [table, setTable] = useState<Table>();
-  const [items, setItems] = useState<ItemReq[]>();
+const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 }) => {
+  const [activeTables, setActiveTables] = useState<Table[]>();
+  const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const flatListRef = useRef<FlatList>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
 
+  const isButtonScrollRef = useRef(false);
   const strings = useStrings();
 
-  // Handle socket updates
-  const handleTableUpdates = async (updatedTables: Table[]): Promise<void> => {
-    // Update current table if it exists in updates
-    const currentTableUpdate = updatedTables.find((t) => t.id === table?.id);
-    if (currentTableUpdate) {
-      setTable(currentTableUpdate);
-      setItems(currentTableUpdate.occupiedByOrder?.orderItems ?? []);
-    }
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchInitialTables();
+    setRefreshing(false);
   };
 
-  const fetchItems = async () => {
+  const fetchInitialTables = async (): Promise<void> => {
     try {
-      const tempOrder: Order = await getTempOrder();
-
-      // Fetch latest table data from server
-      if (tempOrder?.table?.id) {
-        const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
-        if (allTablesIO) {
-          const processedTables = await processTables(allTablesIO);
-          const currentTable = processedTables.find((t) => t.id === tempOrder.table.id);
-          if (currentTable) {
-            setTable(currentTable);
-            setItems(currentTable.occupiedByOrder?.orderItems ?? []);
-            return;
-          }
-        }
+      const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
+      if (!allTablesIO) {
+        return;
       }
-
-      // Fallback to temp order if server fetch fails
-      setTable(tempOrder?.table);
-      setItems(tempOrder?.orderItems ?? []);
+      const allTables = await processTables(allTablesIO);
+      await setStorage('tableOrders', allTables);
+      setActiveTables(allTables.filter((table) => table.occupiedByOrder));
     } catch (error) {
-      console.error('Error fetching items:', error);
-      // Fallback to temp order if there's an error
-      const tempOrder: Order = await getTempOrder();
-      setTable(tempOrder?.table);
-      setItems(tempOrder?.orderItems ?? []);
+      console.error('Error fetching initial table data:', error);
     }
   };
 
-  // Set up socket listener
+  const handleTableUpdates = async (): Promise<void> => {
+    console.log('ORDERS_UPDATED');
+    const updatedTables = await getStorage('tableOrders');
+    setActiveTables(updatedTables?.filter((table) => table.occupiedByOrder));
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchInitialTables();
+    }
+  }, [isFocused]);
+
   useEffect(() => {
     EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
-  }, []); // Depend on table to ensure we have latest table reference in handleTableUpdates
+  }, []);
 
-  // Fetch items when screen is focused or route changes
-  useEffect(() => {
-    if (currentIndex && currentIndex !== 1) return;
-    // fetchItems();
-  }, [isFocused, currentIndex]);
-
-  const refreshTempList = async () => {
-    // await fetchItems();
-  };
-
-  const renderItems = (item: ItemReq) => {
+  const renderOrderItem = ({ item }: { item: ItemReq }) => {
     return (
       <View
         style={[styles.itemContainer, item.markForDelete && { backgroundColor: colors.lightRed }]}
       >
-        {item.alreadySend ? (
-          <CatalogItemDisabled
-            item={item}
-            refreshList={refreshTempList}
-            onItemDelete={async (item: ItemReq) => {
-              await markActiveItemForDelete(item);
-              refreshTempList();
-            }}
-          />
-        ) : (
-          <CatalogItemAdded item={item} refreshList={refreshTempList} onItemPress={() => {}} />
-        )}
+        <CatalogItemViewOnly
+          item={item}
+          refreshList={handleTableUpdates}
+          onItemDelete={async () => {}}
+        />
       </View>
     );
   };
 
+  const renderTable = ({ item, index }: { item: Table; index: number }) => {
+    const orderItems = item.occupiedByOrder?.orderItems || [];
+
+    return (
+      <View style={styles.slideContainer}>
+        <View style={styles.headerContainer}>
+          <View style={styles.headerRow}>
+            <View style={styles.table}>
+              <TableIcon size={26}></TableIcon>
+              <Text style={styles.tableName}>{item.tableName}</Text>
+            </View>
+            <View style={styles.table}>
+              <ClockIcon size={20}></ClockIcon>
+              <Text style={styles.orderTime}>
+                {dayjs(item.occupiedByOrder?.createdAt).format('HH:MM')}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.listContainer}>
+          {orderItems.length > 0 ? (
+            <FlashList
+              data={orderItems}
+              renderItem={renderOrderItem}
+              estimatedItemSize={20}
+              keyExtractor={(item) => item.newItemId || item.id?.toString()}
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={styles.listContent}
+              ItemSeparatorComponent={Divider}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[colors.primary]}
+                  tintColor={colors.primary}
+                />
+              }
+            />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No items in this order</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  const onPaginationPress = useCallback((index: number) => {
+    isButtonScrollRef.current = true;
+    flatListRef.current?.scrollToIndex({
+      index,
+      animated: true,
+      viewPosition: 0.5,
+    });
+    setActiveIndex(index);
+  }, []);
+
+  const onViewableItemsChanged = useCallback(({ viewableItems }: any) => {
+    if (viewableItems[0] && !isButtonScrollRef.current) {
+      setActiveIndex(viewableItems[0].index);
+    }
+  }, []);
+
+  const onMomentumScrollEnd = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / SCREEN_WIDTH);
+    setActiveIndex(index);
+    isButtonScrollRef.current = false;
+  }, []);
+
+  const paginationListRef = useRef<FlatList>(null);
+
+  // Add this function to calculate the scroll position
+  const scrollPaginationToCenter = useCallback(() => {
+    const itemWidth = 38;
+    const itemOffset = itemWidth * activeIndex;
+    const centeredOffset = itemOffset;
+
+    paginationListRef.current?.scrollToOffset({
+      offset: Math.max(0, centeredOffset),
+      animated: true,
+    });
+  }, [activeIndex]);
+
+  useEffect(() => {
+    scrollPaginationToCenter();
+  }, [activeIndex, scrollPaginationToCenter]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <HeaderBar headerTitle={strings.EXPO} />
-
       <View style={styles.container}>
-        {items && items.length > 0 ? (
-          <View style={styles.listContainer}>
-            <FlashList
-              data={items}
-              keyExtractor={(item) => item.newItemId}
-              renderItem={({ item }) => renderItems(item)}
-              estimatedItemSize={50}
-              contentContainerStyle={styles.listContent}
-              showsVerticalScrollIndicator={true}
-              persistentScrollbar={true}
-              ItemSeparatorComponent={Divider}
-            />
-          </View>
-        ) : items?.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>Προϊόντα που θα προσθέσετε</Text>
-            <Text style={styles.emptyText}>θα εμφανιστούν εδώ.</Text>
-          </View>
+        {activeTables ? (
+          activeTables.length > 0 ? (
+            <>
+              <FlatList
+                ref={flatListRef}
+                data={activeTables}
+                renderItem={renderTable}
+                keyExtractor={(item) => item.id.toString()}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onViewableItemsChanged={onViewableItemsChanged}
+                onMomentumScrollEnd={onMomentumScrollEnd}
+                viewabilityConfig={{
+                  itemVisiblePercentThreshold: 50,
+                  minimumViewTime: 100,
+                }}
+                initialScrollIndex={initialIndex}
+                getItemLayout={(data, index) => ({
+                  length: SCREEN_WIDTH,
+                  offset: SCREEN_WIDTH * index,
+                  index,
+                })}
+              />
+
+              <View style={styles.paginationWrapper}>
+                <FlatList
+                  ref={paginationListRef}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={activeTables}
+                  contentContainerStyle={[
+                    styles.paginationContainer,
+                    { paddingHorizontal: SCREEN_WIDTH / 2 - 15 },
+                  ]}
+                  keyExtractor={(_, index) => index.toString()}
+                  renderItem={({ index }) => (
+                    <TouchableOpacity
+                      onPress={() => onPaginationPress(index)}
+                      style={[
+                        styles.paginationNumber,
+                        index === activeIndex && styles.paginationNumberActive,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.paginationNumberText,
+                          index === activeIndex && styles.paginationNumberTextActive,
+                        ]}
+                      >
+                        {index + 1}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  getItemLayout={(_, index) => ({
+                    length: 38, // width + marginHorizontal
+                    offset: index,
+                    index,
+                  })}
+                />
+              </View>
+            </>
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No active orders found</Text>
+            </View>
+          )
         ) : (
           <ActivityIndicator size="large" animating={true} color={colors.primary} />
         )}
@@ -147,16 +268,24 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingTop: 20,
     backgroundColor: '#2F2F2F',
-    justifyContent: 'center',
-    alignContent: 'center',
+  },
+  slideContainer: {
+    width: SCREEN_WIDTH,
+    flex: 1,
+    paddingVertical: 20,
+  },
+  orderCount: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 5,
   },
   listContainer: {
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 20,
   },
   itemContainer: {
     marginVertical: 10,
@@ -165,30 +294,82 @@ const styles = StyleSheet.create({
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   emptyText: {
-    textAlign: 'center',
-    color: '#ffffff',
+    color: '#999',
+    fontSize: 16,
   },
-  tableButtonContainer: {
-    alignItems: 'flex-end',
-    paddingVertical: 2,
-    backgroundColor: colors.darkerGrey,
+  summaryContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#444',
   },
-  tableButton: {
-    marginRight: 20,
-    width: 60,
-    height: 60,
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  summaryText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  paginationWrapper: {
+    paddingVertical: 15,
+  },
+  paginationContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'blue',
-    padding: 4,
-    borderRadius: 6,
+    flexDirection: 'row',
+    paddingHorizontal: 20,
   },
-  buttonText: {
+  paginationNumber: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#666',
+    marginHorizontal: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  paginationNumberActive: {
+    backgroundColor: colors.primary,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+  },
+  paginationNumberText: {
     color: 'white',
+    fontSize: 14,
+  },
+  paginationNumberTextActive: {
+    fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 15,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  table: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+  },
+  tableName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.white,
+  },
+  orderTime: {
+    fontSize: 16,
+    color: colors.white,
   },
 });
 

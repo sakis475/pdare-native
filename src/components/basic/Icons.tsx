@@ -43,7 +43,7 @@ export const AppsIcon = ({ size = 24, color = colors.white, style }: IconProps) 
 export const HistoryIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
   return <MaterialIcons name="history" size={size} color={color} style={style} />;
 };
-export const tickBoxIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+export const TickBoxIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
   return <MaterialIcons name="check" size={size} color={color} style={style} />;
 };
 
@@ -77,6 +77,28 @@ export const ChevronRightIcon = ({ size = 24, color = '#fff', style }: IconProps
 
 export const ULeftArrowIcon = ({ size = 22, color = colors.white, style }: IconProps = {}) => {
   return <MaterialCommunityIcons name="arrow-u-left-top" size={size} color={color} style={style} />;
+};
+
+export const TableIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return (
+    <MaterialCommunityIcons
+      name="apps"
+      size={size}
+      color={color}
+      style={style}
+    ></MaterialCommunityIcons>
+  );
+};
+
+export const ClockIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return (
+    <MaterialCommunityIcons
+      name="clock-time-eight-outline"
+      size={size}
+      color={color}
+      style={style}
+    ></MaterialCommunityIcons>
+  );
 };
 
 export const DoubleDownIcon = ({ size = 20, color = colors.white, style }: IconProps = {}) => {
