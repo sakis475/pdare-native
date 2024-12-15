@@ -13,8 +13,15 @@ class SocketManager {
   private user: User | null = null;
   private eventListeners: Map<EventId, Set<EventListener>> = new Map();
   private static instance: SocketManager | null = null;
-  private initialized: boolean = false;
   private pendingEventSubscriptions: Map<EventId, Set<EventCallback>> = new Map();
+  private currentRoom: string | null = null;
+  private lastConnectedUrl: string | null = null;
+  private lastConnectedOptions: any = null;
+  private reconnectionTimer: NodeJS.Timeout | null = null;
+
+  private reconnectionAttempts: number = 0;
+  private maxReconnectionAttempts: number = 10; // Increased max attempts
+  private reconnectionDelay: number = 1000;
 
   private constructor() {
     this.loadCurrentUser();
@@ -33,8 +40,11 @@ class SocketManager {
       if (this.isValidUser(user)) {
         this.user = user;
         console.log('Current user loaded:', this.user);
-        // Handle any pending subscriptions if user is now available
         await this.handlePendingSubscriptions();
+        // Join restaurant room if connected
+        if (this.socket?.connected) {
+          this.joinRestaurantRoom();
+        }
       } else {
         this.user = null;
         this.handleNoUser();
@@ -52,8 +62,8 @@ class SocketManager {
 
   private handleNoUser(): void {
     console.warn('No valid user found. Socket functionality is disabled.');
+    this.leaveRestaurantRoom();
     this.disconnect();
-    // Store current subscriptions as pending
     this.eventListeners.forEach((listeners, eventId) => {
       const callbacks = new Set(Array.from(listeners).map((l) => l.callback));
       this.pendingEventSubscriptions.set(eventId, callbacks);
@@ -64,7 +74,6 @@ class SocketManager {
   private async handlePendingSubscriptions(): Promise<void> {
     if (!this.user || !this.socket) return;
 
-    // Resubscribe pending listeners
     for (const [eventId, callbacks] of this.pendingEventSubscriptions) {
       for (const callback of callbacks) {
         await this.on(eventId, callback);
@@ -73,12 +82,39 @@ class SocketManager {
     this.pendingEventSubscriptions.clear();
   }
 
+  private joinRestaurantRoom(): void {
+    if (!this.user || !this.socket) return;
+
+    const roomName = `restaurant:${this.user.restaurant.id}`;
+    if (this.currentRoom !== roomName) {
+      if (this.currentRoom) {
+        this.socket.emit('leaveRestaurant', this.currentRoom.split(':')[1]);
+      }
+      this.socket.emit('joinRestaurant', this.user.restaurant.id);
+      this.currentRoom = roomName;
+      console.log(`Joined room: ${roomName}`);
+    }
+  }
+
+  private leaveRestaurantRoom(): void {
+    if (this.currentRoom && this.socket) {
+      this.socket.emit('leaveRestaurant', this.currentRoom.split(':')[1]);
+      this.currentRoom = null;
+      console.log('Left restaurant room');
+    }
+  }
+
   public async updateUserInstance(): Promise<void> {
     try {
       const user = await getStorage('currentUser');
       if (this.isValidUser(user)) {
-        console.log('user is valid');
+        const needsRoomUpdate = !this.user || this.user.restaurant.id !== user.restaurant.id;
         this.user = user;
+
+        if (needsRoomUpdate) {
+          this.joinRestaurantRoom();
+        }
+
         await this.resubscribeAllListeners();
       } else {
         this.user = null;
@@ -94,15 +130,14 @@ class SocketManager {
   private async resubscribeAllListeners(): Promise<void> {
     if (!this.socket || !this.user) return;
 
+    const currentListeners = new Map(this.eventListeners);
+    this.eventListeners.clear();
     this.socket.removeAllListeners();
     this.attachCoreSocketListeners();
 
-    for (const [eventId, listeners] of this.eventListeners) {
+    for (const [eventId, listeners] of currentListeners) {
       for (const listener of listeners) {
-        const newEventString = this.generateEventString(eventId);
-        this.socket.off(listener.eventString);
-        this.socket.on(newEventString, listener.callback);
-        listener.eventString = newEventString;
+        await this.on(eventId, listener.callback);
       }
     }
   }
@@ -112,18 +147,79 @@ class SocketManager {
 
     this.socket.on('connect', () => {
       console.log('Connected to socket server:', this.socket?.id);
-      this.initialized = true;
+      this.reconnectionAttempts = 0;
+      this.joinRestaurantRoom();
+      this.resubscribeAllListeners();
     });
 
-    this.socket.on('disconnect', () => {
-      console.log('Disconnected from socket server.');
-      this.initialized = false;
+    this.socket.on('disconnect', (reason) => {
+      console.log('Disconnected from socket server:', reason);
+      this.currentRoom = null;
+
+      // Handle all disconnect cases
+      this.handleReconnection();
     });
 
     this.socket.on('connect_error', (err: any) => {
       console.error('Connection error:', err);
-      this.initialized = false;
+      this.handleReconnection();
     });
+
+    // Add ping timeout handler
+    this.socket.on('ping_timeout', () => {
+      console.log('Ping timeout - attempting reconnection');
+      this.handleReconnection();
+    });
+
+    // Add error handler
+    this.socket.on('error', (error: Error) => {
+      console.error('Socket error:', error);
+      this.handleReconnection();
+    });
+  }
+
+  private handleReconnection(): void {
+    if (!this.socket) return;
+
+    const attemptReconnection = () => {
+      if (this.reconnectionAttempts < this.maxReconnectionAttempts) {
+        this.reconnectionAttempts++;
+        console.log(
+          `Attempting reconnection ${this.reconnectionAttempts}/${this.maxReconnectionAttempts}`
+        );
+
+        // Force a new connection attempt
+        this.socket?.close();
+        setTimeout(() => {
+          if (!this.socket?.connected) {
+            this.socket?.connect();
+          }
+        }, this.reconnectionDelay * Math.min(this.reconnectionAttempts, 5));
+      } else {
+        console.log('Max reconnection attempts reached. Reinitializing connection...');
+        this.reconnectionAttempts = 0;
+        this.reinitializeConnection();
+      }
+    };
+
+    attemptReconnection();
+  }
+
+  private reinitializeConnection(): void {
+    // Clean up existing connection
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.close();
+      this.socket = null;
+    }
+
+    // Attempt to establish a fresh connection
+    setTimeout(() => {
+      if (this.user) {
+        console.log('Reinitializing socket connection...');
+        this.connect(this.lastConnectedUrl || '', this.lastConnectedOptions);
+      }
+    }, 5000); // Wait 5 seconds before attempting reinitialization
   }
 
   public connect(url: string, options?: any): void {
@@ -132,22 +228,35 @@ class SocketManager {
       return;
     }
 
+    // Store connection details for reconnection
+    this.lastConnectedUrl = url;
+    this.lastConnectedOptions = options;
+
     if (this.socket?.connected) {
       console.warn('Socket already connected.');
       return;
     }
 
     if (this.socket) {
+      this.leaveRestaurantRoom();
       this.socket.removeAllListeners();
       this.socket.disconnect();
+    }
+
+    // Clear any existing reconnection timer
+    if (this.reconnectionTimer) {
+      clearTimeout(this.reconnectionTimer);
+      this.reconnectionTimer = null;
     }
 
     this.socket = io(url, {
       ...options,
       reconnection: true,
-      reconnectionDelay: 1000,
+      reconnectionDelay: this.reconnectionDelay,
       reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: this.maxReconnectionAttempts,
+      timeout: 60000,
+      forceNew: true, // Force a new connection
       auth: {
         userId: this.user.id,
         restaurantId: this.user.restaurant.id,
@@ -163,11 +272,12 @@ class SocketManager {
       return;
     }
 
+    this.leaveRestaurantRoom();
     this.eventListeners.clear();
     this.socket.removeAllListeners();
     this.socket.disconnect();
     this.socket = null;
-    this.initialized = false;
+    this.currentRoom = null;
     console.log('Socket connection closed and listeners cleared.');
   }
 
