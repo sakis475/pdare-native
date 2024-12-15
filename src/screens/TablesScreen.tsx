@@ -84,13 +84,13 @@ const TablesScreen = ({ currentIndex }: any) => {
   };
 
   const handleExistingTable = async (table: Table) => {
-    const tempOrder = await getTempOrder();
-
-    if (tempOrder?.table?.id === table?.id) {
-      navigateToDraft();
-    } else {
-      navigate(ScreenNames.ActiveOrderScreen, { tableParam: table });
-    }
+    // const tempOrder = await getTempOrder();
+    console.log(table, 'table');
+    // if (tempOrder?.table?.id === table?.id) {
+    //   navigateToDraft();
+    // } else {
+    // }
+    navigate(ScreenNames.ActiveOrderScreen, { tableParam: table });
   };
 
   const renderItems = (table: Table, index: number) => (

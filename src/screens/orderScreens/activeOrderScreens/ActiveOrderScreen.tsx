@@ -73,7 +73,6 @@ const ActiveOrderScreen = ({
 
   const handleTempOrderPress = async () => {
     const tempOrder = await getTempOrder();
-
     if (tempOrder?.table && tempOrder?.table?.id !== table.id) {
       AlertWithOptions(
         strings.ONGOING_ORDER,

@@ -38,7 +38,6 @@ const TableSelectHorizontalContainer = ({
     onTableSelect(table);
   };
 
-  // Function to remove an item from allTables
   const filterTable = (searchWord: string) => {
     if (searchWord) {
       setAllTables((prevTables: Table[]) => {
@@ -66,10 +65,10 @@ const TableSelectHorizontalContainer = ({
 
   const screenWidth = Dimensions.get('window').width;
   const numColumns = allTables?.length > 0 ? Math.ceil(allTables.length / 2) : 0;
-  const contentWidth = (numColumns + 1) * boxSize; // Assuming each box has a width of 30 and margin of 5
+  const contentWidth = (numColumns + 1) * boxSize;
 
   return (
-    <View style={{ marginTop: 5 }}>
+    <View style={styles.container}>
       {searchWord?.length && allTables.length === 0 ? (
         <View>
           <Text style={styles.boxText}>{strings.NO_TABLE_FOUND_CREATE_NEW}</Text>
@@ -79,7 +78,9 @@ const TableSelectHorizontalContainer = ({
           ></TableBox>
         </View>
       ) : allTables.length === 0 ? (
-        <Text style={styles.boxText}>{strings.NO_TABLE_AVAILABLE}</Text>
+        <View style={styles.emptyStateContainer}>
+          <Text style={styles.noTablesText}>{strings.NO_TABLE_AVAILABLE}</Text>
+        </View>
       ) : allTables?.length ? (
         contentWidth > screenWidth ? (
           <ScrollView
@@ -108,7 +109,7 @@ const TableSelectHorizontalContainer = ({
           />
         )
       ) : (
-        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+        <View style={styles.loadingContainer}>
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
         </View>
       )}
@@ -117,6 +118,10 @@ const TableSelectHorizontalContainer = ({
 };
 
 const styles = StyleSheet.create({
+  container: {
+    marginTop: 5,
+    flex: 1,
+  },
   box: {
     width: boxSize,
     height: boxSize,
@@ -129,7 +134,22 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 12,
   },
-
+  noTablesText: {
+    color: colors.white,
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: boxSize, // Match the height of a table box
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+  },
   newBox: {
     width: boxSize,
     height: boxSize,

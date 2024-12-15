@@ -23,6 +23,7 @@ import { getTextColorBasedOnLuminance } from '../../core/utils';
 import { getStorage } from '../../storage/store';
 import { storageInitData } from '../../helpers/storage/storageInit';
 import { useStrings } from '../../core/localization/languageContext';
+import CustomNavigationScreenHeaderTitle from '../../components/basic/CustomNavigationScreenHeaderTitle';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const COLUMN_COUNT = 4;
@@ -58,11 +59,11 @@ const NewOrderScreen = ({ route, navigation }: any) => {
 
     const tempOrder = await getTempOrder();
 
-    const newTitle = !!tempOrder?.orderItems?.[0]?.alreadySend
-      ? strings.UPDATE_ORDER
-      : strings.NEW_ORDER;
-
-    setHeaderTitle(newTitle); // Update the title in state
+    const newTitle =
+      !!tempOrder?.id || route.params?.table?.occupiedByOrder
+        ? strings.UPDATE_ORDER
+        : strings.NEW_ORDER;
+    setHeaderTitle(newTitle);
 
     if (tempOrder?.table?.id !== route.params?.table?.id && route.params?.table?.occupiedByOrder) {
       await setTempOrder(route.params.table.occupiedByOrder);
@@ -76,7 +77,13 @@ const NewOrderScreen = ({ route, navigation }: any) => {
   useEffect(() => {
     if (navigation && headerTitle) {
       navigation.setOptions({
-        headerTitle: headerTitle,
+        headerTitle: () => (
+          <CustomNavigationScreenHeaderTitle
+            title={headerTitle}
+            subtitle={tableName}
+            bold={true}
+          ></CustomNavigationScreenHeaderTitle>
+        ),
       });
     }
   }, [navigation, headerTitle]);

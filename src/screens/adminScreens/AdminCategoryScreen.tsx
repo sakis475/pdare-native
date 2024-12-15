@@ -336,7 +336,6 @@ const AdminCategoryScreen = () => {
   }, []);
 
   const handleCategoryUpdate = async (boxData: BoxData[]) => {
-    const strings = useStrings();
     setIsLoading(true);
     try {
       for (const [index, category] of boxData.entries()) {

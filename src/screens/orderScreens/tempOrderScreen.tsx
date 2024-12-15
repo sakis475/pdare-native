@@ -32,6 +32,7 @@ const TempOrderScreen = ({
   const [table, setTable] = useState<Table>();
   const [items, setItems] = useState<ItemReq[]>();
   const [headerTitle, setHeaderTitle] = useState('');
+  const [headerSubtitle, setHeaderSubtitle] = useState('');
 
   const strings = useStrings();
 
@@ -40,6 +41,8 @@ const TempOrderScreen = ({
     setHeaderTitle(
       tempOrder?.orderItems?.[0]?.alreadySend ? strings.UPDATE_ORDER : strings.NEW_ORDER
     );
+
+    setHeaderSubtitle(tempOrder?.table?.tableName ?? '');
 
     setTable(tempOrder?.table);
     setItems(tempOrder?.orderItems ?? []);
@@ -71,7 +74,10 @@ const TempOrderScreen = ({
     setTableTempOrder(clearTable);
   };
 
-  const handleTempOrderPress = () => {
+  const handleTempOrderPress = async () => {
+    const tempOrder: Order = await getTempOrder();
+
+    table.occupiedByOrder = tempOrder;
     navigate(ScreenNames.NewOrderScreen, { table: table });
   };
 
@@ -138,7 +144,7 @@ const TempOrderScreen = ({
 
   return (
     <View style={styles.mainContainer}>
-      {!bottomSheetMode && <HeaderBar headerTitle={headerTitle} />}
+      {!bottomSheetMode && <HeaderBar headerTitle={headerTitle} headerSubtitle={headerSubtitle} />}
 
       <View style={styles.contentContainer}>
         {items && items.length > 0 ? (

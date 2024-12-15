@@ -46,7 +46,7 @@ export async function refreshToken() {
 
 export async function getBearer() {
   const bearer: SessionBearer | null = await getStorage('session_bearer');
-  if (!bearer) {
+  if (!bearer?.info) {
     //go to login page
     navigate(ScreenNames.LoginScreen);
     return;

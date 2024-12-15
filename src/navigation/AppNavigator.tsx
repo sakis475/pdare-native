@@ -66,7 +66,6 @@ const AppNavigator = () => {
         name={ScreenNames.RegisterScreen}
         component={RegisterScreen}
         options={({ route }: any) => ({
-          // title: strings.Categories,
           headerTitle: () => {
             return (
               <CustomNavigationScreenHeaderTitle
@@ -88,16 +87,14 @@ const AppNavigator = () => {
         name={ScreenNames.NewOrderScreen}
         component={NewOrderScreen}
         options={({ route }: any) => ({
-          // title: strings.Categories,
-          headerTitle: () => {
-            return (
-              <CustomNavigationScreenHeaderTitle
-                title={
-                  !!route.params?.table?.occupiedByOrder ? strings.UPDATE_ORDER : strings.NEW_ORDER
-                }
-              ></CustomNavigationScreenHeaderTitle>
-            );
-          },
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={
+                !!route.params?.table?.occupiedByOrder ? strings.UPDATE_ORDER : strings.NEW_ORDER
+              }
+              subtitle={route?.params?.table?.tableName}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
           animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
@@ -129,7 +126,11 @@ const AppNavigator = () => {
         name={ScreenNames.ItemListScreen}
         component={ItemListScreen}
         options={({ route }: any) => ({
-          title: strings.ADD_ITEMS,
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={strings.ADD_ITEMS}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
           animation: 'none',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
