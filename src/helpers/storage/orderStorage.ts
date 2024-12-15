@@ -171,6 +171,7 @@ export const convertNewOrderToRequestObject = (newOrder: Order): CreateNewOrderR
     });
 
   const newReqOrder = {
+    couvert: newOrder.couvert ?? 1,
     table: newOrder.table.id === -1 ? newOrder.table.tableName : newOrder.table.id,
     comment: newOrder.comment ? newOrder.comment : '',
     items: newOrderRequestItems,

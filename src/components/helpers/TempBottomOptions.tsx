@@ -10,6 +10,8 @@ import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
+import CouvertFAB from '../popupModals/CouvertFAB';
+import { setStorage } from '../../storage/store';
 
 interface TempBottomOptionsProps {
   table: Table;
@@ -120,7 +122,24 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       () => {}
     );
   };
+  const handleAddCouvert = async (quantity: number) => {
+    tempOrder.couvert = quantity;
+    setTempOrder(tempOrder);
+    setStorage('newOrder', tempOrder);
 
+    if (tempOrder.id) {
+      const newReqOrder = {
+        couvert: quantity,
+        table: tempOrder.table.id,
+        orderId: tempOrder.id,
+        items: [] as any,
+      };
+      const result = await patchRequest(`/orders/${tempOrder.id}`, newReqOrder);
+      handleOrderSendSuccess(result);
+    }
+
+    toast('success', `Added ${quantity} couvert(s)`, '', 1000);
+  };
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -171,6 +190,13 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           </Text>
         </TouchableOpacity>
       </View>
+      {tempOrder && (
+        <CouvertFAB
+          onSubmit={handleAddCouvert}
+          disabled={noTable}
+          couvertQuantity={tempOrder?.couvert}
+        />
+      )}
     </View>
   );
 };

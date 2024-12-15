@@ -161,3 +161,13 @@ export const SearchIcon = ({ size = 24, color = colors.white, style }: IconProps
 export const PlusIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
   return <FontAwesome5 name="plus" size={size} color={color} style={style} />;
 };
+
+export const MinusIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return <FontAwesome5 name="minus" size={size} color={color} style={style} />;
+};
+
+export const CouvertIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return (
+    <MaterialCommunityIcons name="silverware-fork-knife" size={size} color={color} style={style} />
+  );
+};

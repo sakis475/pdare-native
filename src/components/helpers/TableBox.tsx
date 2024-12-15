@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, StyleSheet, View, Dimensions } from 'react-nati
 import { colors } from '../../core/theme';
 import dayjs, { datetimeDiff } from '../../core/dayjs';
 import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
+import { CouvertIcon } from '../basic/Icons';
 
 // Dynamic size calculations
 const GRID_SIZE = 4; // Number of columns
@@ -53,7 +54,7 @@ export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
         {elapsedTime ? (
           <View style={styles.personsCount}>
             <View style={styles.personsCountContent}>
-              <FeatherIcons name="users" size={BOX_SIZE * 0.14} color={colors.veryLighterGrey} />
+              <CouvertIcon size={BOX_SIZE * 0.14} color={colors.veryLighterGrey}></CouvertIcon>
               <Text style={styles.personsCountText}>{table?.occupiedByOrder?.couvert || 0}</Text>
             </View>
           </View>

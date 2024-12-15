@@ -245,5 +245,8 @@
   "PRIVACY_POLICY_REQUIRED": "Πρέπει να αποδεχτείτε την πολιτική απορρήτου για να συνεχίσετε",
   "PASSWORD_CONFIRMATION": "Επαλήθευση Κωδικού",
   "NEW_ORDER_BTN": "Νέα Παραγγελία",
-  "MARK_DONE_BTN": "Έτοιμα 'Ολα"
+  "MARK_DONE_BTN": "Έτοιμα 'Ολα",
+
+  "SELECT_COUVERT": "Κουβέρ",
+  "OR_CUSTOM_AMOUNT": "ή άλλο ποσό"
 }

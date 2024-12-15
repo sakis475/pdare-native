@@ -1,10 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Keyboard, SafeAreaView } from 'react-native';
-
-import { Divider, Portal } from 'react-native-paper';
-
+import { View, Text, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
+import { Divider, Portal, FAB } from 'react-native-paper';
 import { colors } from '../../core/theme';
-
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate } from '../../navigation/navigationUtils';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
@@ -174,11 +171,13 @@ const TempOrderScreen = ({
 
       {!bottomSheetMode && (
         <>
-          <TempBottomOptions
-            table={table}
-            handleOpenSelectTableModal={handleOpenSelectTableModal}
-            handleTempOrderPress={handleTempOrderPress}
-          />
+          <View style={styles.bottomOptionsContainer}>
+            <TempBottomOptions
+              table={table}
+              handleOpenSelectTableModal={handleOpenSelectTableModal}
+              handleTempOrderPress={handleTempOrderPress}
+            />
+          </View>
           <Portal>
             <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
           </Portal>
@@ -217,74 +216,15 @@ const styles = StyleSheet.create({
   },
   categoryFlashListContainer: {
     paddingHorizontal: 0,
+    paddingBottom: 140,
   },
 
-  categoriesContainer: {
-    // height: 50, // Set a fixed height for the container of the FlatList
-    // backgroundColor: 'red',
-    flex: 1,
-  },
-  categoriesFlatList: {
-    flexGrow: 0, // Prevent FlatList from growing beyond the items it contains
-  },
-  categoriesList: {
-    alignItems: 'center',
-    paddingRight: 16, // Adds padding to the end of the list for better scrolling experience
-  },
-  categoryItem: {
-    backgroundColor: 'grey',
-    borderRadius: 2,
-    paddingVertical: 12,
-    paddingHorizontal: 60, //categoriesLength > 3 ? 16 : 36,
-    // width: 150,
-    marginHorizontal: 2,
-  },
-  categoryText: {
-    color: 'white',
-    fontWeight: 'bold',
-    margin: 0,
-    textAlign: 'center',
-  },
-  tableButtonContainer: {
-    alignItems: 'flex-end',
-    paddingVertical: 2,
-    backgroundColor: colors.darkerGrey,
-  },
-  tableButton: {
-    // position: 'absolute',
-    // right: 20,
-    // bottom: 20,
-    marginRight: 20,
-    width: 60,
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'blue',
-    padding: 4,
-    borderRadius: 6,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tableChangeContainer: {
-    paddingTop: 20,
-    paddingHorizontal: 2,
-    justifyContent: 'center',
-    height: 300,
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)', // Adjust color and opacity as needed
-  },
-  categoryBox: {
-    width: 100,
-    height: 100,
-    borderColor: 'fff',
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
+  bottomOptionsContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
+
 export default TempOrderScreen;

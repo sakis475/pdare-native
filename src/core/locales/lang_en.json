@@ -245,5 +245,8 @@
   "PRIVACY_POLICY_REQUIRED": "You must accept the privacy policy to continue",
   "PASSWORD_CONFIRMATION": "Password Confirmation",
   "NEW_ORDER_BTN": "New Order",
-  "MARK_DONE_BTN": "Mark Done"
+  "MARK_DONE_BTN": "Mark Done",
+
+  "SELECT_COUVERT": "Couvert",
+  "OR_CUSTOM_AMOUNT": "or custom amount"
 }

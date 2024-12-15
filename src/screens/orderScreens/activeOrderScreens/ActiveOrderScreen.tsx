@@ -23,6 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../../../components/basic/CustomNavigationScreenHeaderTitle';
 import { navigate, navigateToDraft, ScreenNames } from '../../../navigation/navigationUtils';
 import { useStrings } from '../../../core/localization/languageContext';
+import CouvertFAB from '../../../components/popupModals/CouvertFAB';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -302,6 +303,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  categoryFlashListContainer: { paddingHorizontal: 0 },
+  categoryFlashListContainer: {
+    paddingHorizontal: 0,
+    paddingBottom: 90,
+  },
 });
 export default ActiveOrderScreen;
