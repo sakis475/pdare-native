@@ -26,19 +26,21 @@ import { useStrings } from '../core/localization/languageContext';
 import { CatalogItemViewOnly } from '../components/itemComponents/CatalogItemViewOnly';
 import dayjs from '../core/dayjs';
 import { AppsIcon, ClockIcon, TableIcon } from '../components/basic/Icons';
+import { LoadingOverlay } from '../components/basic/SavingOverlay';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface ExpoScreenProps {
   currentIndex?: number;
 }
 
 const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 }) => {
-  const [activeTables, setActiveTables] = useState<Table[]>();
+  const [activeTables, setActiveTables] = useState<Table[]>(undefined);
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const flatListRef = useRef<FlatList>(null);
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const [isLoading, setIsLoading] = useState(false);
 
   const isButtonScrollRef = useRef(false);
   const strings = useStrings();
@@ -49,6 +51,14 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
     setRefreshing(false);
   };
 
+  const updateActiveTables = async (allTables: Table[]) => {
+    setActiveTables(
+      allTables
+        ?.filter((table) => table.occupiedByOrder && !table.occupiedByOrder.orderReady)
+        ?.reverse()
+    );
+  };
+
   const fetchInitialTables = async (): Promise<void> => {
     try {
       const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
@@ -57,16 +67,17 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
       }
       const allTables = await processTables(allTablesIO);
       await setStorage('tableOrders', allTables);
-      setActiveTables(allTables.filter((table) => table.occupiedByOrder));
+
+      handleTableUpdates();
     } catch (error) {
       console.error('Error fetching initial table data:', error);
     }
   };
 
   const handleTableUpdates = async (): Promise<void> => {
-    console.log('ORDERS_UPDATED');
+    console.log('expo screen ORDERS_UPDATED');
     const updatedTables = await getStorage('tableOrders');
-    setActiveTables(updatedTables?.filter((table) => table.occupiedByOrder));
+    updateActiveTables(updatedTables);
   };
 
   useEffect(() => {
@@ -96,20 +107,47 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
   const renderTable = ({ item, index }: { item: Table; index: number }) => {
     const orderItems = item.occupiedByOrder?.orderItems || [];
 
+    const handleMarkAsDone = async () => {
+      try {
+        setIsLoading(true);
+        await Requests.patchRequest(`/orders/ready/${item.occupiedByOrder.id}`);
+      } catch (error) {
+        console.error('Error marking order as done:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     return (
       <View style={styles.slideContainer}>
         <View style={styles.headerContainer}>
           <View style={styles.headerRow}>
             <View style={styles.table}>
-              <TableIcon size={26}></TableIcon>
-              <Text style={styles.tableName}>{item.tableName}</Text>
-            </View>
-            <View style={styles.table}>
-              <ClockIcon size={20}></ClockIcon>
-              <Text style={styles.orderTime}>
-                {dayjs(item.occupiedByOrder?.createdAt).format('HH:MM')}
+              <TableIcon size={26} />
+              <Text style={styles.tableName}>
+                {item.tableName} {' | '}
               </Text>
+
+              <View>
+                <View style={styles.table}>
+                  <ClockIcon size={20} />
+                  <Text style={styles.orderTime}>
+                    {dayjs(item.occupiedByOrder?.createdAt).format('HH:mm')}
+                  </Text>
+                </View>
+              </View>
             </View>
+
+            <TouchableOpacity
+              style={[
+                styles.doneButton,
+                item.occupiedByOrder?.orderReady && styles.doneButtonDisabled,
+              ]}
+              onPress={handleMarkAsDone}
+              disabled={item.occupiedByOrder?.orderReady}
+            >
+              <Text style={styles.doneButtonText}>{strings.MARK_DONE_BTN}</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -123,14 +161,6 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
               showsVerticalScrollIndicator={true}
               contentContainerStyle={styles.listContent}
               ItemSeparatorComponent={Divider}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={[colors.primary]}
-                  tintColor={colors.primary}
-                />
-              }
             />
           ) : (
             <View style={styles.emptyContainer}>
@@ -183,81 +213,92 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
     scrollPaginationToCenter();
   }, [activeIndex, scrollPaginationToCenter]);
 
+  const ListEmptyComponent = () => {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>{strings.NO_ACTIVE_EXPO_TABLES}</Text>
+      </View>
+    );
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <HeaderBar headerTitle={strings.EXPO} />
       <View style={styles.container}>
-        {activeTables ? (
-          activeTables.length > 0 ? (
-            <>
+        {activeTables !== undefined ? (
+          <>
+            <FlatList
+              ref={flatListRef}
+              data={activeTables}
+              renderItem={renderTable}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onViewableItemsChanged={onViewableItemsChanged}
+              onMomentumScrollEnd={onMomentumScrollEnd}
+              ListEmptyComponent={ListEmptyComponent}
+              viewabilityConfig={{
+                itemVisiblePercentThreshold: 50,
+                minimumViewTime: 100,
+              }}
+              initialScrollIndex={initialIndex}
+              getItemLayout={(data, index) => ({
+                length: SCREEN_WIDTH,
+                offset: SCREEN_WIDTH * index,
+                index,
+              })}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[colors.primary]}
+                  tintColor={colors.primary}
+                />
+              }
+            />
+
+            <View style={styles.paginationWrapper}>
               <FlatList
-                ref={flatListRef}
-                data={activeTables}
-                renderItem={renderTable}
-                keyExtractor={(item) => item.id.toString()}
+                ref={paginationListRef}
                 horizontal
-                pagingEnabled
                 showsHorizontalScrollIndicator={false}
-                onViewableItemsChanged={onViewableItemsChanged}
-                onMomentumScrollEnd={onMomentumScrollEnd}
-                viewabilityConfig={{
-                  itemVisiblePercentThreshold: 50,
-                  minimumViewTime: 100,
-                }}
-                initialScrollIndex={initialIndex}
-                getItemLayout={(data, index) => ({
-                  length: SCREEN_WIDTH,
-                  offset: SCREEN_WIDTH * index,
+                data={activeTables}
+                contentContainerStyle={[
+                  styles.paginationContainer,
+                  { paddingHorizontal: SCREEN_WIDTH / 2 - 15 },
+                ]}
+                keyExtractor={(_, index) => index.toString()}
+                renderItem={({ index }) => (
+                  <TouchableOpacity
+                    onPress={() => onPaginationPress(index)}
+                    style={[
+                      styles.paginationNumber,
+                      index === activeIndex && styles.paginationNumberActive,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.paginationNumberText,
+                        index === activeIndex && styles.paginationNumberTextActive,
+                      ]}
+                    >
+                      {index + 1}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                getItemLayout={(_, index) => ({
+                  length: 38, // width + marginHorizontal
+                  offset: index,
                   index,
                 })}
               />
-
-              <View style={styles.paginationWrapper}>
-                <FlatList
-                  ref={paginationListRef}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  data={activeTables}
-                  contentContainerStyle={[
-                    styles.paginationContainer,
-                    { paddingHorizontal: SCREEN_WIDTH / 2 - 15 },
-                  ]}
-                  keyExtractor={(_, index) => index.toString()}
-                  renderItem={({ index }) => (
-                    <TouchableOpacity
-                      onPress={() => onPaginationPress(index)}
-                      style={[
-                        styles.paginationNumber,
-                        index === activeIndex && styles.paginationNumberActive,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.paginationNumberText,
-                          index === activeIndex && styles.paginationNumberTextActive,
-                        ]}
-                      >
-                        {index + 1}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                  getItemLayout={(_, index) => ({
-                    length: 38, // width + marginHorizontal
-                    offset: index,
-                    index,
-                  })}
-                />
-              </View>
-            </>
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No active orders found</Text>
             </View>
-          )
+          </>
         ) : (
           <ActivityIndicator size="large" animating={true} color={colors.primary} />
         )}
       </View>
+      {isLoading && <LoadingOverlay />}
     </SafeAreaView>
   );
 };
@@ -273,7 +314,7 @@ const styles = StyleSheet.create({
   slideContainer: {
     width: SCREEN_WIDTH,
     flex: 1,
-    paddingVertical: 20,
+    paddingVertical: 10,
   },
   orderCount: {
     fontSize: 16,
@@ -292,13 +333,15 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   emptyContainer: {
-    flex: 1,
+    height: '100%',
+    width: SCREEN_WIDTH,
     justifyContent: 'center',
     alignItems: 'center',
   },
   emptyText: {
-    color: '#999',
-    fontSize: 16,
+    color: colors.white,
+    textAlign: 'center',
+    fontSize: 14,
   },
   summaryContainer: {
     paddingHorizontal: 20,
@@ -350,7 +393,12 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingHorizontal: 20,
-    marginBottom: 15,
+    paddingVertical: 15,
+    marginBottom: 10,
+    backgroundColor: colors.slightlyDarkerGrey,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderBlockColor: colors.lightGrey,
   },
   headerRow: {
     flexDirection: 'row',
@@ -370,6 +418,21 @@ const styles = StyleSheet.create({
   orderTime: {
     fontSize: 16,
     color: colors.white,
+  },
+  doneButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  doneButtonDisabled: {
+    backgroundColor: colors.success,
+    opacity: 0.8,
+  },
+  doneButtonText: {
+    color: colors.white,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

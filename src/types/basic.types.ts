@@ -72,6 +72,7 @@ interface ItemReq {
   alreadySend?: boolean;
   oItemId?: number;
   markForDelete?: boolean;
+  orderItemReady?: boolean;
 }
 interface catGroupedItems {
   [key: string]: ItemReq[];
@@ -95,6 +96,7 @@ interface Order {
   closedAt?: string;
   originalTable?: Table;
   finalCost?: number;
+  orderReady?: boolean;
 }
 
 interface SendOrderItem {

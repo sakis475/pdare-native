@@ -4,6 +4,7 @@
   "LANGUAGE_SETTINGS": "Language Settings",
   "PROFILE": "Profile",
   "NO_ACTIVE_TABLE": "No active tables found.",
+  "NO_ACTIVE_EXPO_TABLES": "All orders have been served.",
 
   "ERROR": "Error",
   "SUCCESS": "Success",
@@ -243,5 +244,6 @@
   "PRIVACY_POLICY_LINK": "privacy policy",
   "PRIVACY_POLICY_REQUIRED": "You must accept the privacy policy to continue",
   "PASSWORD_CONFIRMATION": "Password Confirmation",
-  "NEW_ORDER_BTN": "New Order"
+  "NEW_ORDER_BTN": "New Order",
+  "MARK_DONE_BTN": "Mark Done"
 }

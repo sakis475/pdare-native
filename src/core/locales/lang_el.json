@@ -4,6 +4,7 @@
   "LANGUAGE_SETTINGS": "Ρυθμίσεις Γλώσσας",
   "PROFILE": "Προφίλ",
   "NO_ACTIVE_TABLE": "Δεν υπάρχουν ενεργά Τραπέζια",
+  "NO_ACTIVE_EXPO_TABLES": "Όλες οι παραγγελίες σερβιρίστηκαν.",
 
   "ERROR": "Σφάλμα",
   "SUCCESS": "Επιτυχία",
@@ -243,5 +244,6 @@
   "PRIVACY_POLICY_LINK": "πολιτική απορρήτου",
   "PRIVACY_POLICY_REQUIRED": "Πρέπει να αποδεχτείτε την πολιτική απορρήτου για να συνεχίσετε",
   "PASSWORD_CONFIRMATION": "Επαλήθευση Κωδικού",
-  "NEW_ORDER_BTN": "Νέα Παραγγελία"
+  "NEW_ORDER_BTN": "Νέα Παραγγελία",
+  "MARK_DONE_BTN": "Έτοιμα 'Ολα"
 }

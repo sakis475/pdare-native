@@ -488,8 +488,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       const reorderedItem = reorderAllItems(itemToSave);
       const transformedData = transformItemData(reorderedItem);
 
-      console.log('Sending to server:', transformedData);
-
       const response = await patchRequest('/items/save', [transformedData]);
       if (!response || !Array.isArray(response) || response.length === 0) {
         return;

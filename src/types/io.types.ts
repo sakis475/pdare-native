@@ -19,6 +19,7 @@ type OrderIO = {
   comment: string;
   createdAt: string;
   closedAt: string | null;
+  orderReady: boolean;
 };
 
 type TableIO = {

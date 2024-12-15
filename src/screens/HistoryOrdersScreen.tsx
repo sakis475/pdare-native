@@ -22,6 +22,11 @@ import dayjs from '../core/dayjs';
 import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
 import { CurrencyFormat } from '../components/helpers/CurrencyFormat';
 import { useStrings } from '../core/localization/languageContext';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { navigate, ScreenNames } from '../navigation/navigationUtils';
+import * as Requests from '../helpers/requests';
+import { processTables } from '../helpers/storage/tablesStorage';
+import _ from 'lodash';
 
 const HistoryOrdersScreen = ({ currentIndex }: any) => {
   const [table, setTable] = useState<Table>();
@@ -80,6 +85,13 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
     return durationString.trim(); // Trim any extra spaces
   };
 
+  const processTable = async (table: Table) => {
+    const tableIOFixType = table as unknown as TableIO;
+    const allTables = await processTables([tableIOFixType]);
+
+    navigate(ScreenNames.ActiveOrderScreen, { tableParam: allTables[0] });
+  };
+
   const renderOrderItem = (order: Order) => {
     const startedAt = dayjs(order.createdAt);
     const closedAt = dayjs(order.closedAt ?? new Date());
@@ -89,46 +101,58 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
     const formattedClosedAt = closedAt.format('DD/MM/YY HH:mm');
 
     return (
-      <View style={styles.rowContainer}>
-        <View style={[styles.column, { width: '15%' }]}>
-          <Text style={styles.tableName}>{order.table?.tableName ?? '?'}</Text>
-        </View>
+      <TouchableOpacity
+        onPress={() => {
+          const deepOrder = _.cloneDeep(order);
+          const deepTable = _.cloneDeep(deepOrder.table);
 
-        <View style={[styles.column, { width: '15%', minWidth: 20 }]}>
-          <View style={styles.personsCount}>
-            <FeatherIcons name="users" size={13} color={colors.veryLighterGrey} />
-            <Text style={styles.couvertText}>{couvert}</Text>
+          deepTable.occupiedByOrder = deepOrder;
+
+          processTable(deepTable);
+        }}
+      >
+        <View style={styles.rowContainer}>
+          <View style={[styles.column, { width: '15%' }]}>
+            <Text style={styles.tableName}>{order.table?.tableName ?? '?'}</Text>
+          </View>
+
+          <View style={[styles.column, { width: '15%', minWidth: 20 }]}>
+            <View style={styles.personsCount}>
+              <FeatherIcons name="users" size={13} color={colors.veryLighterGrey} />
+              <Text style={styles.couvertText}>{couvert}</Text>
+            </View>
+          </View>
+
+          <View style={[styles.column, { width: '25%' }]}>
+            <CurrencyFormat value={order.finalCost} currency={'€'} fontSize={13} />
+          </View>
+
+          <View style={[styles.column, { width: '20%' }]}>
+            <Text style={styles.durationText}>
+              <FeatherIcons name="clock" size={13} color={colors.veryLighterGrey} />{' '}
+              {durationString}
+            </Text>
+          </View>
+
+          <View style={[styles.column, { width: '25%' }]}>
+            {!order.closedAt ? (
+              <>
+                <Text style={styles.activeTag}>{strings.ACTIVE}</Text>
+                <Text style={styles.startedAtText}>
+                  {strings.OPENED_AT} {formattedStartedAt}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.closedTag}>{strings.CLOSED}</Text>
+                <Text style={styles.closedAtText}>
+                  {strings.CLOSED_AT} {formattedClosedAt}
+                </Text>
+              </>
+            )}
           </View>
         </View>
-
-        <View style={[styles.column, { width: '25%' }]}>
-          <CurrencyFormat value={order.finalCost} currency={'€'} fontSize={13} />
-        </View>
-
-        <View style={[styles.column, { width: '20%' }]}>
-          <Text style={styles.durationText}>
-            <FeatherIcons name="clock" size={13} color={colors.veryLighterGrey} /> {durationString}
-          </Text>
-        </View>
-
-        <View style={[styles.column, { width: '25%' }]}>
-          {!order.closedAt ? (
-            <>
-              <Text style={styles.activeTag}>{strings.ACTIVE}</Text>
-              <Text style={styles.startedAtText}>
-                {strings.OPENED_AT}: {formattedStartedAt}
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text style={styles.closedTag}>{strings.CLOSED}</Text>
-              <Text style={styles.closedAtText}>
-                {strings.CLOSED_AT}: {formattedClosedAt}
-              </Text>
-            </>
-          )}
-        </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -173,6 +197,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

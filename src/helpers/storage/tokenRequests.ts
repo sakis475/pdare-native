@@ -16,7 +16,6 @@ export type RegisterData = {
 
 export async function handleUserLogin(sessionBearer: SessionBearer) {
   try {
-    console.log(sessionBearer, 'sessionBearer');
     if (sessionBearer?.user?.restaurant?.active === true && sessionBearer?.user?.active === true) {
       await setBearer(sessionBearer);
       navigateReset(ScreenNames.MainTabs);
@@ -49,7 +48,6 @@ export async function login(username: string, password: string) {
 
 export async function logout() {
   try {
-    console.log('logout!!!!!!!!!!!!!!!!!!!!!!!!!11');
     //TODO: send to request also to log logged out event
     await setStorage('session_bearer', null);
     await clearRestaurantStorageRelatedKeys();

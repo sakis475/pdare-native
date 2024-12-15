@@ -176,8 +176,6 @@ const ActiveOrderScreen = ({
     scrollToBottom();
   }, [scrollToBottom]);
 
-  //---This doesnt scroll to the bottom by default
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>

@@ -50,7 +50,7 @@ const TablesScreen = ({ currentIndex }: any) => {
 
   // Function to handle updates from socket
   const handleTableUpdates = async (): Promise<void> => {
-    console.log('ORDERS_UPDATED');
+    console.log('tables screen: ORDERS_UPDATED');
     const updatedTables = await getStorage('tableOrders');
     setActiveTables(updatedTables);
   };
