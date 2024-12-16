@@ -30,6 +30,7 @@ const App = () => {
       await socketManager.updateUserInstance();
 
       socketManager.connect(BASE_DOMAIN);
+      socketManager.setReconnectInterval(5);
       socketEventSubscriber.initialize();
     };
     initializeApp();
