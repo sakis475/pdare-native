@@ -77,7 +77,7 @@ const CouvertFAB: React.FC<CouvertFABProps> = ({
 
   const CustomFabIcon = () => (
     <View style={styles.fabIconContainer}>
-      <CouvertIcon />
+      <CouvertIcon size={16} />
       <Text style={styles.fabQuantityText}>{quantity}</Text>
     </View>
   );
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   fabQuantityText: {
     color: colors.white,
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   modalContainer: {
