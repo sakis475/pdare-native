@@ -14,6 +14,7 @@ import { EventEmitter } from '../helpers/Sockets/EventEmitter';
 import { useStrings } from '../core/localization/languageContext';
 import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
+import { LoadingOverlay } from '../components/basic/SavingOverlay';
 
 const ProfileScreen = ({ route }: any) => {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -26,7 +27,9 @@ const ProfileScreen = ({ route }: any) => {
     lastName: '',
     email: '',
     restaurantName: '',
+    displayName: '', // Add displayName field
   });
+
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -64,6 +67,7 @@ const ProfileScreen = ({ route }: any) => {
             lastName: currentUser.lastName || '',
             email: currentUser.email || '',
             restaurantName: currentUser.restaurant?.restaurantName || '',
+            displayName: currentUser.displayName || '', // Initialize displayName
           });
         }
 
@@ -104,7 +108,7 @@ const ProfileScreen = ({ route }: any) => {
   }, [strings]);
 
   const handleUpdateProfile = async () => {
-    const { username, firstName, lastName, email } = formData;
+    const { username, firstName, lastName, email, displayName } = formData;
 
     if (!username.trim()) {
       toast('error', strings.ERROR, strings.ERROR_USERNAME_EMPTY);
@@ -120,6 +124,7 @@ const ProfileScreen = ({ route }: any) => {
     try {
       const response: SessionBearer = await patchRequest('/user', {
         username: username.trim(),
+        displayName: displayName.trim(),
         firstName: firstName?.trim(),
         lastName: lastName?.trim(),
         email: email.trim().toLowerCase(),
@@ -332,6 +337,14 @@ const ProfileScreen = ({ route }: any) => {
               onChangeText={updateFormField('email')}
               keyboardType="email-address"
             />
+            {user.role === 'owner' && (
+              <CustomTextInput
+                label={strings.DISPLAY_NAME}
+                value={formData.displayName}
+                onChangeText={updateFormField('displayName')}
+                autoCapitalize="words"
+              />
+            )}
             <Button
               mode="contained"
               onPress={handleUpdateProfile}
@@ -424,6 +437,7 @@ const ProfileScreen = ({ route }: any) => {
           </View>
         </View>
       </ScrollView>
+      {isLoading && <LoadingOverlay />}
     </View>
   );
 };

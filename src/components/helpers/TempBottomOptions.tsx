@@ -25,39 +25,35 @@ interface TempBottomOptionsProps {
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   table,
   isTempOrder,
-  handleOpenSelectTableModal, //opens table modal
-  handleTempOrderPress, //opens additems screen
+  handleOpenSelectTableModal,
+  handleTempOrderPress,
   overrideOrderView,
   couvertUpdated,
 }) => {
   const [noTable, setNoTable] = useState(!table?.tableName);
   const [order, setOrder] = useState<Order>();
-
   const [isOrderView, setIsOrderView] = useState(true);
-
   const [tableChanged, setTableChanged] = useState(false);
-
   const strings = useStrings();
 
-  const fetchTempOrder = async () => {
-    let order = table?.occupiedByOrder;
+  const fetchOrder = async () => {
+    let currentOrder = table?.occupiedByOrder;
     if (isTempOrder) {
-      order = await getTempOrder();
+      currentOrder = await getTempOrder();
     }
 
-    if (order?.table && table?.id !== order?.table?.id) {
+    if (currentOrder?.table && table?.id !== currentOrder?.table?.id) {
       setTableChanged(true);
     }
 
-    const lastItem = order?.orderItems?.slice(-1)?.[0];
-
-    const isAnyItemMarkedAsDeleted = order?.orderItems?.some((e) => e.markForDelete);
+    const lastItem = currentOrder?.orderItems?.slice(-1)?.[0];
+    const isAnyItemMarkedAsDeleted = currentOrder?.orderItems?.some((e) => e.markForDelete);
     setIsOrderView(overrideOrderView || (lastItem?.alreadySend && !isAnyItemMarkedAsDeleted));
-
-    setOrder(order);
+    setOrder(currentOrder);
   };
+
   useEffect(() => {
-    fetchTempOrder();
+    fetchOrder();
     setNoTable(!table?.tableName);
   }, [table]);
 
@@ -68,6 +64,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       navigateToTables();
     }
   };
+
   const handleOrderSend = async () => {
     const newOrder = await getTempOrder();
     if (!newOrder?.orderItems?.length || newOrder?.orderItems?.length === 0) {
@@ -105,19 +102,18 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   };
 
   const handleCloseOrder = async () => {
-    let order = table?.occupiedByOrder;
+    let currentOrder = table?.occupiedByOrder;
     if (isTempOrder) {
-      order = await getTempOrder();
+      currentOrder = await getTempOrder();
     }
-    const orderId = order.id;
+    const orderId = currentOrder.id;
     AlertWithOptions(
       strings.CLOSE_ORDER,
       strings.CLOSE_ORDER_CONFIRM,
       async () => {
         const result = await patchRequest(`/orders/close/${orderId}`);
         if (result?.success === true) {
-          //Clear order only if its temp
-          if (order?.id === (await getTempOrder())?.id) {
+          if (currentOrder?.id === (await getTempOrder())?.id) {
             await clearNewOrder();
           }
           toast('success', strings.DELETED, '', 1000);
@@ -127,29 +123,39 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       () => {}
     );
   };
+
   const handleAddCouvert = async (quantity: number) => {
-    order.couvert = quantity;
-    setOrder(order);
+    const updatedOrder = { ...order, couvert: quantity };
+    setOrder(updatedOrder);
+
     if (isTempOrder) {
-      setStorage('newOrder', order);
+      await setStorage('newOrder', updatedOrder);
     }
 
-    if (order.id) {
+    if (updatedOrder.id) {
       const newReqOrder = {
         couvert: quantity,
-        table: order.table.id,
-        orderId: order.id,
+        table: updatedOrder.table.id,
+        orderId: updatedOrder.id,
         items: [] as any,
       };
-      const result = await patchRequest(`/orders/${order.id}`, newReqOrder);
-      if (result?.id) {
-        if (couvertUpdated) {
-          couvertUpdated(quantity);
+
+      try {
+        const result = await patchRequest(`/orders/${updatedOrder.id}`, newReqOrder);
+        if (result?.id) {
+          if (couvertUpdated) {
+            couvertUpdated(quantity);
+          }
+          toast('success', `Added ${quantity} couvert(s)`, '', 1000);
+          // Refresh the order data after successful update
+          await fetchOrder();
         }
-        toast('success', `Added ${quantity} couvert(s)`, '', 1000);
+      } catch (error) {
+        toast('error', 'Failed to update couvert', '', 1000);
       }
     }
   };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -202,6 +208,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       </View>
       {order && (
         <CouvertFAB
+          key={`couvert-fab-${order.id}-${order.couvert}`}
           onSubmit={handleAddCouvert}
           disabled={noTable}
           couvertQuantity={order?.couvert ?? 0}
@@ -233,7 +240,6 @@ const styles = StyleSheet.create({
     width: 100,
     backgroundColor: colors.green,
   },
-
   actionsContainer: {
     flexDirection: 'row',
     flex: 1,

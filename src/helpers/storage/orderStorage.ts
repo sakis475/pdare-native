@@ -200,12 +200,14 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
   };
   const order: Order = {
     id: occupiedByOrder.id,
+    uniqueId: occupiedByOrder.uniqueId,
     table: table,
     originalTable: table,
     orderItems: [],
     couvert: occupiedByOrder.couvert,
     comment: occupiedByOrder.comment,
     createdAt: occupiedByOrder.createdAt,
+    closedAt: occupiedByOrder.closedAt,
     orderReady: occupiedByOrder.orderReady,
     user: occupiedByOrder.user,
   };

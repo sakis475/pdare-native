@@ -13,6 +13,7 @@ type OrderItemIO = {
 
 type OrderIO = {
   id: number;
+  uniqueId?: string;
   table: Table;
   orderItems: OrderItemIO[];
   couvert: number;

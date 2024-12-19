@@ -88,6 +88,7 @@ interface Table {
 
 interface Order {
   id?: number;
+  uniqueId?: string;
   table: Table;
   orderItems: ItemReq[];
   couvert: number;
