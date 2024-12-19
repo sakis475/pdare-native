@@ -125,7 +125,7 @@ export const BarsIcon = ({ size = 20, color = colors.white, style }: IconProps) 
   return <FontAwesome6 name="bars" size={size} color={color} style={style} />;
 };
 
-export const UserIcon = ({ size = 40, color, style }: IconProps = {}) => {
+export const UserIcon = ({ size = 40, color = colors.white, style }: IconProps = {}) => {
   return <IoniconsIcons name="person-circle-outline" size={size} color={color} style={style} />;
 };
 

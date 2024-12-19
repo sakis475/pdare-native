@@ -23,7 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../../../components/basic/CustomNavigationScreenHeaderTitle';
 import { navigate, navigateToDraft, ScreenNames } from '../../../navigation/navigationUtils';
 import { useStrings } from '../../../core/localization/languageContext';
-import CouvertFAB from '../../../components/popupModals/CouvertFAB';
+import { OrderInfoBar } from '../../../components/helpers/OrderInfoBar';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -32,13 +32,14 @@ const ActiveOrderScreen = ({
 }: any) => {
   const [items, setItems] = useState<ItemReq[]>();
   const [table, setTable] = useState<Table>(route.params?.tableParam);
-
+  const [order, setOrder] = useState<Order>(table.occupiedByOrder);
   const navigation = useNavigation();
 
   const strings = useStrings();
 
   const fetchItems = async () => {
     const tempOrder: Order = table.occupiedByOrder;
+    setOrder(tempOrder);
     setItems(tempOrder?.orderItems ?? []);
   };
 
@@ -182,6 +183,10 @@ const ActiveOrderScreen = ({
         {items && items.length > 0 ? (
           <>
             <View style={styles.categoriesContainer}>
+              <OrderInfoBar
+                order={order}
+                containerStyle={{ paddingVertical: 20, paddingHorizontal: 15 }}
+              ></OrderInfoBar>
               <FlashList
                 ref={listRef}
                 data={items}
@@ -214,9 +219,24 @@ const ActiveOrderScreen = ({
           <View style={{ marginBottom: 20 }}>
             <TempBottomOptions
               table={table}
+              isTempOrder={false}
               handleOpenSelectTableModal={handleOpenSelectTableModal}
               handleTempOrderPress={handleTempOrderPress}
               overrideOrderView={true}
+              couvertUpdated={(couvert) => {
+                // Create a new order object with the updated couvert
+                const updatedOrder = {
+                  ...order,
+                  couvert: couvert,
+                };
+                setOrder(updatedOrder);
+
+                // Also update the table's order reference
+                setTable((prevTable) => ({
+                  ...prevTable,
+                  occupiedByOrder: updatedOrder,
+                }));
+              }}
             />
             <Portal>
               <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
@@ -230,7 +250,7 @@ const ActiveOrderScreen = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 3,
     backgroundColor: '#2F2F2F',
     justifyContent: 'center',
     alignContent: 'center',

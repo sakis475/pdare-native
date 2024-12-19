@@ -25,8 +25,9 @@ import { processTables } from '../helpers/storage/tablesStorage';
 import { useStrings } from '../core/localization/languageContext';
 import { CatalogItemViewOnly } from '../components/itemComponents/CatalogItemViewOnly';
 import dayjs from '../core/dayjs';
-import { AppsIcon, ClockIcon, TableIcon } from '../components/basic/Icons';
+import { AppsIcon, ClockIcon, CouvertIcon, TableIcon, UserIcon } from '../components/basic/Icons';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
+import { OrderInfoBar } from '../components/helpers/OrderInfoBar';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -103,52 +104,51 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
       </View>
     );
   };
+  const handleMarkAsDone = async (item: Table) => {
+    try {
+      setIsLoading(true);
+      await Requests.patchRequest(`/orders/ready/${item.occupiedByOrder.id}`);
+    } catch (error) {
+      console.error('Error marking order as done:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const renderTable = ({ item, index }: { item: Table; index: number }) => {
     const orderItems = item.occupiedByOrder?.orderItems || [];
-
-    const handleMarkAsDone = async () => {
-      try {
-        setIsLoading(true);
-        await Requests.patchRequest(`/orders/ready/${item.occupiedByOrder.id}`);
-      } catch (error) {
-        console.error('Error marking order as done:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
     return (
       <View style={styles.slideContainer}>
         <View style={styles.headerContainer}>
           <View style={styles.headerRow}>
-            <View style={styles.table}>
-              <TableIcon size={26} />
-              <Text style={styles.tableName}>
-                {item.tableName} {' | '}
-              </Text>
-
-              <View>
-                <View style={styles.table}>
-                  <ClockIcon size={20} />
-                  <Text style={styles.orderTime}>
-                    {dayjs(item.occupiedByOrder?.createdAt).format('HH:mm')}
-                  </Text>
-                </View>
+            <View style={styles.tableInfoContainer}>
+              <View style={styles.tableNameContainer}>
+                <TableIcon size={24} />
+                <Text style={styles.tableName} numberOfLines={2}>
+                  {item.tableName}
+                </Text>
               </View>
             </View>
 
-            <TouchableOpacity
-              style={[
-                styles.doneButton,
-                item.occupiedByOrder?.orderReady && styles.doneButtonDisabled,
-              ]}
-              onPress={handleMarkAsDone}
-              disabled={item.occupiedByOrder?.orderReady}
-            >
-              <Text style={styles.doneButtonText}>{strings.MARK_DONE_BTN}</Text>
-            </TouchableOpacity>
+            <View style={styles.infoRow}>
+              <TouchableOpacity
+                style={[
+                  styles.doneButton,
+                  item.occupiedByOrder?.orderReady && styles.doneButtonDisabled,
+                ]}
+                onPress={() => handleMarkAsDone(item)}
+                disabled={item.occupiedByOrder?.orderReady}
+              >
+                <Text style={styles.doneButtonText}>{strings.MARK_DONE_BTN}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+
+          <OrderInfoBar
+            order={item.occupiedByOrder}
+            containerStyle={{ paddingVertical: 3 }}
+          ></OrderInfoBar>
         </View>
 
         <View style={styles.listContainer}>
@@ -400,31 +400,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBlockColor: colors.lightGrey,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+
   table: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 1,
   },
-  tableName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.white,
-  },
+
   orderTime: {
     fontSize: 16,
     color: colors.white,
   },
-  doneButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
+
   doneButtonDisabled: {
     backgroundColor: colors.success,
     opacity: 0.8,
@@ -433,6 +420,64 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 14,
     fontWeight: '600',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+
+  tableInfoContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
+
+  tableNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  tableName: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.white,
+    marginLeft: 8,
+    flexWrap: 'wrap',
+  },
+
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+
+  infoText: {
+    fontSize: 16,
+    color: colors.white,
+  },
+
+  divider: {
+    paddingHorizontal: 8,
+  },
+
+  dividerText: {
+    color: colors.white,
+    fontSize: 16,
+  },
+
+  doneButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
   },
 });
 

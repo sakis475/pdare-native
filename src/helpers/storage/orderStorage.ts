@@ -207,6 +207,7 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
     comment: occupiedByOrder.comment,
     createdAt: occupiedByOrder.createdAt,
     orderReady: occupiedByOrder.orderReady,
+    user: occupiedByOrder.user,
   };
   for (const orderItem of occupiedByOrder.orderItems) {
     try {

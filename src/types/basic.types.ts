@@ -97,6 +97,7 @@ interface Order {
   originalTable?: Table;
   finalCost?: number;
   orderReady?: boolean;
+  user?: User;
 }
 
 interface SendOrderItem {

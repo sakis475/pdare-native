@@ -29,6 +29,7 @@ const CouvertFAB: React.FC<CouvertFABProps> = ({
   };
 
   const handleDismiss = () => {
+    setQuantity(couvertQuantity);
     setIsModalVisible(false);
   };
 
@@ -85,7 +86,7 @@ const CouvertFAB: React.FC<CouvertFABProps> = ({
   return (
     <>
       <FAB
-        icon={() => <CustomFabIcon />}
+        icon={() => <CustomFabIcon key={`fab-icon-${quantity}`} />}
         style={[styles.fab, disabled && styles.fabDisabled, style]}
         onPress={() => setIsModalVisible(true)}
         disabled={disabled}
@@ -93,7 +94,13 @@ const CouvertFAB: React.FC<CouvertFABProps> = ({
         animated={false}
       />
       <Portal>
-        <Modal visible={isModalVisible} onDismiss={handleDismiss} transparent animationType="fade">
+        <Modal
+          visible={isModalVisible}
+          onDismiss={handleDismiss}
+          transparent
+          animationType="fade"
+          key={isModalVisible ? 'modal-open' : 'modal-closed'}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.title}>{strings.SELECT_COUVERT}</Text>
@@ -114,6 +121,7 @@ const CouvertFAB: React.FC<CouvertFABProps> = ({
                 max={99}
                 showButtons
                 style={styles.input}
+                key={isModalVisible ? 'input-open' : 'input-closed'}
               />
 
               <View style={styles.buttonContainer}>

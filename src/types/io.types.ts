@@ -20,6 +20,7 @@ type OrderIO = {
   createdAt: string;
   closedAt: string | null;
   orderReady: boolean;
+  user: User;
 };
 
 type TableIO = {

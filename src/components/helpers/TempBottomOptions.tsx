@@ -15,19 +15,23 @@ import { setStorage } from '../../storage/store';
 
 interface TempBottomOptionsProps {
   table: Table;
+  isTempOrder: Boolean;
   handleOpenSelectTableModal: () => void;
   handleTempOrderPress: () => void;
   overrideOrderView?: boolean;
+  couvertUpdated?: (couvert: number) => void;
 }
 
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   table,
+  isTempOrder,
   handleOpenSelectTableModal, //opens table modal
   handleTempOrderPress, //opens additems screen
   overrideOrderView,
+  couvertUpdated,
 }) => {
   const [noTable, setNoTable] = useState(!table?.tableName);
-  const [tempOrder, setTempOrder] = useState<Order>();
+  const [order, setOrder] = useState<Order>();
 
   const [isOrderView, setIsOrderView] = useState(true);
 
@@ -37,7 +41,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
 
   const fetchTempOrder = async () => {
     let order = table?.occupiedByOrder;
-    if (!table?.occupiedByOrder) {
+    if (isTempOrder) {
       order = await getTempOrder();
     }
 
@@ -50,7 +54,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     const isAnyItemMarkedAsDeleted = order?.orderItems?.some((e) => e.markForDelete);
     setIsOrderView(overrideOrderView || (lastItem?.alreadySend && !isAnyItemMarkedAsDeleted));
 
-    setTempOrder(order);
+    setOrder(order);
   };
   useEffect(() => {
     fetchTempOrder();
@@ -102,7 +106,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
 
   const handleCloseOrder = async () => {
     let order = table?.occupiedByOrder;
-    if (!table?.occupiedByOrder) {
+    if (isTempOrder) {
       order = await getTempOrder();
     }
     const orderId = order.id;
@@ -110,35 +114,41 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       strings.CLOSE_ORDER,
       strings.CLOSE_ORDER_CONFIRM,
       async () => {
-        await patchRequest(`/orders/close/${orderId}`);
-
-        //Clear order only if its temp
-        if (order?.id === (await getTempOrder())?.id) {
-          await clearNewOrder();
+        const result = await patchRequest(`/orders/close/${orderId}`);
+        if (result?.success === true) {
+          //Clear order only if its temp
+          if (order?.id === (await getTempOrder())?.id) {
+            await clearNewOrder();
+          }
+          toast('success', strings.DELETED, '', 1000);
+          navigateToTables();
         }
-        toast('success', strings.DELETED, '', 1000);
-        navigateToTables();
       },
       () => {}
     );
   };
   const handleAddCouvert = async (quantity: number) => {
-    tempOrder.couvert = quantity;
-    setTempOrder(tempOrder);
-    setStorage('newOrder', tempOrder);
-
-    if (tempOrder.id) {
-      const newReqOrder = {
-        couvert: quantity,
-        table: tempOrder.table.id,
-        orderId: tempOrder.id,
-        items: [] as any,
-      };
-      const result = await patchRequest(`/orders/${tempOrder.id}`, newReqOrder);
-      handleOrderSendSuccess(result);
+    order.couvert = quantity;
+    setOrder(order);
+    if (isTempOrder) {
+      setStorage('newOrder', order);
     }
 
-    toast('success', `Added ${quantity} couvert(s)`, '', 1000);
+    if (order.id) {
+      const newReqOrder = {
+        couvert: quantity,
+        table: order.table.id,
+        orderId: order.id,
+        items: [] as any,
+      };
+      const result = await patchRequest(`/orders/${order.id}`, newReqOrder);
+      if (result?.id) {
+        if (couvertUpdated) {
+          couvertUpdated(quantity);
+        }
+        toast('success', `Added ${quantity} couvert(s)`, '', 1000);
+      }
+    }
   };
   return (
     <View style={styles.container}>
@@ -157,7 +167,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
       </TouchableOpacity>
 
       <View style={styles.actionsContainer}>
-        {tempOrder?.createdAt ? (
+        {order?.createdAt ? (
           <TouchableOpacity
             style={[styles.button, styles.closeButton, noTable ? styles.noTableBorder : null]}
             onPress={handleCloseOrder}
@@ -190,11 +200,11 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           </Text>
         </TouchableOpacity>
       </View>
-      {tempOrder && (
+      {order && (
         <CouvertFAB
           onSubmit={handleAddCouvert}
           disabled={noTable}
-          couvertQuantity={tempOrder?.couvert}
+          couvertQuantity={order?.couvert ?? 0}
         />
       )}
     </View>

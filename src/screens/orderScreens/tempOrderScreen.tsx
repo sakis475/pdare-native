@@ -19,6 +19,7 @@ import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItem
 import { useIsFocused } from '@react-navigation/native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { useStrings } from '../../core/localization/languageContext';
+import { OrderInfoBar } from '../../components/helpers/OrderInfoBar';
 const TempOrderScreen = ({
   currentIndex,
   route,
@@ -30,7 +31,7 @@ const TempOrderScreen = ({
   const [items, setItems] = useState<ItemReq[]>();
   const [headerTitle, setHeaderTitle] = useState('');
   const [headerSubtitle, setHeaderSubtitle] = useState('');
-
+  const [order, setOrder] = useState<Order>();
   const strings = useStrings();
 
   const fetchItems = async () => {
@@ -40,7 +41,7 @@ const TempOrderScreen = ({
     );
 
     setHeaderSubtitle(tempOrder?.table?.tableName ?? '');
-
+    setOrder(tempOrder);
     setTable(tempOrder?.table);
     setItems(tempOrder?.orderItems ?? []);
   };
@@ -146,6 +147,11 @@ const TempOrderScreen = ({
       <View style={styles.contentContainer}>
         {items && items.length > 0 ? (
           <View style={styles.listContainer}>
+            <OrderInfoBar
+              order={order}
+              containerStyle={{ paddingHorizontal: 20, paddingVertical: 15 }}
+            />
+
             <FlashList
               data={items}
               keyExtractor={(item) => item.newItemId}
@@ -174,8 +180,13 @@ const TempOrderScreen = ({
           <View style={styles.bottomOptionsContainer}>
             <TempBottomOptions
               table={table}
+              isTempOrder={true}
               handleOpenSelectTableModal={handleOpenSelectTableModal}
               handleTempOrderPress={handleTempOrderPress}
+              couvertUpdated={async (couvert) => {
+                const tempOrder: Order = await getTempOrder();
+                setOrder(tempOrder);
+              }}
             />
           </View>
           <Portal>
@@ -198,7 +209,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 2,
   },
   loadingContainer: {
     flex: 1,

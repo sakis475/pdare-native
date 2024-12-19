@@ -28,10 +28,12 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
     const handleOpenModal = useCallback(async () => {
       bottomSheetRef.current?.expand();
       let allTables = await reqFetchTables();
-      allTables = allTables
-        .filter((e) => !e.occupiedByOrder)
-        .sort((a, b) => a.tableOrder - b.tableOrder);
-      setAvailableTables(allTables);
+      if (Array.isArray(allTables)) {
+        allTables = allTables
+          .filter((e) => !e.occupiedByOrder)
+          .sort((a, b) => a.tableOrder - b.tableOrder);
+        setAvailableTables(allTables);
+      }
     }, [setAvailableTables]);
 
     const handleCloseModal = useCallback(() => {
