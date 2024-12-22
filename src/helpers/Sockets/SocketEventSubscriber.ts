@@ -10,6 +10,7 @@ import {
   EventEmitter,
   TABLES_UPDATED,
   USERS_UPDATED,
+  HEALTH_CHECK_RECEIVE,
 } from './EventEmitter';
 import { EventId, socketManager } from './SocketManager';
 
@@ -25,6 +26,7 @@ class SocketEventSubscriber {
     socketManager.on(EventId.tablesUpdated, SocketEventSubscriber.handleTablesUpdated);
     socketManager.on(EventId.usersUpdated, SocketEventSubscriber.handleUsersUpdated);
     socketManager.on(EventId.tableOrdersUpdated, SocketEventSubscriber.handleTableOrdersUpdates);
+    socketManager.on(EventId.healthCheck, SocketEventSubscriber.healthCheck);
   }
 
   static async handleTableOrdersUpdates(tables: TableIO[]): Promise<void> {
@@ -69,6 +71,11 @@ class SocketEventSubscriber {
     await setStorage('personelUsers', usersAndInvitations.users);
     await setStorage('activeInvitations', usersAndInvitations.activeInvitations);
     EventEmitter.emit(USERS_UPDATED, []);
+  }
+
+  static async healthCheck(): Promise<void> {
+    console.log('Socket Event: healthCheck');
+    EventEmitter.emit(HEALTH_CHECK_RECEIVE, []);
   }
 }
 

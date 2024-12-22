@@ -88,7 +88,9 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
   }, [isFocused]);
 
   useEffect(() => {
-    EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
+    const subscription = EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
+
+    return () => subscription.remove();
   }, []);
 
   const renderOrderItem = ({ item }: { item: ItemReq }) => {
@@ -96,11 +98,7 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
       <View
         style={[styles.itemContainer, item.markForDelete && { backgroundColor: colors.lightRed }]}
       >
-        <CatalogItemViewOnly
-          item={item}
-          refreshList={handleTableUpdates}
-          onItemDelete={async () => {}}
-        />
+        <CatalogItemViewOnly item={item} />
       </View>
     );
   };
@@ -241,7 +239,6 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
                 itemVisiblePercentThreshold: 50,
                 minimumViewTime: 100,
               }}
-              initialScrollIndex={initialIndex}
               getItemLayout={(data, index) => ({
                 length: SCREEN_WIDTH,
                 offset: SCREEN_WIDTH * index,

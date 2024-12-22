@@ -8,7 +8,7 @@ import {
   FlatList,
   RefreshControl,
 } from 'react-native';
-import { Button, Text, TextInput, FAB } from 'react-native-paper';
+import { Button, Text, TextInput, FAB, IconButton } from 'react-native-paper';
 import { getRequest, postRequest } from '../../helpers/requests';
 import { colors } from '../../core/theme';
 import { TrashIcon } from '../../components/basic/Icons';
@@ -29,6 +29,21 @@ const NewUserSetupScreen = () => {
   const [currentUser, setCurrentUser] = useState<User>(undefined);
 
   const strings = useStrings();
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchData();
+      toast('success', strings.SUCCESS);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      toast('error', strings.ERROR);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const fetchData = async () => {
     const fetchUserWithInvitations: User = await getRequest('/user/invite');
@@ -144,7 +159,7 @@ const NewUserSetupScreen = () => {
               }}
               style={styles.acceptButton}
             >
-              Αποδοχή
+              {strings.ACCEPT}
             </Button>
 
             <Button
@@ -174,7 +189,9 @@ const NewUserSetupScreen = () => {
       if (currentUser?.invitations?.length > 0) {
         return (
           <View style={styles.invitationsContainer}>
-            <Text style={styles.invitationsTitle}>{strings.RESTAURANT_INVITATIONS}</Text>
+            <View style={styles.headerContainer}>
+              <Text style={styles.invitationsTitle}>{strings.RESTAURANT_INVITATIONS}</Text>
+            </View>
 
             <FlatList
               data={currentUser.invitations}
@@ -183,15 +200,12 @@ const NewUserSetupScreen = () => {
               contentContainerStyle={styles.listContainer}
               refreshControl={
                 <RefreshControl
-                  refreshing={isLoading}
-                  onRefresh={fetchData}
+                  refreshing={isLoading || isRefreshing}
+                  onRefresh={handleRefresh}
                   colors={[colors.primary]}
                   tintColor={colors.primary}
                 />
               }
-              ListEmptyComponent={() => (
-                <Text style={styles.emptyText}>{strings.NO_INVITATIONS}</Text>
-              )}
             />
 
             <Button
@@ -208,6 +222,14 @@ const NewUserSetupScreen = () => {
 
       return (
         <View style={styles.waitingContainer}>
+          <IconButton
+            icon="refresh"
+            iconColor={colors.white}
+            size={24}
+            onPress={handleRefresh}
+            loading={isRefreshing}
+            style={styles.refreshButton}
+          />
           <Text style={styles.waitingText}>{strings.NO_INVITATIONS}</Text>
           <Button mode="outlined" onPress={() => setSelectedOption(null)} style={styles.backButton}>
             {strings.BACK}
@@ -389,13 +411,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
   },
-  invitationsTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.white,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   invitationCard: {
     backgroundColor: colors.grey,
     borderRadius: 8,
@@ -460,6 +475,21 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 12,
     fontWeight: 'bold',
+  },
+
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  refreshButton: {},
+  invitationsTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.white,
+    textAlign: 'center',
   },
 });
 

@@ -1,5 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 import { getStorage } from '../../storage/store';
+import { getRequest } from '../requests';
+import { EventEmitter, HEALTH_CHECK_RECEIVE } from './EventEmitter';
+import { EmitterSubscription } from 'react-native';
 
 type EventCallback = (data: any) => void;
 
@@ -13,13 +16,12 @@ class SocketManager {
   private user: User | null = null;
   private eventListeners: Map<EventId, Set<EventListener>> = new Map();
   private static instance: SocketManager | null = null;
-  private pendingEventSubscriptions: Map<EventId, Set<EventCallback>> = new Map();
   private currentRoom: string | null = null;
   private lastConnectedUrl: string | null = null;
   private lastConnectedOptions: any = null;
   private reconnectionTimer: NodeJS.Timeout | null = null;
   private periodicReconnectTimer: NodeJS.Timeout | null = null;
-  private periodicReconnectInterval: number = 5 * 60 * 1000; // 5 minutes in milliseconds
+  private periodicReconnectInterval: number = 1 * 25 * 1000;
 
   private reconnectionAttempts: number = 0;
   private maxReconnectionAttempts: number = 10; // Increased max attempts
@@ -44,7 +46,6 @@ class SocketManager {
       if (this.isValidUser(user)) {
         this.user = user;
         console.log('Current user loaded:', this.user);
-        await this.handlePendingSubscriptions();
         // Join restaurant room if connected
         if (this.socket?.connected) {
           this.joinRestaurantRoom();
@@ -68,92 +69,6 @@ class SocketManager {
     console.warn('No valid user found. Socket functionality is disabled.');
     this.leaveRestaurantRoom();
     this.disconnect();
-    this.eventListeners.forEach((listeners, eventId) => {
-      const callbacks = new Set(Array.from(listeners).map((l) => l.callback));
-      this.pendingEventSubscriptions.set(eventId, callbacks);
-    });
-    this.eventListeners.clear();
-  }
-
-  private startPeriodicReconnectCheck(): void {
-    if (this.periodicReconnectTimer) {
-      clearInterval(this.periodicReconnectTimer);
-    }
-
-    this.periodicReconnectTimer = setInterval(async () => {
-      if (!this.user?.restaurant?.id || this.isReconnecting) {
-        console.log('Skipping health check - no user/restaurant or reconnection in progress');
-        return;
-      }
-
-      const isConnected = this.socket?.connected;
-      console.log('Periodic check - Socket status:', isConnected ? 'connected' : 'disconnected');
-
-      if (!isConnected) {
-        console.log('Socket disconnected, triggering reconnection...');
-        this.handleReconnection();
-      } else {
-        await this.performHealthCheck();
-      }
-    }, this.periodicReconnectInterval);
-
-    console.log(`Periodic health check started - interval: ${this.periodicReconnectInterval}ms`);
-  }
-
-  private async performHealthCheck(): Promise<void> {
-    if (!this.socket || !this.user) return;
-
-    return new Promise<void>((resolve) => {
-      let healthCheckReceived = false;
-      const healthCheckTimeout = setTimeout(() => {
-        if (!healthCheckReceived && !this.isReconnecting) {
-          console.log('Health check timeout - triggering reconnection');
-          this.handleReconnection();
-        }
-        resolve();
-      }, 5000);
-
-      const healthCheckEvent = `${EventId.healthCheck}:${this.user.restaurant.id}`;
-      this.socket.once(healthCheckEvent, (response) => {
-        if (response.restaurantId === this.user.restaurant.id) {
-          healthCheckReceived = true;
-          clearTimeout(healthCheckTimeout);
-          console.log('Health check successful');
-          resolve();
-        }
-      });
-
-      try {
-        this.socket.emit('requestHealthCheck', {
-          restaurantId: this.user.restaurant.id,
-        });
-      } catch (error) {
-        console.error('Error sending health check:', error);
-        clearTimeout(healthCheckTimeout);
-        if (!this.isReconnecting) {
-          this.handleReconnection();
-        }
-        resolve();
-      }
-    });
-  }
-
-  private stopPeriodicReconnectCheck(): void {
-    if (this.periodicReconnectTimer) {
-      clearInterval(this.periodicReconnectTimer);
-      this.periodicReconnectTimer = null;
-    }
-  }
-
-  private async handlePendingSubscriptions(): Promise<void> {
-    if (!this.user || !this.socket) return;
-
-    for (const [eventId, callbacks] of this.pendingEventSubscriptions) {
-      for (const callback of callbacks) {
-        await this.on(eventId, callback);
-      }
-    }
-    this.pendingEventSubscriptions.clear();
   }
 
   private joinRestaurantRoom(): void {
@@ -219,112 +134,71 @@ class SocketManager {
   private attachCoreSocketListeners(): void {
     if (!this.socket) return;
 
-    this.socket.on('connect', () => {
-      console.log('Connected to socket server:', this.socket?.id);
-      this.reconnectionAttempts = 0;
-      this.joinRestaurantRoom();
-      this.resubscribeAllListeners();
-    });
-
-    this.socket.on('disconnect', (reason) => {
-      console.log('Disconnected from socket server:', reason);
-      this.currentRoom = null;
-
-      // Handle all disconnect cases
-      this.handleReconnection();
-    });
-
-    this.socket.on('connect_error', (err: any) => {
-      console.error('Connection error:', err);
-      this.handleReconnection();
-    });
-
-    // Add ping timeout handler
-    this.socket.on('ping_timeout', () => {
-      console.log('Ping timeout - attempting reconnection');
-      this.handleReconnection();
-    });
-
-    // Add error handler
-    this.socket.on('error', (error: Error) => {
+    const handleError = (error: any) => {
       console.error('Socket error:', error);
       this.handleReconnection();
-    });
+    };
 
-    // Add pong listener to monitor server response
-    // this.socket.on('pong', () => {
-    //   console.log('Received pong from server - connection alive');
-    // });
+    this.socket
+      .on('connect', () => {
+        console.log('Connected to socket server:', this.socket?.id);
+        this.reconnectionAttempts = 0;
+        this.joinRestaurantRoom();
+        this.resubscribeAllListeners();
+      })
+      .on('disconnect', (reason) => {
+        console.log('Disconnected from socket server:', reason);
+        this.currentRoom = null;
+        this.handleReconnection();
+      })
+      .on('connect_error', handleError)
+      .on('ping_timeout', () => handleError('Ping timeout'))
+      .on('error', handleError);
   }
 
   private handleReconnection(): void {
-    if (this.isReconnecting) {
-      console.log('Reconnection already in progress, skipping');
-      return;
-    }
-
-    console.log('handleReconnection called');
+    if (this.isReconnecting) return;
     this.isReconnecting = true;
 
-    // Close existing socket if any
-    if (this.socket) {
-      this.socket.close();
-      this.socket = null;
-    }
+    const attemptReconnection = async () => {
+      if (this.reconnectionAttempts >= this.maxReconnectionAttempts) {
+        this.reconnectionAttempts = 0;
+        this.isReconnecting = false;
+        return this.reinitializeConnection();
+      }
 
-    if (this.reconnectionTimer) {
-      clearTimeout(this.reconnectionTimer);
-      this.reconnectionTimer = null;
-    }
+      try {
+        if (!this.lastConnectedUrl) return;
 
-    const attemptReconnection = () => {
-      if (this.reconnectionAttempts < this.maxReconnectionAttempts) {
         const backoffDelay = Math.min(
           this.reconnectionDelay * Math.pow(2, this.reconnectionAttempts),
           16000
         );
-        this.reconnectionAttempts++;
 
-        console.log(
-          `Scheduling reconnection attempt ${this.reconnectionAttempts}/${this.maxReconnectionAttempts} in ${backoffDelay}ms`
-        );
+        await new Promise((resolve) => setTimeout(resolve, backoffDelay));
 
-        this.reconnectionTimer = setTimeout(() => {
-          console.log('Executing reconnection attempt...');
+        const socket = io(this.lastConnectedUrl, {
+          ...this.lastConnectedOptions,
+          forceNew: true,
+          timeout: 5000,
+          reconnection: false,
+        });
 
-          if (this.lastConnectedUrl) {
-            const socket = io(this.lastConnectedUrl, {
-              ...this.lastConnectedOptions,
-              forceNew: true,
-              timeout: 5000,
-              reconnection: false, // Disable socket.io's built-in reconnection
-            });
+        await new Promise((resolve, reject) => {
+          socket.once('connect', () => resolve(socket));
+          socket.once('connect_error', reject);
+        });
 
-            socket.once('connect', () => {
-              console.log('Connection successful');
-              if (this.socket) {
-                this.socket.close();
-              }
-              this.socket = socket;
-              this.reconnectionAttempts = 0;
-              this.isReconnecting = false;
-              this.attachCoreSocketListeners();
-              this.joinRestaurantRoom();
-              this.resubscribeAllListeners();
-            });
-
-            socket.once('connect_error', () => {
-              socket.close();
-              console.log('Connection attempt failed, scheduling next attempt');
-              attemptReconnection();
-            });
-          }
-        }, backoffDelay);
-      } else {
-        console.log('Max reconnection attempts reached. Reinitializing connection...');
+        if (this.socket) this.socket.close();
+        this.socket = socket;
         this.reconnectionAttempts = 0;
         this.isReconnecting = false;
-        this.reinitializeConnection();
+        this.attachCoreSocketListeners();
+        this.joinRestaurantRoom();
+        await this.resubscribeAllListeners();
+      } catch (error) {
+        this.reconnectionAttempts++;
+        attemptReconnection();
       }
     };
 
@@ -415,30 +289,7 @@ class SocketManager {
     console.log('Socket connection closed and listeners cleared.');
   }
 
-  public setReconnectInterval(minutes: number): void {
-    this.periodicReconnectInterval = minutes * 60 * 1000;
-    // Restart the periodic check with new interval if it's running
-    if (this.socket?.connected) {
-      this.startPeriodicReconnectCheck();
-    }
-  }
-
   public async on(eventId: EventId, callback: EventCallback): Promise<void> {
-    if (!this.user) {
-      console.warn('Cannot add listener: No user authenticated');
-      // Store as pending subscription
-      if (!this.pendingEventSubscriptions.has(eventId)) {
-        this.pendingEventSubscriptions.set(eventId, new Set());
-      }
-      this.pendingEventSubscriptions.get(eventId)!.add(callback);
-      return;
-    }
-
-    if (!this.socket) {
-      console.warn('Cannot add listener: No active socket connection');
-      return;
-    }
-
     const eventString = this.generateEventString(eventId);
 
     if (!this.eventListeners.has(eventId)) {
@@ -461,21 +312,6 @@ class SocketManager {
   }
 
   public async off(eventId: EventId, callback?: EventCallback): Promise<void> {
-    if (!this.socket) return;
-
-    // Remove from pending subscriptions if exists
-    if (this.pendingEventSubscriptions.has(eventId)) {
-      const pendingCallbacks = this.pendingEventSubscriptions.get(eventId)!;
-      if (callback) {
-        pendingCallbacks.delete(callback);
-      } else {
-        pendingCallbacks.clear();
-      }
-      if (pendingCallbacks.size === 0) {
-        this.pendingEventSubscriptions.delete(eventId);
-      }
-    }
-
     const listeners = this.eventListeners.get(eventId);
     if (!listeners) return;
 
@@ -496,6 +332,81 @@ class SocketManager {
 
     if (listeners.size === 0) {
       this.eventListeners.delete(eventId);
+    }
+  }
+
+  private startPeriodicReconnectCheck(): void {
+    if (this.periodicReconnectTimer) {
+      clearInterval(this.periodicReconnectTimer);
+    }
+
+    this.periodicReconnectTimer = setInterval(async () => {
+      if (!this.user?.restaurant?.id || this.isReconnecting) {
+        console.log('Skipping health check - no user/restaurant or reconnection in progress');
+        return;
+      }
+
+      const isConnected = this.socket?.connected;
+      console.log('Periodic check - Socket status:', isConnected ? 'connected' : 'disconnected');
+
+      if (!isConnected) {
+        console.log('Socket disconnected, triggering reconnection...');
+        this.handleReconnection();
+      } else {
+        await this.performHealthCheck();
+      }
+    }, this.periodicReconnectInterval);
+
+    console.log(`Periodic health check started - interval: ${this.periodicReconnectInterval}ms`);
+  }
+
+  private async performHealthCheck(): Promise<void> {
+    if (!this.socket || !this.user) return;
+
+    return new Promise<void>((resolve) => {
+      let healthCheckReceived = false;
+      let subscription: EmitterSubscription | null = null;
+
+      const cleanup = () => {
+        subscription?.remove();
+        subscription = null;
+      };
+
+      const healthCheckTimeout = setTimeout(() => {
+        if (!healthCheckReceived && !this.isReconnecting) {
+          console.log('Health check timeout - triggering reconnection');
+          this.handleReconnection();
+        }
+        cleanup();
+        resolve();
+      }, 5000);
+
+      const handleHealthCheck = () => {
+        healthCheckReceived = true;
+        clearTimeout(healthCheckTimeout);
+        console.log('Health check received successfully');
+        cleanup();
+        resolve();
+      };
+
+      subscription = EventEmitter.addListener(HEALTH_CHECK_RECEIVE, handleHealthCheck);
+
+      getRequest('/health-check').catch((error) => {
+        console.error('Health check HTTP request failed:', error);
+        clearTimeout(healthCheckTimeout);
+        if (!this.isReconnecting) {
+          this.handleReconnection();
+        }
+        cleanup();
+        resolve();
+      });
+    });
+  }
+
+  private stopPeriodicReconnectCheck(): void {
+    if (this.periodicReconnectTimer) {
+      clearInterval(this.periodicReconnectTimer);
+      this.periodicReconnectTimer = null;
     }
   }
 
@@ -520,10 +431,6 @@ class SocketManager {
         eventId,
         count: listeners.size,
       })),
-      pending: Array.from(this.pendingEventSubscriptions.entries()).map(([eventId, callbacks]) => ({
-        eventId,
-        count: callbacks.size,
-      })),
     });
   }
 }
@@ -541,3 +448,6 @@ export enum EventId {
 export type EventString<ID extends string | number> = `${EventId}:${ID}`;
 
 export const socketManager = SocketManager.getInstance();
+function healthCheck(event: any): void {
+  throw new Error('Function not implemented.');
+}

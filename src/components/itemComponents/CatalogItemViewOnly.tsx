@@ -7,17 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../../core/theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export function CatalogItemViewOnly({
-  item,
-  refreshList,
-  onItemDelete,
-  preDisable,
-}: {
-  item: ItemReq;
-  refreshList: any;
-  onItemDelete: any;
-  preDisable?: boolean;
-}) {
+export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
   if (!item.quantity) {
     item.quantity = 1;
   }

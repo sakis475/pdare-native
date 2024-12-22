@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { setLocalizedStrings, strings } from './strings';
 import { getStorage } from '../../storage/store';
-import { EventEmitter } from '../../helpers/Sockets/EventEmitter';
+import { EventEmitter, LANGUAGE_CHANGED } from '../../helpers/Sockets/EventEmitter';
 
 const LanguageContext = createContext(strings);
 
@@ -23,12 +23,9 @@ export const LanguageProvider = ({ children }: any) => {
     };
 
     initLanguage();
-    // Set up event listener for language changes if you have one
-    EventEmitter.addListener('LANGUAGE_CHANGED', languageChangeListener);
 
-    return () => {
-      // EventEmitter.removeListener('LANGUAGE_CHANGED', languageChangeListener);
-    };
+    const subscription = EventEmitter.addListener(LANGUAGE_CHANGED, languageChangeListener);
+    return () => subscription.remove();
   }, []);
 
   return <LanguageContext.Provider value={stringsState}>{children}</LanguageContext.Provider>;

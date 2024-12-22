@@ -15,6 +15,7 @@ export type RegisterData = {
 };
 
 export async function handleUserLogin(sessionBearer: SessionBearer) {
+  console.log(sessionBearer, 'handleUserLogin');
   try {
     if (sessionBearer?.user?.restaurant?.active === true && sessionBearer?.user?.active === true) {
       await setBearer(sessionBearer);
@@ -46,7 +47,7 @@ export async function login(username: string, password: string) {
   }
 }
 
-export async function logout() {
+export async function logout(options?: { skipNavigate: boolean }) {
   try {
     //TODO: send to request also to log logged out event
     await setStorage('session_bearer', null);
@@ -56,6 +57,7 @@ export async function logout() {
 
     await socketManager.updateUserInstance();
 
+    if (options?.skipNavigate) return false;
     navigateReset(ScreenNames.LoginScreen);
     navigate(ScreenNames.LoginScreen);
 

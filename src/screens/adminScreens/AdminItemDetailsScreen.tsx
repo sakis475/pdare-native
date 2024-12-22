@@ -19,6 +19,7 @@ import { getItem, updateItem } from '../../helpers/storage/orderStorage';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { SelectPatternModal } from './popupModals/SelectPatternModal';
 import { useStrings } from '../../core/localization/languageContext';
+import { EventEmitter, ITEMS_UPDATED } from '../../helpers/Sockets/EventEmitter';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -56,6 +57,13 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     );
     setOriginalPropertyNames(originals);
   };
+
+  useEffect(() => {
+    const subscription = EventEmitter.addListener(ITEMS_UPDATED, getItemStorage);
+
+    return () => subscription.remove();
+  }, []);
+
   useEffect(() => {
     setItem(null);
     getItemStorage();
@@ -499,10 +507,10 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       }
 
       // Update local storage
-      await updateItem(updatedItem);
+      // await updateItem(updatedItem);
 
       //Re-load item
-      await getItemStorage();
+      // await getItemStorage();
       // // Process the response data
 
       // Show success message

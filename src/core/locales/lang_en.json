@@ -72,7 +72,7 @@
   "CATEGORY_LABEL": "Category:",
   "COST_LABEL": "Cost:",
   "DESCRIPTION_LABEL": "Description:",
-  "DRAFT": "Draft",
+  "DRAFT": "Order",
   "EXPO": "Expo",
   "SAVING": "Saving...",
   "CLOSE": "Close",
@@ -88,6 +88,7 @@
   "REMOVE": "Remove",
   "REMOVE_ITEM": "Remove Item From List?",
   "SEND": "Send",
+  "REOPEN": "Reοpen",
   "SELECT_TABLE": "Select Table",
   "ADD": "Add",
   "ADD_ITEMS_FIRST": "Add Items First",
@@ -248,5 +249,8 @@
   "MARK_DONE_BTN": "Mark Done",
 
   "SELECT_COUVERT": "Couvert",
-  "OR_CUSTOM_AMOUNT": "or custom amount"
+  "OR_CUSTOM_AMOUNT": "or custom amount",
+  "REOPEN_ORDER": "Reopen Order",
+  "REOPEN_ORDER_CONFIRM": "Are you sure you want to reopen the order?",
+  "REOPENED": "Reopened"
 }

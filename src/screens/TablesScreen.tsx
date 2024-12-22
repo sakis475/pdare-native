@@ -7,6 +7,7 @@ import {
   Keyboard,
   ActivityIndicator,
   RefreshControl,
+  EmitterSubscription,
 } from 'react-native';
 import { TableBox } from '../components/helpers/TableBox';
 import { HeaderBar } from '../components/helpers/HeaderBar';
@@ -56,14 +57,14 @@ const TablesScreen = ({ currentIndex }: any) => {
   };
 
   useEffect(() => {
-    handleTableUpdates();
-    // Subscribe to table updates
-    EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
+    const subscription = EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
 
     // Initial fetch
     if (currentIndex === undefined || currentIndex === 0) {
-      // fetchInitialTables();
+      handleTableUpdates();
     }
+
+    return () => subscription.remove();
   }, [currentIndex]);
 
   //START TABLE MODAL LOGIC

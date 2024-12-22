@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { Button, RadioButton, Text } from 'react-native-paper';
-import { getStorage, setStorage } from '../storage/store';
+import { clearRestaurantStorageRelatedKeys, getStorage, setStorage } from '../storage/store';
 import { colors } from '../core/theme';
 import { WarningIcon } from '../components/basic/Icons';
 import CustomTextInput from '../components/basic/CustomTextInput';
 import { AlertWithOptions, emailValidator, passwordValidator, toast } from '../core/utils';
 import { deleteRequest, patchRequest, postRequest, setBearer } from '../helpers/requests';
 import { SessionBearer } from '../types/requests.types';
-import { logout } from '../helpers/storage/tokenRequests';
+import { handleUserLogin, logout } from '../helpers/storage/tokenRequests';
 import { AppLanguage, setLocalizedStrings } from '../core/localization/strings';
 import { EventEmitter } from '../helpers/Sockets/EventEmitter';
 import { useStrings } from '../core/localization/languageContext';
 import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
+import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUtils';
 
 const ProfileScreen = ({ route }: any) => {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -232,8 +233,7 @@ const ProfileScreen = ({ route }: any) => {
       async () => {
         setIsLoading(true);
         try {
-          await postRequest('/user/restaurant/delete');
-          await logout();
+          await deleteRequest('/user/restaurant/delete');
         } catch (error) {
           toast('error', strings.DELETE_RESTAURANT_FAILED);
         } finally {
@@ -251,8 +251,10 @@ const ProfileScreen = ({ route }: any) => {
       async () => {
         setIsLoading(true);
         try {
-          // await leaveRestaurant();
-          // await logout();
+          const response: SessionBearer = await deleteRequest('/user/restaurant/leaveRestaurant');
+          await logout({ skipNavigate: true });
+          await setStorage('currentUser', response.user);
+          await handleUserLogin(response);
         } catch (error) {
           toast('error', 'Failed to leave restaurant');
         } finally {

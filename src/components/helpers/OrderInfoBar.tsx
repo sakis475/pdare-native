@@ -5,7 +5,6 @@ import dayjs from '../../core/dayjs';
 import { useStrings } from '../../core/localization/languageContext';
 
 export const OrderInfoBar = ({ order, containerStyle }: { order: Order; containerStyle?: any }) => {
-  console.log(order, 'order');
   const strings = useStrings();
   return (
     <View style={[styles.orderInfoContainer, containerStyle]} testID="order-info-container">

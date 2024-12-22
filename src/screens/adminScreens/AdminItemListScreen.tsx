@@ -251,17 +251,41 @@ const AdminItemListScreen = ({ route }: any) => {
       // Only update if position actually changed
       if (from !== to) {
         setIsLoading(true);
-        setItems(data);
-        await handleItemUpdate(data);
+
+        // Create a deep copy of the data with new order indices
+        const updatedItems = data.map((item, index) => ({
+          ...item,
+          orderItem: index,
+        }));
+
+        // Update the UI immediately with the new order
+        setItems(updatedItems);
+
+        try {
+          // Send the update to the server
+          await handleItemUpdate(updatedItems);
+        } catch (error) {
+          // If server update fails, revert to original order
+          console.error('Failed to update item order:', error);
+          const originalItems = [...items].map((item, index) => ({
+            ...item,
+            orderItem: index,
+          }));
+          setItems(originalItems);
+        }
       } else {
         console.log('No order change detected, skipping update');
       }
     },
-    [categoryTitle, handleItemUpdate]
+    [items, handleItemUpdate]
   );
 
   const renderItem = useCallback(
     ({ item, drag, isActive }: RenderItemParams<ItemReq>) => {
+      // Create a new object without orderItem for the draggable component
+      const itemForRender = { ...item };
+      delete itemForRender.orderItem; // Remove orderItem to prevent Reanimated warning
+
       return (
         <View style={[styles.item, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}>
           <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
@@ -271,12 +295,12 @@ const AdminItemListScreen = ({ route }: any) => {
             <FontAwesome6 name="pencil" size={20} color="#fff" />
           </TouchableOpacity>
           <View style={styles.itemContent}>
-            <CatalogItemEditable item={item} />
+            <CatalogItemEditable item={itemForRender} />
           </View>
         </View>
       );
     },
-    [handleDelete, handleEditPress]
+    [handleEditPress]
   );
 
   return (
@@ -288,7 +312,9 @@ const AdminItemListScreen = ({ route }: any) => {
             <DraggableFlatList
               data={items.filter((item) => item.isEnabled !== false)}
               renderItem={renderItem}
-              keyExtractor={(item) => item?.id + item?.title + item?.category?.title}
+              keyExtractor={(item) =>
+                `draggableItem-${item?.id}-${item?.title}-${item?.category?.title}`
+              }
               onDragEnd={handleDragEnd}
               contentContainerStyle={styles.categoryFlashListContainer}
               ItemSeparatorComponent={Divider}

@@ -112,6 +112,9 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
         }}
       >
         <View style={styles.rowContainer}>
+          <View style={[styles.column, { width: '10%' }]}>
+            <Text style={styles.tableName}>{order.uniqueId ?? '-'}</Text>
+          </View>
           <View style={[styles.column, { width: '15%' }]}>
             <Text style={styles.tableName}>{order.table?.tableName ?? '?'}</Text>
           </View>
@@ -123,11 +126,11 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
             </View>
           </View>
 
-          <View style={[styles.column, { width: '25%' }]}>
+          <View style={[styles.column, { width: '20%' }]}>
             <CurrencyFormat value={order.finalCost} currency={'€'} fontSize={13} />
           </View>
 
-          <View style={[styles.column, { width: '20%' }]}>
+          <View style={[styles.column, { width: '15%' }]}>
             <Text style={styles.durationText}>
               <FeatherIcons name="clock" size={13} color={colors.veryLighterGrey} />{' '}
               {durationString}

@@ -24,6 +24,7 @@ import {
 import dayjs from '../../core/dayjs';
 import { storageInitPersonelUsers } from '../../helpers/storage/storageInit';
 import { useStrings } from '../../core/localization/languageContext';
+import { EventEmitter, USERS_UPDATED } from '../../helpers/Sockets/EventEmitter';
 
 interface SearchUserModalProps {
   visible: boolean;
@@ -334,6 +335,9 @@ const AdminPersonelScreen = () => {
 
   useEffect(() => {
     fetchData();
+
+    const subscription = EventEmitter.addListener(USERS_UPDATED, fetchData);
+    return () => subscription.remove();
   }, []);
 
   const handleUserUpdate = async (updatedUser: User) => {

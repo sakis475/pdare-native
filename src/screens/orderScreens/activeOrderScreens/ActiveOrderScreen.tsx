@@ -24,6 +24,7 @@ import CustomNavigationScreenHeaderTitle from '../../../components/basic/CustomN
 import { navigate, navigateToDraft, ScreenNames } from '../../../navigation/navigationUtils';
 import { useStrings } from '../../../core/localization/languageContext';
 import { OrderInfoBar } from '../../../components/helpers/OrderInfoBar';
+import { CatalogItemViewOnly } from '../../../components/itemComponents/CatalogItemViewOnly';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -137,7 +138,9 @@ const ActiveOrderScreen = ({
   const renderItems = (item: ItemReq) => {
     return (
       <View style={{ marginVertical: 10 }}>
-        {item.alreadySend === true ? (
+        {order.closedAt ? (
+          <CatalogItemViewOnly item={item}></CatalogItemViewOnly>
+        ) : item.alreadySend === true ? (
           <CatalogItemDisabled
             item={item}
             refreshList={refreshTempList}
