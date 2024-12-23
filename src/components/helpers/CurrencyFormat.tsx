@@ -19,11 +19,9 @@ export function CurrencyFormat({
     return null;
   }
   return (
-    <View>
-      <Text style={{ color: color, fontSize }}>
-        {quantity ? `(${quantity}) ` : ''}
-        {currency} {value.toFixed(2)}
-      </Text>
-    </View>
+    <Text style={{ color: color, fontSize }}>
+      {quantity ? `(${quantity}) ` : ''}
+      {currency} {value.toFixed(2)}
+    </Text>
   );
 }

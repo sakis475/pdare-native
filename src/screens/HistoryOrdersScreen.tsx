@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -29,25 +29,56 @@ import { processTables } from '../helpers/storage/tablesStorage';
 import _ from 'lodash';
 
 const HistoryOrdersScreen = ({ currentIndex }: any) => {
-  const [table, setTable] = useState<Table>();
-  const [orders, setOrders] = useState<Order[]>();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [pageNumber, setPageNumber] = useState(0);
 
   const strings = useStrings();
 
-  const fetchOrders = async () => {
-    const orders: Order[] = await getRequest('/orders');
-    setOrders(orders ?? []);
+  const fetchOrders = async (page: number, isRefresh = false) => {
+    if (loading || (!hasMore && !isRefresh)) return;
+
+    setLoading(true);
+    try {
+      const newOrders: Order[] = await getRequest(`/orders?pageNumber=${page}`);
+
+      if (isRefresh) {
+        setOrders(newOrders ?? []);
+        setPageNumber(0);
+        setHasMore(true);
+      } else {
+        if (newOrders?.length) {
+          setOrders((prev) => [...prev, ...newOrders]);
+        } else {
+          setHasMore(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchOrders();
+    await fetchOrders(0, true);
     setRefreshing(false);
   };
 
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      const nextPage = pageNumber + 1;
+      console.log('Loading next page:', nextPage);
+      setPageNumber(nextPage);
+      fetchOrders(nextPage);
+    }
+  }, [loading, hasMore, pageNumber]);
+
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(0, true);
   }, [currentIndex]);
 
   const calculateDuration = (createdAt: string, closedAt: string) => {
@@ -92,6 +123,15 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
     navigate(ScreenNames.ActiveOrderScreen, { tableParam: allTables[0] });
   };
 
+  const renderFooter = () => {
+    if (!loading) return null;
+
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    );
+  };
   const renderOrderItem = (order: Order) => {
     const startedAt = dayjs(order.createdAt);
     const closedAt = dayjs(order.closedAt ?? new Date());
@@ -105,9 +145,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
         onPress={() => {
           const deepOrder = _.cloneDeep(order);
           const deepTable = _.cloneDeep(deepOrder.table);
-
           deepTable.occupiedByOrder = deepOrder;
-
           processTable(deepTable);
         }}
       >
@@ -126,11 +164,11 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
             </View>
           </View>
 
-          <View style={[styles.column, { width: '20%' }]}>
+          <View style={[styles.column, { width: '15%' }]}>
             <CurrencyFormat value={order.finalCost} currency={'€'} fontSize={13} />
           </View>
 
-          <View style={[styles.column, { width: '15%' }]}>
+          <View style={[styles.column, { width: '20%' }]}>
             <Text style={styles.durationText}>
               <FeatherIcons name="clock" size={13} color={colors.veryLighterGrey} />{' '}
               {durationString}
@@ -162,39 +200,39 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        {orders && orders.length > 0 ? (
-          <>
-            <View style={styles.categoriesContainer}>
-              <FlashList
-                data={orders}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={({ item }) => renderOrderItem(item)}
-                estimatedItemSize={15}
-                contentContainerStyle={styles.categoryFlashListContainer}
-                showsVerticalScrollIndicator={true}
-                persistentScrollbar={true}
-                ItemSeparatorComponent={Divider}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[colors.primary]} // Android
-                    tintColor={colors.primary} // iOS
-                  />
-                }
-              />
-            </View>
-          </>
-        ) : orders?.length === 0 ? (
-          <>
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={{ textAlign: 'center', color: '#ffffff' }}>
-                {strings.NO_ORDERS_FOUND}
-              </Text>
-            </View>
-          </>
+        {orders ? (
+          <View style={styles.categoriesContainer}>
+            <FlashList
+              data={orders}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => renderOrderItem(item)}
+              estimatedItemSize={15}
+              contentContainerStyle={styles.categoryFlashListContainer}
+              showsVerticalScrollIndicator={true}
+              persistentScrollbar={true}
+              ItemSeparatorComponent={Divider}
+              onEndReached={loadMore}
+              onEndReachedThreshold={0.1}
+              ListFooterComponent={renderFooter}
+              ListEmptyComponent={
+                !loading && (
+                  <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>{strings.NO_ORDERS_FOUND}</Text>
+                  </View>
+                )
+              }
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[colors.primary]}
+                  tintColor={colors.primary}
+                />
+              }
+            />
+          </View>
         ) : (
-          <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+          <ActivityIndicator size="large" animating={true} color={colors.primary} />
         )}
       </View>
     </SafeAreaView>
@@ -349,6 +387,20 @@ const styles = StyleSheet.create({
     color: 'gray',
     textAlign: 'left',
     marginLeft: 4,
+  },
+  footerLoader: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#ffffff',
   },
 });
 export default HistoryOrdersScreen;

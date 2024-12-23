@@ -74,7 +74,6 @@ class SocketEventSubscriber {
   }
 
   static async healthCheck(): Promise<void> {
-    console.log('Socket Event: healthCheck');
     EventEmitter.emit(HEALTH_CHECK_RECEIVE, []);
   }
 }

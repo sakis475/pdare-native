@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  ScrollView,
 } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
@@ -25,9 +26,10 @@ import { processTables } from '../helpers/storage/tablesStorage';
 import { useStrings } from '../core/localization/languageContext';
 import { CatalogItemViewOnly } from '../components/itemComponents/CatalogItemViewOnly';
 import dayjs from '../core/dayjs';
-import { AppsIcon, ClockIcon, CouvertIcon, TableIcon, UserIcon } from '../components/basic/Icons';
+import { TableIcon } from '../components/basic/Icons';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
 import { OrderInfoBar } from '../components/helpers/OrderInfoBar';
+import { LinearGradientFadeOut } from '../components/basic/LinearGradientFadeOut';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -142,24 +144,39 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
               </TouchableOpacity>
             </View>
           </View>
-
-          <OrderInfoBar
-            order={item.occupiedByOrder}
-            containerStyle={{ paddingVertical: 3 }}
-          ></OrderInfoBar>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.primary]}
+                tintColor={colors.primary}
+                progressViewOffset={20}
+              />
+            }
+          >
+            <OrderInfoBar
+              order={item.occupiedByOrder}
+              containerStyle={{ paddingVertical: 3 }}
+              hideTableName={true}
+            ></OrderInfoBar>
+          </ScrollView>
         </View>
 
         <View style={styles.listContainer}>
           {orderItems.length > 0 ? (
-            <FlashList
-              data={orderItems}
-              renderItem={renderOrderItem}
-              estimatedItemSize={20}
-              keyExtractor={(item) => item.newItemId || item.id?.toString()}
-              showsVerticalScrollIndicator={true}
-              contentContainerStyle={styles.listContent}
-              ItemSeparatorComponent={Divider}
-            />
+            <>
+              <FlashList
+                data={orderItems}
+                renderItem={renderOrderItem}
+                estimatedItemSize={20}
+                keyExtractor={(item) => item.newItemId || item.id?.toString()}
+                showsVerticalScrollIndicator={true}
+                contentContainerStyle={styles.listContent}
+                ItemSeparatorComponent={Divider}
+              />
+              <LinearGradientFadeOut />
+            </>
           ) : (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>No items in this order</Text>
@@ -244,14 +261,6 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
                 offset: SCREEN_WIDTH * index,
                 index,
               })}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={[colors.primary]}
-                  tintColor={colors.primary}
-                />
-              }
             />
 
             <View style={styles.paginationWrapper}>
@@ -324,6 +333,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   itemContainer: {
     marginVertical: 10,
@@ -420,7 +430,7 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'flex-start',
   },
 
@@ -475,6 +485,13 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 6,
     alignSelf: 'flex-start',
+  },
+  gradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 50,
   },
 });
 

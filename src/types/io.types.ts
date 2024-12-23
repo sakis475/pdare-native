@@ -22,6 +22,7 @@ type OrderIO = {
   closedAt: string | null;
   orderReady: boolean;
   user: User;
+  finalCost: number;
 };
 
 type TableIO = {

@@ -20,6 +20,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { useStrings } from '../../core/localization/languageContext';
 import { OrderInfoBar } from '../../components/helpers/OrderInfoBar';
+import { LinearGradientFadeOut } from '../../components/basic/LinearGradientFadeOut';
 const TempOrderScreen = ({
   currentIndex,
   route,
@@ -162,6 +163,7 @@ const TempOrderScreen = ({
               persistentScrollbar={true}
               ItemSeparatorComponent={Divider}
             />
+            <LinearGradientFadeOut height={150} />
           </View>
         ) : items?.length === 0 ? (
           <View style={styles.emptyContainer}>

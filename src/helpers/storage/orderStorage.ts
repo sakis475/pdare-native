@@ -210,6 +210,7 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
     closedAt: occupiedByOrder.closedAt,
     orderReady: occupiedByOrder.orderReady,
     user: occupiedByOrder.user,
+    finalCost: occupiedByOrder.finalCost,
   };
   for (const orderItem of occupiedByOrder.orderItems) {
     try {

@@ -25,6 +25,7 @@ import { navigate, navigateToDraft, ScreenNames } from '../../../navigation/navi
 import { useStrings } from '../../../core/localization/languageContext';
 import { OrderInfoBar } from '../../../components/helpers/OrderInfoBar';
 import { CatalogItemViewOnly } from '../../../components/itemComponents/CatalogItemViewOnly';
+import { LinearGradientFadeOut } from '../../../components/basic/LinearGradientFadeOut';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -205,6 +206,7 @@ const ActiveOrderScreen = ({
                 ItemSeparatorComponent={Divider}
                 onLoad={handleListLoad}
               />
+              <LinearGradientFadeOut />
             </View>
           </>
         ) : items?.length === 0 ? (

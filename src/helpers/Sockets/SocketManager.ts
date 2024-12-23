@@ -347,7 +347,6 @@ class SocketManager {
       }
 
       const isConnected = this.socket?.connected;
-      console.log('Periodic check - Socket status:', isConnected ? 'connected' : 'disconnected');
 
       if (!isConnected) {
         console.log('Socket disconnected, triggering reconnection...');
@@ -384,7 +383,6 @@ class SocketManager {
       const handleHealthCheck = () => {
         healthCheckReceived = true;
         clearTimeout(healthCheckTimeout);
-        console.log('Health check received successfully');
         cleanup();
         resolve();
       };

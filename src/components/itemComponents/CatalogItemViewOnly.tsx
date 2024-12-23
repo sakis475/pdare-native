@@ -56,6 +56,7 @@ export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
                   {item.comment}
                 </Text>
               ) : null}
+              <CurrencyFormat value={totalCost} currency={'€'} fontSize={12}></CurrencyFormat>
             </View>
           </View>
         </View>
