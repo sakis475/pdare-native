@@ -28,18 +28,8 @@ const QuantitySelector = (props: any) => {
       setQuantity((prevQuantity: number) => prevQuantity - 1);
     } else if (showDeleteBtn) {
       clearTimeout(trashIconTimer);
-
-      AlertWithOptions(
-        strings.REMOVE,
-        strings.REMOVE_ITEM,
-        () => {
-          props.removeItem();
-          setShowDeleteBtn(false);
-        },
-        () => {
-          setShowDeleteBtn(false);
-        }
-      );
+      props.removeItem();
+      setShowDeleteBtn(false);
     } else if (quantity === 1) {
       setShowDeleteBtn(true);
     }

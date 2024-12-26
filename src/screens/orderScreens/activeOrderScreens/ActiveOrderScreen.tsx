@@ -8,7 +8,6 @@ import { colors } from '../../../core/theme';
 import { FlashList } from '@shopify/flash-list';
 import TableSelectBottomSheet from '../../../components/bottomSheets/TableSelectBottomSheet';
 import {
-  createNewOrder,
   getTempOrder,
   markActiveItemForDelete,
   setTableTempOrder,

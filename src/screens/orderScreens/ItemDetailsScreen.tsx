@@ -219,7 +219,7 @@ const ItemDetailsScreen = ({ route }: any) => {
                   }
                   onSelectChange={handleSelectChange}
                   isUpdate={isUpdate}
-                ></UnifiedSelect>
+                />
 
                 <Divider style={{ marginVertical: 8 }}></Divider>
               </View>

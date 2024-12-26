@@ -2,11 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppLanguage } from '../core/localization/strings';
 import { SessionBearer } from '../types/requests.types';
 import { toast } from '../core/utils';
+import { EventEmitter, TEMP_ORDER_UPDATED } from '../helpers/Sockets/EventEmitter';
 
 // Function to set item in AsyncStorage
 export async function setStorage<K extends StorageKey>(key: K, value: StorageTypes[K] | null) {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(value));
+    if (key === 'newOrder') {
+      EventEmitter.emit(TEMP_ORDER_UPDATED, value);
+    }
   } catch (error) {
     console.log(error);
   }

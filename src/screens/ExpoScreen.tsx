@@ -37,9 +37,9 @@ interface ExpoScreenProps {
   currentIndex?: number;
 }
 
-const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 }) => {
+const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
   const [activeTables, setActiveTables] = useState<Table[]>(undefined);
-  const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
@@ -92,8 +92,13 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
   useEffect(() => {
     const subscription = EventEmitter.addListener(ORDERS_UPDATED, handleTableUpdates);
 
+    // Initial fetch
+    if (currentIndex === undefined || currentIndex === 2) {
+      handleTableUpdates();
+    }
+
     return () => subscription.remove();
-  }, []);
+  }, [currentIndex]);
 
   const renderOrderItem = ({ item }: { item: ItemReq }) => {
     return (
@@ -144,7 +149,11 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
               </TouchableOpacity>
             </View>
           </View>
+
           <ScrollView
+            style={styles.orderInfoScrollView}
+            contentContainerStyle={styles.orderInfoContentContainer}
+            showsHorizontalScrollIndicator={false}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -154,13 +163,12 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex: initialIndex = 0 
                 progressViewOffset={20}
               />
             }
-          >
-            <OrderInfoBar
-              order={item.occupiedByOrder}
-              containerStyle={{ paddingVertical: 3 }}
-              hideTableName={true}
-            ></OrderInfoBar>
-          </ScrollView>
+          />
+          <OrderInfoBar
+            order={item.occupiedByOrder}
+            containerStyle={{ paddingVertical: 3 }}
+            hideTableName={true}
+          />
         </View>
 
         <View style={styles.listContainer}>
@@ -492,6 +500,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 50,
+  },
+  orderInfoScrollView: {
+    position: 'absolute',
+    top: 10,
+    height: 300,
+    width: SCREEN_WIDTH,
+  },
+  orderInfoContentContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
 });
 

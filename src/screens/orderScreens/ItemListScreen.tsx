@@ -18,25 +18,52 @@ import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBot
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
 import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
-import { setTableTempOrder } from '../../helpers/storage/orderStorage';
+import {
+  addNewItemToTemp,
+  getTempOrder,
+  setTableTempOrder,
+} from '../../helpers/storage/orderStorage';
 import { useStrings } from '../../core/localization/languageContext';
+import { useIsFocused } from '@react-navigation/native';
+import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>(null);
-
+  const isFocused = useIsFocused();
   const strings = useStrings();
 
   const fetchItems = async () => {
     const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
     const categoryItems = fetchedItems[categoryTitle] ?? [];
 
+    const tempOrder = await getTempOrder();
+
+    for (const addedItem of tempOrder.orderItems) {
+      if (addedItem.alreadySend) {
+        continue;
+      }
+      for (const itemOfCategory of categoryItems) {
+        if (itemOfCategory.id === addedItem.id) {
+          if (addedItem.quantity > 0) {
+            itemOfCategory.quantity =
+              (itemOfCategory.quantity ? +itemOfCategory.quantity : 0) + addedItem.quantity;
+          }
+        }
+      }
+    }
     setItems(categoryItems);
   };
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    if (isFocused) {
+      fetchItems();
+    }
+
+    const subscription = EventEmitter.addListener(TEMP_ORDER_UPDATED, fetchItems);
+
+    return () => subscription.remove();
+  }, [isFocused]);
 
   const handleSelectTable = (table: Table) => {
     setTableName(table.tableName);
@@ -71,10 +98,15 @@ const ItemListScreen = ({ route }: any) => {
     navigate(screenName, props);
   };
 
+  const handleAddNewItemPress = async (item: ItemReq) => {
+    await addNewItemToTemp(item);
+    await fetchItems();
+  };
+
   const renderItems = (item: ItemReq, index: number) => {
     return (
       <View style={{ marginVertical: 8, paddingHorizontal: 0 }} key={index}>
-        <CatalogItemAdd item={item} />
+        <CatalogItemAdd item={item} handleAddNewItemPress={handleAddNewItemPress} />
       </View>
     );
   };

@@ -73,6 +73,7 @@ export const PROPERTY_PATTERNS_UPDATED = 'PROPERTY_PATTERNS_UPDATED';
 export const TABLES_UPDATED = 'TABLES_UPDATED';
 export const USERS_UPDATED = 'USERS_UPDATED';
 export const HEALTH_CHECK_RECEIVE = 'HEALTH_CHECK_RECEIVE';
+export const TEMP_ORDER_UPDATED = 'TEMP_ORDER_UPDATED';
 
 // Type for event names (optional but recommended for type safety)
 export type EventType =
@@ -83,4 +84,5 @@ export type EventType =
   | typeof PROPERTY_PATTERNS_UPDATED
   | typeof TABLES_UPDATED
   | typeof USERS_UPDATED
-  | typeof HEALTH_CHECK_RECEIVE;
+  | typeof HEALTH_CHECK_RECEIVE
+  | typeof TEMP_ORDER_UPDATED;

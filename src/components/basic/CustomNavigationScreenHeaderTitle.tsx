@@ -18,7 +18,7 @@ const CustomNavigationScreenHeaderTitle = ({
 
   return (
     <View
-      style={[styles.headerTitleContainer, { maxWidth: width - sharedStyles.SIDE_SPACING * 2 }]}
+    // style={[styles.headerTitleContainer, { maxWidth: width - sharedStyles.SIDE_SPACING * 2 }]}
     >
       <Text
         style={[styles.headerTitle, styles.boldText]}

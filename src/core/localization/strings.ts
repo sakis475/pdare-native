@@ -13,6 +13,7 @@ export const strings = new LocalizedStrings({
 export async function getLanguage() {
   const appLanguage = await getStorage('app_language');
   if (!appLanguage) {
+    await setStorage('app_language', DEFAULT_APP_LANGUAGE);
     return DEFAULT_APP_LANGUAGE;
   }
   return appLanguage;

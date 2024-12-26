@@ -16,7 +16,7 @@ export const OrderInfoBar = ({
 }) => {
   const strings = useStrings();
   return (
-    <View style={[styles.orderInfoContainer, containerStyle]} testID="order-info-container">
+    <View style={[styles.orderInfoContainer, containerStyle]}>
       <View style={styles.tableInfoContainer}>
         <View style={styles.infoRow}>
           <View style={styles.leftSection}>
