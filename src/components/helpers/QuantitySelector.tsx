@@ -5,30 +5,46 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { AlertWithOptions } from '../../core/utils';
 import { useStrings } from '../../core/localization/languageContext';
 
-const QuantitySelector = (props: any) => {
-  const [quantity, setQuantity] = useState(props.quantity || 1); // Assuming the initial quantity is 2 as in the image
-  const [showDeleteBtn, setShowDeleteBtn] = useState(false);
+interface QuantitySelectorProps {
+  quantity: number;
+  quantityChange: (quantity: number) => void;
+  removeItem: () => void;
+}
 
+const QuantitySelector: React.FC<QuantitySelectorProps> = ({
+  quantity: propQuantity,
+  quantityChange,
+  removeItem,
+}) => {
+  const [quantity, setQuantity] = useState(propQuantity || 1);
+  const [showDeleteBtn, setShowDeleteBtn] = useState(false);
   const strings = useStrings();
 
   let trashIconTimer: NodeJS.Timeout;
+
+  // Add useEffect to sync with prop changes
+  useEffect(() => {
+    setQuantity(propQuantity || 1);
+  }, [propQuantity]);
 
   const handleIncrement = () => {
     if (showDeleteBtn) {
       setShowDeleteBtn(false);
     } else {
-      props.quantityChange(quantity + 1);
-      setQuantity((prevQuantity: number) => prevQuantity + 1);
+      const newQuantity = quantity + 1;
+      setQuantity(newQuantity);
+      quantityChange(newQuantity);
     }
   };
 
   const handleDecrement = () => {
     if (quantity > 1) {
-      props.quantityChange(quantity - 1);
-      setQuantity((prevQuantity: number) => prevQuantity - 1);
+      const newQuantity = quantity - 1;
+      setQuantity(newQuantity);
+      quantityChange(newQuantity);
     } else if (showDeleteBtn) {
       clearTimeout(trashIconTimer);
-      props.removeItem();
+      removeItem();
       setShowDeleteBtn(false);
     } else if (quantity === 1) {
       setShowDeleteBtn(true);
@@ -41,7 +57,7 @@ const QuantitySelector = (props: any) => {
         setShowDeleteBtn(false);
       }, 3000);
     }
-    return () => clearTimeout(trashIconTimer); // Cleanup the timer when the component unmounts or showDeleteBtn changes
+    return () => clearTimeout(trashIconTimer);
   }, [showDeleteBtn]);
 
   return (

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import QuantitySelector from '../helpers/QuantitySelector';
@@ -17,14 +17,16 @@ export function CatalogItemAdded({
   onItemPress: any;
 }) {
   const animatedOpacity = useRef(new Animated.Value(1)).current;
-
   const [isTap, setIsTap] = useState(false);
 
-  if (!item.quantity) {
-    item.quantity = 1;
-  }
+  const [quantity, setQuantity] = useState(item.quantity || 1);
 
   const [totalCost, setTotalCost] = useState(item.cost * item.quantity);
+
+  useEffect(() => {
+    setQuantity(item.quantity || 1);
+    setTotalCost(item.cost * (item.quantity || 1));
+  }, [item.quantity, item.cost]);
 
   const handleItemDetailsUpdate = () => {
     navigate(ScreenNames.ItemDetailsScreen, { item, isUpdate: true });
@@ -100,7 +102,7 @@ export function CatalogItemAdded({
         </View>
 
         <QuantitySelector
-          quantity={item.quantity}
+          quantity={quantity}
           quantityChange={handleQuantityUpdate}
           removeItem={handleRemoveItem}
         ></QuantitySelector>

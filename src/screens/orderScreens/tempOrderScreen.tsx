@@ -21,6 +21,7 @@ import { AlertWithOptions, toast } from '../../core/utils';
 import { useStrings } from '../../core/localization/languageContext';
 import { OrderInfoBar } from '../../components/helpers/OrderInfoBar';
 import { LinearGradientFadeOut } from '../../components/basic/LinearGradientFadeOut';
+import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
 const TempOrderScreen = ({
   currentIndex,
   route,
@@ -49,8 +50,15 @@ const TempOrderScreen = ({
   const isFocused = useIsFocused();
   useEffect(() => {
     if (currentIndex && currentIndex !== 1) return;
+
     fetchItems();
   }, [route, isSheetOpen, isFocused, currentIndex]);
+
+  useEffect(() => {
+    fetchItems();
+    const subscription = EventEmitter.addListener(TEMP_ORDER_UPDATED, fetchItems);
+    return () => subscription.remove();
+  }, []);
 
   const handleSelectTable = async (newTable: Table) => {
     const tempOrder: Order = await getTempOrder();

@@ -341,10 +341,10 @@ class SocketManager {
     }
 
     this.periodicReconnectTimer = setInterval(async () => {
-      if (!this.user?.restaurant?.id || this.isReconnecting) {
-        console.log('Skipping health check - no user/restaurant or reconnection in progress');
-        return;
-      }
+      // if (!this.user?.restaurant?.id || this.isReconnecting) {
+      //   console.log('Skipping health check - no user/restaurant or reconnection in progress');
+      //   return;
+      // }
 
       const isConnected = this.socket?.connected;
 

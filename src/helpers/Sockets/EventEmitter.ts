@@ -19,10 +19,7 @@ class SafeEventEmitter extends NativeEventEmitter {
     listener: (...args: any[]) => any,
     context?: any
   ): EmitterSubscription {
-    // Remove existing listeners for this event type
-    this.removeAllListenersForEvent(eventType);
-
-    // Add new listener
+    // Add new listener without removing existing ones
     const subscription = super.addListener(eventType, listener, context);
 
     // Track the new subscription
@@ -34,11 +31,11 @@ class SafeEventEmitter extends NativeEventEmitter {
     return subscription;
   }
 
-  private removeAllListenersForEvent(eventType: string): void {
+  removeListener(eventType: string, subscription: EmitterSubscription): void {
     const listeners = this.activeListeners.get(eventType);
     if (listeners) {
-      listeners.forEach((subscription) => subscription.remove());
-      listeners.clear();
+      listeners.delete(subscription);
+      subscription.remove();
     }
   }
 
@@ -46,13 +43,21 @@ class SafeEventEmitter extends NativeEventEmitter {
     if (eventType) {
       this.removeAllListenersForEvent(eventType);
     } else {
-      this.activeListeners.forEach((listeners) => {
-        listeners.forEach((subscription) => subscription.remove());
-        listeners.clear();
+      this.activeListeners.forEach((listeners, type) => {
+        this.removeAllListenersForEvent(type);
       });
       this.activeListeners.clear();
     }
     super.removeAllListeners(eventType);
+  }
+
+  private removeAllListenersForEvent(eventType: string): void {
+    const listeners = this.activeListeners.get(eventType);
+    if (listeners) {
+      listeners.forEach((subscription) => subscription.remove());
+      listeners.clear();
+      this.activeListeners.delete(eventType);
+    }
   }
 
   // Helper method to check if an event has any active listeners

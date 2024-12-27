@@ -33,37 +33,48 @@ const ItemListScreen = ({ route }: any) => {
   const isFocused = useIsFocused();
   const strings = useStrings();
 
-  const fetchItems = async () => {
-    const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
-    const categoryItems = fetchedItems[categoryTitle] ?? [];
+  const fetchItems = useCallback(
+    async (tempOrderEmitted?: Order) => {
+      if (!categoryTitle) return; // Guard against undefined categoryTitle
 
-    const tempOrder = await getTempOrder();
+      const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
+      const categoryItems = fetchedItems[categoryTitle] ?? [];
 
-    for (const addedItem of tempOrder.orderItems) {
-      if (addedItem.alreadySend) {
-        continue;
-      }
-      for (const itemOfCategory of categoryItems) {
-        if (itemOfCategory.id === addedItem.id) {
-          if (addedItem.quantity > 0) {
-            itemOfCategory.quantity =
-              (itemOfCategory.quantity ? +itemOfCategory.quantity : 0) + addedItem.quantity;
+      const tempOrder = tempOrderEmitted || (await getTempOrder());
+
+      for (const addedItem of tempOrder.orderItems) {
+        if (addedItem.alreadySend) continue;
+
+        for (const itemOfCategory of categoryItems) {
+          if (itemOfCategory.id === addedItem.id) {
+            if (addedItem.quantity > 0) {
+              itemOfCategory.quantity =
+                (itemOfCategory.quantity ? +itemOfCategory.quantity : 0) + addedItem.quantity;
+            }
           }
         }
       }
-    }
-    setItems(categoryItems);
-  };
+      setItems(categoryItems);
+    },
+    [categoryTitle]
+  );
 
   useEffect(() => {
+    setCategoryTitle(route.params.categoryTitle);
+  }, [route.params.categoryTitle]);
+
+  // Separate event listener setup
+  useEffect(() => {
     if (isFocused) {
+      // Initial fetch
       fetchItems();
     }
+  }, [isFocused, fetchItems]);
 
+  useEffect(() => {
     const subscription = EventEmitter.addListener(TEMP_ORDER_UPDATED, fetchItems);
-
     return () => subscription.remove();
-  }, [isFocused]);
+  }, []);
 
   const handleSelectTable = (table: Table) => {
     setTableName(table.tableName);
