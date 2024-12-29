@@ -86,7 +86,7 @@ const TablesScreen = ({ currentIndex }: any) => {
 
   const handleExistingTable = async (table: Table) => {
     // const tempOrder = await getTempOrder();
-    console.log(table, 'table');
+
     // if (tempOrder?.table?.id === table?.id) {
     //   navigateToDraft();
     // } else {
@@ -95,7 +95,7 @@ const TablesScreen = ({ currentIndex }: any) => {
   };
 
   const renderItems = (table: Table, index: number) => (
-    <View style={styles.tableItem} key={table.id}>
+    <View style={styles.tableItem} key={`table-${table.id}-${index}`}>
       <TableBox
         table={table}
         onPress={(table: Table) => {

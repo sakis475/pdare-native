@@ -47,7 +47,7 @@ export async function login(username: string, password: string) {
   }
 }
 
-export async function logout(options?: { skipNavigate: boolean }) {
+export async function logout(options?: { skipNavigate?: boolean }) {
   try {
     //TODO: send to request also to log logged out event
     await setStorage('session_bearer', null);

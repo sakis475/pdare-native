@@ -67,14 +67,15 @@ export const addNewItemToTemp = async (item: ItemReq) => {
   const tempOrder: Order | null = await getStorage('newOrder');
 
   // Find existing item that matches and hasn't been sent
-  const existingItemIndex = tempOrder?.orderItems?.findIndex(
-    (orderItem) =>
+  const existingItemIndex = tempOrder?.orderItems?.findIndex((orderItem) => {
+    return (
       !orderItem.alreadySend &&
       orderItem.id === item.id &&
       // Compare additional properties if needed
       orderItem.comment === item.comment &&
-      _.isEqual(orderItem.itemPropertiesGrouped, orderItem.itemPropertiesGrouped)
-  );
+      _.isEqual(orderItem.itemPropertiesGrouped, item.itemPropertiesGrouped)
+    );
+  });
 
   if (existingItemIndex !== -1 && existingItemIndex !== undefined) {
     // Update existing item's quantity

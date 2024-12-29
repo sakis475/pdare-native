@@ -5,6 +5,7 @@ import { colors } from '../../core/theme';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import { catalogItemStyles } from './CatalogStyles';
 
 export function CatalogItemEditable({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);
@@ -30,39 +31,39 @@ export function CatalogItemEditable({ item }: { item: ItemReq }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  textContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  itemTitle: {
-    color: colors.white,
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  textPressed: {
-    opacity: 0.5,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8, // Space between buttons
-  },
-  button: {
-    width: 33,
-    height: 33,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.lightGrey,
-    borderRadius: 6,
-  },
-  deleteButton: {
-    backgroundColor: '#FF3B30', // Red color for delete button
-  },
-});
+const styles = catalogItemStyles;
+// const styles = StyleSheet.create({
+//   container: {
+//     flexDirection: 'row',
+//     flex: 1,
+//   },
+//   textContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//   },
+//   itemTitle: {
+//     color: colors.white,
+//     fontWeight: 'bold',
+//     fontSize: 14,
+//     marginBottom: 4,
+//   },
+//   textPressed: {
+//     opacity: 0.5,
+//   },
+//   buttonsContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     gap: 8, // Space between buttons
+//   },
+//   button: {
+//     width: 33,
+//     height: 33,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: colors.lightGrey,
+//     borderRadius: 6,
+//   },
+//   deleteButton: {
+//     backgroundColor: '#FF3B30', // Red color for delete button
+//   },
+// });

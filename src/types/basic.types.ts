@@ -42,6 +42,8 @@ interface Restaurant {
   active: boolean;
   id: number;
   restaurantName: string;
+  couvertCost: number;
+  currencySymbol: string;
 }
 
 interface Item {

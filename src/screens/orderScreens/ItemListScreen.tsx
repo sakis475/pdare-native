@@ -30,18 +30,38 @@ const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>(null);
+
+  const [duplicateItemIds, setDuplicateItemIds] = useState<Set<number>>(new Set());
+
   const isFocused = useIsFocused();
   const strings = useStrings();
 
   const fetchItems = useCallback(
     async (tempOrderEmitted?: Order) => {
-      if (!categoryTitle) return; // Guard against undefined categoryTitle
+      if (!categoryTitle) return;
 
       const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
       const categoryItems = fetchedItems[categoryTitle] ?? [];
-
       const tempOrder = tempOrderEmitted || (await getTempOrder());
 
+      // Create a Set of item IDs that are already in the temp order
+      const duplicateIds = new Set<number>();
+
+      // First collect all non-sent item IDs
+      const activeOrderItemIds = tempOrder.orderItems
+        .filter((item) => !item.alreadySend)
+        .map((item) => item.id);
+
+      // Find duplicates by checking if the ID appears more than once
+      activeOrderItemIds.forEach((id) => {
+        if (activeOrderItemIds.filter((orderId) => orderId === id).length > 1) {
+          duplicateIds.add(id);
+        }
+      });
+
+      setDuplicateItemIds(duplicateIds);
+
+      // Rest of your existing logic for setting quantities
       for (const addedItem of tempOrder.orderItems) {
         if (addedItem.alreadySend) continue;
 
@@ -117,7 +137,11 @@ const ItemListScreen = ({ route }: any) => {
   const renderItems = (item: ItemReq, index: number) => {
     return (
       <View style={{ marginVertical: 8, paddingHorizontal: 0 }} key={index}>
-        <CatalogItemAdd item={item} handleAddNewItemPress={handleAddNewItemPress} />
+        <CatalogItemAdd
+          item={item}
+          handleAddNewItemPress={handleAddNewItemPress}
+          disableInstantAdd={duplicateItemIds.has(item.id)}
+        />
       </View>
     );
   };

@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { TextInput, Text, IconButton } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { MinusIcon, PlusIcon } from './Icons';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface CustomNumberInputProps {
   label: string;
@@ -22,7 +23,7 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
   label,
   value,
   onChangeText,
-  min = Number.MIN_SAFE_INTEGER,
+  min = 0,
   max = Number.MAX_SAFE_INTEGER,
   step = 1,
   allowDecimals = false,
@@ -33,6 +34,7 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
   ...props
 }) => {
   const [error, setError] = useState<string>('');
+  const strings = useStrings();
 
   const validateNumber = (text: string): boolean => {
     if (text === '') return true;
@@ -71,7 +73,9 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({
       onChangeText(text);
     } else {
       setError(
-        `Value must be between ${min} and ${max}${!allowDecimals ? ' and whole number' : ''}`
+        `${strings.VALUE_MUST_BETWEEN} ${min} ${strings.AND} ${max}${
+          !allowDecimals ? ` ${strings.AND_WHOLE_NUMBER}` : ''
+        }`
       );
     }
   };

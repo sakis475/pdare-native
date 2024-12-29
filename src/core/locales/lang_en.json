@@ -5,7 +5,6 @@
   "PROFILE": "Profile",
   "NO_ACTIVE_TABLE": "No active tables found.",
   "NO_ACTIVE_EXPO_TABLES": "All orders have been served.",
-
   "ERROR": "Error",
   "SUCCESS": "Success",
   "ERROR_FILL_ALL_PASSWORD_FIELDS": "Please fill in all password fields",
@@ -151,7 +150,6 @@
   "EMPTY_PRODUCT_TITLE_ERROR": "Product title is empty",
   "PRICE_NUMBER_ERROR": "Price must be a number",
   "PRODUCTS_WILL_APPEAR": "Products that are added will appear here.",
-
   "SEARCH_USER": "Search User",
   "SEARCH_BY_EMAIL": "Search by email",
   "NO_USERS_FOUND": "No users found",
@@ -172,7 +170,6 @@
   "SENT_ON": "Sent on:",
   "NO_USERS_OR_INVITATIONS": "No users or invitations found",
   "SEARCH_TO_ADD": "Search to add new ones.",
-
   "CREATE_TABLE": "Create Table",
   "UPDATE_TABLE": "Update Table",
   "TABLE_NAME": "Table Name",
@@ -196,17 +193,13 @@
   "EMAIL_ERROR": "Email Error",
   "PASSWORD_ERROR": "Password Error",
   "LOGIN_ERROR": "Login failed. Please try again.",
-
   "WELCOME_MESSAGE": "Welcome! What would you like to do?",
   "CREATE_RESTAURANT": "Create Restaurant",
   "JOIN_RESTAURANT": "Join Restaurant",
-
   "ENTER_RESTAURANT_NAME": "Please enter a restaurant name",
   "RESTAURANT_CREATED": "Restaurant created successfully",
   "CREATION_ERROR": "An error occurred while creating the restaurant",
-
   "ENTER_RESTAURANT_NAME_PLACEHOLDER": "Enter restaurant name",
-
   "RESTAURANT_INVITATIONS": "Restaurant Invitations",
   "FROM": "From:",
   "ACCEPT": "Accept",
@@ -217,7 +210,6 @@
   "DENY_ERROR": "An error occurred while denying the invitation",
   "NO_INVITATIONS": "You haven't received any restaurant invitations yet.",
   "BACK": "Back",
-
   "TABLE_CHANGE_SUCCESS": "Table change successful",
   "ONGOING_ORDER": "Ongoing Order",
   "DISCARD_CHANGES_CONFIRM": "You have another order in progress, discard your changes?",
@@ -228,7 +220,6 @@
   "WRITE_PRODUCT_COMMENT": "Write a comment for the product",
   "UPDATE": "Update",
   "NO_PRODUCTS_FOUND": "No Products Found",
-
   "NO_ORDERS_FOUND": "No orders found.",
   "ACTIVE": "Active",
   "CLOSED": "Closed",
@@ -239,7 +230,6 @@
   "HOUR_ABBR": "h",
   "MINUTE_ABBR": "m",
   "NOT_AVAILABLE": "N/A",
-
   "CREATE_ACCOUNT": "Create Account",
   "AGREE_TO_PRIVACY": "I agree to the",
   "PRIVACY_POLICY_LINK": "privacy policy",
@@ -247,10 +237,14 @@
   "PASSWORD_CONFIRMATION": "Password Confirmation",
   "NEW_ORDER_BTN": "New Order",
   "MARK_DONE_BTN": "Mark Done",
-
   "SELECT_COUVERT": "Couvert",
   "OR_CUSTOM_AMOUNT": "or custom amount",
   "REOPEN_ORDER": "Reopen Order",
   "REOPEN_ORDER_CONFIRM": "Are you sure you want to reopen the order?",
-  "REOPENED": "Reopened"
+  "REOPENED": "Reopened",
+  "VALUE_MUST_BETWEEN": "Value must be between",
+  "AND": "and",
+  "AND_WHOLE_NUMBER": "and whole number",
+  "COUVERT_COST": "Couvert Cost",
+  "CURRENCY_SYMBOL": "Currency Symbol"
 }

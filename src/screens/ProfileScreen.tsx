@@ -15,7 +15,7 @@ import { useStrings } from '../core/localization/languageContext';
 import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
-import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUtils';
+import CustomNumberInput from '../components/basic/CustomNumberInput';
 
 const ProfileScreen = ({ route }: any) => {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -28,7 +28,9 @@ const ProfileScreen = ({ route }: any) => {
     lastName: '',
     email: '',
     restaurantName: '',
-    displayName: '', // Add displayName field
+    displayName: '',
+    couvertCost: 0,
+    currencySymbol: '€',
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -67,8 +69,10 @@ const ProfileScreen = ({ route }: any) => {
             firstName: currentUser.firstName || '',
             lastName: currentUser.lastName || '',
             email: currentUser.email || '',
-            restaurantName: currentUser.restaurant?.restaurantName || '',
-            displayName: currentUser.displayName || '', // Initialize displayName
+            restaurantName: currentUser?.restaurant?.restaurantName || '',
+            displayName: currentUser.displayName || '',
+            couvertCost: currentUser?.restaurant?.couvertCost || 0,
+            currencySymbol: currentUser?.restaurant?.currencySymbol || '',
           });
         }
 
@@ -186,7 +190,7 @@ const ProfileScreen = ({ route }: any) => {
     }
   };
 
-  const handleUpdateRestaurantName = async () => {
+  const handleUpdateRestaurant = async () => {
     if (!formData.restaurantName.trim()) {
       toast('error', strings.RESTAURANT_NAME_EMPTY);
       return;
@@ -196,12 +200,16 @@ const ProfileScreen = ({ route }: any) => {
     try {
       const response = await patchRequest('/user/restaurant/update', {
         restaurantDisplayName: formData.restaurantName.trim(),
+        currencySymbol: formData.currencySymbol.trim(),
+        couvertCost: formData.couvertCost,
       });
       if (response) {
-        toast('success', strings.RESTAURANT_NAME_UPDATE_SUCCESS);
+        await setStorage('currentUser', response.user);
+        await setBearer(response);
+        toast('success', strings.PROFILE_UPDATE_SUCCESS);
       }
     } catch (error) {
-      toast('error', strings.RESTAURANT_NAME_UPDATE_FAILED);
+      toast('error', strings.PROFILE_UPDATE_SUCCESS);
     } finally {
       setIsLoading(false);
     }
@@ -233,7 +241,11 @@ const ProfileScreen = ({ route }: any) => {
       async () => {
         setIsLoading(true);
         try {
-          await deleteRequest('/user/restaurant/delete');
+          const response: SessionBearer = await deleteRequest('/user/restaurant/delete');
+
+          await logout({ skipNavigate: true });
+          await setStorage('currentUser', response.user);
+          await handleUserLogin(response);
         } catch (error) {
           toast('error', strings.DELETE_RESTAURANT_FAILED);
         } finally {
@@ -395,15 +407,28 @@ const ProfileScreen = ({ route }: any) => {
                 value={formData.restaurantName}
                 onChangeText={updateFormField('restaurantName')}
               />
+              <CustomTextInput
+                label={strings.CURRENCY_SYMBOL}
+                value={`${formData.currencySymbol}`}
+                onChangeText={updateFormField('currencySymbol')}
+              />
+              <CustomNumberInput
+                label={strings.COUVERT_COST}
+                value={formData.couvertCost}
+                onChangeText={updateFormField('couvertCost')}
+                allowDecimals={true}
+                showButtons={true}
+                step={0.1}
+                max={1000}
+              />
               <Button
                 mode="contained"
-                onPress={handleUpdateRestaurantName}
+                onPress={handleUpdateRestaurant}
                 loading={isLoading}
                 style={styles.button}
               >
-                {strings.UPDATE_RESTAURANT_NAME}
+                {strings.UPDATE}
               </Button>
-              {DeleteRestaurantButton}
             </View>
           )}
 
@@ -436,6 +461,7 @@ const ProfileScreen = ({ route }: any) => {
             >
               {strings.DELETE_ACCOUNT_BUTTON}
             </Button>
+            {user.role === 'owner' && DeleteRestaurantButton}
           </View>
         </View>
       </ScrollView>

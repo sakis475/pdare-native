@@ -7,7 +7,7 @@ import { useStrings } from '../core/localization/languageContext';
 export const LogoutFAB: React.FC = () => {
   const strings = useStrings();
   return (
-    <TouchableOpacity style={styles.fabContainer} onPress={logout}>
+    <TouchableOpacity style={styles.fabContainer} onPress={() => logout()}>
       <View style={styles.fabWrapper}>
         <View style={styles.fab}>
           <LogoutIcon style={styles.icon} />

@@ -48,7 +48,7 @@ const NewUserSetupScreen = () => {
   const fetchData = async () => {
     const fetchUserWithInvitations: User = await getRequest('/user/invite');
 
-    if (!fetchUserWithInvitations.id) {
+    if (!fetchUserWithInvitations?.id) {
       return;
     }
 

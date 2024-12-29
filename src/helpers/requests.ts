@@ -4,7 +4,7 @@ import { BASE_DOMAIN, BASE_URL, REQ_TIMEOUT } from '../storage/env';
 import { SessionBearer } from '../types/requests.types';
 import { getStorage, setStorage } from '../storage/store';
 
-import { checkInternetConnectivity, toast } from '../core/utils';
+import { toast } from '../core/utils';
 import dayjs, { datetimeDiff } from '../core/dayjs';
 import { socketManager } from './Sockets/SocketManager';
 import { storageInitData } from './storage/storageInit';
@@ -79,7 +79,6 @@ export async function setBearer(sessionBearer: SessionBearer) {
 
 export async function getRequest(url: string) {
   try {
-    checkInternetConnectivity();
     const auth = await getBearer();
     if (!auth) {
       return;
@@ -101,8 +100,6 @@ export async function getRequest(url: string) {
 
 export async function postRequest(url: string, body?: any, timeout = REQ_TIMEOUT) {
   try {
-    await checkInternetConnectivity();
-
     const options: AxiosRequestConfig = {
       timeout: timeout,
       timeoutErrorMessage: 'Το αίτημα έληξε. Παρακαλώ δοκιμάστε ξανά.',
@@ -127,7 +124,6 @@ export async function postRequest(url: string, body?: any, timeout = REQ_TIMEOUT
 
 export async function patchRequest(url: string, body?: any) {
   try {
-    checkInternetConnectivity();
     let options = {};
 
     if (!['/login', '/login/session'].includes(url)) {
@@ -152,7 +148,6 @@ export async function patchRequest(url: string, body?: any) {
 
 export async function deleteRequest(url: string) {
   try {
-    checkInternetConnectivity();
     const auth = await getBearer();
     if (!auth) {
       return;

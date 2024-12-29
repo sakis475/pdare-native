@@ -6,6 +6,7 @@ import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/storag
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../../core/theme';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import { catalogItemStyles } from './CatalogStyles';
 
 export function CatalogItemAdded({
   item,
@@ -110,48 +111,48 @@ export function CatalogItemAdded({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    flex: 1,
-    overflow: 'hidden',
-    paddingHorizontal: 10,
-  },
-  textContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  itemTitle: {
-    color: colors.white,
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginBottom: 4,
-    paddingVertical: 1,
-  },
-  itemDetails: {
-    color: colors.lighterGrey,
-    fontSize: 12,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.lightGrey,
-    borderRadius: 5,
-    padding: 4,
-  },
-  button: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.slightlyLighterGrey,
-    borderRadius: 6,
-    marginHorizontal: 4,
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-});
+const styles = catalogItemStyles;
+// const styles = StyleSheet.create({
+//   container: {
+//     flexDirection: 'row',
+//     flex: 1,
+//     overflow: 'hidden',
+//     paddingHorizontal: 10,
+//   },
+//   textContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//   },
+//   itemTitle: {
+//     color: colors.white,
+//     fontWeight: 'bold',
+//     fontSize: 14,
+//     marginBottom: 4,
+//     paddingVertical: 1,
+//   },
+//   itemDetails: {
+//     color: colors.lighterGrey,
+//     fontSize: 12,
+//   },
+//   buttonsContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: colors.lightGrey,
+//     borderRadius: 5,
+//     padding: 4,
+//   },
+//   button: {
+//     width: 40,
+//     height: 40,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: colors.slightlyLighterGrey,
+//     borderRadius: 6,
+//     marginHorizontal: 4,
+//   },
+//   buttonText: {
+//     color: colors.white,
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//   },
+// });

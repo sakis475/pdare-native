@@ -5,7 +5,6 @@
   "PROFILE": "Προφίλ",
   "NO_ACTIVE_TABLE": "Δεν υπάρχουν ενεργά Τραπέζια",
   "NO_ACTIVE_EXPO_TABLES": "Όλες οι παραγγελίες σερβιρίστηκαν.",
-
   "ERROR": "Σφάλμα",
   "SUCCESS": "Επιτυχία",
   "ERROR_FILL_ALL_PASSWORD_FIELDS": "Παρακαλώ συμπληρώστε όλα τα πεδία των κωδικών.",
@@ -151,7 +150,6 @@
   "EMPTY_PRODUCT_TITLE_ERROR": "Ο τίτλος του προϊόντος είναι κενός",
   "PRICE_NUMBER_ERROR": "Η τιμή πρέπει να είναι αριθμός",
   "PRODUCTS_WILL_APPEAR": "Προιόντα που προστέθετε θα εμφανίζονται εδώ.",
-
   "SEARCH_USER": "Αναζήτηση Χρήστη",
   "SEARCH_BY_EMAIL": "Αναζήτηση με email",
   "NO_USERS_FOUND": "Δεν βρέθηκαν χρήστες",
@@ -172,7 +170,6 @@
   "SENT_ON": "Στάλθηκε:",
   "NO_USERS_OR_INVITATIONS": "Δεν βρέθηκαν χρήστες ή προσκλήσεις",
   "SEARCH_TO_ADD": "Αναζητήστε για να προσθέσετε καινούργιους.",
-
   "CREATE_TABLE": "Δημιουργία Τραπεζιού",
   "UPDATE_TABLE": "Ενημέρωση Τραπεζιού",
   "TABLE_NAME": "Όνομα Τραπεζιού",
@@ -196,17 +193,13 @@
   "EMAIL_ERROR": "Σφάλμα Email",
   "PASSWORD_ERROR": "Σφάλμα Κωδικού",
   "LOGIN_ERROR": "Η σύνδεση απέτυχε. Παρακαλώ προσπαθήστε ξανά.",
-
   "WELCOME_MESSAGE": "Καλώς ήρθατε! Τι θα θέλατε να κάνετε;",
   "CREATE_RESTAURANT": "Δημιουργία Εστιατορίου",
   "JOIN_RESTAURANT": "Σύνδεση με Εστιατόριο",
-
   "ENTER_RESTAURANT_NAME": "Παρακαλώ εισάγετε όνομα εστιατορίου",
   "RESTAURANT_CREATED": "Το εστιατόριο δημιουργήθηκε επιτυχώς",
   "CREATION_ERROR": "Παρουσιάστηκε σφάλμα κατά τη δημιουργία του εστιατορίου",
-
   "ENTER_RESTAURANT_NAME_PLACEHOLDER": "Εισάγετε όνομα εστιατορίου",
-
   "RESTAURANT_INVITATIONS": "Προσκλήσεις σε Εστιατόρια",
   "FROM": "Από: {email}",
   "ACCEPT": "Αποδοχή",
@@ -217,7 +210,6 @@
   "DENY_ERROR": "Παρουσιάστηκε σφάλμα κατά την απόρριψη της πρόσκλησης",
   "NO_INVITATIONS": "Δεν έχετε λάβει ακόμη πρόσκληση από κάποιο εστιατόριο.",
   "BACK": "Επιστροφή",
-
   "TABLE_CHANGE_SUCCESS": "Επιτυχία Αλλαγής Τραπεζιού",
   "ONGOING_ORDER": "Παραγγελία σε Εξέλιξη",
   "DISCARD_CHANGES_CONFIRM": "Έχετε άλλη παραγγελία σε εξέλιξη, διαγραφή των αλλαγών σας;",
@@ -228,7 +220,6 @@
   "WRITE_PRODUCT_COMMENT": "Γράψε σχόλιο για το προϊόν",
   "UPDATE": "Ενημέρωση",
   "NO_PRODUCTS_FOUND": "Δεν βρέθηκαν προιόντα",
-
   "NO_ORDERS_FOUND": "Δεν βρέθηκε καμία παραγγελία.",
   "ACTIVE": "Ενεργή",
   "CLOSED": "Κλειστή",
@@ -239,7 +230,6 @@
   "HOUR_ABBR": "ω",
   "MINUTE_ABBR": "λ",
   "NOT_AVAILABLE": "N/A",
-
   "CREATE_ACCOUNT": "Δημιουργία Λογαριασμού",
   "AGREE_TO_PRIVACY": "Συμφωνώ με την",
   "PRIVACY_POLICY_LINK": "πολιτική απορρήτου",
@@ -247,10 +237,14 @@
   "PASSWORD_CONFIRMATION": "Επαλήθευση Κωδικού",
   "NEW_ORDER_BTN": "Νέα Παραγγελία",
   "MARK_DONE_BTN": "Έτοιμα 'Ολα",
-
   "SELECT_COUVERT": "Κουβέρ",
   "OR_CUSTOM_AMOUNT": "ή άλλο ποσό",
   "REOPEN_ORDER": "Άνοιξε Ξανά Την Παραγγελία",
   "REOPEN_ORDER_CONFIRM": "Είστε σίγουρος ότι θέλετε να ξανανοίξετε την παραγγελία;",
-  "REOPENED": "Ξανα-άνοιξε"
+  "REOPENED": "Ξανα-άνοιξε",
+  "VALUE_MUST_BETWEEN": "Η τιμή πρέπει να είναι μεταξύ",
+  "AND": "και",
+  "AND_WHOLE_NUMBER": "και ακέραιος αριθμός",
+  "COUVERT_COST": "Κόστος Κουβέρ",
+  "CURRENCY_SYMBOL": "Σύμβολο Νομίσματος"
 }

@@ -20,7 +20,9 @@ export function CurrencyFormat({
   }
   return (
     <Text style={{ color: color, fontSize }}>
-      {quantity ? `(${quantity}) ` : ''}
+      <Text style={{ color: color, fontSize, fontWeight: 'bold' }}>
+        {quantity ? `${quantity} x ` : ''}
+      </Text>
       {currency} {value.toFixed(2)}
     </Text>
   );

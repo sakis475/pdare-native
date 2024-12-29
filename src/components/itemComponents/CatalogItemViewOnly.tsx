@@ -6,6 +6,7 @@ import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/storag
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../../core/theme';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { catalogItemStyles } from './CatalogStyles';
 
 export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
   if (!item.quantity) {
@@ -67,62 +68,62 @@ export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    flex: 1,
-    overflow: 'hidden',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-  },
-  textContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  itemTitle: {
-    color: colors.lighterGrey,
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginBottom: 4,
-    paddingVertical: 1,
-  },
-  itemTitleDeleted: {
-    color: colors.black,
-    textDecorationLine: 'line-through',
-    fontWeight: 'bold',
-    fontSize: 14,
-    marginBottom: 4,
-    paddingVertical: 1,
-  },
-  itemDetails: {
-    color: colors.lighterGrey,
-    fontSize: 12,
-  },
-  itemsDetailsDeleted: {
-    color: colors.black,
-    fontSize: 12,
-    textDecorationLine: 'line-through',
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 5,
-    padding: 4,
-  },
-  button: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.slightlyDarkerGrey,
-    borderRadius: 6,
-    marginHorizontal: 4,
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
+const styles = catalogItemStyles;
+// const styles = StyleSheet.create({
+//   container: {
+//     flexDirection: 'row',
+//     flex: 1,
+//     overflow: 'hidden',
+//     alignItems: 'center',
+//     paddingHorizontal: 10,
+//   },
+//   textContainer: {
+//     flex: 1,
+//     justifyContent: 'center',
+//   },
+//   itemTitle: {
+//     color: colors.lighterGrey,
+//     fontWeight: 'bold',
+//     fontSize: 14,
+//     marginBottom: 4,
+//     paddingVertical: 1,
+//   },
+//   itemTitleDeleted: {
+//     color: colors.black,
+//     textDecorationLine: 'line-through',
+//     fontWeight: 'bold',
+//     fontSize: 14,
+//     marginBottom: 4,
+//     paddingVertical: 1,
+//   },
+//   itemDetails: {
+//     color: colors.lighterGrey,
+//     fontSize: 12,
+//   },
+//   itemsDetailsDeleted: {
+//     color: colors.black,
+//     fontSize: 12,
+//     textDecorationLine: 'line-through',
+//   },
+//   buttonsContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: colors.white,
+//     borderRadius: 5,
+//     padding: 4,
+//   },
+//   button: {
+//     width: 40,
+//     height: 40,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: colors.slightlyDarkerGrey,
+//     borderRadius: 6,
+//     marginHorizontal: 4,
+//   },
+//   buttonText: {
+//     color: colors.white,
+//     fontSize: 16,
+//     fontWeight: 'bold',
+//   },
+// });

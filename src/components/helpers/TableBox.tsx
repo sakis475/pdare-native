@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, View, Dimensions } from 'react-native';
 import { colors } from '../../core/theme';
 import dayjs, { datetimeDiff } from '../../core/dayjs';
-import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
 import { CouvertIcon } from '../basic/Icons';
 
 // Dynamic size calculations
@@ -112,15 +111,5 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
     includeFontPadding: false, // Removes extra padding around text
     marginTop: 1, // Fine-tune vertical alignment
-  },
-});
-
-// You'll need to wrap these boxes in a container with this style:
-export const containerStyles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    padding: MARGIN / 2,
   },
 });

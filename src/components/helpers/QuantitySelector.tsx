@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { AlertWithOptions } from '../../core/utils';
-import { useStrings } from '../../core/localization/languageContext';
 
 interface QuantitySelectorProps {
   quantity: number;
@@ -18,7 +16,6 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
 }) => {
   const [quantity, setQuantity] = useState(propQuantity || 1);
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
-  const strings = useStrings();
 
   let trashIconTimer: NodeJS.Timeout;
 

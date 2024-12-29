@@ -102,6 +102,7 @@ export function AlertWithOptions(
   return true;
 }
 
+//Doesnt properly work for ios, so its not used
 export const checkInternetConnectivity = async () => {
   try {
     const state = await NetInfo.fetch();
