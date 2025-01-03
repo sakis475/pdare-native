@@ -1,3 +1,5 @@
+import { setJSExceptionHandler, setNativeExceptionHandler } from 'react-native-exception-handler';
+import { errorHandler } from './src/errorHandler/error-handler';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, DefaultTheme, PaperProvider } from 'react-native-paper';
 import { NavigationContainer, Theme } from '@react-navigation/native';
@@ -13,9 +15,15 @@ import { socketEventSubscriber } from './src/helpers/Sockets/SocketEventSubscrib
 import { getStorage } from './src/storage/store';
 import AppNavigator, { navigationRef } from './src/navigation/AppNavigator';
 import { LanguageProvider } from './src/core/localization/languageContext';
-
+import { ErrorBoundary } from './src/errorHandler/ErrorBoundary';
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
+
+  setJSExceptionHandler(errorHandler, true);
+
+  setNativeExceptionHandler((errorString) => {
+    console.log('setNativeExceptionHandler');
+  });
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -41,22 +49,24 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <BottomSheetModalProvider>
-            <NavigationContainer ref={navigationRef}>
-              <PaperProvider>
-                <PortalProvider>
-                  <LanguageProvider>
-                    <AppNavigator />
-                  </LanguageProvider>
-                </PortalProvider>
-                <Toast />
-              </PaperProvider>
-            </NavigationContainer>
-          </BottomSheetModalProvider>
-        </GestureHandlerRootView>
-      </SafeAreaView>
+      <ErrorBoundary>
+        <SafeAreaView style={{ flex: 1 }}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <BottomSheetModalProvider>
+              <NavigationContainer ref={navigationRef}>
+                <PaperProvider>
+                  <PortalProvider>
+                    <LanguageProvider>
+                      <AppNavigator />
+                    </LanguageProvider>
+                  </PortalProvider>
+                  <Toast />
+                </PaperProvider>
+              </NavigationContainer>
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
+        </SafeAreaView>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 };

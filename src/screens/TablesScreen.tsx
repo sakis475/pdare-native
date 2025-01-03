@@ -63,7 +63,6 @@ const TablesScreen = ({ currentIndex }: any) => {
     if (currentIndex === undefined || currentIndex === 0) {
       handleTableUpdates();
     }
-
     return () => subscription.remove();
   }, [currentIndex]);
 
@@ -85,12 +84,6 @@ const TablesScreen = ({ currentIndex }: any) => {
   };
 
   const handleExistingTable = async (table: Table) => {
-    // const tempOrder = await getTempOrder();
-
-    // if (tempOrder?.table?.id === table?.id) {
-    //   navigateToDraft();
-    // } else {
-    // }
     navigate(ScreenNames.ActiveOrderScreen, { tableParam: table });
   };
 

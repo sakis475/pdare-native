@@ -1059,6 +1059,8 @@ PODS:
     - React-jsi (= 0.73.4)
     - React-logger (= 0.73.4)
     - React-perflogger (= 0.73.4)
+  - ReactNativeExceptionHandler (2.10.10):
+    - React-Core
   - ReactNativeLocalization (2.3.2):
     - React-Core
   - RNCAsyncStorage (1.24.0):
@@ -1138,6 +1140,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - ReactNativeExceptionHandler (from `../node_modules/react-native-exception-handler`)
   - ReactNativeLocalization (from `../node_modules/react-native-localization`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNFlashList (from `../node_modules/@shopify/flash-list`)"
@@ -1254,6 +1257,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  ReactNativeExceptionHandler:
+    :path: "../node_modules/react-native-exception-handler"
   ReactNativeLocalization:
     :path: "../node_modules/react-native-localization"
   RNCAsyncStorage:
@@ -1322,6 +1327,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ed48e5faac6751e66ee1261c4bd01643b436f112
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
+  ReactNativeExceptionHandler: b11ff67c78802b2f62eed0e10e75cb1ef7947c60
   ReactNativeLocalization: fb171138cdc80d5d0d4f20243d2fc82c2b3cc48f
   RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNFlashList: 41487cd61fd220e21372f7f10a9b4f4e4d5b55b2
