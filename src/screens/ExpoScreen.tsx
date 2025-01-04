@@ -102,9 +102,7 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
 
   const renderOrderItem = ({ item }: { item: ItemReq }) => {
     return (
-      <View
-        style={[styles.itemContainer, item.markForDelete && { backgroundColor: colors.lightRed }]}
-      >
+      <View style={[item.markForDelete && { backgroundColor: colors.lightRed }]}>
         <CatalogItemViewOnly item={item} />
       </View>
     );
@@ -340,12 +338,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingBottom: 100,
-  },
-  itemContainer: {
-    marginVertical: 10,
-    paddingVertical: 5,
   },
   emptyContainer: {
     height: '100%',

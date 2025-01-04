@@ -24,6 +24,7 @@ export const catalogItemStyles = StyleSheet.create({
     flex: 1,
     overflow: 'hidden',
     paddingHorizontal: 10,
+    paddingVertical: 6,
   },
   containerWithPadding: {
     padding: 1,
@@ -41,16 +42,12 @@ export const catalogItemStyles = StyleSheet.create({
     color: colors.white,
     fontWeight: typography.FONT_WEIGHT_BOLD,
     fontSize: typography.FONT_SIZE_TITLE,
-    marginBottom: 4,
-    paddingVertical: 1,
   },
   itemTitleDeleted: {
     color: colors.black,
     textDecorationLine: 'line-through',
     fontWeight: typography.FONT_WEIGHT_BOLD,
     fontSize: typography.FONT_SIZE_TITLE,
-    marginBottom: 4,
-    paddingVertical: 1,
   },
   textPressed: {
     opacity: 0.5,
@@ -71,7 +68,6 @@ export const catalogItemStyles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.lightGrey,
     borderRadius: 5,
     padding: 4,
   },

@@ -137,7 +137,7 @@ const ActiveOrderScreen = ({
 
   const renderItems = (item: ItemReq) => {
     return (
-      <View style={{ marginVertical: 10 }}>
+      <View>
         {order.closedAt ? (
           <CatalogItemViewOnly item={item}></CatalogItemViewOnly>
         ) : item.alreadySend === true ? (

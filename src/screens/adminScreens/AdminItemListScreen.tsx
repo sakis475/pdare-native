@@ -387,8 +387,6 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
-    marginVertical: 4,
     backgroundColor: colors.grey,
     borderRadius: 8,
   },

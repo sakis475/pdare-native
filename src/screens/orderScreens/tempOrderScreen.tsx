@@ -124,8 +124,6 @@ const TempOrderScreen = ({
     return (
       <View
         style={{
-          marginVertical: 10,
-          paddingVertical: 5,
           backgroundColor: item.markForDelete ? colors.lightRed : null,
         }}
       >

@@ -136,7 +136,7 @@ const ItemListScreen = ({ route }: any) => {
 
   const renderItems = (item: ItemReq, index: number) => {
     return (
-      <View style={{ marginVertical: 8, paddingHorizontal: 0 }} key={index}>
+      <View key={index}>
         <CatalogItemAdd
           item={item}
           handleAddNewItemPress={handleAddNewItemPress}

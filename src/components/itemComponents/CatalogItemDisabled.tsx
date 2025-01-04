@@ -39,69 +39,65 @@ export function CatalogItemDisabled({
   }, [item]);
 
   return (
-    <View>
-      <View
-        key={item.newItemId} // Add key to force re-render
-        style={[styles.container]}
-      >
-        <View style={styles.textContainer}>
-          <Text style={markAsDelete ? styles.itemTitleDeleted : styles.itemTitle}>
-            {item.title}
-          </Text>
+    <View
+      key={item.newItemId} // Add key to force re-render
+      style={[styles.container]}
+    >
+      <View style={styles.textContainer}>
+        <Text style={markAsDelete ? styles.itemTitleDeleted : styles.itemTitle}>{item.title}</Text>
 
-          <View>
-            <View style={{ justifyContent: 'center' }}>
-              {allProperties.length > 0 ? (
-                <Text style={markAsDelete ? styles.itemsDetailsDeleted : styles.itemDetails}>
-                  {allProperties.map((e) => e.propertyValue).join(', ')}
-                </Text>
-              ) : null}
-              {item.comment ? (
-                <Text
-                  style={[
-                    markAsDelete ? styles.itemsDetailsDeleted : styles.itemDetails,
-                    { fontStyle: 'italic' },
-                  ]}
-                >
-                  {item.comment}
-                </Text>
-              ) : null}
-              <CurrencyFormat
-                quantity={item.quantity}
-                value={totalCost}
-                currency={'€'}
-                fontSize={12}
-                color={markAsDelete ? colors.black : colors.lighterGrey}
-              ></CurrencyFormat>
-            </View>
+        <View>
+          <View style={{ justifyContent: 'center' }}>
+            {allProperties.length > 0 ? (
+              <Text style={markAsDelete ? styles.itemsDetailsDeleted : styles.itemDetails}>
+                {allProperties.map((e) => e.propertyValue).join(', ')}
+              </Text>
+            ) : null}
+            {item.comment ? (
+              <Text
+                style={[
+                  markAsDelete ? styles.itemsDetailsDeleted : styles.itemDetails,
+                  { fontStyle: 'italic' },
+                ]}
+              >
+                {item.comment}
+              </Text>
+            ) : null}
+            <CurrencyFormat
+              quantity={item.quantity}
+              value={totalCost}
+              currency={'€'}
+              fontSize={12}
+              color={markAsDelete ? colors.black : colors.lighterGrey}
+            ></CurrencyFormat>
           </View>
         </View>
-        {preDisable ? (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              onItemDelete(item);
-            }}
-          >
-            <MaterialCommunityIcons name="trash-can" size={22} color={colors.danger} />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setMarkAsDelete(!markAsDelete);
-              onItemDelete(item);
-            }}
-            activeOpacity={0.6}
-          >
-            {markAsDelete ? (
-              <MaterialCommunityIcons name="arrow-u-left-top" size={22} color={colors.white} />
-            ) : (
-              <MaterialCommunityIcons name="trash-can-outline" size={22} color={colors.danger} />
-            )}
-          </TouchableOpacity>
-        )}
       </View>
+      {preDisable ? (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            onItemDelete(item);
+          }}
+        >
+          <MaterialCommunityIcons name="trash-can-outline" size={22} color={colors.danger} />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            setMarkAsDelete(!markAsDelete);
+            onItemDelete(item);
+          }}
+          activeOpacity={0.6}
+        >
+          {markAsDelete ? (
+            <MaterialCommunityIcons name="arrow-u-left-top" size={22} color={colors.white} />
+          ) : (
+            <MaterialCommunityIcons name="trash-can-outline" size={22} color={colors.danger} />
+          )}
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
