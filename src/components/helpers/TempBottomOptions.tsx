@@ -306,6 +306,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
     gap: 10,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   tempOrderButton: {
