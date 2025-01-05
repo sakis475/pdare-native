@@ -22,8 +22,8 @@ export function TableBox({ table, onPress }: { table: Table; onPress: any }) {
         'minutes'
       );
 
-      if (minutesPassed > 240) {
-        setElapsedTime("240' +");
+      if (minutesPassed > 999) {
+        setElapsedTime("999'");
       } else {
         setElapsedTime(`${minutesPassed}'`);
       }

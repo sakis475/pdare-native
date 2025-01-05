@@ -143,7 +143,6 @@ const ActiveOrderScreen = ({
         ) : item.alreadySend === true ? (
           <CatalogItemDisabled
             item={item}
-            refreshList={refreshTempList}
             onItemDelete={() => {
               handleOnItemDelete(item);
             }}

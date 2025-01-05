@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -11,7 +11,6 @@ import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 import { useStrings } from '../../core/localization/languageContext';
 
 const logoImage = require('../../../assets/mywaitericon.png');
-
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -115,7 +114,9 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={{ flex: 1, height: '100%', backgroundColor: colors.lightBlack }}>
+    <ScrollView
+      style={{ flex: 1, height: '100%', paddingTop: 10, backgroundColor: colors.lightBlack }}
+    >
       <View style={styles.container}>
         <LongPressGestureHandler
           onHandlerStateChange={({ nativeEvent }) => {
@@ -225,7 +226,6 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
-    padding: 20,
     backgroundColor: colors.lightBlack,
   },
   text: {
@@ -233,8 +233,8 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   logo: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
     alignSelf: 'center',
     marginBottom: 10,
   },

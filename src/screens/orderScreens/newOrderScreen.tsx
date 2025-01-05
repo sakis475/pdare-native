@@ -42,9 +42,9 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     let newOrder = await getStorage('groupedItems');
     if (!newOrder) {
       await storageInitData();
+      newOrder = await getStorage('groupedItems');
     }
 
-    newOrder = await getStorage('groupedItems');
     if (!newOrder) {
       return;
     }

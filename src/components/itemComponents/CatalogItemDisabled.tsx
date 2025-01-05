@@ -9,12 +9,10 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { catalogItemStyles } from './CatalogStyles';
 export function CatalogItemDisabled({
   item,
-  refreshList,
   onItemDelete,
   preDisable,
 }: {
   item: ItemReq;
-  refreshList: any;
   onItemDelete: any;
   preDisable?: boolean;
 }) {
