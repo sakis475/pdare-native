@@ -26,6 +26,7 @@ import {
 import { useStrings } from '../../core/localization/languageContext';
 import { useIsFocused } from '@react-navigation/native';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
+import dayjs from '../../core/dayjs';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
@@ -38,6 +39,8 @@ const ItemListScreen = ({ route }: any) => {
 
   const fetchItems = useCallback(
     async (tempOrderEmitted?: Order) => {
+      const start = dayjs();
+
       if (!categoryTitle) return;
 
       const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
@@ -75,6 +78,9 @@ const ItemListScreen = ({ route }: any) => {
         }
       }
       setItems(categoryItems);
+      const end = dayjs();
+
+      console.log(end.diff(start));
     },
     [categoryTitle]
   );
@@ -131,7 +137,6 @@ const ItemListScreen = ({ route }: any) => {
 
   const handleAddNewItemPress = async (item: ItemReq) => {
     await addNewItemToTemp(item);
-    await fetchItems();
   };
 
   const renderItems = (item: ItemReq, index: number) => {

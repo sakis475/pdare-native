@@ -1,8 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MMKV } from 'react-native-mmkv';
 import { AppLanguage } from '../core/localization/strings';
 import { SessionBearer } from '../types/requests.types';
 import { toast } from '../core/utils';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../helpers/Sockets/EventEmitter';
+
+// Initialize MMKV instance
+export const storage = new MMKV();
 
 // Define the types for each storage key
 interface StorageTypes {
@@ -26,48 +29,43 @@ interface StorageTypes {
 type StorageKey = keyof StorageTypes;
 
 /**
- * Sets an item in AsyncStorage with proper type checking and undefined handling
+ * Sets an item in MMKV storage with proper type checking and undefined handling
  * @param key Storage key
  * @param value Value to store
- * @returns Promise<void>
+ * @returns void
  */
-export async function setStorage<K extends StorageKey>(
-  key: K,
-  value: StorageTypes[K] | null
-): Promise<void> {
+export function setStorage<K extends StorageKey>(key: K, value: StorageTypes[K] | null): void {
   try {
     // Handle undefined case by treating it as null
     const valueToStore = value === undefined ? null : value;
 
     if (valueToStore === null) {
-      await removeItemStorage(key);
+      removeItemStorage(key);
       return;
     }
 
-    await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
+    storage.set(key, JSON.stringify(valueToStore));
 
     if (key === 'newOrder') {
       EventEmitter.emit(TEMP_ORDER_UPDATED, valueToStore);
     }
   } catch (error) {
     console.error(`Error setting storage for key ${key}:`, error);
-    throw error; // Propagate error for better error handling
+    throw error;
   }
 }
 
 /**
- * Gets an item from AsyncStorage with proper type checking
+ * Gets an item from MMKV storage with proper type checking
  * @param key Storage key
- * @returns Promise with the stored value or null
+ * @returns The stored value or null
  */
-export async function getStorage<K extends StorageKey>(key: K): Promise<StorageTypes[K] | null> {
+export function getStorage<K extends StorageKey>(key: K): StorageTypes[K] | null {
   try {
-    const item = await AsyncStorage.getItem(key);
-
+    const item = storage.getString(key);
     if (!item) {
       return null;
     }
-
     return JSON.parse(item) as StorageTypes[K];
   } catch (error) {
     console.error(`Error getting storage for key ${key}:`, error);
@@ -78,11 +76,10 @@ export async function getStorage<K extends StorageKey>(key: K): Promise<StorageT
 /**
  * Removes a single item from storage
  * @param key Storage key
- * @returns Promise<void>
  */
-export async function removeItemStorage(key: StorageKey): Promise<void> {
+export function removeItemStorage(key: StorageKey): void {
   try {
-    await AsyncStorage.removeItem(key);
+    storage.delete(key);
   } catch (error) {
     console.error(`Error removing item for key ${key}:`, error);
     throw error;
@@ -91,12 +88,10 @@ export async function removeItemStorage(key: StorageKey): Promise<void> {
 
 /**
  * Removes all items from storage
- * @returns Promise<void>
  */
-export async function removeAllStorage(): Promise<void> {
+export function removeAllStorage(): void {
   try {
-    const keys = await AsyncStorage.getAllKeys();
-    await AsyncStorage.multiRemove(keys);
+    storage.clearAll();
     toast('success', 'Removed all keys');
   } catch (error) {
     console.error('Error removing all storage:', error);
@@ -105,10 +100,17 @@ export async function removeAllStorage(): Promise<void> {
 }
 
 /**
- * Clears all restaurant-related storage keys
- * @returns Promise<void>
+ * Gets all keys from storage
+ * @returns Array of storage keys
  */
-export async function clearRestaurantStorageRelatedKeys(): Promise<void> {
+export function getAllKeys(): string[] {
+  return storage.getAllKeys();
+}
+
+/**
+ * Clears all restaurant-related storage keys
+ */
+export function clearRestaurantStorageRelatedKeys(): void {
   const keysToRemove: StorageKey[] = [
     'groupedItems',
     'newOrder',
@@ -123,7 +125,7 @@ export async function clearRestaurantStorageRelatedKeys(): Promise<void> {
   ];
 
   try {
-    await Promise.all(keysToRemove.map((key) => removeItemStorage(key)));
+    keysToRemove.forEach((key) => removeItemStorage(key));
   } catch (error) {
     console.error('Error clearing restaurant storage:', error);
     throw error;
