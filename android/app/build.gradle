@@ -76,7 +76,7 @@ android {
 
     namespace "com.pdare"
     defaultConfig {
-        applicationId "com.pdare2"
+        applicationId "com.pdare"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
