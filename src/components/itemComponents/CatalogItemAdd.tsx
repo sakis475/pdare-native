@@ -33,10 +33,13 @@ export function CatalogItemAdd({
         <Text style={[styles.itemTitle, isPressedIn ? styles.textPressed : null]}>
           {item.title}
         </Text>
-        <View style={{ flexDirection: 'row' }}>
-          <CurrencyFormat value={item.cost} currency={'€'}></CurrencyFormat>
-          {item.quantity && (
-            <Text style={{ color: colors.white, fontSize: 16 }}> x {item.quantity}</Text>
+        <View style={styles.priceContainer}>
+          <CurrencyFormat value={item.cost} currency="€" />
+          {item.quantity > 0 && (
+            <Text style={styles.quantityText}>
+              {' x '}
+              {item.quantity}
+            </Text>
           )}
         </View>
       </View>
@@ -44,15 +47,12 @@ export function CatalogItemAdd({
       <TouchableOpacity
         onPress={handleAddBtn}
         activeOpacity={0.6}
-        style={[
-          styles.button,
-          styles.smallButton,
-          disableInstantAdd && styles.buttonDisabled, // Add disabled style to button
-        ]}
+        style={[styles.button, styles.smallButton, disableInstantAdd && styles.buttonDisabled]}
         disabled={disableInstantAdd}
       >
         <PlusIcon size={10} />
       </TouchableOpacity>
+
       <TouchableOpacity
         style={[styles.button, styles.smallButton]}
         onPress={handleGoToDetails}
@@ -64,4 +64,14 @@ export function CatalogItemAdd({
   );
 }
 
-const styles = catalogItemStyles;
+const styles = StyleSheet.create({
+  ...catalogItemStyles,
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quantityText: {
+    color: colors.white,
+    fontSize: 16,
+  },
+});

@@ -3,6 +3,10 @@ import { AppLanguage } from '../core/localization/strings';
 import { SessionBearer } from '../types/requests.types';
 import { toast } from '../core/utils';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../helpers/Sockets/EventEmitter';
+import GlobalStore from './GlobalStore';
+import dayjs from '../core/dayjs';
+
+const globalStore = GlobalStore.getInstance();
 
 // Define the types for each storage key
 interface StorageTypes {
@@ -43,8 +47,10 @@ export async function setStorage<K extends StorageKey>(
       await removeItemStorage(key);
       return;
     }
+    const valueStringified = JSON.stringify(valueToStore);
+    await AsyncStorage.setItem(key, valueStringified);
 
-    await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
+    globalStore.setValue(key, valueStringified);
 
     if (key === 'newOrder') {
       EventEmitter.emit(TEMP_ORDER_UPDATED, valueToStore);
@@ -62,13 +68,26 @@ export async function setStorage<K extends StorageKey>(
  */
 export async function getStorage<K extends StorageKey>(key: K): Promise<StorageTypes[K] | null> {
   try {
+    if (globalStore.hasValue(key)) {
+      const value = globalStore.getValue(key);
+
+      const valueParsed = JSON.parse(value) as StorageTypes[K];
+
+      return valueParsed;
+    }
+
     const item = await AsyncStorage.getItem(key);
 
     if (!item) {
+      globalStore.setValue(key, null);
       return null;
     }
 
-    return JSON.parse(item) as StorageTypes[K];
+    const itemParsed = JSON.parse(item) as StorageTypes[K];
+
+    globalStore.setValue(key, item);
+
+    return itemParsed;
   } catch (error) {
     console.error(`Error getting storage for key ${key}:`, error);
     return null;
@@ -124,6 +143,7 @@ export async function clearRestaurantStorageRelatedKeys(): Promise<void> {
 
   try {
     await Promise.all(keysToRemove.map((key) => removeItemStorage(key)));
+    globalStore.clearStore();
   } catch (error) {
     console.error('Error clearing restaurant storage:', error);
     throw error;

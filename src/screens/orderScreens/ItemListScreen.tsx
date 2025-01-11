@@ -131,7 +131,6 @@ const ItemListScreen = ({ route }: any) => {
 
   const handleAddNewItemPress = async (item: ItemReq) => {
     await addNewItemToTemp(item);
-    await fetchItems();
   };
 
   const renderItems = (item: ItemReq, index: number) => {

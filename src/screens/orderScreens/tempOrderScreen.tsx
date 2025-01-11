@@ -130,7 +130,6 @@ const TempOrderScreen = ({
         {item.alreadySend === true ? (
           <CatalogItemDisabled
             item={item}
-            refreshList={refreshTempList}
             onItemDelete={async (item: ItemReq) => {
               await markActiveItemForDelete(item);
               refreshTempList();
