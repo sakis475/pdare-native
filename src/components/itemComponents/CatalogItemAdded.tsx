@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import QuantitySelector from '../helpers/QuantitySelector';
@@ -6,6 +6,7 @@ import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/storag
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../../core/theme';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
+import _ from 'lodash';
 import { catalogItemStyles } from './CatalogStyles';
 
 export function CatalogItemAdded({
@@ -19,96 +20,114 @@ export function CatalogItemAdded({
 }) {
   const animatedOpacity = useRef(new Animated.Value(1)).current;
   const [isTap, setIsTap] = useState(false);
-
   const [quantity, setQuantity] = useState(item.quantity || 1);
-
   const [totalCost, setTotalCost] = useState(item.cost * item.quantity);
+  const updateInProgress = useRef(false);
 
   useEffect(() => {
     setQuantity(item.quantity || 1);
     setTotalCost(item.cost * (item.quantity || 1));
   }, [item.quantity, item.cost]);
 
-  const handleItemDetailsUpdate = () => {
+  const handleItemDetailsUpdate = useCallback(() => {
     navigate(ScreenNames.ItemDetailsScreen, { item, isUpdate: true });
-  };
+  }, [item]);
 
-  let allProperties: ItemProperty[] = [];
-  for (const propertyName of Object.keys(item.itemPropertiesGrouped)) {
-    const propertyGroupSelected = (item.itemPropertiesGrouped as ItemPropertiesGrouped)[
-      propertyName
-    ].filter((e) => e.selected);
-    allProperties = allProperties.concat(propertyGroupSelected);
-  }
+  const allProperties = Object.keys(item.itemPropertiesGrouped).reduce(
+    (acc: ItemProperty[], propertyName) => {
+      const propertyGroupSelected = (item.itemPropertiesGrouped as ItemPropertiesGrouped)[
+        propertyName
+      ].filter((e) => e.selected);
+      return acc.concat(propertyGroupSelected);
+    },
+    []
+  );
 
-  const handleQuantityUpdate = (newQuantity: number) => {
-    setTotalCost(item.cost * newQuantity);
-    updateQuantityOfTempItem(newQuantity, item.newItemId as string);
-  };
+  const handleQuantityUpdate = useCallback(
+    async (newQuantity: number) => {
+      if (updateInProgress.current) return;
 
-  const handleRemoveItem = async () => {
+      updateInProgress.current = true;
+      setTotalCost(item.cost * newQuantity);
+
+      try {
+        await updateQuantityOfTempItem(newQuantity, item.newItemId as string);
+        setQuantity(newQuantity);
+      } catch (error) {
+        console.error('Error updating quantity:', error);
+      } finally {
+        updateInProgress.current = false;
+      }
+    },
+    [item.cost, item.newItemId]
+  );
+
+  const handleRemoveItem = useCallback(async () => {
     Animated.timing(animatedOpacity, {
       toValue: 0,
       duration: 250,
       useNativeDriver: false,
     }).start(async () => {
-      await removeItemOfTemp(item.newItemId as string);
-      refreshList();
+      try {
+        await removeItemOfTemp(item.newItemId as string);
+        refreshList();
+      } catch (error) {
+        console.error('Error removing item:', error);
+      }
     });
-  };
+  }, [animatedOpacity, item.newItemId, refreshList]);
+
+  const handlePress = useCallback(() => {
+    setIsTap(true);
+    setTimeout(() => {
+      setIsTap(false);
+      handleItemDetailsUpdate();
+    }, 100);
+    onItemPress();
+  }, [handleItemDetailsUpdate, onItemPress]);
 
   return (
     <View>
       <Animated.View
-        key={item.newItemId} // Add key to force re-render
+        key={item.newItemId}
         style={[styles.container, { opacity: isTap ? 0.5 : animatedOpacity }]}
       >
         <View style={styles.textContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              setIsTap(true);
-              setTimeout(() => {
-                setIsTap(false);
-                handleItemDetailsUpdate();
-              }, 100);
-              onItemPress();
-            }}
-            activeOpacity={1}
-          >
+          <TouchableOpacity onPress={handlePress} activeOpacity={1}>
             <Text style={styles.itemTitle}>
               <MaterialIcons name="edit" size={14} color={'#fff'} /> {item.title}
             </Text>
           </TouchableOpacity>
           <View>
             <Animated.View style={{ justifyContent: 'center' }}>
-              {allProperties.length > 0 ? (
+              {allProperties.length > 0 && (
                 <Text style={styles.itemDetails}>
                   {allProperties.map((e) => e.propertyValue).join(', ')}
                 </Text>
-              ) : null}
-              {item.comment ? (
+              )}
+              {item.comment && (
                 <Text
                   style={[
                     styles.itemDetails,
                     { fontStyle: 'italic', justifyContent: 'center', alignItems: 'center' },
                   ]}
                 >
-                  <MaterialIcons name="insert-comment"></MaterialIcons>
+                  <MaterialIcons name="insert-comment" />
                   {' ' + item.comment}
                 </Text>
-              ) : null}
-              <CurrencyFormat value={totalCost} currency={'€'} fontSize={12}></CurrencyFormat>
+              )}
+              <CurrencyFormat value={totalCost} currency={'€'} fontSize={12} />
             </Animated.View>
           </View>
         </View>
-
         <QuantitySelector
           quantity={quantity}
           quantityChange={handleQuantityUpdate}
           removeItem={handleRemoveItem}
-        ></QuantitySelector>
+        />
       </Animated.View>
     </View>
   );
 }
+
 const styles = catalogItemStyles;
