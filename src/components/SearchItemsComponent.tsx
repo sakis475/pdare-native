@@ -17,6 +17,14 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
   const [filteredItems, setFilteredItems] = useState<ItemReq[]>([]);
   const strings = useStrings();
 
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      onSearchQueryChange?.(query);
+    },
+    [onSearchQueryChange]
+  );
+
   // Filter items based on search query
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -26,7 +34,6 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
 
     const filtered = allItems.filter((item) => {
       const normalizedQuery = normalizeString(searchQuery);
-
       return (
         normalizeString(item.title).includes(normalizedQuery) ||
         normalizeString(item.category?.title || '').includes(normalizedQuery) ||
@@ -35,11 +42,7 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
     });
 
     setFilteredItems(filtered);
-
-    // Notify parent component of search query change if callback provided
-    onSearchQueryChange?.(searchQuery);
-  }, [searchQuery, allItems, onSearchQueryChange]);
-
+  }, [searchQuery, allItems]);
   const renderSearchItem = useCallback((item: ItemReq, index: number) => {
     return (
       <View key={index}>
@@ -47,16 +50,15 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
       </View>
     );
   }, []);
-
   return (
     <>
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder={strings.SEARCH}
-          onChangeText={setSearchQuery}
+          onChangeText={handleSearchChange}
           value={searchQuery}
           style={styles.searchInput}
-          onClearIconPress={() => onSearchQueryChange('')}
+          onClearIconPress={() => handleSearchChange('')}
         />
       </View>
 
