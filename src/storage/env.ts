@@ -1,7 +1,7 @@
 import { AppLanguage } from '../core/localization/strings';
 
 export const ENV_TYPE: 'PROD' | 'DEV' = 'DEV';
-export const BASE_DOMAIN = 'https://rnjus-2a10-9300-400-e40-5cda-f781-4088-a086.a.free.pinggy.link';
+export const BASE_DOMAIN = 'https://rnfby-2a10-9300-400-e40-b7b2-7ecd-7ecb-41ea.a.free.pinggy.link';
 export const BASE_URL = BASE_DOMAIN + '/api/v1';
 export const DEFAULT_APP_LANGUAGE: AppLanguage = 'lang_en';
 export const REQ_TIMEOUT = 60000;

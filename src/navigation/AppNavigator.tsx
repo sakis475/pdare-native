@@ -40,8 +40,14 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}
-      // initialRouteName={ScreenNames.ManageItemsScreen}
+      initialRouteName={ScreenNames.StartLoadingScreen}
     >
+      <Stack.Screen
+        name="MainTabs"
+        component={MainTabs}
+        options={{ headerShown: false, animation: 'none' }}
+      />
+
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}
         component={StartLoadingScreen}
@@ -59,8 +65,6 @@ const AppNavigator = () => {
         component={LoginScreen}
         options={{ headerShown: false }}
       />
-
-      <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
 
       <Stack.Screen
         name={ScreenNames.RegisterScreen}

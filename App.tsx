@@ -22,7 +22,7 @@ const App = () => {
   setJSExceptionHandler(errorHandler, true);
 
   setNativeExceptionHandler((errorString) => {
-    console.log('setNativeExceptionHandler');
+    console.log('setNativeExceptionHandler', errorString);
   });
 
   useEffect(() => {

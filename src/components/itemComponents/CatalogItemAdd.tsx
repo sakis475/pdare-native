@@ -45,20 +45,11 @@ export function CatalogItemAdd({
       </View>
 
       <TouchableOpacity
-        onPress={handleAddBtn}
-        activeOpacity={0.6}
-        style={[styles.button, styles.smallButton, disableInstantAdd && styles.buttonDisabled]}
-        disabled={disableInstantAdd}
-      >
-        <PlusIcon size={10} />
-      </TouchableOpacity>
-
-      <TouchableOpacity
         style={[styles.button, styles.smallButton]}
         onPress={handleGoToDetails}
         activeOpacity={0.6}
       >
-        <ChevronRightIcon size={20} />
+        <PlusIcon size={10} />
       </TouchableOpacity>
     </View>
   );

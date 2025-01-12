@@ -2,6 +2,8 @@ import _ from 'lodash';
 import * as Requests from '../requests';
 import { getStorage, setStorage } from '../../storage/store';
 import uuid from 'react-native-uuid';
+import { toast } from '../../core/utils';
+import { strings } from '../../core/localization/strings';
 
 export const getGroupedItems = async () => {
   const groupedByCategory: catGroupedItems | null = await getStorage('groupedItems');
@@ -89,7 +91,7 @@ export const addNewItemToTemp = async (item: ItemReq) => {
       newItemId,
     });
   }
-
+  toast('success', strings.ADDED_ITEM, '', 800);
   await setStorage('newOrder', tempOrder);
 };
 

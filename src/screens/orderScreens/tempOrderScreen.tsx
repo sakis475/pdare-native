@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
-import { Divider, Portal, FAB } from 'react-native-paper';
+import { Divider, Portal } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate } from '../../navigation/navigationUtils';
@@ -16,12 +16,55 @@ import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdd
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
 import { HeaderBar } from '../../components/helpers/HeaderBar';
 import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
-import { useIsFocused } from '@react-navigation/native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { useStrings } from '../../core/localization/languageContext';
 import { OrderInfoBar } from '../../components/helpers/OrderInfoBar';
 import { LinearGradientFadeOut } from '../../components/basic/LinearGradientFadeOut';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
+
+// Memoized Item renderer components
+const DisabledItem = memo(({ item, onDelete }: { item: ItemReq; onDelete: any }) => (
+  <CatalogItemDisabled item={item} onItemDelete={onDelete} />
+));
+
+const AddedItem = memo(
+  ({ item, refreshList, onItemPress }: { item: ItemReq; refreshList: any; onItemPress: any }) => (
+    <CatalogItemAdded item={item} refreshList={refreshList} onItemPress={onItemPress} />
+  )
+);
+
+// Memoized OrderItem component
+const OrderItem = memo(
+  ({
+    item,
+    refreshTempList,
+    onItemPress,
+  }: {
+    item: ItemReq;
+    refreshTempList: any;
+    onItemPress: any;
+  }) => {
+    const handleDelete = useCallback(async () => {
+      await markActiveItemForDelete(item);
+      refreshTempList();
+    }, [item, refreshTempList]);
+
+    const handlePress = useCallback(() => {
+      onItemPress(item);
+    }, [item, onItemPress]);
+
+    return (
+      <View style={[styles.itemContainer, item.markForDelete && styles.markedForDelete]}>
+        {item.alreadySend ? (
+          <DisabledItem item={item} onDelete={handleDelete} />
+        ) : (
+          <AddedItem item={item} refreshList={refreshTempList} onItemPress={handlePress} />
+        )}
+      </View>
+    );
+  }
+);
+
 const TempOrderScreen = ({
   currentIndex,
   route,
@@ -29,140 +72,131 @@ const TempOrderScreen = ({
   isSheetOpen,
   onItemPress = () => {},
 }: any) => {
-  const [table, setTable] = useState<Table>();
-  const [items, setItems] = useState<ItemReq[]>();
-  const [headerTitle, setHeaderTitle] = useState('');
-  const [headerSubtitle, setHeaderSubtitle] = useState('');
-  const [order, setOrder] = useState<Order>();
+  const [orderState, setOrderState] = useState({
+    table: null,
+    items: [],
+    order: null,
+    headerTitle: '',
+    headerSubtitle: '',
+  });
+
   const strings = useStrings();
+  const bottomSheetRef = useRef(null);
 
-  const fetchItems = async () => {
-    const tempOrder: Order = await getTempOrder();
-    setHeaderTitle(
-      tempOrder?.orderItems?.[0]?.alreadySend ? strings.UPDATE_ORDER : strings.NEW_ORDER
-    );
-
-    setHeaderSubtitle(tempOrder?.table?.tableName ?? '');
-    setOrder(tempOrder);
-    setTable(tempOrder?.table);
-    setItems(tempOrder?.orderItems ?? []);
-  };
-  const isFocused = useIsFocused();
-  useEffect(() => {
-    if (currentIndex && currentIndex !== 1) return;
-
-    fetchItems();
-  }, [route, isSheetOpen, isFocused, currentIndex]);
+  const fetchItems = useCallback(async () => {
+    try {
+      const tempOrder = await getTempOrder();
+      setOrderState({
+        table: tempOrder?.table,
+        items: tempOrder?.orderItems ?? [],
+        order: tempOrder,
+        headerTitle: tempOrder?.orderItems?.[0]?.alreadySend
+          ? strings.UPDATE_ORDER
+          : strings.NEW_ORDER,
+        headerSubtitle: tempOrder?.table?.tableName ?? '',
+      });
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
+  }, [strings]);
 
   useEffect(() => {
     fetchItems();
     const subscription = EventEmitter.addListener(TEMP_ORDER_UPDATED, fetchItems);
     return () => subscription.remove();
-  }, []);
+  }, [fetchItems]);
 
-  const handleSelectTable = async (newTable: Table) => {
-    const tempOrder: Order = await getTempOrder();
-    let clearTable = newTable;
+  const handleSelectTable = useCallback(
+    async (newTable: Table) => {
+      try {
+        const tempOrder = await getTempOrder();
+        let clearTable = newTable;
 
-    //In Case of new order start a new order
-    if (!items.length && newTable?.id) {
-      clearTable = (await createNewOrder(newTable))?.table;
-    } else if (tempOrder.id) {
-      //update existing order table
-      const updatedOrder = await updateTableOfOrder(tempOrder, newTable);
-      if (!updatedOrder?.id) {
-        return;
-      } else {
-        toast('success', strings.TABLE_CHANGE_SUCCESS);
+        if (!orderState.items.length && newTable?.id) {
+          const newOrder = await createNewOrder(newTable);
+          clearTable = newOrder?.table;
+        } else if (tempOrder.id) {
+          const updatedOrder = await updateTableOfOrder(tempOrder, newTable);
+          if (!updatedOrder?.id) return;
+          toast('success', strings.TABLE_CHANGE_SUCCESS);
+        }
+
+        setOrderState((prev) => ({
+          ...prev,
+          table: clearTable,
+        }));
+        await setTableTempOrder(clearTable);
+      } catch (error) {
+        console.error('Error selecting table:', error);
       }
-    }
+    },
+    [orderState.items, strings]
+  );
 
-    setTable(clearTable);
-    setTableTempOrder(clearTable);
-  };
+  const handleTempOrderPress = useCallback(async () => {
+    const tempOrder = await getTempOrder();
+    const tableWithOrder = {
+      ...orderState.table,
+      occupiedByOrder: tempOrder,
+    };
+    navigate(ScreenNames.NewOrderScreen, { table: tableWithOrder });
+  }, [orderState.table]);
 
-  const handleTempOrderPress = async () => {
-    const tempOrder: Order = await getTempOrder();
-
-    table.occupiedByOrder = tempOrder;
-    navigate(ScreenNames.NewOrderScreen, { table: table });
-  };
-
-  //START TABLE MODAL LOGIC
-  const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
-
-  const handleOpenSelectTableModal = () => {
-    if (table) {
+  const handleOpenSelectTableModal = useCallback(() => {
+    if (orderState.table) {
       AlertWithOptions(
         strings.CHANGE_TABLE,
         strings.CHANGE_TABLE_CONFIRM,
-        () => {
-          bottomSheetRef.current?.openModal();
-        },
+        () => bottomSheetRef.current?.openModal(),
         () => {}
       );
     } else {
       bottomSheetRef.current?.openModal();
     }
-  };
+  }, [orderState.table, strings]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     bottomSheetRef.current?.closeModal();
     Keyboard.dismiss();
-  };
+  }, []);
 
-  const refreshTempList = async (updatedItems?: ItemReq[]) => {
-    await fetchItems();
-  };
-  //END TABLE MODAL LOGIC
+  const renderItem = useCallback(
+    ({ item }: { item: ItemReq }) => (
+      <OrderItem item={item} refreshTempList={fetchItems} onItemPress={onItemPress} />
+    ),
+    [fetchItems, onItemPress]
+  );
 
-  const handleItemPress = (screenName: ScreenNames, props: any = null) => {
-    navigate(screenName, props);
-  };
+  const keyExtractor = useCallback((item: ItemReq) => item.newItemId, []);
 
-  const renderItems = (item: ItemReq) => {
+  if (!orderState.items) {
     return (
-      <View
-        style={{
-          backgroundColor: item.markForDelete ? colors.lightRed : null,
-        }}
-      >
-        {item.alreadySend === true ? (
-          <CatalogItemDisabled
-            item={item}
-            onItemDelete={async (item: ItemReq) => {
-              await markActiveItemForDelete(item);
-              refreshTempList();
-            }}
-          />
-        ) : (
-          <CatalogItemAdded
-            item={item}
-            refreshList={refreshTempList}
-            onItemPress={() => onItemPress(item)}
-          />
-        )}
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
-  };
+  }
 
   return (
     <View style={styles.mainContainer}>
-      {!bottomSheetMode && <HeaderBar headerTitle={headerTitle} headerSubtitle={headerSubtitle} />}
+      {!bottomSheetMode && (
+        <HeaderBar
+          headerTitle={orderState.headerTitle}
+          headerSubtitle={orderState.headerSubtitle}
+        />
+      )}
 
       <View style={styles.contentContainer}>
-        {items && items.length > 0 ? (
+        {orderState.items.length > 0 ? (
           <View style={styles.listContainer}>
-            <OrderInfoBar
-              order={order}
-              containerStyle={{ paddingHorizontal: 20, paddingVertical: 15 }}
-            />
+            <OrderInfoBar order={orderState.order} containerStyle={styles.orderInfoBar} />
 
             <FlashList
-              data={items}
-              keyExtractor={(item) => item.newItemId}
-              renderItem={({ item }) => renderItems(item)}
+              data={orderState.items}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
               estimatedItemSize={50}
+              removeClippedSubviews={true}
               contentContainerStyle={styles.categoryFlashListContainer}
               showsVerticalScrollIndicator={true}
               persistentScrollbar={true}
@@ -170,14 +204,10 @@ const TempOrderScreen = ({
             />
             <LinearGradientFadeOut height={150} />
           </View>
-        ) : items?.length === 0 ? (
+        ) : (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_ADD}</Text>
             <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_APPEAR_HERE}</Text>
-          </View>
-        ) : (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
           </View>
         )}
       </View>
@@ -186,14 +216,11 @@ const TempOrderScreen = ({
         <>
           <View style={styles.bottomOptionsContainer}>
             <TempBottomOptions
-              table={table}
+              table={orderState.table}
               isTempOrder={true}
               handleOpenSelectTableModal={handleOpenSelectTableModal}
               handleTempOrderPress={handleTempOrderPress}
-              couvertUpdated={async (couvert) => {
-                const tempOrder: Order = await getTempOrder();
-                setOrder(tempOrder);
-              }}
+              couvertUpdated={fetchItems}
             />
           </View>
           <Portal>
@@ -236,13 +263,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingBottom: 140,
   },
-
   bottomOptionsContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
   },
+  itemContainer: {
+    backgroundColor: 'transparent',
+  },
+  markedForDelete: {
+    backgroundColor: colors.lightRed,
+  },
+  orderInfoBar: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
 });
 
-export default TempOrderScreen;
+export default memo(TempOrderScreen);

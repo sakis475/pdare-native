@@ -26,6 +26,7 @@ import {
 import { useStrings } from '../../core/localization/languageContext';
 import { useIsFocused } from '@react-navigation/native';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
+import { toast } from '../../core/utils';
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
@@ -36,48 +37,14 @@ const ItemListScreen = ({ route }: any) => {
   const isFocused = useIsFocused();
   const strings = useStrings();
 
-  const fetchItems = useCallback(
-    async (tempOrderEmitted?: Order) => {
-      if (!categoryTitle) return;
+  const fetchItems = useCallback(async () => {
+    if (!categoryTitle) return;
 
-      const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
-      const categoryItems = fetchedItems[categoryTitle] ?? [];
-      const tempOrder = tempOrderEmitted || (await getTempOrder());
+    const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
+    const categoryItems = fetchedItems[categoryTitle] ?? [];
 
-      // Create a Set of item IDs that are already in the temp order
-      const duplicateIds = new Set<number>();
-
-      // First collect all non-sent item IDs
-      const activeOrderItemIds = tempOrder.orderItems
-        .filter((item) => !item.alreadySend)
-        .map((item) => item.id);
-
-      // Find duplicates by checking if the ID appears more than once
-      activeOrderItemIds.forEach((id) => {
-        if (activeOrderItemIds.filter((orderId) => orderId === id).length > 1) {
-          duplicateIds.add(id);
-        }
-      });
-
-      setDuplicateItemIds(duplicateIds);
-
-      // Rest of your existing logic for setting quantities
-      for (const addedItem of tempOrder.orderItems) {
-        if (addedItem.alreadySend) continue;
-
-        for (const itemOfCategory of categoryItems) {
-          if (itemOfCategory.id === addedItem.id) {
-            if (addedItem.quantity > 0) {
-              itemOfCategory.quantity =
-                (itemOfCategory.quantity ? +itemOfCategory.quantity : 0) + addedItem.quantity;
-            }
-          }
-        }
-      }
-      setItems(categoryItems);
-    },
-    [categoryTitle]
-  );
+    setItems(categoryItems);
+  }, [categoryTitle]);
 
   useEffect(() => {
     setCategoryTitle(route.params.categoryTitle);
@@ -90,11 +57,6 @@ const ItemListScreen = ({ route }: any) => {
       fetchItems();
     }
   }, [isFocused, fetchItems]);
-
-  useEffect(() => {
-    const subscription = EventEmitter.addListener(TEMP_ORDER_UPDATED, fetchItems);
-    return () => subscription.remove();
-  }, []);
 
   const handleSelectTable = (table: Table) => {
     setTableName(table.tableName);

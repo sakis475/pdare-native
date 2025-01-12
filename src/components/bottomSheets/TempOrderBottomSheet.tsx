@@ -18,7 +18,7 @@ import { useStrings } from '../../core/localization/languageContext';
 
 const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['85%', '85%'], []);
+  const snapPoints = useMemo(() => ['93%', '93%'], []);
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
