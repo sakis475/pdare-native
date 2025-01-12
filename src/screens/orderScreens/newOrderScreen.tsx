@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Keyboard,
   Dimensions,
+  TextInput,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
@@ -24,6 +25,7 @@ import { getStorage } from '../../storage/store';
 import { storageInitData } from '../../helpers/storage/storageInit';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomNavigationScreenHeaderTitle from '../../components/basic/CustomNavigationScreenHeaderTitle';
+import SearchItemsScreen from '../../components/SearchItemsComponent';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const COLUMN_COUNT = 4;
@@ -69,6 +71,8 @@ const NewOrderScreen = ({ route, navigation }: any) => {
   const [tableName, setTableName] = useState(route.params?.table?.tableName);
   const [categories, setCategories] = useState<Category[]>([]);
   const [headerTitle, setHeaderTitle] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [allItems, setAllItems] = useState<ItemReq[]>([]);
   const strings = useStrings();
 
   // Memoized callbacks
@@ -92,9 +96,11 @@ const NewOrderScreen = ({ route, navigation }: any) => {
       newOrder = await getStorage('groupedItems');
     }
 
-    if (!newOrder) {
-      return;
-    }
+    if (!newOrder) return;
+
+    // Flatten all items from all categories
+    const items = Object.values(newOrder).flat();
+    setAllItems(items);
 
     if (!tableName) {
       const fetchTempTable = await getTableTempOrder();
@@ -120,6 +126,10 @@ const NewOrderScreen = ({ route, navigation }: any) => {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  const handleSearchQueryChange = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
 
   useEffect(() => {
     if (navigation && headerTitle) {
@@ -155,17 +165,21 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     <View style={styles.container}>
       {categories && Object.keys(categories)?.length ? (
         <>
-          <View style={styles.categoriesContainer}>
-            <FlashList
-              data={categories}
-              renderItem={renderCategories}
-              estimatedItemSize={BOX_SIZE}
-              contentContainerStyle={styles.categoryFlashListContainer}
-              numColumns={COLUMN_COUNT}
-              keyExtractor={keyExtractor}
-              removeClippedSubviews={true}
-            />
+          <View style={styles.contentContainer}>
+            <SearchItemsScreen allItems={allItems} onSearchQueryChange={handleSearchQueryChange} />
+            {searchQuery.trim() === '' && (
+              <FlashList
+                data={categories}
+                renderItem={renderCategories}
+                estimatedItemSize={BOX_SIZE}
+                contentContainerStyle={styles.categoryFlashListContainer}
+                numColumns={COLUMN_COUNT}
+                keyExtractor={keyExtractor}
+                removeClippedSubviews={true}
+              />
+            )}
           </View>
+
           <OrderBottomOptions
             tableName={tableName}
             handleOpenModal={handleOpenModal}
@@ -185,6 +199,26 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flex: 1,
     backgroundColor: '#2F2F2F',
+  },
+  searchContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 10,
+  },
+  searchInput: {
+    backgroundColor: colors.darkerGrey,
+    color: colors.white,
+    padding: 1,
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  searchResultsContainer: {
+    flex: 1,
+  },
+  searchResultsList: {
+    paddingHorizontal: 20,
   },
   categoriesContainer: {
     flex: 1,
@@ -234,6 +268,16 @@ const styles = StyleSheet.create({
   },
   categoryFlashListContainer: {
     paddingHorizontal: MARGIN / 2,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    color: colors.white,
+    textAlign: 'center',
   },
 });
 
