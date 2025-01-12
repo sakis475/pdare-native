@@ -123,6 +123,7 @@ const EditModal: React.FC<EditModalProps> = ({
             onChangeText={setTableName}
             style={styles.input}
             mode="outlined"
+            maxLength={15}
           />
 
           <View style={styles.buttonUpdateContainer}>

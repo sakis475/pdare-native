@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { TextInput, Text, IconButton } from 'react-native-paper';
+import { TextInput, Text } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { MinusIcon, PlusIcon } from './Icons';
 import { useStrings } from '../../core/localization/languageContext';
