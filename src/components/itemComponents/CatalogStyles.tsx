@@ -25,6 +25,7 @@ export const catalogItemStyles = StyleSheet.create({
     overflow: 'hidden',
     paddingHorizontal: 10,
     paddingVertical: 6,
+    alignItems: 'center',
   },
   containerWithPadding: {
     padding: 1,
@@ -82,7 +83,7 @@ export const catalogItemStyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.slightlyLighterGrey,
     borderRadius: 6,
-    marginHorizontal: 4,
+    marginRight: 6,
   },
   smallButton: {
     width: 33,

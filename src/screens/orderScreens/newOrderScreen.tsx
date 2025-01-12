@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
 import {
   View,
   Text,
@@ -30,15 +30,62 @@ const COLUMN_COUNT = 4;
 const MARGIN = 1;
 const BOX_SIZE = (SCREEN_WIDTH - MARGIN * (COLUMN_COUNT + 1)) / COLUMN_COUNT;
 
+// Memoized category item component
+const CategoryItem = memo(
+  ({
+    category,
+    tableName,
+    onPress,
+  }: {
+    category: Category;
+    tableName: string;
+    onPress: (screenName: ScreenNames, props: any) => void;
+  }) => {
+    const textColor = getTextColorBasedOnLuminance(category.color ?? colors.darkGrey);
+
+    const handlePress = useCallback(() => {
+      onPress(ScreenNames.ItemListScreen, {
+        tableName,
+        categoryTitle: category.title,
+      });
+    }, [category.title, tableName, onPress]);
+
+    return (
+      <View style={styles.buttonContainer}>
+        <View style={styles.shadowBox} />
+        <TouchableOpacity
+          style={[styles.categoryBox, { backgroundColor: category.color ?? colors.darkGrey }]}
+          onPress={handlePress}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.categoryText, { color: textColor }]}>{category.title}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+);
+
 const NewOrderScreen = ({ route, navigation }: any) => {
   const [tableName, setTableName] = useState(route.params?.table?.tableName);
   const [categories, setCategories] = useState<Category[]>([]);
-
   const [headerTitle, setHeaderTitle] = useState('');
-
   const strings = useStrings();
 
-  const fetchItems = async () => {
+  // Memoized callbacks
+  const handleSelectTable = useCallback((table: Table) => {
+    setTableName(table.tableName);
+    setTableTempOrder(table);
+  }, []);
+
+  const handleCategoryPress = useCallback((screenName: ScreenNames, props: any = null) => {
+    navigate(screenName, props);
+  }, []);
+
+  const handleTempOrderPress = useCallback(() => {
+    navigateToDraft();
+  }, []);
+
+  const fetchItems = useCallback(async () => {
     let newOrder = await getStorage('groupedItems');
     if (!newOrder) {
       await storageInitData();
@@ -68,73 +115,41 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     if (tempOrder?.table?.id !== route.params?.table?.id && route.params?.table?.occupiedByOrder) {
       await setTempOrder(route.params.table.occupiedByOrder);
     }
-  };
+  }, [route.params?.table?.id, tableName, strings]);
 
   useEffect(() => {
     fetchItems();
-  }, [route.params?.table?.id]);
+  }, [fetchItems]);
 
   useEffect(() => {
     if (navigation && headerTitle) {
       navigation.setOptions({
         headerTitle: () => (
-          <CustomNavigationScreenHeaderTitle
-            title={headerTitle}
-            subtitle={tableName}
-            bold={true}
-          ></CustomNavigationScreenHeaderTitle>
+          <CustomNavigationScreenHeaderTitle title={headerTitle} subtitle={tableName} bold={true} />
         ),
       });
     }
-  }, [navigation, headerTitle]);
+  }, [navigation, headerTitle, tableName]);
 
-  const handleSelectTable = (table: Table) => {
-    setTableName(table.tableName);
-    setTableTempOrder(table);
-  };
-  //START TABLE MODAL LOGIC
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = useCallback(() => {
     bottomSheetRef.current?.openModal();
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     bottomSheetRef.current?.closeModal();
     Keyboard.dismiss();
-  };
+  }, []);
 
-  //END TABLE MODAL LOGIC
+  const renderCategories = useCallback(
+    ({ item: category }: { item: Category }) => (
+      <CategoryItem category={category} tableName={tableName} onPress={handleCategoryPress} />
+    ),
+    [tableName, handleCategoryPress]
+  );
 
-  const handleCategoryPress = (screenName: ScreenNames, props: any = null) => {
-    navigate(screenName, props);
-  };
-
-  const handleTempOrderPress = () => {
-    // navigate(ScreenNames.TempOrderScreen, {});
-    navigateToDraft();
-  };
-
-  const renderCategories = ({ item: category }: { item: Category }) => {
-    const textColor = getTextColorBasedOnLuminance(category.color ?? colors.darkGrey);
-    return (
-      <View style={styles.buttonContainer}>
-        <View style={styles.shadowBox}></View>
-        <TouchableOpacity
-          style={[styles.categoryBox, { backgroundColor: category.color ?? colors.darkGrey }]}
-          onPress={() => {
-            handleCategoryPress(ScreenNames.ItemListScreen, {
-              tableName,
-              categoryTitle: category.title,
-            });
-          }}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.categoryText, { color: textColor }]}>{category.title}</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  const keyExtractor = useCallback((item: Category) => item.id.toString(), []);
 
   return (
     <View style={styles.container}>
@@ -147,6 +162,8 @@ const NewOrderScreen = ({ route, navigation }: any) => {
               estimatedItemSize={BOX_SIZE}
               contentContainerStyle={styles.categoryFlashListContainer}
               numColumns={COLUMN_COUNT}
+              keyExtractor={keyExtractor}
+              removeClippedSubviews={true}
             />
           </View>
           <OrderBottomOptions
@@ -157,7 +174,7 @@ const NewOrderScreen = ({ route, navigation }: any) => {
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
         </>
       ) : (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+        <ActivityIndicator size="large" animating={true} color={colors.primary} />
       )}
     </View>
   );

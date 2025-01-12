@@ -247,5 +247,6 @@
   "AND_WHOLE_NUMBER": "και ακέραιος αριθμός",
   "COUVERT_COST": "Κόστος Κουβέρ",
   "CURRENCY_SYMBOL": "Σύμβολο Νομίσματος",
-  "ADDED_ITEM": "Το προιόν προστέθηκε"
+  "ADDED_ITEM": "Το προιόν προστέθηκε",
+  "ENTER_QUANTITY": "Εισάγετε ποσότητα"
 }

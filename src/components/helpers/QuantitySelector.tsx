@@ -12,6 +12,7 @@ import {
 import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import _ from 'lodash';
+import { useStrings } from '../../core/localization/languageContext';
 
 interface QuantitySelectorProps {
   quantity: number;
@@ -30,7 +31,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   const [tempQuantity, setTempQuantity] = useState('');
   const trashIconTimerRef = useRef<NodeJS.Timeout>();
   const lastUpdateTimeRef = useRef<number>(Date.now());
-
+  const strings = useStrings();
   // Debounced update function
   const debouncedQuantityChange = useCallback(
     _.debounce((newQuantity: number) => {
@@ -112,7 +113,6 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   };
 
   const handleModalSubmit = () => {
-    console.log('handleModalSubmit');
     const newQuantity = parseInt(tempQuantity);
     if (!isNaN(newQuantity) && newQuantity >= 0 && newQuantity <= 999) {
       if (newQuantity === 0) {
@@ -164,7 +164,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
           style={styles.modalContainer}
         >
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Enter Quantity</Text>
+            <Text style={styles.modalTitle}>{strings.ENTER_QUANTITY}</Text>
             <TextInput
               style={styles.input}
               keyboardType="number-pad"
@@ -180,13 +180,13 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
                 style={[styles.modalButton, styles.cancelButton]}
                 onPress={() => setIsModalVisible(false)}
               >
-                <Text style={styles.modalButtonText}>Cancel</Text>
+                <Text style={styles.modalButtonText}>{strings.CANCEL}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.confirmButton]}
                 onPress={handleModalSubmit}
               >
-                <Text style={styles.modalButtonText}>Confirm</Text>
+                <Text style={styles.modalButtonText}>{strings.SAVE}</Text>
               </TouchableOpacity>
             </View>
           </View>

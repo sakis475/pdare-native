@@ -34,6 +34,9 @@ export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
         key={item.newItemId} // Add key to force re-render
         style={[styles.container]}
       >
+        <View style={styles.button}>
+          <Text style={styles.buttonText}>x{item.quantity}</Text>
+        </View>
         <View style={styles.textContainer}>
           <Text style={markAsDelete ? styles.itemTitleDeleted : styles.itemTitle}>
             {item.title}
@@ -59,9 +62,6 @@ export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
               <CurrencyFormat value={totalCost} currency={'€'} fontSize={12}></CurrencyFormat>
             </View>
           </View>
-        </View>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>x{item.quantity}</Text>
         </View>
       </View>
     </View>
