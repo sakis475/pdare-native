@@ -21,6 +21,8 @@ interface TempBottomOptionsProps {
   handleTempOrderPress: () => void;
   overrideOrderView?: boolean;
   couvertUpdated?: (couvert: number) => void;
+  isSending?: boolean;
+  setIsSending?: (value: boolean) => void;
 }
 
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
@@ -30,6 +32,8 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   handleTempOrderPress,
   overrideOrderView,
   couvertUpdated,
+  isSending,
+  setIsSending,
 }) => {
   const [noTable, setNoTable] = useState(!table?.tableName);
   const [order, setOrder] = useState<Order>();
@@ -62,43 +66,55 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     if (request?.id) {
       toast('success', strings.SUCCESS, '', 1000);
       await clearNewOrder();
+      setIsSending(false);
       navigateToTables();
     }
   };
 
   const handleOrderSend = async () => {
-    const newOrder = await getTempOrder();
-    if (!newOrder?.orderItems?.length || newOrder?.orderItems?.length === 0) {
-      toast('info', strings.ADD_ITEMS_FIRST, '', 1600);
-      return;
-    }
-    const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
-    let result;
-    if (convertedServerOrder?.orderId) {
-      const itemsRemainingLength = newOrder.orderItems.filter((e) => !e.markForDelete)?.length;
-      if (itemsRemainingLength === 0) {
-        AlertWithOptions(
-          strings.CLOSE_ORDER,
-          strings.CLOSE_ORDER_NO_ITEMS,
-          async () => {
-            result = await patchRequest(
-              `/orders/${convertedServerOrder?.orderId}`,
-              convertedServerOrder
-            );
-            handleOrderSendSuccess(result);
-          },
-          () => {}
-        );
+    setIsSending(true);
+    try {
+      const newOrder = await getTempOrder();
+      if (!newOrder?.orderItems?.length || newOrder?.orderItems?.length === 0) {
+        toast('info', strings.ADD_ITEMS_FIRST, '', 1600);
+        setIsSending(false);
+        return;
+      }
+
+      const convertedServerOrder = convertNewOrderToRequestObject(newOrder);
+      let result;
+
+      if (convertedServerOrder?.orderId) {
+        const itemsRemainingLength = newOrder.orderItems.filter((e) => !e.markForDelete)?.length;
+        if (itemsRemainingLength === 0) {
+          AlertWithOptions(
+            strings.CLOSE_ORDER,
+            strings.CLOSE_ORDER_NO_ITEMS,
+            async () => {
+              result = await patchRequest(
+                `/orders/${convertedServerOrder?.orderId}`,
+                convertedServerOrder
+              );
+              handleOrderSendSuccess(result);
+            },
+            () => {
+              setIsSending(false);
+            }
+          );
+        } else {
+          result = await patchRequest(
+            `/orders/${convertedServerOrder?.orderId}`,
+            convertedServerOrder
+          );
+          handleOrderSendSuccess(result);
+        }
       } else {
-        result = await patchRequest(
-          `/orders/${convertedServerOrder?.orderId}`,
-          convertedServerOrder
-        );
+        result = await postRequest('/orders', convertedServerOrder);
         handleOrderSendSuccess(result);
       }
-    } else {
-      result = await postRequest('/orders', convertedServerOrder);
-      handleOrderSendSuccess(result);
+    } catch (error) {
+      setIsSending(false);
+      toast('error', 'Failed to send order', '', 1000);
     }
   };
 
@@ -183,13 +199,16 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
         style={[
           styles.button,
           styles.sendOrderButton,
-          noTable || isOrderView || isOrderClosed ? styles.noTableOtherBtns : null,
+          noTable || isOrderView || isOrderClosed || isSending ? styles.noTableOtherBtns : null,
         ]}
         onPress={handleOrderSend}
-        disabled={noTable || isOrderView || isOrderClosed}
+        disabled={noTable || isOrderView || isOrderClosed || isSending}
       >
         <Text
-          style={[styles.buttonText, noTable || isOrderClosed ? styles.noTableOtherText : null]}
+          style={[
+            styles.buttonText,
+            noTable || isOrderClosed || isSending ? styles.noTableOtherText : null,
+          ]}
         >
           {strings.SEND}
         </Text>

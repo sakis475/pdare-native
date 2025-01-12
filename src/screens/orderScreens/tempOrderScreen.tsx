@@ -21,6 +21,7 @@ import { useStrings } from '../../core/localization/languageContext';
 import { OrderInfoBar } from '../../components/helpers/OrderInfoBar';
 import { LinearGradientFadeOut } from '../../components/basic/LinearGradientFadeOut';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
+import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 
 // Memoized Item renderer components
 const DisabledItem = memo(({ item, onDelete }: { item: ItemReq; onDelete: any }) => (
@@ -79,6 +80,7 @@ const TempOrderScreen = ({
     headerTitle: '',
     headerSubtitle: '',
   });
+  const [isSending, setIsSending] = useState(false);
 
   const strings = useStrings();
   const bottomSheetRef = useRef(null);
@@ -179,6 +181,8 @@ const TempOrderScreen = ({
 
   return (
     <View style={styles.mainContainer}>
+      {isSending && <LoadingOverlay />}
+
       {!bottomSheetMode && (
         <HeaderBar
           headerTitle={orderState.headerTitle}
@@ -221,6 +225,8 @@ const TempOrderScreen = ({
               handleOpenSelectTableModal={handleOpenSelectTableModal}
               handleTempOrderPress={handleTempOrderPress}
               couvertUpdated={fetchItems}
+              isSending={isSending}
+              setIsSending={setIsSending}
             />
           </View>
           <Portal>
@@ -244,11 +250,6 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingTop: 2,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   emptyContainer: {
     flex: 1,
@@ -278,6 +279,28 @@ const styles = StyleSheet.create({
   orderInfoBar: {
     paddingHorizontal: 20,
     paddingVertical: 15,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+  },
+  loadingContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: colors.grey,
+    fontSize: 16,
   },
 });
 
