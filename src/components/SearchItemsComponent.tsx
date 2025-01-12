@@ -55,6 +55,7 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder={strings.SEARCH}
+          placeholderTextColor={colors.veryLighterGrey}
           onChangeText={handleSearchChange}
           value={searchQuery}
           style={styles.searchInput}

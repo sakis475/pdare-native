@@ -8,6 +8,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,6 +33,9 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   const trashIconTimerRef = useRef<NodeJS.Timeout>();
   const lastUpdateTimeRef = useRef<number>(Date.now());
   const strings = useStrings();
+
+  const textInputRef = useRef<any>(null); // TextInput ref
+
   // Debounced update function
   const debouncedQuantityChange = useCallback(
     _.debounce((newQuantity: number) => {
@@ -101,6 +105,20 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
     };
   }, [showDeleteBtn]);
 
+  useEffect(() => {
+    if (isModalVisible) {
+      const keyboardTimer = setTimeout(() => {
+        textInputRef.current?.focus();
+        Keyboard.dismiss(); // First dismiss any existing keyboard
+        setTimeout(() => {
+          textInputRef.current?.focus(); // Then try to focus again
+        }, 50);
+      }, 100);
+
+      return () => clearTimeout(keyboardTimer);
+    }
+  }, [isModalVisible]);
+
   const handleQuantityInputChange = (text: string) => {
     // Only allow numbers
     const numericValue = text.replace(/[^0-9]/g, '');
@@ -166,6 +184,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{strings.ENTER_QUANTITY}</Text>
             <TextInput
+              ref={textInputRef}
               style={styles.input}
               keyboardType="number-pad"
               value={tempQuantity}

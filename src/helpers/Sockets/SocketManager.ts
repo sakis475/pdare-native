@@ -410,7 +410,7 @@ class SocketManager {
 
   public generateEventString(eventId: EventId): EventString<number> {
     if (!this.isValidUser(this.user)) {
-      throw new Error('User or restaurant ID not available');
+      console.warn('User or restaurant ID not available');
     }
     return `${eventId}:${this.user.restaurant.id}`;
   }

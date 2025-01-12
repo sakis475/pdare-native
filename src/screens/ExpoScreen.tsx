@@ -25,7 +25,6 @@ import { EventEmitter, ORDERS_UPDATED } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
 import { useStrings } from '../core/localization/languageContext';
 import { CatalogItemViewOnly } from '../components/itemComponents/CatalogItemViewOnly';
-import dayjs from '../core/dayjs';
 import { TableIcon } from '../components/basic/Icons';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
 import { OrderInfoBar } from '../components/helpers/OrderInfoBar';
@@ -108,9 +107,20 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
     );
   };
   const handleMarkAsDone = async (item: Table) => {
+    if (!item?.occupiedByOrder?.id) {
+      console.warn('Invalid order ID');
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await Requests.patchRequest(`/orders/ready/${item.occupiedByOrder.id}`);
+      const response = await Requests.patchRequest(`/orders/ready/${item.occupiedByOrder.id}`);
+
+      if (!response) {
+        throw new Error('No response from server');
+      }
+
+      await fetchInitialTables();
     } catch (error) {
       console.error('Error marking order as done:', error);
     } finally {
@@ -135,16 +145,22 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
             </View>
 
             <View style={styles.infoRow}>
-              <TouchableOpacity
-                style={[
-                  styles.doneButton,
-                  item.occupiedByOrder?.orderReady && styles.doneButtonDisabled,
-                ]}
-                onPress={() => handleMarkAsDone(item)}
-                disabled={item.occupiedByOrder?.orderReady}
-              >
-                <Text style={styles.doneButtonText}>{strings.MARK_DONE_BTN}</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonWrapper}>
+                <TouchableOpacity
+                  style={[
+                    styles.doneButton,
+                    item.occupiedByOrder?.orderReady && styles.doneButtonDisabled,
+                  ]}
+                  onPress={(e) => {
+                    e.stopPropagation(); // Stop event propagation
+                    handleMarkAsDone(item);
+                  }}
+                  disabled={item.occupiedByOrder?.orderReady}
+                  pressRetentionOffset={{ top: 20, left: 20, bottom: 20, right: 20 }}
+                >
+                  <Text style={styles.doneButtonText}>{strings.MARK_DONE_BTN}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
@@ -429,6 +445,7 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 14,
     fontWeight: '600',
+    textAlign: 'center',
   },
   headerRow: {
     flexDirection: 'row',
@@ -481,12 +498,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
+  buttonWrapper: {
+    zIndex: 1, // Ensure button is above other elements
+    elevation: 1, // For Android
+    padding: 5, // Add some padding for better touch area
+  },
   doneButton: {
     backgroundColor: colors.primary,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 6,
     alignSelf: 'flex-start',
+    zIndex: 2,
+    elevation: 2,
   },
   gradient: {
     position: 'absolute',
@@ -500,10 +524,12 @@ const styles = StyleSheet.create({
     top: 10,
     height: 300,
     width: SCREEN_WIDTH,
+    zIndex: 999,
   },
   orderInfoContentContainer: {
     flexGrow: 1,
     justifyContent: 'center',
+    zIndex: 999,
   },
 });
 

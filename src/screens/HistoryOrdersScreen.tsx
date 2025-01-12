@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
-  Keyboard,
   SafeAreaView,
   RefreshControl,
+  Pressable,
 } from 'react-native';
 
 import { Divider } from 'react-native-paper';
@@ -14,9 +14,7 @@ import { Divider } from 'react-native-paper';
 import { colors } from '../core/theme';
 
 import { FlashList } from '@shopify/flash-list';
-import { HeaderBar } from '../components/helpers/HeaderBar';
 
-import { AlertWithOptions } from '../core/utils';
 import { getRequest } from '../helpers/requests';
 import dayjs from '../core/dayjs';
 import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
@@ -24,7 +22,6 @@ import { CurrencyFormat } from '../components/helpers/CurrencyFormat';
 import { useStrings } from '../core/localization/languageContext';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { navigate, ScreenNames } from '../navigation/navigationUtils';
-import * as Requests from '../helpers/requests';
 import { processTables } from '../helpers/storage/tablesStorage';
 import _ from 'lodash';
 
@@ -141,7 +138,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
     const formattedClosedAt = closedAt.format('DD/MM/YY HH:mm');
 
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={() => {
           const deepOrder = _.cloneDeep(order);
           const deepTable = _.cloneDeep(deepOrder.table);
@@ -193,7 +190,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
             )}
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
