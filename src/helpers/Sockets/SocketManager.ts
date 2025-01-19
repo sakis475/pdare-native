@@ -1,8 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 import { getStorage } from '../../storage/store';
-import { getRequest } from '../requests';
+import { getBearer, getRequest } from '../requests';
 import { EventEmitter, HEALTH_CHECK_RECEIVE } from './EventEmitter';
 import { EmitterSubscription } from 'react-native';
+import { SessionBearer } from '../../types/requests.types';
 
 type EventCallback = (data: any) => void;
 
@@ -14,6 +15,7 @@ interface EventListener {
 class SocketManager {
   private socket: Socket | null = null;
   private user: User | null = null;
+  private sessionBearer: SessionBearer | null = null;
   private eventListeners: Map<EventId, Set<EventListener>> = new Map();
   private static instance: SocketManager | null = null;
   private currentRoom: string | null = null;
@@ -43,6 +45,12 @@ class SocketManager {
   private async loadCurrentUser(): Promise<void> {
     try {
       const user = await getStorage('currentUser');
+      const sessionBearer = await getBearer();
+
+      if (!sessionBearer) return;
+
+      this.sessionBearer = sessionBearer;
+
       if (this.isValidUser(user)) {
         this.user = user;
         console.log('Current user loaded:', this.user);
@@ -64,7 +72,6 @@ class SocketManager {
   private isValidUser(user: any): user is User {
     return user && user.restaurant && typeof user.restaurant.id === 'number';
   }
-
   private handleNoUser(): void {
     console.warn('No valid user found. Socket functionality is disabled.');
     this.leaveRestaurantRoom();
@@ -176,12 +183,14 @@ class SocketManager {
         );
 
         await new Promise((resolve) => setTimeout(resolve, backoffDelay));
-
         const socket = io(this.lastConnectedUrl, {
           ...this.lastConnectedOptions,
           forceNew: true,
           timeout: 5000,
           reconnection: false,
+          auth: {
+            token: this.sessionBearer.token,
+          },
         });
 
         await new Promise((resolve, reject) => {
@@ -193,6 +202,7 @@ class SocketManager {
         this.socket = socket;
         this.reconnectionAttempts = 0;
         this.isReconnecting = false;
+
         this.attachCoreSocketListeners();
         this.joinRestaurantRoom();
         await this.resubscribeAllListeners();
@@ -264,8 +274,7 @@ class SocketManager {
       timeout: 60000,
       forceNew: true,
       auth: {
-        userId: this.user.id,
-        restaurantId: this.user.restaurant.id,
+        token: this.sessionBearer.token,
       },
     });
 
@@ -341,11 +350,6 @@ class SocketManager {
     }
 
     this.periodicReconnectTimer = setInterval(async () => {
-      // if (!this.user?.restaurant?.id || this.isReconnecting) {
-      //   console.log('Skipping health check - no user/restaurant or reconnection in progress');
-      //   return;
-      // }
-
       const isConnected = this.socket?.connected;
 
       if (!isConnected) {
@@ -391,6 +395,7 @@ class SocketManager {
 
       getRequest('/health-check').catch((error) => {
         console.error('Health check HTTP request failed:', error);
+        console.log(error, 'error');
         clearTimeout(healthCheckTimeout);
         if (!this.isReconnecting) {
           this.handleReconnection();
@@ -446,6 +451,3 @@ export enum EventId {
 export type EventString<ID extends string | number> = `${EventId}:${ID}`;
 
 export const socketManager = SocketManager.getInstance();
-function healthCheck(event: any): void {
-  throw new Error('Function not implemented.');
-}

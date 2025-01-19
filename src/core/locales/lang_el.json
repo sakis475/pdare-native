@@ -223,8 +223,8 @@
   "NO_ORDERS_FOUND": "Δεν βρέθηκε καμία παραγγελία.",
   "ACTIVE": "Ενεργή",
   "CLOSED": "Κλειστή",
-  "OPENED_AT": "Άνοιξε:",
-  "CLOSED_AT": "Έκλεισε:",
+  "OPENED_AT": "Άνοιξε",
+  "CLOSED_AT": "Έκλεισε",
   "MONTH_ABBR": "μ",
   "DAY_ABBR": "η",
   "HOUR_ABBR": "ω",
@@ -249,5 +249,10 @@
   "CURRENCY_SYMBOL": "Σύμβολο Νομίσματος",
   "ADDED_ITEM": "Το προιόν προστέθηκε",
   "ENTER_QUANTITY": "Εισάγετε ποσότητα",
-  "SEARCH": "Αναζήτηση"
+  "SEARCH": "Αναζήτηση",
+  "ORDER_ID": "ID",
+  "TABLE": "Τραπέζι",
+  "GUESTS": "Άτομα",
+  "TOTAL": "Σύνολο",
+  "STATUS": "Κατάσταση"
 }

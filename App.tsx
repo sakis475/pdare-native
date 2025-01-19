@@ -16,6 +16,7 @@ import { getStorage } from './src/storage/store';
 import AppNavigator, { navigationRef } from './src/navigation/AppNavigator';
 import { LanguageProvider } from './src/core/localization/languageContext';
 import { ErrorBoundary } from './src/errorHandler/ErrorBoundary';
+import GlobalStore from './src/storage/GlobalStore';
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
 
@@ -38,6 +39,10 @@ const App = () => {
 
       socketManager.connect(BASE_DOMAIN);
       socketEventSubscriber.initialize();
+
+      const user = await getStorage('currentUser');
+      const currencySymbol = user?.restaurant?.currencySymbol;
+      GlobalStore.getInstance().setValue('currencySymbol', currencySymbol);
     };
     initializeApp();
   }, []);

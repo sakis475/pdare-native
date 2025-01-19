@@ -18,7 +18,6 @@ import { FlashList } from '@shopify/flash-list';
 import { useIsFocused } from '@react-navigation/native';
 import { colors } from '../core/theme';
 import { HeaderBar } from '../components/helpers/HeaderBar';
-import { CatalogItemDisabled } from '../components/itemComponents/CatalogItemDisabled';
 import * as Requests from '../helpers/requests';
 import { getStorage, setStorage } from '../storage/store';
 import { EventEmitter, ORDERS_UPDATED } from '../helpers/Sockets/EventEmitter';
@@ -342,7 +341,6 @@ const styles = StyleSheet.create({
   slideContainer: {
     width: SCREEN_WIDTH,
     flex: 1,
-    paddingVertical: 10,
   },
   orderCount: {
     fontSize: 16,
@@ -418,8 +416,8 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    marginBottom: 10,
+    paddingVertical: 5,
+    marginBottom: 5,
     backgroundColor: colors.slightlyDarkerGrey,
     borderTopWidth: 1,
     borderBottomWidth: 1,

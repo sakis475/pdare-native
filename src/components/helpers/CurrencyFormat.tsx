@@ -1,6 +1,7 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { colors } from '../../core/theme';
+import GlobalStore from '../../storage/GlobalStore';
 
 export function CurrencyFormat({
   value,
@@ -17,6 +18,10 @@ export function CurrencyFormat({
 }) {
   if (typeof value !== 'number') {
     return null;
+  }
+
+  if (GlobalStore.getInstance().hasValue('currencySymbol')) {
+    currency = GlobalStore.getInstance().getValue('currencySymbol');
   }
   return (
     <Text style={{ color: color, fontSize }}>

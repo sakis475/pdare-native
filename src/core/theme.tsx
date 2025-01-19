@@ -42,6 +42,7 @@ export const colors = {
   lightRed: '#ff272e',
   veryLightRed: '#ff4349',
   veryLighterRed: '#ff999c',
+  veryVeryLighterRed: '#ffd2d3',
 };
 
 export const hexColors = [

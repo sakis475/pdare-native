@@ -20,7 +20,7 @@ import { AlertWithOptions, getTextColorBasedOnLuminance, toast } from '../../cor
 import { colors, getRandomColor } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { getStorage, setStorage } from '../../storage/store';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, SegmentedButtons } from 'react-native-paper';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { getItemsOfCategory } from '../../helpers/storage/orderStorage';
 import { ActivityIndicator, FAB } from 'react-native-paper';
@@ -50,6 +50,12 @@ interface EditModalProps {
   mode: 'edit' | 'create';
 }
 
+enum PrintLocation {
+  KITCHEN = 'kitchen',
+  BAR = 'bar',
+  ALL = 'all',
+}
+
 type BoxProps = {
   item: BoxData;
   categoriesLength: number;
@@ -76,19 +82,26 @@ const EditModal: React.FC<EditModalProps> = ({
 }) => {
   const [title, setTitle] = useState(category?.title || '');
   const [color, setColor] = useState(category?.color || colors.darkGrey);
+  const [printLocation, setPrintLocation] = useState<PrintLocation>(
+    category?.printLocation || PrintLocation.ALL
+  );
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const strings = useStrings();
 
+  const handlePrintLocationChange = (value: string) => {
+    setPrintLocation(value as PrintLocation);
+  };
+
   useEffect(() => {
     if (visible) {
-      // When modal opens, set initial values
       setTitle(category?.title || '');
       setColor(category?.color || getRandomColor());
+      setPrintLocation(category?.printLocation || PrintLocation.ALL);
     } else {
-      // When modal closes, reset to default values
       setTitle('');
       setColor(colors.darkGrey);
+      setPrintLocation(PrintLocation.ALL);
       setShowColorPicker(false);
     }
   }, [visible, category]);
@@ -103,6 +116,7 @@ const EditModal: React.FC<EditModalProps> = ({
       const newCategory: Category = {
         title: title.trim(),
         color,
+        printLocation,
         isEnabled: true,
         orderCategory: 1,
       };
@@ -112,6 +126,7 @@ const EditModal: React.FC<EditModalProps> = ({
         ...category,
         title: title.trim(),
         color,
+        printLocation,
       });
     }
     onDismiss();
@@ -142,6 +157,12 @@ const EditModal: React.FC<EditModalProps> = ({
       );
     }
   };
+
+  const printLocationOptions = [
+    { value: PrintLocation.ALL, label: 'All' },
+    { value: PrintLocation.KITCHEN, label: 'Kitchen' },
+    { value: PrintLocation.BAR, label: 'Bar' },
+  ];
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
@@ -180,6 +201,20 @@ const EditModal: React.FC<EditModalProps> = ({
               />
             </View>
           )}
+
+          {/* Print Location Selector using SegmentedButtons */}
+          <Text style={styles.sectionLabel}>Print Location</Text>
+          <SegmentedButtons
+            value={printLocation}
+            onValueChange={handlePrintLocationChange}
+            buttons={printLocationOptions.map((option) => ({
+              value: option.value,
+              label: option.label,
+              style: styles.segmentButton,
+            }))}
+            style={styles.segmentedButtons}
+          />
+
           <View style={styles.buttonUpdateContainer}>
             {mode === 'edit' && onDelete && (
               <Button
@@ -626,6 +661,17 @@ const styles = StyleSheet.create({
   emptyText: {
     color: colors.white,
     textAlign: 'center',
+  },
+  sectionLabel: {
+    fontSize: 16,
+    color: colors.grey,
+    marginBottom: 8,
+  },
+  segmentedButtons: {
+    marginBottom: 20,
+  },
+  segmentButton: {
+    flex: 1,
   },
 });
 

@@ -223,8 +223,8 @@
   "NO_ORDERS_FOUND": "No orders found.",
   "ACTIVE": "Active",
   "CLOSED": "Closed",
-  "OPENED_AT": "Opened:",
-  "CLOSED_AT": "Closed:",
+  "OPENED_AT": "Opened",
+  "CLOSED_AT": "Closed",
   "MONTH_ABBR": "mo",
   "DAY_ABBR": "d",
   "HOUR_ABBR": "h",
@@ -249,5 +249,10 @@
   "CURRENCY_SYMBOL": "Currency Symbol",
   "ADDED_ITEM": "Adden Item",
   "ENTER_QUANTITY": "Enter Quantity",
-  "SEARCH": "Search"
+  "SEARCH": "Search",
+  "ORDER_ID": "ID",
+  "TABLE": "Table",
+  "GUESTS": "Guests",
+  "TOTAL": "Total",
+  "STATUS": "Status"
 }

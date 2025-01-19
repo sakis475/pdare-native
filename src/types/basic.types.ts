@@ -26,6 +26,7 @@ interface Category {
   title: string;
   orderCategory?: number;
   isEnabled?: boolean;
+  printLocation?: PrintLocation;
   color?: string;
 }
 
@@ -162,4 +163,9 @@ enum InvitationRequestStatus {
   ACCEPTED = 'accepted',
   CANCELLED = 'cancelled',
   AWAITING = 'awaiting',
+}
+enum PrintLocation {
+  KITCHEN = 'kitchen',
+  BAR = 'bar',
+  ALL = 'all',
 }
