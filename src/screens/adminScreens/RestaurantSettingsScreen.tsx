@@ -65,6 +65,13 @@ const RestaurantSettingsScreen = ({ route }: any) => {
         screen: ScreenNames.AdminPersonelScreen,
         allowedRoles: ['owner'],
       },
+      {
+        id: '6',
+        title: strings.PRINTERS,
+        icon: 'printer',
+        screen: ScreenNames.ManagePrintersScreen,
+        allowedRoles: ['owner'],
+      },
     ],
     [strings]
   );

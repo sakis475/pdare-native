@@ -11,6 +11,7 @@ import {
   TABLES_UPDATED,
   USERS_UPDATED,
   HEALTH_CHECK_RECEIVE,
+  PRINTERS_DISCOVERED_UPDATE,
 } from './EventEmitter';
 import { EventId, socketManager } from './SocketManager';
 
@@ -27,6 +28,7 @@ class SocketEventSubscriber {
     socketManager.on(EventId.usersUpdated, SocketEventSubscriber.handleUsersUpdated);
     socketManager.on(EventId.tableOrdersUpdated, SocketEventSubscriber.handleTableOrdersUpdates);
     socketManager.on(EventId.healthCheck, SocketEventSubscriber.healthCheck);
+    socketManager.on(EventId.printersDiscovered, SocketEventSubscriber.printersDiscovered);
   }
 
   static async handleTableOrdersUpdates(tables: TableIO[]): Promise<void> {
@@ -75,6 +77,10 @@ class SocketEventSubscriber {
 
   static async healthCheck(): Promise<void> {
     EventEmitter.emit(HEALTH_CHECK_RECEIVE, []);
+  }
+
+  static async printersDiscovered(printers: Printer[]): Promise<void> {
+    EventEmitter.emit(PRINTERS_DISCOVERED_UPDATE, printers);
   }
 }
 

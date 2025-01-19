@@ -79,6 +79,7 @@ export const TABLES_UPDATED = 'TABLES_UPDATED';
 export const USERS_UPDATED = 'USERS_UPDATED';
 export const HEALTH_CHECK_RECEIVE = 'HEALTH_CHECK_RECEIVE';
 export const TEMP_ORDER_UPDATED = 'TEMP_ORDER_UPDATED';
+export const PRINTERS_DISCOVERED_UPDATE = 'PRINTERS_DISCOVERED_UPDATE';
 
 // Type for event names (optional but recommended for type safety)
 export type EventType =

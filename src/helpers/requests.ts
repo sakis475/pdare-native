@@ -33,6 +33,7 @@ export async function refreshToken() {
       return;
     }
   } catch (error) {
+    console.log(error, 'refreshToken');
     if (error instanceof AxiosError) {
       if (error.response?.data.appcode === 'AU02') {
         toast('error', 'Your session is expired');
@@ -72,6 +73,7 @@ export async function setBearer(sessionBearer: SessionBearer) {
       socketEventSubscriber.initialize();
       await storageInitData();
     } catch (error) {
+      console.log(error, 'setBearer');
       toast('error', 'Something bad happened...');
     }
   }

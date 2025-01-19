@@ -15,6 +15,7 @@ export enum ScreenNames {
   ManageItemDetailsScreen = 'manageItemsDetailsScreen',
   ManageItemDetailsPatternScreen = 'manageItemDetailsPatternScreen',
   ManageItemDetailsPatternEditScreen = 'manageItemDetailsPatternEditScreen',
+  ManagePrintersScreen = 'managePrintersScreen',
   LoginScreen = 'loginScreen',
   StartLoadingScreen = 'startLoadingScreen',
   RegisterScreen = 'registerScreen',

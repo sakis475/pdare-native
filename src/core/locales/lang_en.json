@@ -254,5 +254,6 @@
   "TABLE": "Table",
   "GUESTS": "Guests",
   "TOTAL": "Total",
-  "STATUS": "Status"
+  "STATUS": "Status",
+  "PRINTERS": "Printers"
 }

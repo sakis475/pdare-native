@@ -169,3 +169,19 @@ enum PrintLocation {
   BAR = 'bar',
   ALL = 'all',
 }
+
+interface Printer {
+  id?: number;
+  printerNickname: string;
+  printerMac: string;
+  printerIp: string;
+  printerPort: string;
+  overrideIP?: string;
+  overridePort?: string;
+  characterSet: string;
+  printLocation?: PrintLocation;
+  active?: boolean;
+  restaurant?: Restaurant;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

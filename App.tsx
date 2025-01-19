@@ -28,9 +28,11 @@ const App = () => {
 
   useEffect(() => {
     const initializeApp = async () => {
+      console.log('App.tsx initializeApp');
       await setLocalizedStrings();
       setLocalizedStringsLoaded(true);
       if (ENV_TYPE === 'DEV') {
+        //
         // require('./src/helpers/Reactotron.js');
         console.log(await getStorage('session_bearer'), 'session_bearer');
       }

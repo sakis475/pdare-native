@@ -32,6 +32,7 @@ import { navigateBack, ScreenNames } from './navigationUtils';
 import AdminPersonelScreen from '../screens/adminScreens/AdminPersonelScreen';
 import NewUserSetupScreen from '../screens/authenticationScreens/NewUserSetupScreen';
 import { useStrings } from '../core/localization/languageContext';
+import AdminPrintersScreen from '../screens/adminScreens/AdminPrintersScreen';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -362,6 +363,27 @@ const AppNavigator = () => {
           headerBackVisible: false,
         })}
       />
+
+      <Stack.Screen
+        name={ScreenNames.ManagePrintersScreen}
+        component={AdminPrintersScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={strings.PRINTERS}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'none',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+
       <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
         component={ItemDetailsScreen}
