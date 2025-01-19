@@ -4,6 +4,7 @@ import { getBearer, getRequest } from '../requests';
 import { EventEmitter, HEALTH_CHECK_RECEIVE } from './EventEmitter';
 import { EmitterSubscription } from 'react-native';
 import { SessionBearer } from '../../types/requests.types';
+import { BASE_DOMAIN } from '../../storage/env';
 
 type EventCallback = (data: any) => void;
 
@@ -16,11 +17,12 @@ class SocketManager {
   private socket: Socket | null = null;
   private user: User | null = null;
   private sessionBearer: SessionBearer | null = null;
+
+  //Prevent Duplicate Listeners
   private eventListeners: Map<EventId, Set<EventListener>> = new Map();
+
   private static instance: SocketManager | null = null;
   private currentRoom: string | null = null;
-  private lastConnectedUrl: string | null = null;
-  private lastConnectedOptions: any = null;
   private reconnectionTimer: NodeJS.Timeout | null = null;
   private periodicReconnectTimer: NodeJS.Timeout | null = null;
   private periodicReconnectInterval: number = 1 * 25 * 1000;
@@ -175,19 +177,19 @@ class SocketManager {
       }
 
       try {
-        if (!this.lastConnectedUrl) return;
-
         const backoffDelay = Math.min(
           this.reconnectionDelay * Math.pow(2, this.reconnectionAttempts),
           16000
         );
 
         await new Promise((resolve) => setTimeout(resolve, backoffDelay));
-        const socket = io(this.lastConnectedUrl, {
-          ...this.lastConnectedOptions,
+        const socket = io(BASE_DOMAIN, {
           forceNew: true,
           timeout: 5000,
-          reconnection: false,
+          reconnection: true,
+          reconnectionDelay: this.reconnectionDelay,
+          reconnectionDelayMax: 5000,
+          reconnectionAttempts: this.maxReconnectionAttempts,
           auth: {
             token: this.sessionBearer.token,
           },
@@ -227,19 +229,16 @@ class SocketManager {
     setTimeout(() => {
       if (this.user) {
         console.log('Reinitializing socket connection...');
-        this.connect(this.lastConnectedUrl || '', this.lastConnectedOptions);
+        this.connect();
       }
     }, 5000); // Wait 5 seconds before attempting reinitialization
   }
 
-  public connect(url: string, options?: any): void {
+  public connect(): void {
     if (!this.user) {
       console.warn('Cannot connect: No user authenticated');
       return;
     }
-
-    this.lastConnectedUrl = url;
-    this.lastConnectedOptions = options;
 
     // Don't attempt connection if we're in the middle of reconnecting
     if (this.isReconnecting) {
@@ -265,14 +264,13 @@ class SocketManager {
     this.isReconnecting = false;
 
     // Create new socket with initial configuration
-    this.socket = io(url, {
-      ...options,
+    this.socket = io(BASE_DOMAIN, {
+      forceNew: true,
+      timeout: 5000,
       reconnection: true,
       reconnectionDelay: this.reconnectionDelay,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: this.maxReconnectionAttempts,
-      timeout: 60000,
-      forceNew: true,
       auth: {
         token: this.sessionBearer.token,
       },

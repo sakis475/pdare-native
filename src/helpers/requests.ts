@@ -68,7 +68,7 @@ export async function setBearer(sessionBearer: SessionBearer) {
       await setStorage('session_bearer', sessionBearer);
       await setStorage('currentUser', sessionBearer.user);
       await socketManager.updateUserInstance();
-      socketManager.connect(BASE_DOMAIN, {});
+      socketManager.connect();
       socketEventSubscriber.initialize();
       await storageInitData();
     } catch (error) {

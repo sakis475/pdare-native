@@ -37,7 +37,7 @@ const App = () => {
 
       await socketManager.updateUserInstance();
 
-      socketManager.connect(BASE_DOMAIN);
+      socketManager.connect();
       socketEventSubscriber.initialize();
 
       const user = await getStorage('currentUser');
