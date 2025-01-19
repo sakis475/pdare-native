@@ -1,14 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Modal, FlatList } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Modal,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, Switch, SegmentedButtons, Portal, Dialog } from 'react-native-paper';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { getRequest, patchRequest, postRequest } from '../../helpers/requests';
 import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, PRINTERS_DISCOVERED_UPDATE } from '../../helpers/Sockets/EventEmitter';
+import DropDownPicker from 'react-native-dropdown-picker';
+
+enum CharacterSet {
+  PC437_USA = 'PC437_USA',
+  PC850_MULTILINGUAL = 'PC850_MULTILINGUAL',
+  PC860_PORTUGUESE = 'PC860_PORTUGUESE',
+  PC863_CANADIAN_FRENCH = 'PC863_CANADIAN_FRENCH',
+  PC865_NORDIC = 'PC865_NORDIC',
+  PC851_GREEK = 'PC851_GREEK',
+  PC857_TURKISH = 'PC857_TURKISH',
+  PC737_GREEK = 'PC737_GREEK',
+  ISO8859_7_GREEK = 'ISO8859_7_GREEK',
+  WPC1252 = 'WPC1252',
+  PC866_CYRILLIC2 = 'PC866_CYRILLIC2',
+  PC852_LATIN2 = 'PC852_LATIN2',
+  SLOVENIA = 'SLOVENIA',
+  PC858_EURO = 'PC858_EURO',
+  WPC775_BALTIC_RIM = 'WPC775_BALTIC_RIM',
+  PC855_CYRILLIC = 'PC855_CYRILLIC',
+  PC861_ICELANDIC = 'PC861_ICELANDIC',
+  PC862_HEBREW = 'PC862_HEBREW',
+  PC864_ARABIC = 'PC864_ARABIC',
+  PC869_GREEK = 'PC869_GREEK',
+  ISO8859_2_LATIN2 = 'ISO8859_2_LATIN2',
+  ISO8859_15_LATIN9 = 'ISO8859_15_LATIN9',
+  PC1125_UKRANIAN = 'PC1125_UKRANIAN',
+  WPC1250_LATIN2 = 'WPC1250_LATIN2',
+  WPC1251_CYRILLIC = 'WPC1251_CYRILLIC',
+  WPC1253_GREEK = 'WPC1253_GREEK',
+  WPC1254_TURKISH = 'WPC1254_TURKISH',
+  WPC1255_HEBREW = 'WPC1255_HEBREW',
+  WPC1256_ARABIC = 'WPC1256_ARABIC',
+  WPC1257_BALTIC_RIM = 'WPC1257_BALTIC_RIM',
+  WPC1258_VIETNAMESE = 'WPC1258_VIETNAMESE',
+  KZ1048_KAZAKHSTAN = 'KZ1048_KAZAKHSTAN',
+  JAPAN = 'JAPAN',
+  KOREA = 'KOREA',
+  CHINA = 'CHINA',
+  HK_TW = 'HK_TW',
+  TCVN_VIETNAMESE = 'TCVN_VIETNAMESE',
+}
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -25,31 +74,14 @@ interface EditModalProps {
   mode: 'edit' | 'create';
 }
 
-const EditModal: React.FC<EditModalProps> = ({
-  visible,
-  printer,
-  onDismiss,
-  onSave,
-  onDelete,
-  mode,
-}) => {
+const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSave, mode }) => {
   const [nickname, setNickname] = useState(printer?.printerNickname || '');
   const [overrideIP, setOverrideIP] = useState(printer?.overrideIP || '');
   const [overridePort, setOverridePort] = useState(printer?.overridePort || '');
   const [characterSet, setCharacterSet] = useState(printer?.characterSet || '');
   const [printLocation, setPrintLocation] = useState(printer?.printLocation || PrintLocation.ALL);
-
-  const strings = useStrings();
-
-  useEffect(() => {
-    if (printer) {
-      setNickname(printer.printerNickname);
-      setOverrideIP(printer.overrideIP || '');
-      setOverridePort(printer.overridePort || '');
-      setCharacterSet(printer.characterSet || '');
-      setPrintLocation(printer.printLocation || PrintLocation.ALL);
-    }
-  }, [printer]);
+  const [active, setActive] = useState(printer?.active ?? true);
+  const [charSetPickerVisible, setCharSetPickerVisible] = useState(false);
 
   const handleSave = () => {
     if (!nickname.trim()) {
@@ -66,6 +98,47 @@ const EditModal: React.FC<EditModalProps> = ({
       printLocation,
     });
     onDismiss();
+  };
+
+  // CharSet Picker Modal Component
+  const CharSetPicker = () => (
+    <Portal>
+      <Dialog visible={charSetPickerVisible} onDismiss={() => setCharSetPickerVisible(false)}>
+        <Dialog.Title>Select Character Set</Dialog.Title>
+        <Dialog.Content>
+          <FlatList
+            data={Object.entries(CharacterSet)}
+            keyExtractor={([key]) => key}
+            style={styles.pickerList}
+            renderItem={({ item: [key, value] }) => (
+              <TouchableOpacity
+                style={[styles.pickerItem, characterSet === value && styles.pickerItemSelected]}
+                onPress={() => {
+                  setCharacterSet(value);
+                  setCharSetPickerVisible(false);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.pickerItemText,
+                    characterSet === value && styles.pickerItemTextSelected,
+                  ]}
+                >
+                  {key.replace(/_/g, ' ')}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={() => setCharSetPickerVisible(false)}>Cancel</Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  );
+
+  const handlePrintLocationChange = (value: string) => {
+    setPrintLocation(value as PrintLocation);
   };
 
   return (
@@ -98,13 +171,32 @@ const EditModal: React.FC<EditModalProps> = ({
             mode="outlined"
           />
 
-          <TextInput
-            label="Character Set"
-            value={characterSet}
-            onChangeText={setCharacterSet}
-            style={styles.input}
-            mode="outlined"
+          <Text style={styles.inputLabel}>Print Location</Text>
+          <SegmentedButtons
+            value={printLocation}
+            onValueChange={handlePrintLocationChange}
+            buttons={[
+              { value: PrintLocation.ALL, label: 'All' },
+              { value: PrintLocation.KITCHEN, label: 'Kitchen' },
+              { value: PrintLocation.BAR, label: 'Bar' },
+            ]}
+            style={styles.segmentedButtons}
           />
+
+          <Text style={styles.inputLabel}>Character Set</Text>
+          <TouchableOpacity
+            style={styles.charsetButton}
+            onPress={() => setCharSetPickerVisible(true)}
+          >
+            <Text style={styles.charsetButtonText}>
+              {characterSet ? characterSet.replace(/_/g, ' ') : 'Select Character Set'}
+            </Text>
+          </TouchableOpacity>
+
+          <View style={styles.switchContainer}>
+            <Text style={styles.switchLabel}>Active</Text>
+            <Switch value={active} onValueChange={setActive} />
+          </View>
 
           <View style={styles.buttonContainer}>
             <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
@@ -115,6 +207,8 @@ const EditModal: React.FC<EditModalProps> = ({
             </Button>
           </View>
         </View>
+
+        <CharSetPicker />
       </View>
     </Modal>
   );
@@ -337,6 +431,57 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flex: 2,
+  },
+  inputLabel: {
+    color: colors.grey,
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  segmentedButtons: {
+    marginBottom: 20,
+  },
+  charsetButton: {
+    borderWidth: 1,
+    borderColor: colors.grey,
+    borderRadius: 4,
+    padding: 12,
+    marginBottom: 20,
+  },
+  charsetButtonText: {
+    color: colors.grey,
+  },
+  pickerModal: {
+    backgroundColor: 'white',
+    margin: 20,
+    borderRadius: 10,
+    maxHeight: '80%',
+  },
+  pickerItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.lightGrey,
+  },
+  pickerItemSelected: {
+    backgroundColor: colors.primary + '20',
+  },
+  pickerItemText: {
+    color: colors.grey,
+  },
+  pickerItemTextSelected: {
+    color: colors.primary,
+    fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  switchLabel: {
+    color: colors.grey,
+  },
+  pickerList: {
+    maxHeight: 300,
   },
 });
 
