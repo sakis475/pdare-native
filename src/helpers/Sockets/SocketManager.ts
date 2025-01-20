@@ -87,7 +87,7 @@ class SocketManager {
   }
 
   private isValidUser(user: any): user is User {
-    return user && user.restaurant && typeof user.restaurant.id === 'number';
+    return user && user?.restaurant && typeof user?.restaurant?.id === 'number';
   }
   private handleNoUser(): void {
     console.warn('No valid user found. Socket functionality is disabled.');
@@ -324,7 +324,7 @@ class SocketManager {
       reconnectionDelayMax: 5000,
       reconnectionAttempts: this.maxReconnectionAttempts,
       auth: {
-        token: this.sessionBearer.token,
+        token: this.sessionBearer?.token,
       },
     });
 

@@ -111,7 +111,7 @@ export async function postRequest(url: string, body?: any, timeout = REQ_TIMEOUT
       const auth = await getBearer();
       if (auth) {
         options.headers = {
-          Authorization: `Bearer ${auth.token}`,
+          Authorization: `Bearer ${auth?.token}`,
         };
       }
     }
@@ -134,7 +134,7 @@ export async function patchRequest(url: string, body?: any) {
       if (auth) {
         options = {
           headers: {
-            Authorization: `Bearer ${auth.token}`,
+            Authorization: `Bearer ${auth?.token}`,
           },
           timeout: REQ_TIMEOUT,
         };
