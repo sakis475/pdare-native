@@ -2,11 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Image, Text, Animated } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { colors } from '../core/theme';
-import { refreshToken } from '../helpers/requests';
+import { getBearer } from '../helpers/requests';
 import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUtils';
 import { handleNoRestaurantUser, logout } from '../helpers/storage/tokenRequests';
 import { getStorage } from '../storage/store';
-import dayjs from '../core/dayjs';
 import { useStrings } from '../core/localization/languageContext';
 
 const logoImage = require('../../assets/mywaitericon.png');
@@ -42,9 +41,9 @@ const StartLoadingScreen: React.FC = () => {
   }, [fadeAnim]);
 
   const handleRedirect = async () => {
-    // Create a timeout promise that rejects after 20 seconds
+    // Create a timeout promise that rejects after 10 seconds
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Redirect timeout')), 5000);
+      setTimeout(() => reject(new Error('Redirect timeout')), 10000);
     });
 
     try {
@@ -54,7 +53,7 @@ const StartLoadingScreen: React.FC = () => {
           const currentUser = await getStorage('currentUser');
           const sessionBearer = await getStorage('session_bearer');
           if (currentUser?.restaurant?.id) {
-            const newToken = await refreshToken();
+            const newToken = await getBearer();
             if (newToken?.user?.restaurant) {
               navigateReset(ScreenNames.MainTabs);
               navigate(ScreenNames.MainTabs);
