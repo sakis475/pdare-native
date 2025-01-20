@@ -255,5 +255,6 @@
   "GUESTS": "Guests",
   "TOTAL": "Total",
   "STATUS": "Status",
-  "PRINTERS": "Printers"
+  "PRINTERS": "Printers",
+  "NO_PRINTERS": "No Printers Found"
 }

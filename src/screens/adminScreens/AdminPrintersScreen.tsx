@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -17,7 +17,6 @@ import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { getRequest, patchRequest, postRequest } from '../../helpers/requests';
 import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, PRINTERS_DISCOVERED_UPDATE } from '../../helpers/Sockets/EventEmitter';
-import DropDownPicker from 'react-native-dropdown-picker';
 
 enum CharacterSet {
   PC437_USA = 'PC437_USA',
@@ -75,7 +74,6 @@ interface EditModalProps {
 }
 
 const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSave, mode }) => {
-  console.log(printer?.printerNickname, 'printer');
   const [nickname, setNickname] = useState('');
   const [overrideIP, setOverrideIP] = useState('');
   const [overridePort, setOverridePort] = useState('');
@@ -231,6 +229,10 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
               <Switch value={active} onValueChange={setActive} />
             </View>
 
+            <Text style={styles.switchContainer}>
+              Current IP: {printer?.printerIp}:{printer?.printerPort}
+            </Text>
+
             <View style={styles.buttonContainer}>
               <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
                 Cancel
@@ -280,26 +282,73 @@ const AdminPrintersScreen = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPrinters();
-
-    const subscription = EventEmitter.addListener(
-      PRINTERS_DISCOVERED_UPDATE,
-      (printers: Printer[]) => setPrinters(printers ?? [])
+  const handlePrinterDiscovered = (freshPrinters: Printer[]) => {
+    const printersDiff = freshPrinters?.filter(
+      (freshPrinter) => !printers?.some((printer) => freshPrinter.printerMac === printer.printerMac)
     );
 
+    if (!freshPrinters.length) {
+      toast('error', strings.NO_PRINTERS);
+    } else if (printersDiff?.length) {
+      toast('success', `Found new printers!`);
+    } else {
+      toast('success', strings.SUCCESS);
+    }
+
+    setIsScanning(false);
+    setPrinters(freshPrinters ?? []);
+  };
+
+  useEffect(() => {
+    fetchPrinters();
+    const subscription = EventEmitter.addListener(
+      PRINTERS_DISCOVERED_UPDATE,
+      handlePrinterDiscovered
+    );
     return () => subscription.remove();
   }, []);
 
   const handleScanPrinters = async () => {
     setIsScanning(true);
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Scan timeout')), 10000);
+    });
+
     try {
-      await postRequest('/printers/requestScan');
-      toast('success', strings.SUCCESS, 'Scanning for printers...');
-      await fetchPrinters();
+      // Wait for either the scan to complete or timeout
+      await Promise.race([
+        (async () => {
+          await postRequest('/printers/requestScan');
+          await fetchPrinters();
+
+          // Set a flag to wait a bit for potential printer discovery
+          await new Promise<void>((resolve) => {
+            const discoveryTimeout = setTimeout(() => {
+              setIsScanning(false);
+              toast('error', strings.NO_PRINTERS);
+              resolve();
+            }, 2000); // Give 2 seconds for printer discovery
+
+            // If printers are discovered, this listener will handle it
+            const discoverySubscription = EventEmitter.addListener(
+              PRINTERS_DISCOVERED_UPDATE,
+              () => {
+                clearTimeout(discoveryTimeout);
+                resolve();
+              }
+            );
+
+            // Cleanup
+            setTimeout(() => {
+              discoverySubscription.remove();
+            }, 2000);
+          });
+        })(),
+        timeoutPromise,
+      ]);
     } catch (error) {
-      toast('error', strings.ERROR, 'Failed to scan for printers');
-    } finally {
+      toast('error', strings.ERROR, 'Scan timeout');
       setIsScanning(false);
     }
   };
@@ -364,6 +413,7 @@ const AdminPrintersScreen = () => {
         style={styles.scanFab}
         onPress={handleScanPrinters}
         loading={isScanning}
+        disabled={isScanning}
         color={colors.darkGrey}
       />
 
