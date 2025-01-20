@@ -54,17 +54,22 @@ class SocketManager {
     return SocketManager.instance;
   }
 
-  private async loadCurrentUser(): Promise<void> {
+  private async reloadCurrentUser(): Promise<void> {
     try {
       const user = await getStorage('currentUser');
       const sessionBearer = await getBearer();
-
-      if (!sessionBearer) return;
-
+      this.user = user;
       this.sessionBearer = sessionBearer;
+    } catch (error) {
+      console.error('Error reloadCurrentUser:', error);
+    }
+  }
 
-      if (this.isValidUser(user)) {
-        this.user = user;
+  private async loadCurrentUser(): Promise<void> {
+    try {
+      await this.reloadCurrentUser();
+
+      if (this.isValidUser(this.user)) {
         console.log('Current user loaded:', this.user);
         // Join restaurant room if connected
         if (this.socket?.connected) {

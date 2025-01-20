@@ -75,13 +75,15 @@ interface EditModalProps {
 }
 
 const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSave, mode }) => {
-  const [nickname, setNickname] = useState(printer?.printerNickname || '');
-  const [overrideIP, setOverrideIP] = useState(printer?.overrideIP || '');
-  const [overridePort, setOverridePort] = useState(printer?.overridePort || '');
-  const [characterSet, setCharacterSet] = useState(printer?.characterSet || '');
-  const [printLocation, setPrintLocation] = useState(printer?.printLocation || PrintLocation.ALL);
-  const [active, setActive] = useState(printer?.active ?? true);
+  console.log(printer?.printerNickname, 'printer');
+  const [nickname, setNickname] = useState('');
+  const [overrideIP, setOverrideIP] = useState('');
+  const [overridePort, setOverridePort] = useState('');
+  const [characterSet, setCharacterSet] = useState<CharacterSet | null>(null);
+  const [printLocation, setPrintLocation] = useState<PrintLocation>(PrintLocation.ALL);
+  const [active, setActive] = useState<boolean>(!!printer?.active);
   const [charSetPickerVisible, setCharSetPickerVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   const handleSave = () => {
     if (!nickname.trim()) {
@@ -95,15 +97,49 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
       overrideIP: overrideIP.trim(),
       overridePort: overridePort.trim(),
       characterSet: characterSet.trim(),
+      active: active,
       printLocation,
     });
     onDismiss();
   };
 
+  useEffect(() => {
+    if (visible) {
+      // If we have a printer, use its values, otherwise use defaults
+      setNickname(printer?.printerNickname ?? '');
+      setOverrideIP(printer?.overrideIP ?? '');
+      setOverridePort(printer?.overridePort ?? '');
+      setCharacterSet((printer?.characterSet as CharacterSet) ?? ('' as any));
+      setPrintLocation(printer?.printLocation ?? PrintLocation.ALL);
+      setActive(printer?.active);
+    }
+  }, [printer, visible]);
+
+  // Update editModalVisible when parent visible prop changes
+  useEffect(() => {
+    setEditModalVisible(visible);
+  }, [visible]);
+
+  const handleCharSetPress = () => {
+    setEditModalVisible(false); // Hide edit modal
+    setCharSetPickerVisible(true);
+  };
+
+  const handleCharSetSelect = (value: CharacterSet) => {
+    setCharacterSet(value);
+    setCharSetPickerVisible(false);
+    setEditModalVisible(true); // Show edit modal again
+  };
+
+  const handleCharSetDismiss = () => {
+    setCharSetPickerVisible(false);
+    setEditModalVisible(true); // Show edit modal again
+  };
+
   // CharSet Picker Modal Component
   const CharSetPicker = () => (
     <Portal>
-      <Dialog visible={charSetPickerVisible} onDismiss={() => setCharSetPickerVisible(false)}>
+      <Dialog visible={charSetPickerVisible} onDismiss={handleCharSetDismiss}>
         <Dialog.Title>Select Character Set</Dialog.Title>
         <Dialog.Content>
           <FlatList
@@ -113,10 +149,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
             renderItem={({ item: [key, value] }) => (
               <TouchableOpacity
                 style={[styles.pickerItem, characterSet === value && styles.pickerItemSelected]}
-                onPress={() => {
-                  setCharacterSet(value);
-                  setCharSetPickerVisible(false);
-                }}
+                onPress={() => handleCharSetSelect(value)}
               >
                 <Text
                   style={[
@@ -131,7 +164,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
           />
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={() => setCharSetPickerVisible(false)}>Cancel</Button>
+          <Button onPress={handleCharSetDismiss}>Cancel</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>
@@ -142,82 +175,87 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{mode === 'edit' ? 'Edit Printer' : 'New Printer'}</Text>
-
-          <TextInput
-            label="Nickname"
-            value={nickname}
-            onChangeText={setNickname}
-            style={styles.input}
-            mode="outlined"
-          />
-
-          <TextInput
-            label="Override IP (optional)"
-            value={overrideIP}
-            onChangeText={setOverrideIP}
-            style={styles.input}
-            mode="outlined"
-          />
-
-          <TextInput
-            label="Override Port (optional)"
-            value={overridePort}
-            onChangeText={setOverridePort}
-            style={styles.input}
-            mode="outlined"
-          />
-
-          <Text style={styles.inputLabel}>Print Location</Text>
-          <SegmentedButtons
-            value={printLocation}
-            onValueChange={handlePrintLocationChange}
-            buttons={[
-              { value: PrintLocation.ALL, label: 'All' },
-              { value: PrintLocation.KITCHEN, label: 'Kitchen' },
-              { value: PrintLocation.BAR, label: 'Bar' },
-            ]}
-            style={styles.segmentedButtons}
-          />
-
-          <Text style={styles.inputLabel}>Character Set</Text>
-          <TouchableOpacity
-            style={styles.charsetButton}
-            onPress={() => setCharSetPickerVisible(true)}
-          >
-            <Text style={styles.charsetButtonText}>
-              {characterSet ? characterSet.replace(/_/g, ' ') : 'Select Character Set'}
+    <>
+      <Modal visible={editModalVisible} transparent animationType="fade" onRequestClose={onDismiss}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {mode === 'edit' ? 'Edit Printer' : 'New Printer'}
             </Text>
-          </TouchableOpacity>
 
-          <View style={styles.switchContainer}>
-            <Text style={styles.switchLabel}>Active</Text>
-            <Switch value={active} onValueChange={setActive} />
-          </View>
+            <TextInput
+              label="Nickname"
+              value={nickname}
+              onChangeText={setNickname}
+              style={styles.input}
+              mode="outlined"
+            />
 
-          <View style={styles.buttonContainer}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              Cancel
-            </Button>
-            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              Save
-            </Button>
+            <TextInput
+              label="Override IP (optional)"
+              value={overrideIP}
+              onChangeText={setOverrideIP}
+              style={styles.input}
+              mode="outlined"
+            />
+
+            <TextInput
+              label="Override Port (optional)"
+              value={overridePort}
+              onChangeText={setOverridePort}
+              style={styles.input}
+              mode="outlined"
+            />
+
+            <Text style={styles.inputLabel}>Print Items</Text>
+            <SegmentedButtons
+              value={printLocation}
+              onValueChange={handlePrintLocationChange}
+              buttons={[
+                { value: PrintLocation.ALL, label: 'All' },
+                { value: PrintLocation.KITCHEN, label: 'Kitchen' },
+                { value: PrintLocation.BAR, label: 'Bar' },
+              ]}
+              style={styles.segmentedButtons}
+            />
+
+            <Text style={styles.inputLabel}>Character Set</Text>
+            <TouchableOpacity style={styles.charsetButton} onPress={handleCharSetPress}>
+              <Text style={styles.charsetButtonText}>
+                {characterSet ? characterSet.replace(/_/g, ' ') : 'Select Character Set'}
+              </Text>
+            </TouchableOpacity>
+
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>Active</Text>
+              <Switch value={active} onValueChange={setActive} />
+            </View>
+
+            <View style={styles.buttonContainer}>
+              <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
+                Cancel
+              </Button>
+              <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
+                Save
+              </Button>
+            </View>
           </View>
         </View>
-
-        <CharSetPicker />
-      </View>
-    </Modal>
+      </Modal>
+      <CharSetPicker />
+    </>
   );
 };
 
 const PrinterItem = ({ printer, onEdit }: { printer: Printer; onEdit: any }) => (
-  <TouchableOpacity style={styles.printerItem} onPress={() => onEdit(printer)}>
+  <TouchableOpacity
+    style={[styles.printerItem, !printer.active && styles.disabledPrinter]}
+    onPress={() => onEdit(printer)}
+  >
     <View style={styles.printerInfo}>
-      <Text style={styles.printerName}>{printer.printerNickname}</Text>
+      <Text style={[styles.printerName, !printer.active && styles.disabledPrinterText]}>
+        {printer.printerNickname}
+      </Text>
       <Text style={styles.printerDetails}>Print Type: {printer.printLocation}</Text>
     </View>
     <FontAwesome6 name="pencil" size={16} color={colors.white} />
@@ -273,6 +311,8 @@ const AdminPrintersScreen = () => {
 
   const handleEditPrinter = async (updatedPrinter: Printer) => {
     setIsLoading(true);
+
+    console.log(updatedPrinter, 'updatedPrinter');
     try {
       const response = await patchRequest(`/printers`, {
         printer: updatedPrinter,
@@ -312,7 +352,7 @@ const AdminPrintersScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={printers.filter((printer) => printer.active !== false)}
+          data={printers}
           keyExtractor={(item) => `printer-${item.id}`}
           renderItem={({ item }) => <PrinterItem printer={item} onEdit={handleEditPress} />}
           contentContainerStyle={styles.listContent}
@@ -425,6 +465,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 10,
     marginTop: 10,
+  },
+  disabledPrinter: {
+    borderColor: colors.grey,
+    backgroundColor: colors.lightRed,
+    opacity: 0.7,
+  },
+  disabledPrinterText: {
+    textDecorationLine: 'line-through',
+    color: colors.lightGrey,
   },
   cancelButton: {
     flex: 1,

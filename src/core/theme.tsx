@@ -19,6 +19,7 @@ export const colors = {
   darkGrey: '#2B2B2B',
   slightlyDarkerGrey: '#262626',
   darkerGrey: '#252525',
+  veryDarkerGrey: '#121212',
 
   primary: '#5851ff',
   danger: '#f68775',

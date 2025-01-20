@@ -63,7 +63,7 @@ export async function getBearer() {
 }
 
 export async function setBearer(sessionBearer: SessionBearer) {
-  if (sessionBearer) {
+  if (sessionBearer?.token) {
     try {
       socketManager.disconnect();
       await setStorage('session_bearer', sessionBearer);
