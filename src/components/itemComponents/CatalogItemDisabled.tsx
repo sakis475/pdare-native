@@ -1,11 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View, TouchableOpacity } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
-import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/storage/orderStorage';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { colors } from '../../core/theme';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { catalogItemStyles } from './CatalogStyles';
+import { TrashIcon, ULeftArrowIcon } from '../basic/Icons';
 export function CatalogItemDisabled({
   item,
   onItemDelete,
@@ -77,7 +75,7 @@ export function CatalogItemDisabled({
             onItemDelete(item);
           }}
         >
-          <MaterialCommunityIcons name="trash-can-outline" size={22} color={colors.danger} />
+          <TrashIcon size={22} color={colors.danger}></TrashIcon>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
@@ -89,9 +87,9 @@ export function CatalogItemDisabled({
           activeOpacity={0.6}
         >
           {markAsDelete ? (
-            <MaterialCommunityIcons name="arrow-u-left-top" size={22} color={colors.white} />
+            <ULeftArrowIcon size={22}></ULeftArrowIcon>
           ) : (
-            <MaterialCommunityIcons name="trash-can-outline" size={22} color={colors.danger} />
+            <TrashIcon size={22} color={colors.danger}></TrashIcon>
           )}
         </TouchableOpacity>
       )}

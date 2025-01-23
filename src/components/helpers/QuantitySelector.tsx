@@ -11,9 +11,9 @@ import {
   Keyboard,
 } from 'react-native';
 import { colors } from '../../core/theme';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import _ from 'lodash';
 import { useStrings } from '../../core/localization/languageContext';
+import { TrashIcon } from '../basic/Icons';
 
 interface QuantitySelectorProps {
   quantity: number;
@@ -154,7 +154,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
       <View style={styles.container}>
         <TouchableOpacity style={styles.button} onPress={handleDecrement} activeOpacity={0.6}>
           {showDeleteBtn ? (
-            <Icon name="trash-can-outline" size={22} color={colors.danger} />
+            <TrashIcon size={22} color={colors.danger} />
           ) : (
             <Text style={styles.buttonText}>-</Text>
           )}

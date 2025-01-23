@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { TextInput, Button, Switch, SegmentedButtons, Portal, Dialog } from 'react-native-paper';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
@@ -21,6 +20,7 @@ import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, PRINTERS_DISCOVERED_UPDATE } from '../../helpers/Sockets/EventEmitter';
 import dayjs from '../../core/dayjs';
 import { CharacterSet } from '../../types/exportable.types';
+import { EditIcon } from '../../components/basic/Icons';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -251,7 +251,7 @@ const PrinterItem = ({ printer, onEdit }: { printer: Printer; onEdit: any }) => 
         {printer.lastDiscovered ? dayjs(printer.lastDiscovered).format('HH:mm DD/MM/YY') : '-'}
       </Text>
     </View>
-    <FontAwesome6 name="pencil" size={16} color={colors.white} />
+    <EditIcon size={16} color={colors.white} />
   </TouchableOpacity>
 );
 

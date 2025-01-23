@@ -3,9 +3,10 @@ import { View, Text, StyleSheet, ActivityIndicator, Keyboard } from 'react-nativ
 import { Button, Divider, Portal } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate } from '../../navigation/navigationUtils';
+import { ScreenNames, navigate, navigateToTables } from '../../navigation/navigationUtils';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import {
+  clearNewOrder,
   createNewOrder,
   getTempOrder,
   markActiveItemForDelete,
@@ -17,16 +18,14 @@ import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdd
 import TempBottomOptions from '../../components/helpers/TempBottomOptions';
 import { HeaderBar } from '../../components/helpers/HeaderBar';
 import { CatalogItemDisabled } from '../../components/itemComponents/CatalogItemDisabled';
-import { AlertWithOptions, toast } from '../../core/utils';
+import { toast } from '../../core/utils';
 import { useStrings } from '../../core/localization/languageContext';
 import { OrderInfoBar } from '../../components/helpers/OrderInfoBar';
 import { LinearGradientFadeOut } from '../../components/basic/LinearGradientFadeOut';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import MoreOptionsTempBottomSheet from '../../components/bottomSheets/MoreOptionsTempBottomSheet';
-import CouvertFAB from '../../components/popupModals/CouvertModal';
 import { patchRequest } from '../../helpers/requests';
-import { setStorage } from '../../storage/store';
 
 // Memoized Item renderer components
 const DisabledItem = memo(({ item, onDelete }: { item: ItemReq; onDelete: any }) => (
@@ -210,11 +209,24 @@ const TempOrderScreen = ({
       }
     } else {
       await setTempOrder(updatedOrder);
+    }
 
-      setOrderState((prev) => ({
-        ...prev,
-        order: updatedOrder,
-      }));
+    setOrderState((prev) => ({
+      ...prev,
+      order: updatedOrder,
+    }));
+  };
+
+  const handleCloseOrder = async () => {
+    const orderId = orderState.order.id;
+
+    const result = await patchRequest(`/orders/close/${orderId}`);
+    if (result?.success === true) {
+      if (orderId === (await getTempOrder())?.id) {
+        await clearNewOrder();
+      }
+      toast('success', strings.DELETED, '', 1000);
+      navigateToTables();
     }
   };
 
@@ -299,8 +311,10 @@ const TempOrderScreen = ({
           <Portal>
             <MoreOptionsTempBottomSheet
               ref={moreOptionsBottomSheetRef}
+              order={orderState.order}
               onChangeTable={handleOpenSelectTableModal}
               onChangeCouvert={handleChangeCouvert}
+              onCloseOrder={handleCloseOrder}
             ></MoreOptionsTempBottomSheet>
           </Portal>
         </>

@@ -11,7 +11,6 @@ import {
   Animated,
 } from 'react-native';
 import { colors } from '../../core/theme';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { FAB } from 'react-native-paper';
@@ -23,6 +22,16 @@ import {
   setItemPropertyPatterns,
 } from '../../helpers/storage/orderStorage';
 import { strings } from '../../core/localization/strings';
+import {
+  CheckBoxChecked,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EditIcon,
+  RadioButtonChecked,
+  RestoreIcon,
+  TickBoxIcon,
+  TrashIcon,
+} from '../../components/basic/Icons';
 
 const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
   const [propertyGroups, setPropertyGroups] = useState<[string, ItemProperty[]][]>([]);
@@ -309,7 +318,7 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
           {editingPropertyName === propertyName ? (
             <View style={styles.itemContainer}>
               <TouchableOpacity onPress={handlePropertyNameEdit} style={styles.editButton}>
-                <MaterialIcons name="check" size={20} color="#fff" />
+                <TickBoxIcon size={20}></TickBoxIcon>
               </TouchableOpacity>
               <TextInput
                 style={[styles.input, styles.editingInput]}
@@ -327,18 +336,18 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
                   style={styles.editButton}
                   disabled={isDeleted}
                 >
-                  <MaterialIcons name="edit" size={20} color="#fff" />
+                  <EditIcon size={20} color="#fff"></EditIcon>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => handleDeletePropertyGroup(propertyName)}
                   style={[styles.deleteButton, { marginLeft: 0 }]}
                 >
-                  <MaterialIcons
-                    name={isDeleted ? 'restore' : 'delete'}
-                    size={20}
-                    color={isDeleted ? colors.green : colors.lightRed}
-                  />
+                  {isDeleted ? (
+                    <RestoreIcon size={20} color={colors.green}></RestoreIcon>
+                  ) : (
+                    <TrashIcon size={20} color={colors.lightRed}></TrashIcon>
+                  )}
                 </TouchableOpacity>
 
                 <Text style={[styles.header, isDeleted && styles.deletedText]}>{propertyName}</Text>
@@ -355,22 +364,19 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
               style={styles.propertyTypeButton}
               disabled={isDeleted}
             >
-              <MaterialIcons
-                name={
-                  properties?.[0]?.propertyType === 'singleselect'
-                    ? 'radio-button-checked'
-                    : 'check-box'
-                }
-                size={20}
-                color="#fff"
-              />
+              {' '}
+              {properties?.[0]?.propertyType === 'singleselect' ? (
+                <RadioButtonChecked />
+              ) : (
+                <CheckBoxChecked />
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => movePropertyGroup(index, 'up')}
               disabled={index === 0 || isDeleted}
               style={[styles.reorderButton, (index === 0 || isDeleted) && styles.disabledButton]}
             >
-              <MaterialIcons name="arrow-upward" size={20} color="#fff" />
+              <ChevronUpIcon size={20}></ChevronUpIcon>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => movePropertyGroup(index, 'down')}
@@ -380,7 +386,7 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
                 (index === propertyGroups.length - 1 || isDeleted) && styles.disabledButton,
               ]}
             >
-              <MaterialIcons name="arrow-downward" size={20} color="#fff" />
+              <ChevronDownIcon size={20}></ChevronDownIcon>
             </TouchableOpacity>
           </View>
         </View>

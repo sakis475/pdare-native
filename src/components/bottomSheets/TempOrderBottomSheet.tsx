@@ -12,9 +12,9 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { Portal } from '@gorhom/portal';
 import TempOrderScreen from '../../screens/orderScreens/tempOrderScreen';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
+import { DoubleDownIcon } from '../basic/Icons';
 
 const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -86,8 +86,7 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
               onPress={handleCloseModal}
             >
               <Text style={{ textAlign: 'center', color: colors.white }}>
-                {strings.CLOSE}{' '}
-                <FontAwesomeIcon name={'angle-double-down'} size={20} color="#fff" />
+                {strings.CLOSE} <DoubleDownIcon />
               </Text>
             </TouchableOpacity>
           </View>

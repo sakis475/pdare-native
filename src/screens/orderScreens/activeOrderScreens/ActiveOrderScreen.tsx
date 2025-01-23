@@ -8,6 +8,7 @@ import { colors } from '../../../core/theme';
 import { FlashList } from '@shopify/flash-list';
 import TableSelectBottomSheet from '../../../components/bottomSheets/TableSelectBottomSheet';
 import {
+  clearNewOrder,
   getTempOrder,
   markActiveItemForDelete,
   setTableTempOrder,
@@ -20,7 +21,12 @@ import { CatalogItemDisabled } from '../../../components/itemComponents/CatalogI
 import { AlertWithOptions, toast } from '../../../core/utils';
 import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../../../components/basic/CustomNavigationScreenHeaderTitle';
-import { navigate, navigateToDraft, ScreenNames } from '../../../navigation/navigationUtils';
+import {
+  navigate,
+  navigateToDraft,
+  navigateToTables,
+  ScreenNames,
+} from '../../../navigation/navigationUtils';
 import { useStrings } from '../../../core/localization/languageContext';
 import { OrderInfoBar } from '../../../components/helpers/OrderInfoBar';
 import { CatalogItemViewOnly } from '../../../components/itemComponents/CatalogItemViewOnly';
@@ -54,7 +60,6 @@ const ActiveOrderScreen = ({
     const tempOrder: Order = await getTempOrder();
 
     if (table?.occupiedByOrder?.id) {
-      //update existing order table
       const updatedOrder: Order = await updateTableOfOrder(table.occupiedByOrder, newTable);
 
       if (!updatedOrder?.id) {
@@ -73,6 +78,19 @@ const ActiveOrderScreen = ({
 
     if (table?.occupiedByOrder?.id === tempOrder?.id) {
       setTableTempOrder(newTable);
+    }
+  };
+
+  const handleCloseOrder = async () => {
+    const orderId = order.id;
+
+    const result = await patchRequest(`/orders/close/${orderId}`);
+    if (result?.success === true) {
+      if (orderId === (await getTempOrder())?.id) {
+        await clearNewOrder();
+      }
+      toast('success', strings.DELETED, '', 1000);
+      navigateToTables();
     }
   };
 
@@ -293,8 +311,10 @@ const ActiveOrderScreen = ({
             <Portal>
               <MoreOptionsTempBottomSheet
                 ref={moreOptionsBottomSheetRef}
+                order={order}
                 onChangeTable={handleOpenSelectTableModal}
                 onChangeCouvert={handleChangeCouvert}
+                onCloseOrder={handleCloseOrder}
               ></MoreOptionsTempBottomSheet>
             </Portal>
           </View>

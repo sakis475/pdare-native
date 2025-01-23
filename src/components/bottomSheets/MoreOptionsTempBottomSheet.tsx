@@ -9,27 +9,33 @@ import React, {
 import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Portal } from '@gorhom/portal';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '../../core/theme';
-import { List, Switch, SegmentedButtons } from 'react-native-paper';
+import { List, SegmentedButtons } from 'react-native-paper';
 import { CategoryHeader } from '../helpers/CategoryHeader';
 import { useStrings } from '../../core/localization/languageContext';
 import CouvertModal from '../popupModals/CouvertModal';
+import { AlertWithOptions, toast } from '../../core/utils';
+import { patchRequest } from '../../helpers/requests';
+import { navigateToTables } from '../../navigation/navigationUtils';
+import dayjs from '../../core/dayjs';
+import { DoubleDownIcon } from '../basic/Icons';
 
 interface MoreOptionsTempBottomSheet {
   onChangeTable?: () => void;
   onChangeCouvert?: (quantity: number) => void;
   onPrint?: (destination: 'all' | 'bar' | 'kitchen') => void;
   onCustomerAnalysis?: () => void;
+  onCloseOrder?: () => void;
+  order: Order;
 }
 
 const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
-  ({ onChangeTable, onChangeCouvert, onPrint, onCustomerAnalysis }, ref) => {
+  ({ onChangeTable, onChangeCouvert, onPrint, onCustomerAnalysis, onCloseOrder, order }, ref) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [isPrintEnabled, setIsPrintEnabled] = useState(false);
     const [printDestination, setPrintDestination] = useState('all');
-    const snapPoints = useMemo(() => ['65%', '65%'], []);
+    const snapPoints = useMemo(() => ['80%', '80%'], []);
     const strings = useStrings();
     const [openCouvertModal, setOpenCouvertModal] = useState(false);
 
@@ -60,12 +66,36 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
       <View>
         <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
           <Text style={styles.closeButtonText}>
-            {strings.CLOSE}{' '}
-            <FontAwesomeIcon name={'angle-double-down'} size={20} color={colors.white} />
+            {strings.CLOSE} <DoubleDownIcon></DoubleDownIcon>
           </Text>
         </TouchableOpacity>
       </View>
     );
+
+    const showChangeTable = !order?.closedAt;
+    const showChangeCouvert = !order?.closedAt;
+    const showReprintOrder = order?.createdAt && !order?.closedAt;
+    const showPrintAnalysis = order?.createdAt;
+    const showCloseOrder = order?.createdAt && !order?.closedAt;
+    const showReOpenOrder = order?.closedAt && dayjs().diff(dayjs(order.closedAt), 'minute') < 15;
+
+    const onReopenOrder = () => {
+      if (order.closedAt) {
+        AlertWithOptions(
+          strings.REOPEN_ORDER,
+          strings.REOPEN_ORDER_CONFIRM,
+          async () => {
+            const result = await patchRequest(`/orders/reopen/${order.id}`);
+            if (result?.success === true) {
+              toast('success', strings.REOPENED, '', 1000);
+              navigateToTables();
+            }
+          },
+          () => {}
+        );
+        return;
+      }
+    };
 
     return (
       <>
@@ -89,96 +119,135 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
             backgroundStyle={{ backgroundColor: colors.darkGrey }}
           >
             <BottomSheetView style={styles.tableChangeContainer}>
-              <View style={styles.contentContainer}>
+              <ScrollView style={styles.contentContainer}>
                 <CategoryHeader title={strings.MORE_OPTIONS} />
 
                 <List.Section style={styles.listSection}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      onChangeTable();
-                      handleCloseModal();
-                    }}
-                  >
-                    <List.Item
-                      title="Change Table"
-                      description="Move the current order to a different table"
-                      descriptionStyle={styles.listItemDescription}
-                      left={(props) => (
-                        <List.Icon {...props} icon="table-furniture" color={colors.white} />
-                      )}
-                      titleStyle={styles.listItemTitle}
-                      style={styles.listItem}
-                    />
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={() => {
-                      setOpenCouvertModal(true);
-                      handleCloseModal();
-                    }}
-                  >
-                    <List.Item
-                      title="Change Couvert"
-                      description="Modify the cover charge for the current order"
-                      descriptionStyle={styles.listItemDescription}
-                      left={(props) => (
-                        <List.Icon {...props} icon="silverware" color={colors.white} />
-                      )}
-                      titleStyle={styles.listItemTitle}
-                      style={styles.listItem}
-                    />
-                  </TouchableOpacity>
-
-                  <View style={styles.printSection}>
-                    <List.Item
-                      title="Re-print Order"
-                      description="Print a copy of the order"
-                      descriptionStyle={styles.listItemDescription}
-                      left={(props) => <List.Icon {...props} icon="printer" color={colors.white} />}
-                      titleStyle={styles.listItemTitle}
-                      style={styles.listItem}
-                    />
-
-                    <View style={styles.printControls}>
-                      <SegmentedButtons
-                        value={printDestination}
-                        onValueChange={setPrintDestination}
-                        buttons={[
-                          { value: 'all', label: 'All' },
-                          { value: 'bar', label: 'Bar' },
-                          { value: 'kitchen', label: 'Kitchen' },
-                        ]}
-                        style={styles.segmentedButtons}
-                        theme={{
-                          colors: {
-                            onSurface: colors.white,
-                            onSurfaceVariant: colors.white,
-                          },
-                        }}
+                  {showChangeTable ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        onChangeTable();
+                        handleCloseModal();
+                      }}
+                    >
+                      <List.Item
+                        title="Change Table"
+                        description="Move the current order to a different table"
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => (
+                          <List.Icon {...props} icon="table-furniture" color={colors.white} />
+                        )}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
                       />
-                      <TouchableOpacity
-                        style={styles.printButton}
-                        onPress={() => onPrint?.(printDestination as 'all' | 'bar' | 'kitchen')}
-                      >
-                        <Text style={styles.printButtonText}>PRINT</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                    </TouchableOpacity>
+                  ) : null}
+                  {showChangeCouvert ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setOpenCouvertModal(true);
+                        handleCloseModal();
+                      }}
+                    >
+                      <List.Item
+                        title="Change Couvert"
+                        description="Modify the cover charge for the current order"
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => (
+                          <List.Icon {...props} icon="silverware" color={colors.white} />
+                        )}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
 
-                  <TouchableOpacity onPress={onCustomerAnalysis}>
-                    <List.Item
-                      title="Print Analysis"
-                      description="Print final order analysis"
-                      descriptionStyle={styles.listItemDescription}
-                      left={(props) => <List.Icon {...props} icon="receipt" color={colors.white} />}
-                      titleStyle={styles.listItemTitle}
-                      style={styles.listItem}
-                    />
-                  </TouchableOpacity>
+                  {showReprintOrder ? (
+                    <View style={styles.printSection}>
+                      <List.Item
+                        title="Re-print Order"
+                        description="Print a copy of the order"
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => (
+                          <List.Icon {...props} icon="printer" color={colors.white} />
+                        )}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
+                      />
+
+                      <View style={styles.printControls}>
+                        <SegmentedButtons
+                          value={printDestination}
+                          onValueChange={setPrintDestination}
+                          buttons={[
+                            { value: 'all', label: 'All' },
+                            { value: 'bar', label: 'Bar' },
+                            { value: 'kitchen', label: 'Kitchen' },
+                          ]}
+                          style={styles.segmentedButtons}
+                          theme={{
+                            colors: {
+                              onSurface: colors.white,
+                              onSurfaceVariant: colors.white,
+                            },
+                          }}
+                        />
+                        <TouchableOpacity
+                          style={styles.printButton}
+                          onPress={() => onPrint?.(printDestination as 'all' | 'bar' | 'kitchen')}
+                        >
+                          <Text style={styles.printButtonText}>PRINT</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ) : null}
+
+                  {showPrintAnalysis ? (
+                    <TouchableOpacity onPress={onCustomerAnalysis}>
+                      <List.Item
+                        title="Print Analysis"
+                        description="Print final order analysis"
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => (
+                          <List.Icon {...props} icon="receipt" color={colors.white} />
+                        )}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
+
+                  {showCloseOrder ? (
+                    <TouchableOpacity onPress={onCloseOrder}>
+                      <List.Item
+                        title="Close Order"
+                        description="Free up the table"
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => <List.Icon {...props} icon="close" color={colors.white} />}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
+
+                  {showReOpenOrder ? (
+                    <TouchableOpacity onPress={onReopenOrder}>
+                      <List.Item
+                        title="Re Open Order"
+                        description="Opens Order Again"
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => (
+                          <List.Icon {...props} icon="refresh" color={colors.white} />
+                        )}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
                 </List.Section>
 
                 {Platform.OS === 'ios' ? <CloseModalBtn /> : null}
-              </View>
+              </ScrollView>
               {Platform.OS === 'android' ? <CloseModalBtn /> : null}
             </BottomSheetView>
           </BottomSheet>

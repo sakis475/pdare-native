@@ -1,23 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  Modal,
-  ActivityIndicator,
-  TouchableOpacity,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
+import { View, StyleSheet, Modal, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { Button, Text, TextInput, FAB, IconButton } from 'react-native-paper';
 import { getRequest, postRequest } from '../../helpers/requests';
 import { colors } from '../../core/theme';
-import { TrashIcon } from '../../components/basic/Icons';
 import { toast } from '../../core/utils';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { handleUserLogin, logout } from '../../helpers/storage/tokenRequests';
+import { handleUserLogin } from '../../helpers/storage/tokenRequests';
 import { SessionBearer } from '../../types/requests.types';
-import { clearRestaurantStorageRelatedKeys, getStorage } from '../../storage/store';
-import { LoadingOverlay } from '../../components/basic/SavingOverlay';
+import { clearRestaurantStorageRelatedKeys } from '../../storage/store';
 import { LogoutFAB } from '../../components/LogoutFab';
 import { useStrings } from '../../core/localization/languageContext';
 

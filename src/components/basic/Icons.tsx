@@ -47,7 +47,7 @@ export const TickBoxIcon = ({ size = 24, color = colors.white, style }: IconProp
   return <MaterialIcons name="check" size={size} color={color} style={style} />;
 };
 
-export const restoreIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+export const RestoreIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
   return <MaterialIcons name="restore" size={size} color={color} style={style} />;
 };
 
@@ -163,7 +163,9 @@ export const SearchIcon = ({ size = 24, color = colors.white, style }: IconProps
 };
 
 export const PlusIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
-  return <FontAwesome5 name="plus" size={size} color={color} style={style} />;
+  return (
+    <MaterialCommunityIcons name="plus-circle-outline" size={size} color={color} style={style} />
+  );
 };
 
 export const MinusIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
@@ -174,4 +176,20 @@ export const CouvertIcon = ({ size = 24, color = colors.white, style }: IconProp
   return (
     <MaterialCommunityIcons name="silverware-fork-knife" size={size} color={color} style={style} />
   );
+};
+
+export const SendIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return <MaterialCommunityIcons name="send" size={size} color={color} style={style} />;
+};
+
+export const RadioButtonChecked = ({ size = 20, color = colors.white, style }: IconProps = {}) => {
+  return <MaterialIcons name="radio-button-checked" size={size} color={color} style={style} />;
+};
+
+export const CheckBoxChecked = ({ size = 20, color = colors.white, style }: IconProps = {}) => {
+  return <MaterialIcons name="check-box" size={size} color={color} style={style} />;
+};
+
+export const CloseIcon = ({ size = 24, color = colors.white, style }: IconProps = {}) => {
+  return <MaterialIcons name="close" size={size} color={color} style={style} />;
 };

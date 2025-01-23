@@ -18,15 +18,13 @@ import Animated, {
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { AlertWithOptions, naturalSort, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { TextInput, Button } from 'react-native-paper';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
-import { reqFetchTables } from '../../helpers/storage/tablesStorage';
 import { patchRequest } from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useStrings } from '../../core/localization/languageContext';
+import { BarsIcon, EditIcon, SortIcon, TrashIcon } from '../../components/basic/Icons';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -134,7 +132,7 @@ const EditModal: React.FC<EditModalProps> = ({
                 style={[styles.deleteButton]}
                 textColor={colors.lightRed}
               >
-                <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
+                <TrashIcon size={15} color={colors.lightRed} />
               </Button>
             )}
 
@@ -158,7 +156,7 @@ const TableBox: React.FC<Table & { onEdit?: () => void }> = (table) => {
     <View style={styles.buttonContainer}>
       <View style={[styles.tableBox]}>
         <TouchableOpacity style={styles.editButton} onPress={table.onEdit}>
-          <FontAwesome6 name="pencil" size={16} color={colors.white} />
+          <EditIcon size={16} color={colors.white} />
         </TouchableOpacity>
         <View style={{ backgroundColor: '#333', borderRadius: 4, paddingHorizontal: 3 }}>
           <Text style={styles.tableText}>{table.tableName}</Text>
@@ -240,7 +238,7 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, tablesLength }) => {
       <TableBox {...item} />
       <PanGestureHandler onGestureEvent={gestureHandler}>
         <Animated.View style={[styles.dragHandle]}>
-          <FontAwesome6 name="bars" size={DRAG_HANDLE_SIZE} color={colors.white} />
+          <BarsIcon size={DRAG_HANDLE_SIZE} color={colors.white} />
         </Animated.View>
       </PanGestureHandler>
     </Animated.View>
@@ -400,7 +398,7 @@ const AdminTableScreen = () => {
             </ScrollView>
 
             <FAB
-              icon={() => <MaterialIcons name="sort-by-alpha" size={24} color={colors.darkGrey} />}
+              icon={() => <SortIcon size={24} color={colors.darkGrey} />}
               style={styles.sortFab}
               onPress={handleSortNaturally}
               color={colors.darkGrey}

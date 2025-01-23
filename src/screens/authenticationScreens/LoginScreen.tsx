@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { colors } from '../../core/theme';
 import { login } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 import { useStrings } from '../../core/localization/languageContext';
+import { EyeOff, EyeOn } from '../../components/basic/Icons';
 
 const logoImage = require('../../../assets/mywaitericon.png');
 const LoginScreen: React.FC = () => {
@@ -185,11 +185,7 @@ const LoginScreen: React.FC = () => {
                   onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                   style={styles.eyeIcon}
                 >
-                  <MaterialCommunityIcons
-                    name={isPasswordVisible ? 'eye-off' : 'eye'}
-                    size={24}
-                    color={colors.white}
-                  />
+                  {isPasswordVisible ? <EyeOff></EyeOff> : <EyeOn></EyeOn>}
                 </TouchableOpacity>
               </View>
               {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}

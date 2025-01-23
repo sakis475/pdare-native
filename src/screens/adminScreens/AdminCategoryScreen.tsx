@@ -18,7 +18,6 @@ import Animated, {
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { AlertWithOptions, getTextColorBasedOnLuminance, toast } from '../../core/utils';
 import { colors, getRandomColor } from '../../core/theme';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { getStorage, setStorage } from '../../storage/store';
 import { TextInput, Button, SegmentedButtons } from 'react-native-paper';
 import ColorPicker from 'react-native-wheel-color-picker';
@@ -28,6 +27,7 @@ import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
+import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -223,7 +223,7 @@ const EditModal: React.FC<EditModalProps> = ({
                 style={[styles.deleteButton]}
                 textColor={colors.lightRed}
               >
-                <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
+                <TrashIcon size={15} color={colors.lightRed}></TrashIcon>
               </Button>
             )}
 
@@ -256,7 +256,7 @@ const CategoryBox: React.FC<Category & { onEdit?: () => void }> = (category) => 
         activeOpacity={0.7}
       >
         <TouchableOpacity style={styles.editButton} onPress={category.onEdit}>
-          <FontAwesome6 name="pencil" size={16} color={textColor} />
+          <EditIcon size={16} color={textColor}></EditIcon>
         </TouchableOpacity>
         <Text style={{ color: textColor, fontWeight: 'bold', padding: 3 }}>{category.title}</Text>
       </TouchableOpacity>
@@ -337,11 +337,10 @@ const Box: React.FC<BoxProps> = ({ item, onDragEnd, categoriesLength }) => {
       <CategoryBox {...item} />
       <PanGestureHandler onGestureEvent={gestureHandler}>
         <Animated.View style={[styles.dragHandle]}>
-          <FontAwesome6
-            name="bars"
+          <BarsIcon
             size={DRAG_HANDLE_SIZE}
             color={getTextColorBasedOnLuminance(item.color ?? colors.darkGrey)}
-          />
+          ></BarsIcon>
         </Animated.View>
       </PanGestureHandler>
     </Animated.View>

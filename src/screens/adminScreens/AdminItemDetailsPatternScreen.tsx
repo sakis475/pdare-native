@@ -11,17 +11,22 @@ import { Button, Divider, FAB, Text, TextInput } from 'react-native-paper';
 import { getStorage, setStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { useIsFocused } from '@react-navigation/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { CategoryBottomSheet } from '../../components/bottomSheets/PatternCategorySelectBottomSheet';
 import { Portal } from 'react-native-paper';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
+import {
+  BarsIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  EditIcon,
+  TrashIcon,
+} from '../../components/basic/Icons';
 
 interface EditPatternModalProps {
   visible: boolean;
@@ -110,7 +115,7 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
               <Text style={styles.selectedCategory}>
                 {selectedCategory?.title || `${strings.SELECT_CATEGORY}`}
               </Text>
-              <MaterialIcons name="keyboard-arrow-down" size={24} color={colors.grey} />
+              <ChevronDownIcon size={24} color={colors.grey}></ChevronDownIcon>
             </View>
           </TouchableOpacity>
 
@@ -122,7 +127,7 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
                 style={[styles.deleteButton]}
                 textColor={colors.lightRed}
               >
-                <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
+                <TrashIcon size={15} color={colors.lightRed}></TrashIcon>
               </Button>
             )}
 
@@ -303,10 +308,10 @@ const AdminItemDetailsPatternScreen = () => {
           style={[styles.item, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}
         >
           <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
-            <FontAwesome6 name="bars" size={20} color="#fff" />
+            <BarsIcon></BarsIcon>
           </Pressable>
           <TouchableOpacity style={styles.editButton} onPress={() => handleEditPress(pattern)}>
-            <FontAwesome6 name="pencil" size={20} color="#fff" />
+            <EditIcon size={20} color={colors.white}></EditIcon>
           </TouchableOpacity>
           <View style={styles.itemContent}>
             <Text style={{ color: colors.white, fontSize: 16 }}>
@@ -317,7 +322,7 @@ const AdminItemDetailsPatternScreen = () => {
               {strings.PROPERTIES}
             </Text>
           </View>
-          <FontAwesome6 name="chevron-right" size={20} color="#fff" style={{ marginRight: 10 }} />
+          <ChevronRightIcon size={20} color="#fff" style={{ marginRight: 10 }}></ChevronRightIcon>
         </TouchableOpacity>
       );
     },

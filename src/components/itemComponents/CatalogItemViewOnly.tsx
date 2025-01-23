@@ -1,10 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
-import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/storage/orderStorage';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { colors } from '../../core/theme';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { catalogItemStyles } from './CatalogStyles';
 
 export function CatalogItemViewOnly({ item }: { item: ItemReq }) {

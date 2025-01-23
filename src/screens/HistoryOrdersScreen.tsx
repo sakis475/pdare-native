@@ -14,12 +14,12 @@ import { colors } from '../core/theme';
 import { FlashList } from '@shopify/flash-list';
 import { getRequest } from '../helpers/requests';
 import dayjs from '../core/dayjs';
-import FeatherIcons from 'react-native-vector-icons/FontAwesome5';
 import { CurrencyFormat } from '../components/helpers/CurrencyFormat';
 import { useStrings } from '../core/localization/languageContext';
 import { navigate, ScreenNames } from '../navigation/navigationUtils';
 import { processTables } from '../helpers/storage/tablesStorage';
 import _ from 'lodash';
+import { UsersIcon } from '../components/basic/Icons';
 
 const FONT_SIZES = {
   header: 12, // For column headers
@@ -147,7 +147,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
             </View>
             <View style={[styles.column, { width: '15%' }]}>
               <View style={styles.personsCount}>
-                <FeatherIcons name="users" size={13} color={colors.veryLighterGrey} />
+                <UsersIcon color={colors.veryLighterGrey}></UsersIcon>
                 <Text style={styles.couvertText}>{couvert}</Text>
               </View>
             </View>

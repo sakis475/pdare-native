@@ -13,13 +13,13 @@ import { getStorage, setStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { CatalogItemEditable } from '../../components/itemComponents/CatalogItemEditable';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { findCategoryByTitle } from '../../helpers/storage/orderStorage';
 import { useStrings } from '../../core/localization/languageContext';
+import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
 
 interface EditItemModalProps {
   visible: boolean;
@@ -142,7 +142,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 style={[styles.deleteButton]}
                 textColor={colors.lightRed}
               >
-                <FontAwesome6 name="trash" size={15} color={colors.lightRed} />
+                <TrashIcon size={15} color={colors.lightRed} />
               </Button>
             )}
 
@@ -289,10 +289,10 @@ const AdminItemListScreen = ({ route }: any) => {
       return (
         <View style={[styles.item, { backgroundColor: isActive ? colors.darkGrey : colors.grey }]}>
           <Pressable onPressIn={drag} disabled={isActive} style={styles.dragHandle}>
-            <FontAwesome6 name="bars" size={20} color="#fff" />
+            <BarsIcon size={20} color="#fff" />
           </Pressable>
           <TouchableOpacity style={styles.editButton} onPress={() => handleEditPress(item)}>
-            <FontAwesome6 name="pencil" size={20} color="#fff" />
+            <EditIcon size={20} color="#fff" />
           </TouchableOpacity>
           <View style={styles.itemContent}>
             <CatalogItemEditable item={itemForRender} />

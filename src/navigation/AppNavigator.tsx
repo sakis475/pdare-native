@@ -14,8 +14,7 @@ import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
 import Tooltip from 'rn-tooltip';
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
 import StartLoadingScreen from '../screens/StartLoadingScreen';
@@ -33,6 +32,7 @@ import AdminPersonelScreen from '../screens/adminScreens/AdminPersonelScreen';
 import NewUserSetupScreen from '../screens/authenticationScreens/NewUserSetupScreen';
 import { useStrings } from '../core/localization/languageContext';
 import AdminPrintersScreen from '../screens/adminScreens/AdminPrintersScreen';
+import { BackIcon, InfoIcon } from '../components/basic/Icons';
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -429,7 +429,7 @@ const AppNavigator = () => {
                   width="80%"
                   actionType="press"
                 >
-                  <Icon name={'information-circle-outline'} size={24} color={'#fff'}></Icon>
+                  <InfoIcon></InfoIcon>
                 </Tooltip>
               </View>
             );
@@ -503,7 +503,7 @@ const MainTabs = ({ route }: any) => {
 function navigateBackBtn() {
   return (
     <TouchableOpacity onPress={() => navigateBack()}>
-      <Icon name="arrow-back" size={30} color="white" />
+      <BackIcon></BackIcon>
     </TouchableOpacity>
   );
 }

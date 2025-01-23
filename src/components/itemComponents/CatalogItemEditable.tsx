@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
-import { colors } from '../../core/theme';
-import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { catalogItemStyles } from './CatalogStyles';
+import { ChevronRightIcon } from '../basic/Icons';
 
 export function CatalogItemEditable({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);
@@ -29,7 +27,7 @@ export function CatalogItemEditable({ item }: { item: ItemReq }) {
           onPress={handleAddNewItemPress}
           activeOpacity={0.6}
         >
-          <Entypo name="chevron-right" size={20} color={colors.white} />
+          <ChevronRightIcon size={20}></ChevronRightIcon>
         </TouchableOpacity>
       </View>
     </View>

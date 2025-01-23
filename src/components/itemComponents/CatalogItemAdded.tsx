@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
+import { Text, View, TouchableOpacity, Animated } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import QuantitySelector from '../helpers/QuantitySelector';
 import { removeItemOfTemp, updateQuantityOfTempItem } from '../../helpers/storage/orderStorage';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { colors } from '../../core/theme';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import _ from 'lodash';
 import { catalogItemStyles } from './CatalogStyles';
+import { CommentIcon, EditIcon } from '../basic/Icons';
 
 export function CatalogItemAdded({
   item,
@@ -95,7 +94,7 @@ export function CatalogItemAdded({
         <View style={styles.textContainer}>
           <TouchableOpacity onPress={handlePress} activeOpacity={1}>
             <Text style={styles.itemTitle}>
-              <MaterialIcons name="edit" size={14} color={'#fff'} /> {item.title}
+              <EditIcon size={14} /> {item.title}
             </Text>
           </TouchableOpacity>
           <View>
@@ -112,7 +111,7 @@ export function CatalogItemAdded({
                     { fontStyle: 'italic', justifyContent: 'center', alignItems: 'center' },
                   ]}
                 >
-                  <MaterialIcons name="insert-comment" />
+                  <CommentIcon></CommentIcon>
                   {' ' + item.comment}
                 </Text>
               )}

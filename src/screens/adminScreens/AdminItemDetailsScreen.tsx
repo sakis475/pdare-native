@@ -10,16 +10,25 @@ import {
   Alert,
 } from 'react-native';
 import { colors } from '../../core/theme';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import PropertyTypeBottomSheet from '../../components/bottomSheets/PropertyTypeBottomSheet';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { Checkbox, FAB, RadioButton } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
-import { getItem, updateItem } from '../../helpers/storage/orderStorage';
+import { getItem } from '../../helpers/storage/orderStorage';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { SelectPatternModal } from './popupModals/SelectPatternModal';
 import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, ITEMS_UPDATED } from '../../helpers/Sockets/EventEmitter';
+import {
+  CheckBoxChecked,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  EditIcon,
+  RadioButtonChecked,
+  RestoreIcon,
+  TickBoxIcon,
+  TrashIcon,
+} from '../../components/basic/Icons';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -195,11 +204,11 @@ const AdminItemDetailsScreen = ({ route }: any) => {
       <View>
         {propertyType === 'singleselect' ? (
           <View style={styles.itemContent}>
-            <MaterialIcons name="radio-button-checked" size={20} color={colors.white} />
+            <RadioButtonChecked size={20} color={colors.white} />
           </View>
         ) : (
           <View style={styles.itemContent}>
-            <MaterialIcons name="check-box" size={20} color={colors.white} />
+            <CheckBoxChecked size={20} color={colors.white} />
           </View>
         )}
       </View>
@@ -319,7 +328,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
           {editingPropertyName === propertyName ? (
             <View style={styles.itemContainer}>
               <TouchableOpacity onPress={handlePropertyNameEdit} style={styles.editButton}>
-                <MaterialIcons name="check" size={20} color="#fff" />
+                <TickBoxIcon size={20}></TickBoxIcon>
               </TouchableOpacity>
               <TextInput
                 style={[styles.input, styles.editingInput]}
@@ -351,18 +360,18 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                   style={styles.editButton}
                   disabled={isDeleted}
                 >
-                  <MaterialIcons name="edit" size={20} color="#fff" />
+                  <EditIcon size={20}></EditIcon>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => handleDeletePropertyGroup(propertyName)}
                   style={[styles.deleteButton, { marginLeft: 0 }]}
                 >
-                  <MaterialIcons
-                    name={isDeleted ? 'restore' : 'delete'}
-                    size={20}
-                    color={isDeleted ? colors.green : colors.lightRed}
-                  />
+                  {isDeleted ? (
+                    <RestoreIcon size={20} color={colors.green}></RestoreIcon>
+                  ) : (
+                    <TrashIcon size={20} color={colors.lightRed}></TrashIcon>
+                  )}
                 </TouchableOpacity>
 
                 <Text
@@ -397,7 +406,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               disabled={index === 0 || isDeleted}
               style={[styles.reorderButton, (index === 0 || isDeleted) && styles.disabledButton]}
             >
-              <MaterialIcons name="arrow-upward" size={20} color="#fff" />
+              <ChevronUpIcon size={20}></ChevronUpIcon>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => movePropertyGroup(index, 'down')}
@@ -408,7 +417,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                   styles.disabledButton,
               ]}
             >
-              <MaterialIcons name="arrow-downward" size={20} color="#fff" />
+              <ChevronDownIcon size={20}></ChevronDownIcon>
             </TouchableOpacity>
           </View>
         </View>
@@ -751,7 +760,7 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
             disabled={index === 0 || isDeleted}
             style={[styles.reorderButton, (index === 0 || isDeleted) && styles.disabledButton]}
           >
-            <MaterialIcons name="arrow-upward" size={20} color="#fff" />
+            <ChevronUpIcon size={20}></ChevronUpIcon>
           </TouchableOpacity>
         </View>
 
@@ -759,7 +768,7 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
           {editingId === item.id ? (
             <>
               <TouchableOpacity onPress={handleSaveEdit} style={styles.editButton}>
-                <MaterialIcons name="check" size={20} color="#fff" />
+                <TickBoxIcon size={20} color="#fff" />
               </TouchableOpacity>
               <TextInput
                 ref={inputRef}
@@ -795,7 +804,7 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
                 style={styles.editButton}
                 disabled={isDeleted}
               >
-                <MaterialIcons name="edit" size={20} color="#fff" />
+                <EditIcon size={20} color="#fff" />
               </TouchableOpacity>
               <Text
                 style={[
@@ -809,11 +818,11 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
               {/* Only show delete button if group is not deleted */}
               {!item.isDeletedGroup && (
                 <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
-                  <MaterialIcons
-                    name={item.isDeleted ? 'restore' : 'delete'}
-                    size={20}
-                    color={item.isDeleted ? colors.green : colors.lightRed}
-                  />
+                  {item.isDeleted ? (
+                    <RestoreIcon size={20} color={colors.green}></RestoreIcon>
+                  ) : (
+                    <TrashIcon size={20} color={colors.lightRed}></TrashIcon>
+                  )}
                 </TouchableOpacity>
               )}
             </>
@@ -828,7 +837,7 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
               (index === itemPropertiesGrouped.length - 1 || isDeleted) && styles.disabledButton,
             ]}
           >
-            <MaterialIcons name="arrow-downward" size={20} color="#fff" />
+            <ChevronDownIcon size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>

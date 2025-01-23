@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ChevronDownIcon, ChevronUpIcon } from './basic/Icons';
 
 export function SortButtons({ handleSort, disableUp, disableDown }: any) {
   return (
@@ -10,7 +10,7 @@ export function SortButtons({ handleSort, disableUp, disableDown }: any) {
         activeOpacity={0.6}
         disabled={disableUp}
       >
-        <MaterialCommunityIcons name="chevron-up" size={24} color={'#fff'} />
+        <ChevronUpIcon></ChevronUpIcon>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
@@ -18,7 +18,7 @@ export function SortButtons({ handleSort, disableUp, disableDown }: any) {
         activeOpacity={0.6}
         disabled={disableDown}
       >
-        <MaterialCommunityIcons name="chevron-down" size={24} color={'#fff'} />
+        <ChevronDownIcon></ChevronDownIcon>
       </TouchableOpacity>
     </View>
   );

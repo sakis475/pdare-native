@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { colors } from '../../core/theme';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { DoubleRightIcon } from '../basic/Icons';
 
 export const CategoryHeader = ({ title }: any) => (
   <View
@@ -17,7 +17,7 @@ export const CategoryHeader = ({ title }: any) => (
         alignItems: 'center',
       }}
     >
-      <Icon name={'chevron-double-right'} size={20} color="#fff" />
+      <DoubleRightIcon />
       <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.white }}>{title}</Text>
     </View>
   </View>

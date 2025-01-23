@@ -10,11 +10,11 @@ import { Keyboard, Platform, StyleSheet, Text, View } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Portal } from '@gorhom/portal';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../../core/theme';
 import { TextInput } from 'react-native-paper';
 import { CategoryHeader } from '../helpers/CategoryHeader';
 import { useStrings } from '../../core/localization/languageContext';
+import { DoubleDownIcon } from '../basic/Icons';
 
 interface CommentBottomSheetProps {
   item: ItemReq;
@@ -58,8 +58,7 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
           }}
         >
           <Text style={styles.closeButtonText}>
-            {strings.CLOSE}{' '}
-            <FontAwesomeIcon name={'angle-double-down'} size={20} color={colors.white} />
+            {strings.CLOSE} <DoubleDownIcon></DoubleDownIcon>
           </Text>
         </TouchableOpacity>
       </View>

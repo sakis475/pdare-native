@@ -1,6 +1,6 @@
+import React from 'react';
 import { Modal, FlatList, TouchableOpacity, StyleSheet, View, Text } from 'react-native';
 import { colors } from '../../../core/theme';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { ActivityIndicator, Button } from 'react-native-paper';
 import { useEffect, useState } from 'react';
 import { toast } from '../../../core/utils';
@@ -8,6 +8,7 @@ import { getItemPropertyPatterns } from '../../../helpers/storage/orderStorage';
 import { useNavigation } from '@react-navigation/native';
 import { navigate, ScreenNames } from '../../../navigation/navigationUtils';
 import { useStrings } from '../../../core/localization/languageContext';
+import { CloseIcon } from '../../../components/basic/Icons';
 
 interface SelectPatternModalProps {
   visible: boolean;
@@ -72,7 +73,7 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{strings.SELECT_PATTERN}</Text>
             <TouchableOpacity onPress={onDismiss}>
-              <MaterialIcons name="close" size={24} color={colors.white} />
+              <CloseIcon size={24} color={colors.white} />
             </TouchableOpacity>
           </View>
 
