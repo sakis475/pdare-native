@@ -25,6 +25,8 @@ import { useStrings } from '../../../core/localization/languageContext';
 import { OrderInfoBar } from '../../../components/helpers/OrderInfoBar';
 import { CatalogItemViewOnly } from '../../../components/itemComponents/CatalogItemViewOnly';
 import { LinearGradientFadeOut } from '../../../components/basic/LinearGradientFadeOut';
+import MoreOptionsTempBottomSheet from '../../../components/bottomSheets/MoreOptionsTempBottomSheet';
+import { patchRequest } from '../../../helpers/requests';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -58,8 +60,8 @@ const ActiveOrderScreen = ({
       if (!updatedOrder?.id) {
         return;
       } else {
-        newTable = updatedOrder.table;
         newTable.occupiedByOrder = updatedOrder;
+        newTable = updatedOrder.table;
         toast('success', strings.TABLE_CHANGE_SUCCESS);
       }
     }
@@ -69,7 +71,7 @@ const ActiveOrderScreen = ({
       headerTitle: () => <CustomNavigationScreenHeaderTitle title={newTable.tableName} />,
     });
 
-    if (table.occupiedByOrder.id === tempOrder.id) {
+    if (table?.occupiedByOrder?.id === tempOrder?.id) {
       setTableTempOrder(newTable);
     }
   };
@@ -115,14 +117,7 @@ const ActiveOrderScreen = ({
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
   const handleOpenSelectTableModal = () => {
-    AlertWithOptions(
-      strings.CHANGE_TABLE,
-      strings.CHANGE_TABLE_CONFIRM,
-      () => {
-        bottomSheetRef.current?.openModal();
-      },
-      () => {}
-    );
+    bottomSheetRef.current?.openModal();
   };
 
   const handleCloseModal = () => {
@@ -134,6 +129,60 @@ const ActiveOrderScreen = ({
     await fetchItems();
   };
   //END TABLE MODAL LOGIC
+
+  //START COMMENT MODAL LOGIC
+  const moreOptionsBottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
+
+  const handleMoreOptionsOpenModal = () => {
+    moreOptionsBottomSheetRef.current?.openModal();
+  };
+
+  const handleMoreOptionsCloseModal = () => {
+    moreOptionsBottomSheetRef.current?.closeModal();
+    Keyboard.dismiss();
+  };
+
+  //END COMMENT MODAL LOGIC
+
+  const handleChangeCouvert = async (newQuantity: number) => {
+    const tempOrder: Order = await getTempOrder();
+
+    if (table.occupiedByOrder.id === tempOrder.id) {
+      await setTempOrder({ ...tempOrder, couvert: newQuantity });
+    }
+
+    const updatedOrder = {
+      ...order,
+      couvert: newQuantity,
+    };
+
+    //In case of existing order
+    if (updatedOrder.id) {
+      const newReqOrder = {
+        couvert: newQuantity,
+        table: updatedOrder.table.id,
+        orderId: updatedOrder.id,
+        items: [] as any,
+      };
+
+      try {
+        const result = await patchRequest(`/orders/${updatedOrder.id}`, newReqOrder);
+        if (result?.id) {
+          setOrder((prev) => ({
+            ...prev,
+            couvert: newQuantity,
+          }));
+          setTable((prevTable) => ({
+            ...prevTable,
+            occupiedByOrder: updatedOrder,
+          }));
+          toast('success', `Added ${newQuantity} couvert(s)`, '', 1000);
+        }
+      } catch (error) {
+        toast('error', 'Failed to update couvert', '', 1000);
+      }
+    }
+  };
 
   const renderItems = (item: ItemReq) => {
     return (
@@ -235,14 +284,18 @@ const ActiveOrderScreen = ({
                 setOrder(updatedOrder);
 
                 // Also update the table's order reference
-                setTable((prevTable) => ({
-                  ...prevTable,
-                  occupiedByOrder: updatedOrder,
-                }));
               }}
+              handleOpenMoreOptionsModal={handleMoreOptionsOpenModal}
             />
             <Portal>
               <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
+            </Portal>
+            <Portal>
+              <MoreOptionsTempBottomSheet
+                ref={moreOptionsBottomSheetRef}
+                onChangeTable={handleOpenSelectTableModal}
+                onChangeCouvert={handleChangeCouvert}
+              ></MoreOptionsTempBottomSheet>
             </Portal>
           </View>
         ) : null}

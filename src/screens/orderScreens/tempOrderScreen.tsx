@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
-import { Divider, Portal } from 'react-native-paper';
+import { Button, Divider, Portal } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
 import { ScreenNames, navigate } from '../../navigation/navigationUtils';
@@ -10,6 +10,7 @@ import {
   getTempOrder,
   markActiveItemForDelete,
   setTableTempOrder,
+  setTempOrder,
   updateTableOfOrder,
 } from '../../helpers/storage/orderStorage';
 import { CatalogItemAdded } from '../../components/itemComponents/CatalogItemAdded';
@@ -22,6 +23,10 @@ import { OrderInfoBar } from '../../components/helpers/OrderInfoBar';
 import { LinearGradientFadeOut } from '../../components/basic/LinearGradientFadeOut';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
+import MoreOptionsTempBottomSheet from '../../components/bottomSheets/MoreOptionsTempBottomSheet';
+import CouvertFAB from '../../components/popupModals/CouvertModal';
+import { patchRequest } from '../../helpers/requests';
+import { setStorage } from '../../storage/store';
 
 // Memoized Item renderer components
 const DisabledItem = memo(({ item, onDelete }: { item: ItemReq; onDelete: any }) => (
@@ -79,6 +84,7 @@ const TempOrderScreen = ({
     order: null,
     headerTitle: '',
     headerSubtitle: '',
+    isNewOrder: false,
   });
   const [isSending, setIsSending] = useState(false);
 
@@ -88,6 +94,7 @@ const TempOrderScreen = ({
   const fetchItems = useCallback(async () => {
     try {
       const tempOrder = await getTempOrder();
+      console.log(tempOrder, 'tempOrder');
       setOrderState({
         table: tempOrder?.table,
         items: tempOrder?.orderItems ?? [],
@@ -96,6 +103,7 @@ const TempOrderScreen = ({
           ? strings.UPDATE_ORDER
           : strings.NEW_ORDER,
         headerSubtitle: tempOrder?.table?.tableName ?? '',
+        isNewOrder: !tempOrder?.orderItems?.[0]?.alreadySend,
       });
     } catch (error) {
       console.error('Error fetching items:', error);
@@ -145,22 +153,70 @@ const TempOrderScreen = ({
   }, [orderState.table]);
 
   const handleOpenSelectTableModal = useCallback(() => {
-    if (orderState.table) {
-      AlertWithOptions(
-        strings.CHANGE_TABLE,
-        strings.CHANGE_TABLE_CONFIRM,
-        () => bottomSheetRef.current?.openModal(),
-        () => {}
-      );
-    } else {
-      bottomSheetRef.current?.openModal();
-    }
+    // if (orderState.table) {
+    //   AlertWithOptions(
+    //     strings.CHANGE_TABLE,
+    //     strings.CHANGE_TABLE_CONFIRM,
+    //     () => bottomSheetRef.current?.openModal(),
+    //     () => {}
+    //   );
+    // } else {
+    // }
+    bottomSheetRef.current?.openModal();
   }, [orderState.table, strings]);
 
   const handleCloseModal = useCallback(() => {
     bottomSheetRef.current?.closeModal();
     Keyboard.dismiss();
   }, []);
+
+  //START COMMENT MODAL LOGIC
+  const moreOptionsBottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
+
+  const handleMoreOptionsOpenModal = () => {
+    moreOptionsBottomSheetRef.current?.openModal();
+  };
+
+  const handleMoreOptionsCloseModal = () => {
+    moreOptionsBottomSheetRef.current?.closeModal();
+    Keyboard.dismiss();
+  };
+
+  //END COMMENT MODAL LOGIC
+
+  const handleChangeCouvert = async (newQuantity: number) => {
+    const updatedOrder = {
+      ...orderState.order,
+      couvert: newQuantity,
+    };
+
+    //In case of existing order
+    if (updatedOrder.id) {
+      const newReqOrder = {
+        couvert: newQuantity,
+        table: updatedOrder.table.id,
+        orderId: updatedOrder.id,
+        items: [] as any,
+      };
+
+      try {
+        const result = await patchRequest(`/orders/${updatedOrder.id}`, newReqOrder);
+        if (result?.id) {
+          toast('success', `Added ${newQuantity} couvert(s)`, '', 1000);
+          await fetchItems(); // Refresh data from storage
+        }
+      } catch (error) {
+        toast('error', 'Failed to update couvert', '', 1000);
+      }
+    } else {
+      await setTempOrder(updatedOrder);
+
+      setOrderState((prev) => ({
+        ...prev,
+        order: updatedOrder,
+      }));
+    }
+  };
 
   const renderItem = useCallback(
     ({ item }: { item: ItemReq }) => (
@@ -191,10 +247,9 @@ const TempOrderScreen = ({
       )}
 
       <View style={styles.contentContainer}>
+        <OrderInfoBar order={orderState.order} containerStyle={styles.orderInfoBar} />
         {orderState.items.length > 0 ? (
           <View style={styles.listContainer}>
-            <OrderInfoBar order={orderState.order} containerStyle={styles.orderInfoBar} />
-
             <FlashList
               data={orderState.items}
               keyExtractor={keyExtractor}
@@ -210,8 +265,16 @@ const TempOrderScreen = ({
           </View>
         ) : (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_ADD}</Text>
-            <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_APPEAR_HERE}</Text>
+            {orderState.table ? (
+              <>
+                <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_ADD}</Text>
+                <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_APPEAR_HERE}</Text>
+              </>
+            ) : (
+              <Button mode="outlined" onPress={() => handleOpenSelectTableModal()}>
+                <Text>{strings.SELECT_TABLE}</Text>
+              </Button>
+            )}
           </View>
         )}
       </View>
@@ -227,10 +290,18 @@ const TempOrderScreen = ({
               couvertUpdated={fetchItems}
               isSending={isSending}
               setIsSending={setIsSending}
+              handleOpenMoreOptionsModal={handleMoreOptionsOpenModal}
             />
           </View>
           <Portal>
             <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
+          </Portal>
+          <Portal>
+            <MoreOptionsTempBottomSheet
+              ref={moreOptionsBottomSheetRef}
+              onChangeTable={handleOpenSelectTableModal}
+              onChangeCouvert={handleChangeCouvert}
+            ></MoreOptionsTempBottomSheet>
           </Portal>
         </>
       )}

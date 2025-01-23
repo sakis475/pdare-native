@@ -6,31 +6,30 @@ import { useStrings } from '../../core/localization/languageContext';
 import CustomNumberInput from '../basic/CustomNumberInput';
 import { CouvertIcon } from '../basic/Icons';
 
-interface CouvertFABProps {
+interface CouvertModalProps {
   couvertQuantity: number;
   onSubmit: (quantity: number) => void;
-  disabled?: boolean;
-  style?: any;
+  isModalVisible: boolean; // New prop to control modal visibility
+  onModalClose?: () => void; // New prop to handle modal closing
 }
 
-const CouvertFAB: React.FC<CouvertFABProps> = ({
+const CouvertModal: React.FC<CouvertModalProps> = ({
   couvertQuantity,
   onSubmit,
-  disabled = false,
-  style,
+  isModalVisible,
+  onModalClose,
 }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [quantity, setQuantity] = useState<number>(couvertQuantity ?? 0);
   const strings = useStrings();
 
   const handleSubmit = () => {
     onSubmit(quantity);
-    setIsModalVisible(false);
+    onModalClose();
   };
 
   const handleDismiss = () => {
     setQuantity(couvertQuantity);
-    setIsModalVisible(false);
+    onModalClose();
   };
 
   const handleQuantityChange = (value: string) => {
@@ -76,23 +75,8 @@ const CouvertFAB: React.FC<CouvertFABProps> = ({
     );
   };
 
-  const CustomFabIcon = () => (
-    <View style={styles.fabIconContainer}>
-      <CouvertIcon size={16} />
-      <Text style={styles.fabQuantityText}>{quantity}</Text>
-    </View>
-  );
-
   return (
     <>
-      <FAB
-        icon={() => <CustomFabIcon key={`fab-icon-${quantity}`} />}
-        style={[styles.fab, disabled && styles.fabDisabled, style]}
-        onPress={() => setIsModalVisible(true)}
-        disabled={disabled}
-        color={colors.lighterGrey}
-        animated={false}
-      />
       <Portal>
         <Modal
           visible={isModalVisible}
@@ -273,4 +257,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CouvertFAB;
+export default CouvertModal;

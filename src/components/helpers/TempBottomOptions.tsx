@@ -1,6 +1,6 @@
 // TempBottomOptions.tsx
-import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Keyboard } from 'react-native';
 import { colors } from '../../core/theme';
 import {
   clearNewOrder,
@@ -11,8 +11,10 @@ import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
-import CouvertFAB from '../popupModals/CouvertFAB';
+import CouvertFAB from '../popupModals/CouvertModal';
 import { setStorage } from '../../storage/store';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MoreIconHorizontal, TableIcon } from '../basic/Icons';
 
 interface TempBottomOptionsProps {
   table: Table;
@@ -23,6 +25,7 @@ interface TempBottomOptionsProps {
   couvertUpdated?: (couvert: number) => void;
   isSending?: boolean;
   setIsSending?: (value: boolean) => void;
+  handleOpenMoreOptionsModal: () => void;
 }
 
 const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
@@ -34,6 +37,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   couvertUpdated,
   isSending,
   setIsSending,
+  handleOpenMoreOptionsModal,
 }) => {
   const [noTable, setNoTable] = useState(!table?.tableName);
   const [order, setOrder] = useState<Order>();
@@ -195,27 +199,8 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={[
-          styles.button,
-          styles.sendOrderButton,
-          noTable || isOrderView || isOrderClosed || isSending ? styles.noTableOtherBtns : null,
-        ]}
-        onPress={handleOrderSend}
-        disabled={noTable || isOrderView || isOrderClosed || isSending}
-      >
-        <Text
-          style={[
-            styles.buttonText,
-            noTable || isOrderClosed || isSending ? styles.noTableOtherText : null,
-          ]}
-        >
-          {strings.SEND}
-        </Text>
-      </TouchableOpacity>
-
       <View style={styles.actionsContainer}>
-        {order?.createdAt
+        {/* {order?.createdAt
           ? (() => {
               const isReopenDisabled =
                 order?.closedAt &&
@@ -236,21 +221,23 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
                   onPress={handleCloseOrder}
                   disabled={isReopenDisabled}
                 >
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      noTable ? styles.noTableText : null,
-                      isReopenDisabled ? styles.noTableOtherText : null,
-                    ]}
-                  >
-                    {isOrderClosed ? strings.REOPEN : strings.CLOSE}
-                  </Text>
+                  <Icon
+                    name={isOrderClosed ? 'refresh' : 'close-circle-outline'}
+                    size={24}
+                    color={
+                      isReopenDisabled
+                        ? colors.slightlyLighterGrey
+                        : noTable
+                        ? colors.green
+                        : colors.white
+                    }
+                  />
                 </TouchableOpacity>
               );
             })()
-          : null}
+          : null} */}
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[
             styles.button,
             styles.tableButton,
@@ -260,15 +247,27 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           onPress={handleOpenSelectTableModal}
           disabled={isOrderClosed}
         >
-          <Text
-            style={[
-              styles.buttonText,
-              noTable ? styles.noTableText : null,
-              isOrderClosed ? styles.noTableOtherText : null,
-            ]}
-          >
-            {table?.tableName ?? strings.SELECT_TABLE}
-          </Text>
+          <TableIcon
+            size={24}
+            color={
+              isOrderClosed ? colors.slightlyLighterGrey : noTable ? colors.green : colors.white
+            }
+          />
+        </TouchableOpacity> */}
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            styles.moreButton,
+            noTable || isOrderClosed ? styles.noTableOtherBtns : null,
+          ]}
+          onPress={handleOpenMoreOptionsModal}
+          disabled={noTable || isOrderClosed}
+        >
+          <MoreIconHorizontal
+            size={24}
+            color={noTable || isOrderClosed ? colors.slightlyLighterGrey : colors.white}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -280,21 +279,31 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           onPress={handleTempOrderPress}
           disabled={noTable || isOrderClosed}
         >
-          <Text
-            style={[styles.buttonText, noTable || isOrderClosed ? styles.noTableOtherText : null]}
-          >
-            {strings.ADD}
-          </Text>
+          <Icon
+            name="plus-circle-outline"
+            size={24}
+            color={noTable || isOrderClosed ? colors.slightlyLighterGrey : colors.white}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            styles.sendOrderButton,
+            noTable || isOrderView || isOrderClosed || isSending ? styles.noTableOtherBtns : null,
+          ]}
+          onPress={handleOrderSend}
+          disabled={noTable || isOrderView || isOrderClosed || isSending}
+        >
+          <Icon
+            name="send"
+            size={24}
+            color={
+              noTable || isOrderClosed || isSending ? colors.slightlyLighterGrey : colors.white
+            }
+          />
         </TouchableOpacity>
       </View>
-      {order && (
-        <CouvertFAB
-          key={`couvert-fab-${order.id}-${order.couvert}`}
-          onSubmit={handleAddCouvert}
-          disabled={noTable || isOrderClosed}
-          couvertQuantity={order?.couvert ?? 0}
-        />
-      )}
     </View>
   );
 };
@@ -333,9 +342,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blue,
     borderRadius: 50,
   },
-  tableButton: {
+  moreButton: {
     flex: 1,
-    backgroundColor: colors.lightGrey,
+    backgroundColor: colors.darkerBlue,
   },
   closeButton: {
     flex: 1,
@@ -344,22 +353,16 @@ const styles = StyleSheet.create({
   reopenButton: {
     backgroundColor: colors.green,
   },
-  buttonText: {
-    color: colors.white,
-    fontSize: 10,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  noTableText: {
-    fontSize: 10,
-  },
   noTableBorder: {
     borderWidth: 2,
     borderColor: colors.green,
   },
-  noTableOtherBtns: { backgroundColor: colors.darkerGrey },
-  noTableOtherText: { color: colors.slightlyLighterGrey },
-  changedTable: { backgroundColor: colors.blue },
+  noTableOtherBtns: {
+    backgroundColor: colors.darkerGrey,
+  },
+  changedTable: {
+    backgroundColor: colors.blue,
+  },
 });
 
 export default TempBottomOptions;

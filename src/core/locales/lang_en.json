@@ -256,5 +256,6 @@
   "TOTAL": "Total",
   "STATUS": "Status",
   "PRINTERS": "Printers",
-  "NO_PRINTERS": "No Printers Found"
+  "NO_PRINTERS": "No Printers Found",
+  "MORE_OPTIONS": "More Options"
 }

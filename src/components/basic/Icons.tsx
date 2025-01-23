@@ -55,6 +55,10 @@ export const EditIcon = ({ size = 24, color = '#c8c6ff', style }: IconProps = {}
   return <MaterialIcons name="edit" size={size} color={color} style={style} />;
 };
 
+export const MoreIconHorizontal = ({ size = 24, color = '#c8c6ff', style }: IconProps = {}) => {
+  return <MaterialIcons name="more-horiz" size={size} color={color} style={style} />;
+};
+
 export const TrashIcon = ({ size = 24, color = '#ffc4c4', style }: IconProps = {}) => {
   return <FontAwesome6 name="trash" size={size} color={color} style={style} />;
 };

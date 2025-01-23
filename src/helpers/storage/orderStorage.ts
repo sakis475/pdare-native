@@ -60,6 +60,7 @@ export const getTempOrder = async (): Promise<Order | null> => {
 };
 
 export const setTempOrder = async (order: Order): Promise<Order | null> => {
+  console.log(order, 'in setTempOrder');
   await setStorage('newOrder', order);
 
   return order;
@@ -310,11 +311,12 @@ export const setItemPropertyPatterns = async (itemPropertyPatterns: PropertyPatt
 };
 
 export const updateTableOfOrder = async (order: Order, newTable: Table) => {
-  order.table = newTable;
-  const convertedServerOrder = convertNewOrderToRequestObject(order);
+  const updateOrder: CreateNewOrderRequest = {
+    orderId: order.id,
+    table: newTable.id > 0 ? newTable.id : newTable.tableName,
+    comment: order.comment,
+    items: [],
+  };
 
-  return await Requests.patchRequest(
-    `/orders/${convertedServerOrder?.orderId}`,
-    convertedServerOrder
-  );
+  return await Requests.patchRequest(`/orders/${order?.id}`, updateOrder);
 };

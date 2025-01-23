@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,6 +7,8 @@ import {
   Modal,
   FlatList,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
@@ -17,46 +19,8 @@ import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { getRequest, patchRequest, postRequest } from '../../helpers/requests';
 import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, PRINTERS_DISCOVERED_UPDATE } from '../../helpers/Sockets/EventEmitter';
-
-enum CharacterSet {
-  PC437_USA = 'PC437_USA',
-  PC850_MULTILINGUAL = 'PC850_MULTILINGUAL',
-  PC860_PORTUGUESE = 'PC860_PORTUGUESE',
-  PC863_CANADIAN_FRENCH = 'PC863_CANADIAN_FRENCH',
-  PC865_NORDIC = 'PC865_NORDIC',
-  PC851_GREEK = 'PC851_GREEK',
-  PC857_TURKISH = 'PC857_TURKISH',
-  PC737_GREEK = 'PC737_GREEK',
-  ISO8859_7_GREEK = 'ISO8859_7_GREEK',
-  WPC1252 = 'WPC1252',
-  PC866_CYRILLIC2 = 'PC866_CYRILLIC2',
-  PC852_LATIN2 = 'PC852_LATIN2',
-  SLOVENIA = 'SLOVENIA',
-  PC858_EURO = 'PC858_EURO',
-  WPC775_BALTIC_RIM = 'WPC775_BALTIC_RIM',
-  PC855_CYRILLIC = 'PC855_CYRILLIC',
-  PC861_ICELANDIC = 'PC861_ICELANDIC',
-  PC862_HEBREW = 'PC862_HEBREW',
-  PC864_ARABIC = 'PC864_ARABIC',
-  PC869_GREEK = 'PC869_GREEK',
-  ISO8859_2_LATIN2 = 'ISO8859_2_LATIN2',
-  ISO8859_15_LATIN9 = 'ISO8859_15_LATIN9',
-  PC1125_UKRANIAN = 'PC1125_UKRANIAN',
-  WPC1250_LATIN2 = 'WPC1250_LATIN2',
-  WPC1251_CYRILLIC = 'WPC1251_CYRILLIC',
-  WPC1253_GREEK = 'WPC1253_GREEK',
-  WPC1254_TURKISH = 'WPC1254_TURKISH',
-  WPC1255_HEBREW = 'WPC1255_HEBREW',
-  WPC1256_ARABIC = 'WPC1256_ARABIC',
-  WPC1257_BALTIC_RIM = 'WPC1257_BALTIC_RIM',
-  WPC1258_VIETNAMESE = 'WPC1258_VIETNAMESE',
-  KZ1048_KAZAKHSTAN = 'KZ1048_KAZAKHSTAN',
-  JAPAN = 'JAPAN',
-  KOREA = 'KOREA',
-  CHINA = 'CHINA',
-  HK_TW = 'HK_TW',
-  TCVN_VIETNAMESE = 'TCVN_VIETNAMESE',
-}
+import dayjs from '../../core/dayjs';
+import { CharacterSet } from '../../types/exportable.types';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -89,12 +53,20 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
       return;
     }
 
+    // Add validation for required IP and port when creating a custom printer
+    if (mode === 'create') {
+      if (!overrideIP.trim()) {
+        AlertWithOptions('', 'IP address is required for custom printers');
+        return;
+      }
+    }
+
     onSave({
       ...printer,
       printerNickname: nickname.trim(),
       overrideIP: overrideIP.trim(),
       overridePort: overridePort.trim(),
-      characterSet: characterSet.trim(),
+      characterSet: characterSet?.trim(),
       active: active,
       printLocation,
     });
@@ -173,79 +145,94 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
   };
 
   return (
-    <>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Modal visible={editModalVisible} transparent animationType="fade" onRequestClose={onDismiss}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {mode === 'edit' ? 'Edit Printer' : 'New Printer'}
-            </Text>
-
-            <TextInput
-              label="Nickname"
-              value={nickname}
-              onChangeText={setNickname}
-              style={styles.input}
-              mode="outlined"
-            />
-
-            <TextInput
-              label="Override IP (optional)"
-              value={overrideIP}
-              onChangeText={setOverrideIP}
-              style={styles.input}
-              mode="outlined"
-            />
-
-            <TextInput
-              label="Override Port (optional)"
-              value={overridePort}
-              onChangeText={setOverridePort}
-              style={styles.input}
-              mode="outlined"
-            />
-
-            <Text style={styles.inputLabel}>Print Items</Text>
-            <SegmentedButtons
-              value={printLocation}
-              onValueChange={handlePrintLocationChange}
-              buttons={[
-                { value: PrintLocation.ALL, label: 'All' },
-                { value: PrintLocation.KITCHEN, label: 'Kitchen' },
-                { value: PrintLocation.BAR, label: 'Bar' },
-              ]}
-              style={styles.segmentedButtons}
-            />
-
-            <Text style={styles.inputLabel}>Character Set</Text>
-            <TouchableOpacity style={styles.charsetButton} onPress={handleCharSetPress}>
-              <Text style={styles.charsetButtonText}>
-                {characterSet ? characterSet.replace(/_/g, ' ') : 'Select Character Set'}
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>
+                {mode === 'edit' ? 'Edit Printer' : 'New Printer'}
               </Text>
-            </TouchableOpacity>
 
-            <View style={styles.switchContainer}>
-              <Text style={styles.switchLabel}>Active</Text>
-              <Switch value={active} onValueChange={setActive} />
-            </View>
+              <ScrollView style={styles.scrollContent}>
+                <TextInput
+                  label="Nickname"
+                  value={nickname}
+                  onChangeText={setNickname}
+                  style={styles.input}
+                  mode="outlined"
+                />
 
-            <Text style={styles.switchContainer}>
-              Current IP: {printer?.printerIp}:{printer?.printerPort}
-            </Text>
+                <TextInput
+                  label={`${mode === 'edit' ? 'Override IP (optional)' : 'IP'}`}
+                  value={overrideIP}
+                  onChangeText={setOverrideIP}
+                  style={styles.input}
+                  mode="outlined"
+                />
 
-            <View style={styles.buttonContainer}>
-              <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-                Cancel
-              </Button>
-              <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-                Save
-              </Button>
+                <TextInput
+                  label={`${mode === 'edit' ? 'Override Port (optional)' : 'Port'}`}
+                  value={overridePort}
+                  onChangeText={setOverridePort}
+                  style={styles.input}
+                  mode="outlined"
+                />
+
+                <Text style={styles.inputLabel}>Print Items</Text>
+                <SegmentedButtons
+                  value={printLocation}
+                  onValueChange={handlePrintLocationChange}
+                  buttons={[
+                    { value: PrintLocation.ALL, label: 'All' },
+                    { value: PrintLocation.KITCHEN, label: 'Kitchen' },
+                    { value: PrintLocation.BAR, label: 'Bar' },
+                  ]}
+                  style={styles.segmentedButtons}
+                />
+
+                <Text style={styles.inputLabel}>Character Set</Text>
+                <TouchableOpacity style={styles.charsetButton} onPress={handleCharSetPress}>
+                  <Text style={styles.charsetButtonText}>
+                    {characterSet ? characterSet.replace(/_/g, ' ') : 'Select Character Set'}
+                  </Text>
+                </TouchableOpacity>
+
+                {mode === 'edit' ? (
+                  <View style={styles.switchContainer}>
+                    <Text style={styles.switchLabel}>Active</Text>
+                    <Switch value={active} onValueChange={setActive} />
+                  </View>
+                ) : null}
+
+                <Text style={styles.switchContainer}>
+                  {`${
+                    printer?.printerIp
+                      ? `Current IP: ${printer?.printerIp}${`${
+                          printer?.printerPort ? `:${printer?.printerPort}` : ''
+                        }`}`
+                      : ''
+                  }`}
+                </Text>
+
+                {/* Add padding at the bottom to ensure scrolling reveals all content */}
+                <View style={{ height: 20 }} />
+              </ScrollView>
+
+              <View style={styles.buttonFooter}>
+                <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
+                  Cancel
+                </Button>
+                <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
+                  Save
+                </Button>
+              </View>
             </View>
           </View>
         </View>
       </Modal>
       <CharSetPicker />
-    </>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -258,7 +245,11 @@ const PrinterItem = ({ printer, onEdit }: { printer: Printer; onEdit: any }) => 
       <Text style={[styles.printerName, !printer.active && styles.disabledPrinterText]}>
         {printer.printerNickname}
       </Text>
-      <Text style={styles.printerDetails}>Print Type: {printer.printLocation}</Text>
+      <Text style={styles.printerDetails}>Print Items: {printer.printLocation}</Text>
+      <Text style={styles.printerDetails}>
+        Latest Discovery:{' '}
+        {printer.lastDiscovered ? dayjs(printer.lastDiscovered).format('HH:mm DD/MM/YY') : '-'}
+      </Text>
     </View>
     <FontAwesome6 name="pencil" size={16} color={colors.white} />
   </TouchableOpacity>
@@ -271,7 +262,52 @@ const AdminPrintersScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
 
+  const [mode, setMode] = useState<'edit' | 'create'>('edit');
+
   const strings = useStrings();
+
+  const handleAddCustomPrinter = () => {
+    setSelectedPrinter(null);
+    setMode('create');
+    setModalVisible(true);
+  };
+
+  const handleEditPress = (printer: Printer) => {
+    setSelectedPrinter(printer);
+    setMode('edit');
+    setModalVisible(true);
+  };
+
+  const handleCreatePrinter = async (newPrinter: Printer) => {
+    setIsLoading(true);
+
+    const newPrinterToSend: Printer = {
+      printerNickname: newPrinter.printerNickname,
+      printerMac: '',
+      printerIp: newPrinter.overrideIP,
+      printerPort: newPrinter.overridePort,
+      printLocation: newPrinter.printLocation,
+      characterSet: newPrinter.characterSet,
+    };
+
+    console.log(newPrinterToSend, 'newPrinterToSend');
+
+    try {
+      const response = await postRequest('/printers', {
+        printer: newPrinterToSend,
+      });
+      if (Array.isArray(response)) {
+        setPrinters(response);
+        toast('success', strings.SUCCESS, 'Printer added successfully');
+      } else {
+        throw new Error('No valid printer entity Response');
+      }
+    } catch (error) {
+      toast('error', strings.ERROR, 'Failed to add printer');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchPrinters = async () => {
     try {
@@ -282,28 +318,49 @@ const AdminPrintersScreen = () => {
     }
   };
 
-  const handlePrinterDiscovered = (freshPrinters: Printer[]) => {
-    const printersDiff = freshPrinters?.filter(
-      (freshPrinter) => !printers?.some((printer) => freshPrinter.printerMac === printer.printerMac)
-    );
-
-    if (!freshPrinters.length) {
+  const handlePrinterDiscovered = useCallback((freshPrinters: Printer[]) => {
+    // Early return if freshPrinters is null/undefined
+    if (!freshPrinters) {
       toast('error', strings.NO_PRINTERS);
-    } else if (printersDiff?.length) {
-      toast('success', `Found new printers!`);
-    } else {
-      toast('success', strings.SUCCESS);
+      setIsScanning(false);
+      setPrinters([]);
+      return;
     }
 
+    setPrinters((currentPrinters) => {
+      // Find new printers using current state
+      const printersDiff = freshPrinters.filter(
+        (freshPrinter) =>
+          !currentPrinters?.some((printer) => freshPrinter.printerMac === printer.printerMac)
+      );
+
+      if (freshPrinters.length === 0) {
+        // No printers found at all
+        toast('error', strings.NO_PRINTERS);
+      } else if (printersDiff.length > 0) {
+        // Found new printers
+        toast(
+          'success',
+          `Found ${printersDiff.length} new printer${printersDiff.length > 1 ? 's' : ''}!`
+        );
+      } else {
+        // Found printers, but all were already known
+        toast('info', 'All discovered printers are already registered');
+      }
+
+      return freshPrinters;
+    });
+
     setIsScanning(false);
-    setPrinters(freshPrinters ?? []);
-  };
+  }, []);
 
   useEffect(() => {
     fetchPrinters();
     const subscription = EventEmitter.addListener(
       PRINTERS_DISCOVERED_UPDATE,
-      handlePrinterDiscovered
+      (freshPrinters: Printer[]) => {
+        handlePrinterDiscovered(freshPrinters);
+      }
     );
     return () => subscription.remove();
   }, []);
@@ -353,11 +410,6 @@ const AdminPrintersScreen = () => {
     }
   };
 
-  const handleEditPress = (printer: Printer) => {
-    setSelectedPrinter(printer);
-    setModalVisible(true);
-  };
-
   const handleEditPrinter = async (updatedPrinter: Printer) => {
     setIsLoading(true);
 
@@ -366,8 +418,13 @@ const AdminPrintersScreen = () => {
       const response = await patchRequest(`/printers`, {
         printer: updatedPrinter,
       });
-      setPrinters(response);
-      toast('success', strings.SUCCESS, 'Printer updated successfully');
+
+      if (Array.isArray(response)) {
+        setPrinters(response);
+        toast('success', strings.SUCCESS, 'Printer added successfully');
+      } else {
+        throw new Error('No valid printer entity Response');
+      }
     } catch (error) {
       toast('error', strings.ERROR, 'Failed to update printer');
     } finally {
@@ -392,30 +449,40 @@ const AdminPrintersScreen = () => {
 
   return (
     <View style={styles.container}>
-      {printers === null ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : printers?.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No printers found</Text>
-          <Text style={styles.emptyText}>Tap the search button to scan for printers</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={printers}
-          keyExtractor={(item) => `printer-${item.id}`}
-          renderItem={({ item }) => <PrinterItem printer={item} onEdit={handleEditPress} />}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
+      <View>
+        {printers === null ? (
+          <ActivityIndicator size="large" color={colors.primary} />
+        ) : printers?.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No printers found</Text>
+            <Text style={styles.emptyText}>Tap the search button to scan for printers</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={printers}
+            keyExtractor={(item) => `printer-${item.id}`}
+            renderItem={({ item }) => <PrinterItem printer={item} onEdit={handleEditPress} />}
+            contentContainerStyle={styles.listContent}
+          />
+        )}
+      </View>
 
-      <FAB
-        icon="magnify"
-        style={styles.scanFab}
-        onPress={handleScanPrinters}
-        loading={isScanning}
-        disabled={isScanning}
-        color={colors.darkGrey}
-      />
+      <View style={styles.fabContainer}>
+        <FAB
+          icon="plus"
+          style={[styles.fab, styles.addFab]}
+          onPress={handleAddCustomPrinter}
+          color={colors.darkGrey}
+        />
+        <FAB
+          icon="magnify"
+          style={[styles.fab, styles.scanFab]}
+          onPress={handleScanPrinters}
+          loading={isScanning}
+          disabled={isScanning}
+          color={colors.darkGrey}
+        />
+      </View>
 
       <EditModal
         visible={modalVisible}
@@ -424,9 +491,9 @@ const AdminPrintersScreen = () => {
           setModalVisible(false);
           setSelectedPrinter(null);
         }}
-        onSave={handleEditPrinter}
+        onSave={mode === 'create' ? handleCreatePrinter : handleEditPrinter}
         onDelete={handleDeletePrinter}
-        mode="edit"
+        mode={mode}
       />
 
       {isLoading && <LoadingOverlay />}
@@ -441,6 +508,58 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    padding: 16,
+  },
+  modalContainer: {
+    marginVertical: 40,
+    maxHeight: '90%',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    flexDirection: 'column',
+    height: '100%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: colors.grey,
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.lightGrey,
+  },
+  scrollContent: {
+    flex: 1,
+    padding: 20,
+  },
+  buttonFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: colors.lightGrey,
+    backgroundColor: 'white',
+    borderRadius: 10,
+  },
+  cancelButton: {
+    flex: 1,
+    marginRight: 8,
+  },
+  saveButton: {
+    flex: 2,
+    marginLeft: 8,
+  },
+  modalScroll: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    maxHeight: '100%',
   },
   printerItem: {
     flexDirection: 'row',
@@ -481,30 +600,17 @@ const styles = StyleSheet.create({
   },
   scanFab: {
     position: 'absolute',
-    margin: 16,
+    margin: 8,
     right: 0,
     bottom: 0,
     backgroundColor: colors.primary,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '90%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: colors.grey,
+  addFab: {
+    position: 'absolute',
+    margin: 8,
+    left: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
   },
   input: {
     marginBottom: 20,
@@ -524,12 +630,6 @@ const styles = StyleSheet.create({
   disabledPrinterText: {
     textDecorationLine: 'line-through',
     color: colors.lightGrey,
-  },
-  cancelButton: {
-    flex: 1,
-  },
-  saveButton: {
-    flex: 2,
   },
   inputLabel: {
     color: colors.grey,
@@ -581,6 +681,17 @@ const styles = StyleSheet.create({
   },
   pickerList: {
     maxHeight: 300,
+  },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  fab: {
+    backgroundColor: colors.primary,
   },
 });
 

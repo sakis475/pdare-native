@@ -184,4 +184,5 @@ interface Printer {
   restaurant?: Restaurant;
   createdAt?: Date;
   updatedAt?: Date;
+  lastDiscovered?: Date;
 }
