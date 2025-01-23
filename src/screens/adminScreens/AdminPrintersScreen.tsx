@@ -38,6 +38,7 @@ interface EditModalProps {
 }
 
 const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSave, mode }) => {
+  const strings = useStrings();
   const [nickname, setNickname] = useState('');
   const [overrideIP, setOverrideIP] = useState('');
   const [overridePort, setOverridePort] = useState('');
@@ -49,14 +50,14 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
 
   const handleSave = () => {
     if (!nickname.trim()) {
-      AlertWithOptions('', 'Printer nickname cannot be empty');
+      AlertWithOptions('', strings.EMPTY_NICKNAME_ERROR);
       return;
     }
 
     // Add validation for required IP and port when creating a custom printer
     if (mode === 'create') {
       if (!overrideIP.trim()) {
-        AlertWithOptions('', 'IP address is required for custom printers');
+        AlertWithOptions('', strings.IP_REQUIRED_ERROR);
         return;
       }
     }
@@ -110,7 +111,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
   const CharSetPicker = () => (
     <Portal>
       <Dialog visible={charSetPickerVisible} onDismiss={handleCharSetDismiss}>
-        <Dialog.Title>Select Character Set</Dialog.Title>
+        <Dialog.Title>{strings.SELECT_CHARACTER_SET}</Dialog.Title>
         <Dialog.Content>
           <FlatList
             data={Object.entries(CharacterSet)}
@@ -134,7 +135,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
           />
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={handleCharSetDismiss}>Cancel</Button>
+          <Button onPress={handleCharSetDismiss}>{strings.CANCEL}</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>
@@ -151,12 +152,12 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>
-                {mode === 'edit' ? 'Edit Printer' : 'New Printer'}
+                {mode === 'edit' ? strings.EDIT_PRINTER : strings.NEW_PRINTER}
               </Text>
 
               <ScrollView style={styles.scrollContent}>
                 <TextInput
-                  label="Nickname"
+                  label={strings.NICKNAME}
                   value={nickname}
                   onChangeText={setNickname}
                   style={styles.input}
@@ -164,7 +165,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
                 />
 
                 <TextInput
-                  label={`${mode === 'edit' ? 'Override IP (optional)' : 'IP'}`}
+                  label={mode === 'edit' ? strings.OVERRIDE_IP : strings.IP}
                   value={overrideIP}
                   onChangeText={setOverrideIP}
                   style={styles.input}
@@ -172,59 +173,55 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
                 />
 
                 <TextInput
-                  label={`${mode === 'edit' ? 'Override Port (optional)' : 'Port'}`}
+                  label={mode === 'edit' ? strings.OVERRIDE_PORT : strings.PORT}
                   value={overridePort}
                   onChangeText={setOverridePort}
                   style={styles.input}
                   mode="outlined"
                 />
 
-                <Text style={styles.inputLabel}>Print Items</Text>
+                <Text style={styles.inputLabel}>{strings.PRINT_ITEMS}</Text>
                 <SegmentedButtons
                   value={printLocation}
                   onValueChange={handlePrintLocationChange}
                   buttons={[
-                    { value: PrintLocation.ALL, label: 'All' },
-                    { value: PrintLocation.KITCHEN, label: 'Kitchen' },
-                    { value: PrintLocation.BAR, label: 'Bar' },
+                    { value: PrintLocation.ALL, label: strings.ALL },
+                    { value: PrintLocation.KITCHEN, label: strings.KITCHEN },
+                    { value: PrintLocation.BAR, label: strings.BAR },
                   ]}
                   style={styles.segmentedButtons}
                 />
 
-                <Text style={styles.inputLabel}>Character Set</Text>
+                <Text style={styles.inputLabel}>{strings.CHARACTER_SET}</Text>
                 <TouchableOpacity style={styles.charsetButton} onPress={handleCharSetPress}>
                   <Text style={styles.charsetButtonText}>
-                    {characterSet ? characterSet.replace(/_/g, ' ') : 'Select Character Set'}
+                    {characterSet ? characterSet.replace(/_/g, ' ') : strings.SELECT_CHARACTER_SET}
                   </Text>
                 </TouchableOpacity>
 
-                {mode === 'edit' ? (
+                {mode === 'edit' && (
                   <View style={styles.switchContainer}>
-                    <Text style={styles.switchLabel}>Active</Text>
+                    <Text style={styles.switchLabel}>{strings.ACTIVE}</Text>
                     <Switch value={active} onValueChange={setActive} />
                   </View>
-                ) : null}
+                )}
 
                 <Text style={styles.switchContainer}>
-                  {`${
-                    printer?.printerIp
-                      ? `Current IP: ${printer?.printerIp}${`${
-                          printer?.printerPort ? `:${printer?.printerPort}` : ''
-                        }`}`
-                      : ''
-                  }`}
+                  {printer?.printerIp &&
+                    `${strings.CURRENT_IP}: ${printer.printerIp}${
+                      printer.printerPort ? `:${printer.printerPort}` : ''
+                    }`}
                 </Text>
 
-                {/* Add padding at the bottom to ensure scrolling reveals all content */}
                 <View style={{ height: 20 }} />
               </ScrollView>
 
               <View style={styles.buttonFooter}>
                 <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-                  Cancel
+                  {strings.CANCEL}
                 </Button>
                 <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-                  Save
+                  {strings.SAVE}
                 </Button>
               </View>
             </View>
@@ -290,20 +287,18 @@ const AdminPrintersScreen = () => {
       characterSet: newPrinter.characterSet,
     };
 
-    console.log(newPrinterToSend, 'newPrinterToSend');
-
     try {
       const response = await postRequest('/printers', {
         printer: newPrinterToSend,
       });
       if (Array.isArray(response)) {
         setPrinters(response);
-        toast('success', strings.SUCCESS, 'Printer added successfully');
+        toast('success', strings.SUCCESS, strings.PRINTER_ADDED);
       } else {
         throw new Error('No valid printer entity Response');
       }
     } catch (error) {
-      toast('error', strings.ERROR, 'Failed to add printer');
+      toast('error', strings.ERROR, strings.PRINTER_ADD_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -314,7 +309,7 @@ const AdminPrintersScreen = () => {
       const response = await getRequest('/printers');
       setPrinters(response);
     } catch (error) {
-      toast('error', strings.ERROR, 'Failed to fetch printers');
+      toast('error', strings.ERROR, strings.PRINTER_FETCH_FAILED);
     }
   };
 
@@ -339,13 +334,10 @@ const AdminPrintersScreen = () => {
         toast('error', strings.NO_PRINTERS);
       } else if (printersDiff.length > 0) {
         // Found new printers
-        toast(
-          'success',
-          `Found ${printersDiff.length} new printer${printersDiff.length > 1 ? 's' : ''}!`
-        );
+        toast('success', `${strings.FOUND} ${printersDiff.length} ${strings.NEW_PRINTER} }!`);
       } else {
         // Found printers, but all were already known
-        toast('info', 'All discovered printers are already registered');
+        toast('info', strings.ALL_PRINTERS_REGISTERED);
       }
 
       return freshPrinters;
@@ -405,7 +397,7 @@ const AdminPrintersScreen = () => {
         timeoutPromise,
       ]);
     } catch (error) {
-      toast('error', strings.ERROR, 'Scan timeout');
+      toast('error', strings.ERROR, strings.SCAN_TIMEOUT);
       setIsScanning(false);
     }
   };
@@ -413,7 +405,6 @@ const AdminPrintersScreen = () => {
   const handleEditPrinter = async (updatedPrinter: Printer) => {
     setIsLoading(true);
 
-    console.log(updatedPrinter, 'updatedPrinter');
     try {
       const response = await patchRequest(`/printers`, {
         printer: updatedPrinter,
@@ -421,12 +412,12 @@ const AdminPrintersScreen = () => {
 
       if (Array.isArray(response)) {
         setPrinters(response);
-        toast('success', strings.SUCCESS, 'Printer added successfully');
+        toast('success', strings.SUCCESS, strings.PRINTER_ADDED);
       } else {
         throw new Error('No valid printer entity Response');
       }
     } catch (error) {
-      toast('error', strings.ERROR, 'Failed to update printer');
+      toast('error', strings.ERROR, strings.PRINTER_UPDATE_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -439,9 +430,9 @@ const AdminPrintersScreen = () => {
         printer: { active: false },
       });
       setPrinters((prev) => prev.filter((printer) => printer.id !== printerId));
-      toast('success', strings.SUCCESS, 'Printer deleted successfully');
+      toast('success', strings.SUCCESS, strings.PRINTER_DELETED);
     } catch (error) {
-      toast('error', strings.ERROR, 'Failed to delete printer');
+      toast('error', strings.ERROR, strings.PRINTER_DELETE_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -454,8 +445,8 @@ const AdminPrintersScreen = () => {
           <ActivityIndicator size="large" color={colors.primary} />
         ) : printers?.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No printers found</Text>
-            <Text style={styles.emptyText}>Tap the search button to scan for printers</Text>
+            <Text style={styles.emptyText}>{strings.NO_PRINTERS}</Text>
+            <Text style={styles.emptyText}>{strings.TAP_TO_SCAN}</Text>
           </View>
         ) : (
           <FlatList

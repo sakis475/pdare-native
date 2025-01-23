@@ -131,8 +131,8 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                       }}
                     >
                       <List.Item
-                        title="Change Table"
-                        description="Move the current order to a different table"
+                        title={strings.CHANGE_TABLE}
+                        description={strings.CHANGE_TABLE_DESCRIPTION}
                         descriptionStyle={styles.listItemDescription}
                         left={(props) => (
                           <List.Icon {...props} icon="table-furniture" color={colors.white} />
@@ -150,8 +150,8 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                       }}
                     >
                       <List.Item
-                        title="Change Couvert"
-                        description="Modify the cover charge for the current order"
+                        title={strings.CHANGE_COUVERT}
+                        description={strings.CHANGE_COUVERT_DESCRIPTION}
                         descriptionStyle={styles.listItemDescription}
                         left={(props) => (
                           <List.Icon {...props} icon="silverware" color={colors.white} />
@@ -165,8 +165,8 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                   {showReprintOrder ? (
                     <View style={styles.printSection}>
                       <List.Item
-                        title="Re-print Order"
-                        description="Print a copy of the order"
+                        title={strings.REPRINT_ORDER}
+                        description={strings.REPRINT_ORDER_DESCRIPTION}
                         descriptionStyle={styles.listItemDescription}
                         left={(props) => (
                           <List.Icon {...props} icon="printer" color={colors.white} />
@@ -180,9 +180,9 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                           value={printDestination}
                           onValueChange={setPrintDestination}
                           buttons={[
-                            { value: 'all', label: 'All' },
-                            { value: 'bar', label: 'Bar' },
-                            { value: 'kitchen', label: 'Kitchen' },
+                            { value: 'all', label: strings.ALL },
+                            { value: 'bar', label: strings.BAR },
+                            { value: 'kitchen', label: strings.KITCHEN },
                           ]}
                           style={styles.segmentedButtons}
                           theme={{
@@ -196,7 +196,7 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                           style={styles.printButton}
                           onPress={() => onPrint?.(printDestination as 'all' | 'bar' | 'kitchen')}
                         >
-                          <Text style={styles.printButtonText}>PRINT</Text>
+                          <Text style={styles.printButtonText}>{strings.PRINT}</Text>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -205,8 +205,8 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                   {showPrintAnalysis ? (
                     <TouchableOpacity onPress={onCustomerAnalysis}>
                       <List.Item
-                        title="Print Analysis"
-                        description="Print final order analysis"
+                        title={strings.PRINT_ANALYSIS}
+                        description={strings.PRINT_ANALYSIS_DESCRIPTION}
                         descriptionStyle={styles.listItemDescription}
                         left={(props) => (
                           <List.Icon {...props} icon="receipt" color={colors.white} />
@@ -220,8 +220,8 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                   {showCloseOrder ? (
                     <TouchableOpacity onPress={onCloseOrder}>
                       <List.Item
-                        title="Close Order"
-                        description="Free up the table"
+                        title={strings.CLOSE_ORDER}
+                        description={strings.CLOSE_ORDER_DESCRIPTION}
                         descriptionStyle={styles.listItemDescription}
                         left={(props) => <List.Icon {...props} icon="close" color={colors.white} />}
                         titleStyle={styles.listItemTitle}
@@ -233,8 +233,8 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                   {showReOpenOrder ? (
                     <TouchableOpacity onPress={onReopenOrder}>
                       <List.Item
-                        title="Re Open Order"
-                        description="Opens Order Again"
+                        title={strings.REOPEN_ORDER}
+                        description={strings.REOPEN_ORDER_DESCRIPTION}
                         descriptionStyle={styles.listItemDescription}
                         left={(props) => (
                           <List.Icon {...props} icon="refresh" color={colors.white} />
