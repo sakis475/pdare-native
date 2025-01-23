@@ -193,3 +193,11 @@ export const CheckBoxChecked = ({ size = 20, color = colors.white, style }: Icon
 export const CloseIcon = ({ size = 24, color = colors.white, style }: IconProps = {}) => {
   return <MaterialIcons name="close" size={size} color={color} style={style} />;
 };
+
+export const EyeOff = ({ size = 24, color = colors.white, style }: IconProps = {}) => {
+  return <MaterialCommunityIcons name="eye-off" size={size} color={color} style={style} />;
+};
+
+export const EyeOn = ({ size = 24, color = colors.white, style }: IconProps = {}) => {
+  return <MaterialCommunityIcons name="eye" size={size} color={color} style={style} />;
+};
