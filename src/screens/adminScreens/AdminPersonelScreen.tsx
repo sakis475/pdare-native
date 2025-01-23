@@ -484,7 +484,7 @@ const AdminPersonelScreen = () => {
         icon={() => <SearchIcon size={24} color={colors.white} />}
         style={styles.fab}
         onPress={() => setSearchModalVisible(true)}
-        color={colors.darkGrey}
+        color={colors.white}
         animated={false}
       />
 

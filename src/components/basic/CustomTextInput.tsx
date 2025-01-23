@@ -12,6 +12,8 @@ interface CustomTextInputProps {
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   style?: any;
   disabled?: boolean;
+  mode?: 'outlined' | 'flat';
+  theme?: 'light' | 'dark';
 }
 
 const CustomTextInput: React.FC<CustomTextInputProps> = ({
@@ -23,8 +25,36 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   autoCapitalize = 'none',
   style,
   disabled = false,
+  mode = 'outlined',
+  theme = 'dark',
   ...props
 }) => {
+  const getThemeColors = () => {
+    return theme === 'light'
+      ? {
+          primary: colors.grey,
+          placeholder: colors.grey,
+          text: colors.grey,
+          background: colors.white,
+          surface: colors.white,
+          onSurface: colors.grey,
+          onSurfaceVariant: colors.grey,
+          accent: colors.grey,
+          onSecondaryContainer: colors.grey,
+        }
+      : {
+          primary: colors.primary,
+          placeholder: colors.grey,
+          text: colors.white,
+          background: colors.grey,
+          surface: colors.grey,
+          onSurface: colors.darkGrey,
+          onSurfaceVariant: colors.lighterGrey,
+          accent: colors.primary,
+          onSecondaryContainer: colors.white,
+        };
+  };
+
   return (
     <TextInput
       label={label}
@@ -36,22 +66,11 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
       mode="outlined"
       style={[styles.input, style]}
       theme={{
-        colors: {
-          primary: colors.primary,
-          placeholder: colors.grey,
-          text: colors.white,
-          background: colors.grey,
-          surface: colors.grey,
-          onSurface: colors.darkGrey,
-          onSurfaceVariant: colors.lighterGrey,
-          // Add these for focus state
-          accent: colors.primary, // Color when focused
-          onSecondaryContainer: colors.white, // Label color when focused
-        },
+        colors: getThemeColors(),
       }}
-      outlineColor={colors.lightGrey}
-      activeOutlineColor={colors.primary} // Border color when focused
-      textColor={colors.white}
+      outlineColor={theme === 'light' ? colors.grey : colors.lightGrey}
+      activeOutlineColor={theme === 'light' ? colors.grey : colors.primary}
+      textColor={theme === 'light' ? colors.grey : colors.white}
       disabled={disabled}
       {...props}
     />

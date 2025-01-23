@@ -398,10 +398,10 @@ const AdminTableScreen = () => {
             </ScrollView>
 
             <FAB
-              icon={() => <SortIcon size={24} color={colors.darkGrey} />}
+              icon={() => <SortIcon size={24} color={colors.white} />}
               style={styles.sortFab}
               onPress={handleSortNaturally}
-              color={colors.darkGrey}
+              color={colors.white}
               animated={false}
             />
 
@@ -409,7 +409,7 @@ const AdminTableScreen = () => {
               icon="plus"
               style={styles.createFab}
               onPress={handleCreatePress}
-              color={colors.darkGrey}
+              color={colors.white}
               animated={false}
             />
           </>
@@ -425,7 +425,7 @@ const AdminTableScreen = () => {
               icon="plus"
               style={styles.createFab}
               onPress={handleCreatePress}
-              color={colors.darkGrey}
+              color={colors.white}
               animated={false}
             />
           </>

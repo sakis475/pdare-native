@@ -8,6 +8,8 @@ import {
   ScrollView,
   StyleProp,
   Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -28,6 +30,7 @@ import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
 import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -165,80 +168,84 @@ const EditModal: React.FC<EditModalProps> = ({
   ];
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {mode === 'create' ? strings.CREATE_CATEGORY : strings.UPDATE_CATEGORY}
-          </Text>
-
-          <TextInput
-            label={strings.CATEGORY_TITLE}
-            value={title}
-            onChangeText={setTitle}
-            style={styles.input}
-            mode="outlined"
-          />
-
-          <TouchableOpacity
-            style={[styles.colorPreview, { backgroundColor: color }]}
-            onPress={() => setShowColorPicker(!showColorPicker)}
-          >
-            <Text style={{ color: getTextColorBasedOnLuminance(color) }}>
-              {strings.SELECT_CATEGORY_COLOR}
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {mode === 'create' ? strings.CREATE_CATEGORY : strings.UPDATE_CATEGORY}
             </Text>
-          </TouchableOpacity>
-
-          {showColorPicker && (
-            <View style={styles.colorPickerContainer}>
-              <ColorPicker
-                color={color}
-                onColorChange={setColor}
-                thumbSize={30}
-                sliderSize={40}
-                noSnap={true}
-                row={true}
-              />
-            </View>
-          )}
-
-          {/* Print Location Selector using SegmentedButtons */}
-          <Text style={styles.sectionLabel}>Print Location</Text>
-          <SegmentedButtons
-            value={printLocation}
-            onValueChange={handlePrintLocationChange}
-            buttons={printLocationOptions.map((option) => ({
-              value: option.value,
-              label: option.label,
-              style: styles.segmentButton,
-            }))}
-            style={styles.segmentedButtons}
-          />
-
-          <View style={styles.buttonUpdateContainer}>
-            {mode === 'edit' && onDelete && (
-              <Button
+            <ScrollView style={styles.scrollContent}>
+              <CustomTextInput
+                label={strings.CATEGORY_TITLE}
+                value={title}
+                onChangeText={setTitle}
+                style={styles.input}
                 mode="outlined"
-                onPress={handleDelete}
-                style={[styles.deleteButton]}
-                textColor={colors.lightRed}
-              >
-                <TrashIcon size={15} color={colors.lightRed}></TrashIcon>
-              </Button>
-            )}
+                theme="light"
+              />
 
-            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? strings.CREATE : strings.SAVE}
-            </Button>
-          </View>
-          <View style={styles.buttonUpdateContainer}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              {strings.CANCEL}
-            </Button>
+              <TouchableOpacity
+                style={[styles.colorPreview, { backgroundColor: color }]}
+                onPress={() => setShowColorPicker(!showColorPicker)}
+              >
+                <Text style={{ color: getTextColorBasedOnLuminance(color) }}>
+                  {strings.SELECT_CATEGORY_COLOR}
+                </Text>
+              </TouchableOpacity>
+
+              {showColorPicker && (
+                <View style={styles.colorPickerContainer}>
+                  <ColorPicker
+                    color={color}
+                    onColorChange={setColor}
+                    thumbSize={30}
+                    sliderSize={40}
+                    noSnap={true}
+                    row={true}
+                  />
+                </View>
+              )}
+
+              {/* Print Location Selector using SegmentedButtons */}
+              <Text style={styles.sectionLabel}>Print Location</Text>
+              <SegmentedButtons
+                value={printLocation}
+                onValueChange={handlePrintLocationChange}
+                buttons={printLocationOptions.map((option) => ({
+                  value: option.value,
+                  label: option.label,
+                  style: styles.segmentButton,
+                }))}
+                style={styles.segmentedButtons}
+              />
+
+              <View style={styles.buttonUpdateContainer}>
+                {mode === 'edit' && onDelete && (
+                  <Button
+                    mode="outlined"
+                    onPress={handleDelete}
+                    style={[styles.deleteButton]}
+                    textColor={colors.lightRed}
+                  >
+                    <TrashIcon size={15} color={colors.lightRed}></TrashIcon>
+                  </Button>
+                )}
+
+                <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
+                  {mode === 'create' ? strings.CREATE : strings.SAVE}
+                </Button>
+              </View>
+              <View style={styles.buttonUpdateContainer}>
+                <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
+                  {strings.CANCEL}
+                </Button>
+              </View>
+            </ScrollView>
           </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -472,7 +479,7 @@ const AdminCategoryScreen = () => {
               icon="plus"
               style={styles.fab}
               onPress={handleCreatePress}
-              color={colors.darkGrey}
+              color={colors.white}
               animated={false}
             />
           </>
@@ -486,7 +493,7 @@ const AdminCategoryScreen = () => {
               icon="plus"
               style={styles.fab}
               onPress={handleCreatePress}
-              color={colors.darkGrey}
+              color={colors.white}
               animated={false}
             />
           </>
@@ -521,6 +528,10 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
+  },
+  scrollContent: {
+    flex: 1,
+    padding: 20,
   },
   container: {
     flex: 1,
@@ -589,6 +600,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
+    flex: 1,
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,

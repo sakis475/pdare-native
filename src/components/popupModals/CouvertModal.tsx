@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Modal, TouchableOpacity, Text, ScrollView } from 'react-native';
-import { Portal, FAB, Button } from 'react-native-paper';
+import { View, StyleSheet, Modal, TouchableOpacity, Text } from 'react-native';
+import { Portal, Button } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomNumberInput from '../basic/CustomNumberInput';
-import { CouvertIcon } from '../basic/Icons';
 
 interface CouvertModalProps {
   couvertQuantity: number;

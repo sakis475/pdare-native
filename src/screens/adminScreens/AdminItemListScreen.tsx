@@ -325,7 +325,7 @@ const AdminItemListScreen = ({ route }: any) => {
             icon="plus"
             style={styles.fab}
             onPress={handleCreatePress}
-            color={colors.darkGrey}
+            color={colors.white}
             animated={false}
           />
         </>
@@ -347,7 +347,7 @@ const AdminItemListScreen = ({ route }: any) => {
               icon="plus"
               style={styles.fab}
               onPress={handleCreatePress}
-              color={colors.darkGrey}
+              color={colors.white}
               animated={false}
             />
           </View>

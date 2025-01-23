@@ -552,7 +552,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                 icon="plus"
                 style={styles.fab}
                 onPress={handleAddPropertyGroup}
-                color={colors.darkGrey}
+                color={colors.white}
                 animated={false}
               />
             ) : (
@@ -561,7 +561,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                   icon="plus"
                   style={styles.fab}
                   onPress={() => setIsPatternModalVisible(true)}
-                  color={colors.darkGrey}
+                  color={colors.white}
                   animated={false}
                 />
 

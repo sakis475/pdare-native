@@ -1,6 +1,6 @@
 // TempBottomOptions.tsx
-import React, { useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Keyboard } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../../core/theme';
 import {
   clearNewOrder,
@@ -11,10 +11,7 @@ import { AlertWithOptions, toast } from '../../core/utils';
 import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
-import CouvertFAB from '../popupModals/CouvertModal';
-import { setStorage } from '../../storage/store';
 import { MoreIconHorizontal, PlusIcon, SendIcon } from '../basic/Icons';
-import dayjs from '../../core/dayjs';
 
 interface TempBottomOptionsProps {
   table: Table;

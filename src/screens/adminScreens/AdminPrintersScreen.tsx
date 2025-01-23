@@ -463,7 +463,7 @@ const AdminPrintersScreen = () => {
           icon="plus"
           style={[styles.fab, styles.addFab]}
           onPress={handleAddCustomPrinter}
-          color={colors.darkGrey}
+          color={colors.white}
         />
         <FAB
           icon="magnify"
@@ -471,7 +471,7 @@ const AdminPrintersScreen = () => {
           onPress={handleScanPrinters}
           loading={isScanning}
           disabled={isScanning}
-          color={colors.darkGrey}
+          color={colors.white}
         />
       </View>
 

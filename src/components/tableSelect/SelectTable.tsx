@@ -13,8 +13,8 @@ export function SelectTable({ allTables, onTableSelect }: any) {
       <View style={styles.inputContainer}>
         <TextInput
           placeholder={strings.SEARCH_NEW_TABLE}
-          placeholderTextColor="#fff"
-          textColor="#fff"
+          placeholderTextColor={colors.white}
+          textColor={colors.white}
           value={text}
           onChangeText={setText}
           style={styles.input}

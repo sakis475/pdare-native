@@ -365,7 +365,7 @@ const AdminItemDetailsPatternScreen = () => {
           icon="plus"
           style={styles.fab}
           onPress={handleCreatePress}
-          color={colors.darkGrey}
+          color={colors.white}
           animated={false}
         />
 

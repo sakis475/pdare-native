@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
-import { Button, RadioButton, Text } from 'react-native-paper';
-import { clearRestaurantStorageRelatedKeys, getStorage, setStorage } from '../storage/store';
+import { RadioButton, Text } from 'react-native-paper';
+import { getStorage, setStorage } from '../storage/store';
 import { colors } from '../core/theme';
 import { WarningIcon } from '../components/basic/Icons';
 import CustomTextInput from '../components/basic/CustomTextInput';
@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
 import CustomNumberInput from '../components/basic/CustomNumberInput';
+import CustomButton from '../components/basic/CustomButton';
 
 const ProfileScreen = ({ route }: any) => {
   const [isInitializing, setIsInitializing] = useState(true);
@@ -279,19 +280,14 @@ const ProfileScreen = ({ route }: any) => {
 
   const DeleteRestaurantButton = useMemo(
     () => (
-      <Button
+      <CustomButton
         mode="outlined"
         onPress={handleDeleteRestaurant}
         loading={isLoading}
-        style={[styles.button, styles.deleteButton]}
-        textColor={colors.lightRed}
+        variant="warning"
       >
-        <View style={styles.buttonInner}>
-          <WarningIcon size={20} color={colors.veryLighterRed} />
-          <Text style={styles.buttonText}>{strings.DELETE_RESTAURANT}</Text>
-          <WarningIcon size={20} color={colors.veryLighterRed} />
-        </View>
-      </Button>
+        {strings.DELETE_RESTAURANT}
+      </CustomButton>
     ),
     [isLoading]
   );
@@ -359,14 +355,9 @@ const ProfileScreen = ({ route }: any) => {
                 autoCapitalize="words"
               />
             )}
-            <Button
-              mode="contained"
-              onPress={handleUpdateProfile}
-              loading={isLoading}
-              style={styles.button}
-            >
+            <CustomButton mode="contained" onPress={handleUpdateProfile} loading={isLoading}>
               {strings.UPDATE_PROFILE}
-            </Button>
+            </CustomButton>
           </View>
 
           <View style={styles.section}>
@@ -389,14 +380,9 @@ const ProfileScreen = ({ route }: any) => {
               onChangeText={updatePasswordField('confirmPassword')}
               secureTextEntry
             />
-            <Button
-              mode="contained"
-              onPress={handleUpdatePassword}
-              loading={isLoading}
-              style={styles.button}
-            >
+            <CustomButton mode="contained" onPress={handleUpdatePassword} loading={isLoading}>
               {strings.UPDATE_PASSWORD}
-            </Button>
+            </CustomButton>
           </View>
 
           {user.role === 'owner' && user.restaurant && (
@@ -421,14 +407,9 @@ const ProfileScreen = ({ route }: any) => {
                 step={0.1}
                 max={1000}
               />
-              <Button
-                mode="contained"
-                onPress={handleUpdateRestaurant}
-                loading={isLoading}
-                style={styles.button}
-              >
+              <CustomButton mode="contained" onPress={handleUpdateRestaurant} loading={isLoading}>
                 {strings.UPDATE}
-              </Button>
+              </CustomButton>
             </View>
           )}
 
@@ -439,28 +420,26 @@ const ProfileScreen = ({ route }: any) => {
                 {strings.YOU_ARE_MEMBER_OF}{' '}
                 <Text style={styles.restaurantName}>{user.restaurant.restaurantName}</Text>
               </Text>
-              <Button
+              <CustomButton
                 mode="outlined"
                 onPress={handleLeaveRestaurant}
                 loading={isLoading}
-                style={[styles.button, styles.leaveButton]}
-                textColor={colors.lightRed}
+                variant="delete"
               >
                 {strings.LEAVE_RESTAURANT}
-              </Button>
+              </CustomButton>
             </View>
           )}
 
           <View style={styles.section}>
-            <Button
+            <CustomButton
               mode="contained"
               onPress={handleDeleteAccount}
               loading={isLoading}
-              style={[styles.button, styles.deleteAccountButton]}
-              textColor={colors.white}
+              variant="delete"
             >
               {strings.DELETE_ACCOUNT_BUTTON}
-            </Button>
+            </CustomButton>
             {user.role === 'owner' && DeleteRestaurantButton}
           </View>
         </View>
