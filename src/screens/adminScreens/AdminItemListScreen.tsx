@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
-  Keyboard,
   Pressable,
   Modal,
   TouchableOpacity,
@@ -20,6 +19,8 @@ import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { findCategoryByTitle } from '../../helpers/storage/orderStorage';
 import { useStrings } from '../../core/localization/languageContext';
 import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
+import BaseModal from '../../components/basic/BaseModal';
+import CustomButton from '../../components/basic/CustomButton';
 
 interface EditItemModalProps {
   visible: boolean;
@@ -100,64 +101,49 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {mode === 'create' ? `${strings.CREATE_PRODUCT}` : `${strings.UPDATE_PRODUCT}`}
-          </Text>
+    <BaseModal
+      title={mode === 'create' ? `${strings.CREATE_PRODUCT}` : `${strings.UPDATE_PRODUCT}`}
+      visible={visible}
+      onClose={onDismiss}
+      onConfirm={handleSave}
+      testID="item-list-edit-modal"
+      backgroundColor={colors.white}
+    >
+      <TextInput
+        label={strings.PRODUCT_TITLE}
+        value={title}
+        onChangeText={setTitle}
+        style={styles.input}
+        mode="outlined"
+      />
 
-          <TextInput
-            label={strings.PRODUCT_TITLE}
-            value={title}
-            onChangeText={setTitle}
-            style={styles.input}
-            mode="outlined"
-          />
+      <TextInput
+        label={strings.DESCRIPTION}
+        value={description}
+        onChangeText={setDescription}
+        style={styles.input}
+        mode="outlined"
+        multiline
+        numberOfLines={3}
+      />
 
-          <TextInput
-            label={strings.DESCRIPTION}
-            value={description}
-            onChangeText={setDescription}
-            style={styles.input}
-            mode="outlined"
-            multiline
-            numberOfLines={3}
-          />
+      <TextInput
+        label={strings.PRICE}
+        value={cost}
+        onChangeText={setCost}
+        style={styles.input}
+        mode="outlined"
+        keyboardType="numeric"
+      />
 
-          <TextInput
-            label={strings.PRICE}
-            value={cost}
-            onChangeText={setCost}
-            style={styles.input}
-            mode="outlined"
-            keyboardType="numeric"
-          />
-
-          <View style={styles.buttonContainer}>
-            {mode === 'edit' && onDelete && (
-              <Button
-                mode="outlined"
-                onPress={handleDelete}
-                style={[styles.deleteButton]}
-                textColor={colors.lightRed}
-              >
-                <TrashIcon size={15} color={colors.lightRed} />
-              </Button>
-            )}
-
-            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? strings.CREATE : strings.SAVE}
-            </Button>
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              {strings.CANCEL}
-            </Button>
-          </View>
+      {mode === 'edit' && onDelete && (
+        <View style={{ marginBottom: 5 }}>
+          <CustomButton onPress={handleDelete} variant={'delete'}>
+            <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+          </CustomButton>
         </View>
-      </View>
-    </Modal>
+      )}
+    </BaseModal>
   );
 };
 

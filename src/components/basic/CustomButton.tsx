@@ -1,15 +1,16 @@
 import React from 'react';
 import { Button } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
-import { WarningIcon } from './/Icons';
+import { WarningIcon } from './Icons';
 import { Text } from 'react-native-paper';
 import { colors } from '../../core/theme';
 
 interface CustomButtonProps {
   mode?: 'text' | 'outlined' | 'contained';
-  onPress: () => void;
+  onPress: (e: any) => any;
   loading?: boolean;
   style?: any;
+  contentStyle?: any;
   textColor?: string;
   children: React.ReactNode;
   variant?: 'normal' | 'delete' | 'warning';
@@ -20,6 +21,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   onPress,
   loading = false,
   style,
+  contentStyle,
   textColor,
   children,
   variant = 'normal',
@@ -66,6 +68,8 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       loading={loading}
       style={getButtonStyle()}
       textColor={textColor || (variant === 'delete' ? colors.white : undefined)}
+      contentStyle={[styles.contentStyle, contentStyle]}
+      labelStyle={styles.labelStyle}
     >
       {renderContent()}
     </Button>
@@ -91,6 +95,15 @@ const styles = StyleSheet.create({
   warningButtonText: {
     color: colors.lightRed,
     fontSize: 16,
+  },
+  contentStyle: {
+    height: 40,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  labelStyle: {
+    flexGrow: 1,
   },
 });
 

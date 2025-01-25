@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,7 +6,6 @@ import {
   Modal,
   TouchableOpacity,
   FlatList,
-  ListRenderItem,
   RefreshControl,
 } from 'react-native';
 import { Button, Divider, FAB, Text, Searchbar, TextInput } from 'react-native-paper';
@@ -15,16 +14,13 @@ import { colors } from '../../core/theme';
 import { AlertWithOptions, emailValidator, toast } from '../../core/utils';
 import { patchRequest, getRequest, postRequest, deleteRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
-import {
-  DoubleLeftIcon,
-  DoubleRightIcon,
-  SearchIcon,
-  TrashIcon,
-} from '../../components/basic/Icons';
+import { SearchIcon, TrashIcon } from '../../components/basic/Icons';
 import dayjs from '../../core/dayjs';
 import { storageInitPersonelUsers } from '../../helpers/storage/storageInit';
 import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, USERS_UPDATED } from '../../helpers/Sockets/EventEmitter';
+import BaseModal from '../../components/basic/BaseModal';
+import CustomButton from '../../components/basic/CustomButton';
 
 interface SearchUserModalProps {
   visible: boolean;
@@ -180,32 +176,34 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{strings.SEARCH_USER}</Text>
+    <BaseModal
+      title={strings.SEARCH_USER}
+      visible={visible}
+      onClose={onDismiss}
+      onConfirm={() => {}}
+      testID="user-search-modal"
+      backgroundColor={colors.white}
+      showButtons={false}
+    >
+      <Searchbar
+        placeholder={strings.SEARCH_BY_EMAIL}
+        onChangeText={handleSearchChange}
+        value={searchQuery}
+        style={styles.searchBar}
+      />
 
-          <Searchbar
-            placeholder={strings.SEARCH_BY_EMAIL}
-            onChangeText={handleSearchChange}
-            value={searchQuery}
-            style={styles.searchBar}
-          />
+      {isSearching ? (
+        <ActivityIndicator style={styles.searchLoading} color={colors.primary} />
+      ) : (
+        <View style={styles.searchResults}>{renderSearchResult()}</View>
+      )}
 
-          {isSearching ? (
-            <ActivityIndicator style={styles.searchLoading} color={colors.primary} />
-          ) : (
-            <View style={styles.searchResults}>{renderSearchResult()}</View>
-          )}
-
-          <View style={styles.buttonContainer}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              {strings.CANCEL}
-            </Button>
-          </View>
-        </View>
+      <View style={styles.buttonContainer}>
+        <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
+          {strings.CANCEL}
+        </Button>
       </View>
-    </Modal>
+    </BaseModal>
   );
 };
 
@@ -261,45 +259,32 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{strings.UPDATE_USER}</Text>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>{strings.DISPLAY_NAME}</Text>
-            <TextInput
-              mode="outlined"
-              value={displayName}
-              onChangeText={setDisplayName}
-              placeholder={strings.ENTER_DISPLAY_NAME}
-              style={styles.input}
-            />
-          </View>
-
-          <View style={styles.buttonContainer}>
-            {onDelete && (
-              <Button
-                mode="outlined"
-                onPress={handleDelete}
-                style={[styles.deleteButton]}
-                textColor={colors.lightRed}
-              >
-                <TrashIcon size={15} color={colors.lightRed} />
-              </Button>
-            )}
-
-            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {strings.SAVE}
-            </Button>
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              {strings.CANCEL}
-            </Button>
-          </View>
-        </View>
+    <BaseModal
+      title={strings.UPDATE_USER}
+      visible={visible}
+      onClose={onDismiss}
+      onConfirm={handleSave}
+      testID="update-user-modal"
+      backgroundColor={colors.white}
+    >
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputLabel}>{strings.DISPLAY_NAME}</Text>
+        <TextInput
+          mode="outlined"
+          value={displayName}
+          onChangeText={setDisplayName}
+          placeholder={strings.ENTER_DISPLAY_NAME}
+          style={styles.input}
+        />
       </View>
-    </Modal>
+      {onDelete && (
+        <View style={{ marginBottom: 5 }}>
+          <CustomButton onPress={handleDelete} variant={'delete'}>
+            <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+          </CustomButton>
+        </View>
+      )}
+    </BaseModal>
   );
 };
 

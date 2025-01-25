@@ -27,6 +27,8 @@ import {
   EditIcon,
   TrashIcon,
 } from '../../components/basic/Icons';
+import BaseModal from '../../components/basic/BaseModal';
+import CustomButton from '../../components/basic/CustomButton';
 
 interface EditPatternModalProps {
   visible: boolean;
@@ -97,53 +99,39 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
     );
   };
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          {/* ... */}
-          <TextInput
-            label={strings.PATTERN_TITLE}
-            value={title}
-            onChangeText={onTitleChange}
-            style={styles.input}
-            mode="outlined"
-          />
+    <BaseModal
+      title=""
+      visible={visible}
+      onClose={onDismiss}
+      onConfirm={handleSave}
+      testID="pattern-add-modal"
+      backgroundColor={colors.white}
+    >
+      <TextInput
+        label={strings.PATTERN_TITLE}
+        value={title}
+        onChangeText={onTitleChange}
+        style={styles.input}
+        mode="outlined"
+      />
 
-          <TouchableOpacity style={styles.categorySelector} onPress={onCategoryPress}>
-            <Text style={styles.categorySelectorLabel}>{strings.CATEGORY}</Text>
-            <View style={styles.categorySelectorContent}>
-              <Text style={styles.selectedCategory}>
-                {selectedCategory?.title || `${strings.SELECT_CATEGORY}`}
-              </Text>
-              <ChevronDownIcon size={24} color={colors.grey}></ChevronDownIcon>
-            </View>
-          </TouchableOpacity>
-
-          <View style={styles.buttonContainer}>
-            {mode === 'edit' && onDelete && (
-              <Button
-                mode="outlined"
-                onPress={handleDelete}
-                style={[styles.deleteButton]}
-                textColor={colors.lightRed}
-              >
-                <TrashIcon size={15} color={colors.lightRed}></TrashIcon>
-              </Button>
-            )}
-
-            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? strings.CREATE : strings.SAVE}
-            </Button>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              {strings.CANCEL}
-            </Button>
-          </View>
+      <TouchableOpacity style={styles.categorySelector} onPress={onCategoryPress}>
+        <Text style={styles.categorySelectorLabel}>{strings.CATEGORY}</Text>
+        <View style={styles.categorySelectorContent}>
+          <Text style={styles.selectedCategory}>
+            {selectedCategory?.title || `${strings.SELECT_CATEGORY}`}
+          </Text>
+          <ChevronDownIcon size={24} color={colors.grey}></ChevronDownIcon>
         </View>
-      </View>
-    </Modal>
+      </TouchableOpacity>
+      {mode === 'edit' && onDelete && (
+        <View style={{ marginBottom: 5 }}>
+          <CustomButton onPress={handleDelete} variant={'delete'}>
+            <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+          </CustomButton>
+        </View>
+      )}
+    </BaseModal>
   );
 };
 

@@ -4,6 +4,7 @@ import { Portal, Button } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomNumberInput from '../basic/CustomNumberInput';
+import BaseModal from '../basic/BaseModal';
 
 interface CouvertModalProps {
   couvertQuantity: number;
@@ -74,66 +75,40 @@ const CouvertModal: React.FC<CouvertModalProps> = ({
     );
   };
 
+  const handleConfirm = () => {
+    handleSubmit();
+  };
+
   return (
-    <>
-      <Portal>
-        <Modal
-          visible={isModalVisible}
-          onDismiss={handleDismiss}
-          transparent
-          animationType="fade"
-          key={isModalVisible ? 'modal-open' : 'modal-closed'}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.title}>{strings.SELECT_COUVERT}</Text>
+    <Portal>
+      <BaseModal
+        title={strings.SELECT_COUVERT}
+        visible={isModalVisible}
+        onClose={onModalClose}
+        onConfirm={handleConfirm}
+      >
+        <View>
+          {renderQuickSelectButtons()}
 
-              {renderQuickSelectButtons()}
-
-              <View style={styles.dividerContainer}>
-                <View style={styles.divider} />
-                <Text style={styles.dividerText}>{strings.OR_CUSTOM_AMOUNT}</Text>
-                <View style={styles.divider} />
-              </View>
-
-              <CustomNumberInput
-                label={strings.SELECT_COUVERT}
-                value={quantity}
-                onChangeText={handleQuantityChange}
-                min={1}
-                max={99}
-                showButtons
-                style={styles.input}
-                key={isModalVisible ? 'input-open' : 'input-closed'}
-              />
-
-              <View style={styles.buttonContainer}>
-                <Button
-                  mode="outlined"
-                  onPress={handleDismiss}
-                  style={styles.button}
-                  textColor={colors.lightRed}
-                  labelStyle={styles.buttonLabel}
-                  contentStyle={styles.buttonContent}
-                >
-                  {strings.CANCEL}
-                </Button>
-                <Button
-                  mode="contained"
-                  style={[styles.button, styles.confirmButton]}
-                  onPress={handleSubmit}
-                  textColor={colors.white}
-                  labelStyle={styles.buttonLabel}
-                  contentStyle={styles.buttonContent}
-                >
-                  {strings.SAVE}
-                </Button>
-              </View>
-            </View>
+          <View style={styles.dividerContainer}>
+            <View style={styles.divider} />
+            <Text style={styles.dividerText}>{strings.OR_CUSTOM_AMOUNT}</Text>
+            <View style={styles.divider} />
           </View>
-        </Modal>
-      </Portal>
-    </>
+
+          <CustomNumberInput
+            label={strings.SELECT_COUVERT}
+            value={quantity}
+            onChangeText={handleQuantityChange}
+            min={1}
+            max={99}
+            showButtons
+            style={styles.input}
+            key={isModalVisible ? 'input-open' : 'input-closed'}
+          />
+        </View>
+      </BaseModal>
+    </Portal>
   );
 };
 
@@ -159,17 +134,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: colors.grey,
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    maxWidth: 400,
+    // backgroundColor: colors.grey,
+    // padding: 20,
+    // borderRadius: 10,
+    // width: '80%',
+    // maxWidth: 400,
   },
   title: {
     fontSize: 18,

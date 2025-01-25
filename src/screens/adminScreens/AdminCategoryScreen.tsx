@@ -31,6 +31,8 @@ import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
 import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import BaseModal from '../../components/basic/BaseModal';
+import CustomButton from '../../components/basic/CustomButton';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -168,84 +170,65 @@ const EditModal: React.FC<EditModalProps> = ({
   ];
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {mode === 'create' ? strings.CREATE_CATEGORY : strings.UPDATE_CATEGORY}
-            </Text>
-            <ScrollView style={styles.scrollContent}>
-              <CustomTextInput
-                label={strings.CATEGORY_TITLE}
-                value={title}
-                onChangeText={setTitle}
-                style={styles.input}
-                mode="outlined"
-                theme="light"
-              />
+    <BaseModal
+      title={mode === 'create' ? strings.CREATE_CATEGORY : strings.UPDATE_CATEGORY}
+      visible={visible}
+      onClose={onDismiss}
+      onConfirm={handleSave}
+      testID="category-edit-modal"
+      backgroundColor={colors.white}
+    >
+      <CustomTextInput
+        label={strings.CATEGORY_TITLE}
+        value={title}
+        onChangeText={setTitle}
+        style={styles.input}
+        mode="outlined"
+        theme="light"
+      />
 
-              <TouchableOpacity
-                style={[styles.colorPreview, { backgroundColor: color }]}
-                onPress={() => setShowColorPicker(!showColorPicker)}
-              >
-                <Text style={{ color: getTextColorBasedOnLuminance(color) }}>
-                  {strings.SELECT_CATEGORY_COLOR}
-                </Text>
-              </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.colorPreview, { backgroundColor: color }]}
+        onPress={() => setShowColorPicker(!showColorPicker)}
+      >
+        <Text style={{ color: getTextColorBasedOnLuminance(color) }}>
+          {strings.SELECT_CATEGORY_COLOR}
+        </Text>
+      </TouchableOpacity>
 
-              {showColorPicker && (
-                <View style={styles.colorPickerContainer}>
-                  <ColorPicker
-                    color={color}
-                    onColorChange={setColor}
-                    thumbSize={30}
-                    sliderSize={40}
-                    noSnap={true}
-                    row={true}
-                  />
-                </View>
-              )}
-
-              {/* Print Location Selector using SegmentedButtons */}
-              <Text style={styles.sectionLabel}>Print Location</Text>
-              <SegmentedButtons
-                value={printLocation}
-                onValueChange={handlePrintLocationChange}
-                buttons={printLocationOptions.map((option) => ({
-                  value: option.value,
-                  label: option.label,
-                  style: styles.segmentButton,
-                }))}
-                style={styles.segmentedButtons}
-              />
-
-              <View style={styles.buttonUpdateContainer}>
-                {mode === 'edit' && onDelete && (
-                  <Button
-                    mode="outlined"
-                    onPress={handleDelete}
-                    style={[styles.deleteButton]}
-                    textColor={colors.lightRed}
-                  >
-                    <TrashIcon size={15} color={colors.lightRed}></TrashIcon>
-                  </Button>
-                )}
-
-                <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-                  {mode === 'create' ? strings.CREATE : strings.SAVE}
-                </Button>
-              </View>
-              <View style={styles.buttonUpdateContainer}>
-                <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-                  {strings.CANCEL}
-                </Button>
-              </View>
-            </ScrollView>
-          </View>
+      {showColorPicker && (
+        <View style={styles.colorPickerContainer}>
+          <ColorPicker
+            color={color}
+            onColorChange={setColor}
+            thumbSize={30}
+            sliderSize={30}
+            noSnap={true}
+            row={true}
+          />
         </View>
-      </Modal>
-    </KeyboardAvoidingView>
+      )}
+
+      <Text style={styles.sectionLabel}>Print Location</Text>
+      <SegmentedButtons
+        value={printLocation}
+        onValueChange={handlePrintLocationChange}
+        buttons={printLocationOptions.map((option) => ({
+          value: option.value,
+          label: option.label,
+          style: styles.segmentButton,
+        }))}
+        style={styles.segmentedButtons}
+      />
+
+      {mode === 'edit' && onDelete && (
+        <View style={{ marginBottom: 5 }}>
+          <CustomButton onPress={handleDelete} variant={'delete'}>
+            <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+          </CustomButton>
+        </View>
+      )}
+    </BaseModal>
   );
 };
 
@@ -625,7 +608,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   colorPickerContainer: {
-    height: 300,
+    height: 230,
     marginBottom: 20,
   },
   colorPickerButton: {

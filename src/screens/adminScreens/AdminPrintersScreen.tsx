@@ -21,6 +21,8 @@ import { EventEmitter, PRINTERS_DISCOVERED_UPDATE } from '../../helpers/Sockets/
 import dayjs from '../../core/dayjs';
 import { CharacterSet } from '../../types/exportable.types';
 import { EditIcon } from '../../components/basic/Icons';
+import BaseModal from '../../components/basic/BaseModal';
+import CustomButton from '../../components/basic/CustomButton';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -146,90 +148,76 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <Modal visible={editModalVisible} transparent animationType="fade" onRequestClose={onDismiss}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>
-                {mode === 'edit' ? strings.EDIT_PRINTER : strings.NEW_PRINTER}
-              </Text>
+    <>
+      <BaseModal
+        title={mode === 'edit' ? strings.EDIT_PRINTER : strings.NEW_PRINTER}
+        visible={visible}
+        onClose={onDismiss}
+        onConfirm={handleSave}
+        testID="item-list-edit-modal"
+        backgroundColor={colors.white}
+      >
+        <TextInput
+          label={strings.NICKNAME}
+          value={nickname}
+          onChangeText={setNickname}
+          style={styles.input}
+          mode="outlined"
+        />
 
-              <ScrollView style={styles.scrollContent}>
-                <TextInput
-                  label={strings.NICKNAME}
-                  value={nickname}
-                  onChangeText={setNickname}
-                  style={styles.input}
-                  mode="outlined"
-                />
+        <TextInput
+          label={mode === 'edit' ? strings.OVERRIDE_IP : strings.IP}
+          value={overrideIP}
+          onChangeText={setOverrideIP}
+          style={styles.input}
+          mode="outlined"
+        />
 
-                <TextInput
-                  label={mode === 'edit' ? strings.OVERRIDE_IP : strings.IP}
-                  value={overrideIP}
-                  onChangeText={setOverrideIP}
-                  style={styles.input}
-                  mode="outlined"
-                />
+        <TextInput
+          label={mode === 'edit' ? strings.OVERRIDE_PORT : strings.PORT}
+          value={overridePort}
+          onChangeText={setOverridePort}
+          style={styles.input}
+          mode="outlined"
+        />
 
-                <TextInput
-                  label={mode === 'edit' ? strings.OVERRIDE_PORT : strings.PORT}
-                  value={overridePort}
-                  onChangeText={setOverridePort}
-                  style={styles.input}
-                  mode="outlined"
-                />
+        <Text style={styles.inputLabel}>{strings.PRINT_ITEMS}</Text>
+        <SegmentedButtons
+          value={printLocation}
+          onValueChange={handlePrintLocationChange}
+          buttons={[
+            { value: PrintLocation.ALL, label: strings.ALL },
+            { value: PrintLocation.KITCHEN, label: strings.KITCHEN },
+            { value: PrintLocation.BAR, label: strings.BAR },
+          ]}
+          style={styles.segmentedButtons}
+        />
 
-                <Text style={styles.inputLabel}>{strings.PRINT_ITEMS}</Text>
-                <SegmentedButtons
-                  value={printLocation}
-                  onValueChange={handlePrintLocationChange}
-                  buttons={[
-                    { value: PrintLocation.ALL, label: strings.ALL },
-                    { value: PrintLocation.KITCHEN, label: strings.KITCHEN },
-                    { value: PrintLocation.BAR, label: strings.BAR },
-                  ]}
-                  style={styles.segmentedButtons}
-                />
+        <Text style={styles.inputLabel}>{strings.CHARACTER_SET}</Text>
+        <TouchableOpacity style={styles.charsetButton} onPress={handleCharSetPress}>
+          <Text style={styles.charsetButtonText}>
+            {characterSet ? characterSet.replace(/_/g, ' ') : strings.SELECT_CHARACTER_SET}
+          </Text>
+        </TouchableOpacity>
 
-                <Text style={styles.inputLabel}>{strings.CHARACTER_SET}</Text>
-                <TouchableOpacity style={styles.charsetButton} onPress={handleCharSetPress}>
-                  <Text style={styles.charsetButtonText}>
-                    {characterSet ? characterSet.replace(/_/g, ' ') : strings.SELECT_CHARACTER_SET}
-                  </Text>
-                </TouchableOpacity>
-
-                {mode === 'edit' && (
-                  <View style={styles.switchContainer}>
-                    <Text style={styles.switchLabel}>{strings.ACTIVE}</Text>
-                    <Switch value={active} onValueChange={setActive} />
-                  </View>
-                )}
-
-                <Text style={styles.switchContainer}>
-                  {printer?.printerIp &&
-                    `${strings.CURRENT_IP}: ${printer.printerIp}${
-                      printer.printerPort ? `:${printer.printerPort}` : ''
-                    }`}
-                </Text>
-
-                <View style={{ height: 20 }} />
-              </ScrollView>
-
-              <View style={styles.buttonFooter}>
-                <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-                  {strings.CANCEL}
-                </Button>
-                <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-                  {strings.SAVE}
-                </Button>
-              </View>
-            </View>
+        {mode === 'edit' && (
+          <View style={styles.switchContainer}>
+            <Text style={styles.switchLabel}>{strings.ACTIVE}</Text>
+            <Switch value={active} onValueChange={setActive} />
           </View>
-        </View>
-      </Modal>
+        )}
+
+        <Text style={styles.switchContainer}>
+          {printer?.printerIp &&
+            `${strings.CURRENT_IP}: ${printer.printerIp}${
+              printer.printerPort ? `:${printer.printerPort}` : ''
+            }`}
+        </Text>
+
+        <View style={{ height: 20 }} />
+      </BaseModal>
       <CharSetPicker />
-    </KeyboardAvoidingView>
+    </>
   );
 };
 

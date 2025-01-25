@@ -25,6 +25,8 @@ import { patchRequest } from '../../helpers/requests';
 import { getStorage, setStorage } from '../../storage/store';
 import { useStrings } from '../../core/localization/languageContext';
 import { BarsIcon, EditIcon, SortIcon, TrashIcon } from '../../components/basic/Icons';
+import BaseModal from '../../components/basic/BaseModal';
+import CustomButton from '../../components/basic/CustomButton';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -108,46 +110,30 @@ const EditModal: React.FC<EditModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {mode === 'create' ? strings.CREATE_TABLE : strings.UPDATE_TABLE}
-          </Text>
-
-          <TextInput
-            label={strings.TABLE_NAME}
-            value={tableName}
-            onChangeText={setTableName}
-            style={styles.input}
-            mode="outlined"
-            maxLength={15}
-          />
-
-          <View style={styles.buttonUpdateContainer}>
-            {mode === 'edit' && onDelete && (
-              <Button
-                mode="outlined"
-                onPress={handleDelete}
-                style={[styles.deleteButton]}
-                textColor={colors.lightRed}
-              >
-                <TrashIcon size={15} color={colors.lightRed} />
-              </Button>
-            )}
-
-            <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-              {mode === 'create' ? strings.CREATE : strings.SAVE}
-            </Button>
-          </View>
-          <View style={styles.buttonUpdateContainer}>
-            <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-              {strings.CANCEL}
-            </Button>
-          </View>
+    <BaseModal
+      title={mode === 'create' ? strings.CREATE_TABLE : strings.UPDATE_TABLE}
+      visible={visible}
+      onClose={onDismiss}
+      onConfirm={handleSave}
+      testID="item-list-edit-modal"
+      backgroundColor={colors.white}
+    >
+      <TextInput
+        label={strings.TABLE_NAME}
+        value={tableName}
+        onChangeText={setTableName}
+        style={styles.input}
+        mode="outlined"
+        maxLength={15}
+      />
+      {mode === 'edit' && onDelete && (
+        <View style={{ marginBottom: 10 }}>
+          <CustomButton onPress={handleDelete} variant={'delete'}>
+            <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+          </CustomButton>
         </View>
-      </View>
-    </Modal>
+      )}
+    </BaseModal>
   );
 };
 

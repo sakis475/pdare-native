@@ -49,7 +49,7 @@ export function CatalogItemAdd({
         onPress={handleGoToDetails}
         activeOpacity={0.6}
       >
-        <PlusIcon size={10} />
+        <PlusIcon size={15} />
       </TouchableOpacity>
     </View>
   );

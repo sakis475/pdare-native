@@ -294,5 +294,5 @@
   "EMPTY_NICKNAME_ERROR": "Printer nickname cannot be empty",
   "IP_REQUIRED_ERROR": "IP address is required for custom printers",
   "FOUND": "Found",
-  "NEW_PRINTER": "new printer"
+  "NEW_PRINTER": "New Printer"
 }

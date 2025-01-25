@@ -9,6 +9,8 @@ import { useNavigation } from '@react-navigation/native';
 import { navigate, ScreenNames } from '../../../navigation/navigationUtils';
 import { useStrings } from '../../../core/localization/languageContext';
 import { CloseIcon } from '../../../components/basic/Icons';
+import BaseModal from '../../../components/basic/BaseModal';
+import { FlashList } from '@shopify/flash-list';
 
 interface SelectPatternModalProps {
   visible: boolean;
@@ -67,45 +69,49 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onDismiss}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{strings.SELECT_PATTERN}</Text>
-            <TouchableOpacity onPress={onDismiss}>
-              <CloseIcon size={24} color={colors.white} />
-            </TouchableOpacity>
-          </View>
-
-          {loading ? (
-            <ActivityIndicator size="large" color={colors.primary} />
-          ) : (
-            <>
-              <FlatList
-                data={patterns}
-                renderItem={renderPattern}
-                keyExtractor={(item) => item.id?.toString() || item.propertyPatternTitle}
-                contentContainerStyle={styles.patternList}
-                ListEmptyComponent={
-                  <Text style={styles.emptyText}>{strings.NO_PATTERNS_AVAILABLE}</Text>
-                }
-              />
-
-              <View style={styles.footer}>
-                <Button
-                  mode="contained"
-                  onPress={handleCreatePattern}
-                  style={styles.createButton}
-                  icon="plus"
-                >
-                  {strings.CREATE_NEW_PATTERN}
-                </Button>
-              </View>
-            </>
-          )}
-        </View>
+    <BaseModal
+      visible={visible}
+      onClose={onDismiss}
+      onConfirm={handleCreatePattern}
+      testID="select-pattern-edit-modal"
+      backgroundColor={colors.darkGrey}
+      showButtons={false}
+    >
+      <View style={styles.modalHeader}>
+        <Text style={styles.modalTitle}>{strings.SELECT_PATTERN}</Text>
+        <TouchableOpacity onPress={onDismiss}>
+          <CloseIcon size={24} color={colors.white} />
+        </TouchableOpacity>
       </View>
-    </Modal>
+
+      {loading ? (
+        <ActivityIndicator size="large" color={colors.primary} />
+      ) : (
+        <>
+          <FlashList
+            data={patterns}
+            renderItem={renderPattern}
+            keyExtractor={(item) => item.id?.toString() || item.propertyPatternTitle}
+            contentContainerStyle={styles.patternList}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>{strings.NO_PATTERNS_AVAILABLE}</Text>
+            }
+            estimatedItemSize={10}
+          />
+
+          <View style={styles.footer}>
+            <Button
+              mode="contained"
+              onPress={handleCreatePattern}
+              style={styles.createButton}
+              icon="plus"
+            >
+              {strings.CREATE_NEW_PATTERN}
+            </Button>
+          </View>
+        </>
+      )}
+    </BaseModal>
   );
 };
 

@@ -163,9 +163,7 @@ export const SearchIcon = ({ size = 24, color = colors.white, style }: IconProps
 };
 
 export const PlusIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
-  return (
-    <MaterialCommunityIcons name="plus-circle-outline" size={size} color={color} style={style} />
-  );
+  return <MaterialCommunityIcons name="plus" size={size} color={color} style={style} />;
 };
 
 export const MinusIcon = ({ size = 24, color = colors.white, style }: IconProps) => {

@@ -26,6 +26,7 @@ import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmi
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import MoreOptionsTempBottomSheet from '../../components/bottomSheets/MoreOptionsTempBottomSheet';
 import { patchRequest } from '../../helpers/requests';
+import CustomButton from '../../components/basic/CustomButton';
 
 // Memoized Item renderer components
 const DisabledItem = memo(({ item, onDelete }: { item: ItemReq; onDelete: any }) => (
@@ -152,15 +153,6 @@ const TempOrderScreen = ({
   }, [orderState.table]);
 
   const handleOpenSelectTableModal = useCallback(() => {
-    // if (orderState.table) {
-    //   AlertWithOptions(
-    //     strings.CHANGE_TABLE,
-    //     strings.CHANGE_TABLE_CONFIRM,
-    //     () => bottomSheetRef.current?.openModal(),
-    //     () => {}
-    //   );
-    // } else {
-    // }
     bottomSheetRef.current?.openModal();
   }, [orderState.table, strings]);
 
@@ -283,9 +275,12 @@ const TempOrderScreen = ({
                 <Text style={styles.emptyText}>{strings.PRODUCTS_WILL_APPEAR_HERE}</Text>
               </>
             ) : (
-              <Button mode="outlined" onPress={() => handleOpenSelectTableModal()}>
+              <CustomButton
+                onPress={() => handleOpenSelectTableModal()}
+                contentStyle={{ width: '50%' }}
+              >
                 <Text>{strings.SELECT_TABLE}</Text>
-              </Button>
+              </CustomButton>
             )}
           </View>
         )}

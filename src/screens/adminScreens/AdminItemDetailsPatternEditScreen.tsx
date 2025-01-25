@@ -364,7 +364,6 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
               style={styles.propertyTypeButton}
               disabled={isDeleted}
             >
-              {' '}
               {properties?.[0]?.propertyType === 'singleselect' ? (
                 <RadioButtonChecked />
               ) : (
