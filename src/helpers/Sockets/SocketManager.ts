@@ -120,6 +120,9 @@ class SocketManager {
   public async updateUserInstance(): Promise<void> {
     try {
       const user = await getStorage('currentUser');
+      const sessionBearer = await getStorage('session_bearer');
+
+      this.sessionBearer = sessionBearer;
       if (this.isValidUser(user)) {
         const needsRoomUpdate = !this.user || this.user.restaurant.id !== user.restaurant.id;
         this.user = user;

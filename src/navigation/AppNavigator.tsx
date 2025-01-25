@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BottomNavigation, DefaultTheme, Text } from 'react-native-paper';
+import { BottomNavigation } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import TablesScreen from '../screens/TablesScreen';
@@ -13,8 +13,7 @@ import { NavigationContainerRef, Route } from '@react-navigation/native';
 import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ItemListScreen from '../screens/orderScreens/ItemListScreen';
 import ItemDetailsScreen from '../screens/orderScreens/ItemDetailsScreen';
-import Tooltip from 'rn-tooltip';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigationScreenHeaderTitle';
 import RegisterScreen from '../screens/authenticationScreens/RegisterScreen';
 import StartLoadingScreen from '../screens/StartLoadingScreen';
@@ -397,44 +396,6 @@ const AppNavigator = () => {
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
-          headerRight: () => {
-            return (
-              <View>
-                <Tooltip
-                  popover={
-                    <View
-                      style={{ alignItems: 'flex-start', justifyContent: 'flex-start', gap: 10 }}
-                    >
-                      <Text style={styles.toolTipText}>
-                        {route.params?.item?.category?.title
-                          ? `${strings.CATEGORY_LABEL} ${route.params.item.category.title}`
-                          : null}
-                      </Text>
-                      <Text style={styles.toolTipText}>
-                        {route.params?.item?.cost
-                          ? `${strings.COST_LABEL} ${route.params?.item?.cost.toFixed(2)}`
-                          : null}
-                      </Text>
-                      <Text style={styles.toolTipText}>
-                        {route.params?.item?.description
-                          ? `${strings.DESCRIPTION_LABEL} ${route.params.item.description}`
-                          : null}
-                      </Text>
-                      {/* Make tooltip content go to flex-start */}
-                      <Text style={styles.toolTipText}>{' '.repeat(100)}</Text>
-                    </View>
-                  }
-                  backgroundColor={colors.darkGrey}
-                  height="auto"
-                  width="80%"
-                  actionType="press"
-                >
-                  <InfoIcon></InfoIcon>
-                </Tooltip>
-              </View>
-            );
-          },
-
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
         })}
@@ -507,9 +468,4 @@ function navigateBackBtn() {
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  toolTipText: { color: colors.white, fontSize: 16 },
-});
-
 export default AppNavigator;

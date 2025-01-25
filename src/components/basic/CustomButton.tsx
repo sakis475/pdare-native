@@ -22,7 +22,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   loading = false,
   style,
   contentStyle,
-  textColor,
+  textColor = colors.white,
   children,
   variant = 'normal',
 }) => {
@@ -34,6 +34,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
           styles.deleteButton,
           mode === 'outlined' && { borderColor: colors.lightRed },
           mode === 'contained' && { backgroundColor: colors.lightRed },
+
           style,
         ];
       case 'warning':
@@ -44,7 +45,13 @@ const CustomButton: React.FC<CustomButtonProps> = ({
           style,
         ];
       default:
-        return [styles.button, style];
+        return [
+          styles.button,
+          {
+            backgroundColor: colors.blue,
+          },
+          style,
+        ];
     }
   };
 

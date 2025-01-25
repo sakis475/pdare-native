@@ -118,16 +118,6 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       />
 
       <TextInput
-        label={strings.DESCRIPTION}
-        value={description}
-        onChangeText={setDescription}
-        style={styles.input}
-        mode="outlined"
-        multiline
-        numberOfLines={3}
-      />
-
-      <TextInput
         label={strings.PRICE}
         value={cost}
         onChangeText={setCost}

@@ -72,7 +72,7 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
       </View>
     );
 
-    const showChangeTable = order && !order.closedAt;
+    const showChangeTable = !order?.closedAt;
     const showChangeCouvert = order?.table && !order.closedAt;
     const showReprintOrder = order?.createdAt && !order?.closedAt;
     const showPrintAnalysis = order?.createdAt;
