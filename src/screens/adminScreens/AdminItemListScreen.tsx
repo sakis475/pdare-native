@@ -21,6 +21,7 @@ import { useStrings } from '../../core/localization/languageContext';
 import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 interface EditItemModalProps {
   visible: boolean;
@@ -107,9 +108,8 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       onClose={onDismiss}
       onConfirm={handleSave}
       testID="item-list-edit-modal"
-      backgroundColor={colors.white}
     >
-      <TextInput
+      <CustomTextInput
         label={strings.PRODUCT_TITLE}
         value={title}
         onChangeText={setTitle}
@@ -117,7 +117,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
         mode="outlined"
       />
 
-      <TextInput
+      <CustomTextInput
         label={strings.PRICE}
         value={cost}
         onChangeText={setCost}

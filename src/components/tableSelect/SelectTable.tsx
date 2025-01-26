@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { TextInput } from 'react-native-paper';
 import TableSelectHorizontalContainer from './TableSelectHorizontalContainer';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
+import CustomTextInput from '../basic/CustomTextInput';
 
 export function SelectTable({ allTables, onTableSelect }: any) {
   const [text, setText] = useState('');
@@ -11,10 +11,9 @@ export function SelectTable({ allTables, onTableSelect }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <TextInput
+        <CustomTextInput
+          label={'Αναζήτηση/Νέο Τραπέζι'}
           placeholder={strings.SEARCH_NEW_TABLE}
-          placeholderTextColor={colors.white}
-          textColor={colors.white}
           value={text}
           onChangeText={setText}
           style={styles.input}

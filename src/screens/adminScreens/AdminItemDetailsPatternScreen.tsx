@@ -29,6 +29,7 @@ import {
 } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 interface EditPatternModalProps {
   visible: boolean;
@@ -105,13 +106,13 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
       onClose={onDismiss}
       onConfirm={handleSave}
       testID="pattern-add-modal"
-      backgroundColor={colors.white}
     >
-      <TextInput
+      <CustomTextInput
         label={strings.PATTERN_TITLE}
         value={title}
         onChangeText={onTitleChange}
         style={styles.input}
+        theme="light"
         mode="outlined"
       />
 

@@ -86,6 +86,7 @@ const CouvertModal: React.FC<CouvertModalProps> = ({
         visible={isModalVisible}
         onClose={onModalClose}
         onConfirm={handleConfirm}
+        theme={'dark'}
       >
         <View>
           {renderQuickSelectButtons()}

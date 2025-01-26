@@ -33,6 +33,7 @@ import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
+import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -176,7 +177,6 @@ const EditModal: React.FC<EditModalProps> = ({
       onClose={onDismiss}
       onConfirm={handleSave}
       testID="category-edit-modal"
-      backgroundColor={colors.white}
     >
       <CustomTextInput
         label={strings.CATEGORY_TITLE}
@@ -210,7 +210,7 @@ const EditModal: React.FC<EditModalProps> = ({
       )}
 
       <Text style={styles.sectionLabel}>Print Location</Text>
-      <SegmentedButtons
+      <CustomSegmentedButtons
         value={printLocation}
         onValueChange={handlePrintLocationChange}
         buttons={printLocationOptions.map((option) => ({

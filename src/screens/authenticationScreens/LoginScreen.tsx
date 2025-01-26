@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -9,6 +16,7 @@ import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 import { useStrings } from '../../core/localization/languageContext';
 import { EyeOff, EyeOn } from '../../components/basic/Icons';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 const logoImage = require('../../../assets/mywaitericon.png');
 const LoginScreen: React.FC = () => {
@@ -114,108 +122,96 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView
-      style={{ flex: 1, height: '100%', paddingTop: 10, backgroundColor: colors.lightBlack }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
-      <View style={styles.container}>
-        <LongPressGestureHandler
-          onHandlerStateChange={({ nativeEvent }) => {
-            if (nativeEvent.state === State.ACTIVE) {
-              handleLongPress();
-            }
-          }}
-        >
-          <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
-        </LongPressGestureHandler>
-        <Text style={styles.appTitle}>OrderPOS</Text>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
-            {strings.APP_DESCRIPTION}
-          </Text>
-        </View>
-        <Divider style={styles.divider} />
+      <ScrollView
+        style={{ flex: 1, height: '100%', paddingTop: 10, backgroundColor: colors.lightBlack }}
+      >
+        <View style={styles.container}>
+          <LongPressGestureHandler
+            onHandlerStateChange={({ nativeEvent }) => {
+              if (nativeEvent.state === State.ACTIVE) {
+                handleLongPress();
+              }
+            }}
+          >
+            <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
+          </LongPressGestureHandler>
+          <Text style={styles.appTitle}>OrderPOS</Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
+              {strings.APP_DESCRIPTION}
+            </Text>
+          </View>
+          <Divider style={styles.divider} />
 
-        <View
-          style={{
-            backgroundColor: '#383838',
-            paddingHorizontal: 25,
-            paddingTop: 15,
-            paddingBottom: 35,
-            borderRadius: 10,
-            borderColor: colors.black,
-          }}
-        >
-          <Text style={styles.header}>{strings.LOGIN}</Text>
+          <View
+            style={{
+              backgroundColor: '#383838',
+              paddingHorizontal: 25,
+              paddingTop: 15,
+              paddingBottom: 35,
+              borderRadius: 10,
+              borderColor: colors.black,
+            }}
+          >
+            <Text style={styles.header}>{strings.LOGIN}</Text>
 
-          <View style={{ gap: 15 }}>
-            <View>
-              <TextInput
-                label={strings.EMAIL}
-                value={email}
-                onChangeText={(text) => setEmail(text)}
-                error={!!emailError}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                textContentType="emailAddress"
-                style={styles.input}
-                textColor={colors.white}
-                underlineColor={colors.lighterGrey}
-                activeUnderlineColor={colors.white}
-                disabled={isLoading}
-                theme={customTheme}
-              />
-              {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
-            </View>
-            <View>
-              <View style={[styles.passwordInputContainer]}>
-                <TextInput
+            <View style={{ gap: 15 }}>
+              <View>
+                <CustomTextInput
+                  label={strings.EMAIL}
+                  value={email}
+                  onChangeText={setEmail}
+                  error={!!emailError}
+                  keyboardType="email-address"
+                  textContentType="emailAddress"
+                  disabled={isLoading}
+                />
+                {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
+              </View>
+              <View>
+                <CustomTextInput
                   label={strings.PASSWORD}
                   value={password}
                   onChangeText={(text) => setPassword(text)}
                   error={!!passwordError}
-                  secureTextEntry={!isPasswordVisible}
-                  style={[styles.input, { flex: 1 }]}
-                  textColor={colors.white}
-                  underlineColor={colors.lightGrey}
-                  activeUnderlineColor={colors.white}
+                  secureTextEntry={true}
                   disabled={isLoading}
-                  theme={customTheme}
                 />
-                <TouchableOpacity
-                  onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                  style={styles.eyeIcon}
-                >
-                  {isPasswordVisible ? <EyeOff></EyeOff> : <EyeOn></EyeOn>}
-                </TouchableOpacity>
+
+                {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
               </View>
-              {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
             </View>
+            <TouchableOpacity style={{ marginTop: 2 }}>
+              <Text style={{ textAlign: 'right', fontSize: 12, color: colors.veryLighterGrey }}>
+                {strings.RESET_PASSWORD}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={_onLoginPressed}
+              style={[styles.button, isLoading && styles.buttonDisabled]}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={colors.white} size="small" />
+              ) : (
+                <Text style={styles.text}>{strings.LOGIN}</Text>
+              )}
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={{ marginTop: 2 }}>
-            <Text style={{ textAlign: 'right', fontSize: 12, color: colors.veryLighterGrey }}>
-              {strings.RESET_PASSWORD}
+          <TouchableOpacity style={{ marginTop: 10 }} onPress={handlePressRegister}>
+            <Text style={{ textAlign: 'center', fontSize: 14, color: colors.veryLighterGrey }}>
+              {strings.CREATE_NEW_ACCOUNT}
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={_onLoginPressed}
-            style={[styles.button, isLoading && styles.buttonDisabled]}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.white} size="small" />
-            ) : (
-              <Text style={styles.text}>{strings.LOGIN}</Text>
-            )}
-          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={{ marginTop: 10 }} onPress={handlePressRegister}>
-          <Text style={{ textAlign: 'center', fontSize: 14, color: colors.veryLighterGrey }}>
-            {strings.CREATE_NEW_ACCOUNT}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -9,6 +9,7 @@ import { SessionBearer } from '../../types/requests.types';
 import { clearRestaurantStorageRelatedKeys } from '../../storage/store';
 import { LogoutFAB } from '../../components/LogoutFab';
 import { useStrings } from '../../core/localization/languageContext';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 const NewUserSetupScreen = () => {
   const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
@@ -248,17 +249,13 @@ const NewUserSetupScreen = () => {
             <Text style={styles.modalTitle}>{strings.CREATE_RESTAURANT}</Text>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>{strings.RESTAURANT_NAME}</Text>
-              <TextInput
+              <CustomTextInput
+                label={strings.RESTAURANT_NAME}
                 mode="outlined"
                 value={restaurantName}
                 onChangeText={setRestaurantName}
                 placeholder={strings.ENTER_RESTAURANT_NAME_PLACEHOLDER}
-                style={styles.input}
-                returnKeyType="done"
-                blurOnSubmit={false}
-                onSubmitEditing={() => {}}
-                keyboardType="default"
+                theme="light"
               />
             </View>
 
@@ -357,9 +354,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.grey,
     marginBottom: 8,
-  },
-  input: {
-    backgroundColor: 'white',
   },
   buttonContainer: {
     flexDirection: 'row',

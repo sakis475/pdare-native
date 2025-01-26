@@ -21,6 +21,7 @@ import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, USERS_UPDATED } from '../../helpers/Sockets/EventEmitter';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 interface SearchUserModalProps {
   visible: boolean;
@@ -182,7 +183,6 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
       onClose={onDismiss}
       onConfirm={() => {}}
       testID="user-search-modal"
-      backgroundColor={colors.white}
       showButtons={false}
     >
       <Searchbar
@@ -265,16 +265,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
       onClose={onDismiss}
       onConfirm={handleSave}
       testID="update-user-modal"
-      backgroundColor={colors.white}
     >
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>{strings.DISPLAY_NAME}</Text>
-        <TextInput
+        <CustomTextInput
+          label={strings.DISPLAY_NAME}
           mode="outlined"
           value={displayName}
           onChangeText={setDisplayName}
           placeholder={strings.ENTER_DISPLAY_NAME}
           style={styles.input}
+          theme="light"
         />
       </View>
       {onDelete && (

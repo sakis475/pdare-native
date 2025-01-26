@@ -7,6 +7,7 @@ import { postRequest, setBearer } from '../../helpers/requests';
 import { clearRestaurantStorageRelatedKeys } from '../../storage/store';
 import { register, RegisterData } from '../../helpers/storage/tokenRequests';
 import { useStrings } from '../../core/localization/languageContext';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -65,7 +66,7 @@ const FormField: React.FC<
     onBlur,
   }) => (
     <View style={styles.fieldWrapper}>
-      <TextInput
+      <CustomTextInput
         label={label}
         value={value}
         onChangeText={onChangeText}
@@ -73,11 +74,6 @@ const FormField: React.FC<
         error={!!error}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
-        autoCapitalize="none"
-        style={styles.input}
-        textColor={colors.white}
-        underlineColor={colors.lighterGrey}
-        activeUnderlineColor={colors.white}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>

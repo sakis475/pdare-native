@@ -20,6 +20,8 @@ import { patchRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/navigationUtils';
 import dayjs from '../../core/dayjs';
 import { DoubleDownIcon } from '../basic/Icons';
+import CustomSegmentedButtons from '../basic/CustomSegmentedButtons';
+import CustomButton from '../basic/CustomButton';
 
 interface MoreOptionsTempBottomSheet {
   onChangeTable?: () => void;
@@ -72,7 +74,7 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
       </View>
     );
 
-    const showChangeTable = !order?.closedAt;
+    const showChangeTable = order && !order?.closedAt;
     const showChangeCouvert = order?.table && !order.closedAt;
     const showReprintOrder = order?.createdAt && !order?.closedAt;
     const showPrintAnalysis = order?.createdAt;
@@ -176,7 +178,7 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                       />
 
                       <View style={styles.printControls}>
-                        <SegmentedButtons
+                        <CustomSegmentedButtons
                           value={printDestination}
                           onValueChange={setPrintDestination}
                           buttons={[
@@ -185,19 +187,13 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                             { value: 'kitchen', label: strings.KITCHEN },
                           ]}
                           style={styles.segmentedButtons}
-                          theme={{
-                            colors: {
-                              onSurface: colors.white,
-                              onSurfaceVariant: colors.white,
-                            },
-                          }}
+                          variant="dark"
                         />
-                        <TouchableOpacity
-                          style={styles.printButton}
+                        <CustomButton
                           onPress={() => onPrint?.(printDestination as 'all' | 'bar' | 'kitchen')}
                         >
-                          <Text style={styles.printButtonText}>{strings.PRINT}</Text>
-                        </TouchableOpacity>
+                          <Text>{strings.PRINT}</Text>
+                        </CustomButton>
                       </View>
                     </View>
                   ) : null}
@@ -309,24 +305,12 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   printControls: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
-    marginTop: 8,
-    paddingHorizontal: 8,
   },
   segmentedButtons: {
     flex: 1,
     backgroundColor: 'transparent',
-  },
-  printButton: {
-    backgroundColor: colors.green,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   printButtonText: {
     color: colors.white,

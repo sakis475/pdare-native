@@ -27,6 +27,7 @@ import { useStrings } from '../../core/localization/languageContext';
 import { BarsIcon, EditIcon, SortIcon, TrashIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -116,9 +117,8 @@ const EditModal: React.FC<EditModalProps> = ({
       onClose={onDismiss}
       onConfirm={handleSave}
       testID="item-list-edit-modal"
-      backgroundColor={colors.white}
     >
-      <TextInput
+      <CustomTextInput
         label={strings.TABLE_NAME}
         value={tableName}
         onChangeText={setTableName}

@@ -19,9 +19,9 @@ interface BaseModalProps {
   onConfirm: () => void;
   children: React.ReactNode;
   testID?: string;
-  backgroundColor?: string;
   showButtons?: boolean;
   title: string;
+  theme?: 'light' | 'dark';
 }
 
 const BaseModal: React.FC<BaseModalProps> = ({
@@ -30,12 +30,34 @@ const BaseModal: React.FC<BaseModalProps> = ({
   onConfirm,
   children,
   testID,
-  backgroundColor = colors.grey,
   showButtons = true,
   title = '',
+  theme = 'light',
 }) => {
   const strings = useStrings();
   if (!visible) return null;
+
+  const getThemeColors = () => {
+    return theme === 'light'
+      ? {
+          background: colors.white,
+          text: colors.grey,
+          border: colors.lightGrey,
+          buttonBackground: 'rgba(0, 0, 0, 0.05)',
+          buttonBorder: 'rgba(0, 0, 0, 0.1)',
+          overlay: 'rgba(0, 0, 0, 0.3)',
+        }
+      : {
+          background: colors.grey,
+          text: colors.white,
+          border: colors.lightGrey,
+          buttonBackground: 'rgba(0, 0, 0, 0.2)',
+          buttonBorder: 'rgba(255, 255, 255, 0.1)',
+          overlay: 'rgba(0, 0, 0, 0.5)',
+        };
+  };
+
+  const themeColors = getThemeColors();
 
   return (
     <Modal
@@ -45,7 +67,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: themeColors.overlay }]}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
@@ -55,8 +77,24 @@ const BaseModal: React.FC<BaseModalProps> = ({
             <View style={styles.overlay}>
               <TouchableWithoutFeedback>
                 <View style={styles.modalContainer}>
-                  <View style={[styles.contentContainer, { backgroundColor }]}>
-                    {title ? <Text style={styles.modalTitle}>{title}</Text> : null}
+                  <View
+                    style={[styles.contentContainer, { backgroundColor: themeColors.background }]}
+                  >
+                    {title ? (
+                      <Text
+                        style={[
+                          styles.modalTitle,
+                          {
+                            color: themeColors.text,
+                            borderBottomColor: themeColors.border,
+                          },
+                        ]}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
+                        {title}
+                      </Text>
+                    ) : null}
 
                     <ScrollView
                       bounces={false}
@@ -66,7 +104,15 @@ const BaseModal: React.FC<BaseModalProps> = ({
                       {children}
                     </ScrollView>
                     {showButtons && (
-                      <View style={styles.buttonContainer}>
+                      <View
+                        style={[
+                          styles.buttonContainer,
+                          {
+                            borderTopColor: themeColors.buttonBorder,
+                            backgroundColor: themeColors.buttonBackground,
+                          },
+                        ]}
+                      >
                         <Button
                           mode="outlined"
                           onPress={onClose}
@@ -107,7 +153,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   keyboardView: {
     flex: 1,
@@ -138,11 +183,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: colors.grey,
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: colors.lightGrey,
     marginBottom: 10,
+    flexWrap: 'wrap',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -150,8 +194,6 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     marginHorizontal: -20,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,

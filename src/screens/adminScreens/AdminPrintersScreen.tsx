@@ -23,6 +23,8 @@ import { CharacterSet } from '../../types/exportable.types';
 import { EditIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
+import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
+import CustomTextInput from '../../components/basic/CustomTextInput';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -155,34 +157,36 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
         onClose={onDismiss}
         onConfirm={handleSave}
         testID="item-list-edit-modal"
-        backgroundColor={colors.white}
       >
-        <TextInput
+        <CustomTextInput
           label={strings.NICKNAME}
           value={nickname}
           onChangeText={setNickname}
           style={styles.input}
           mode="outlined"
+          theme="light"
         />
 
-        <TextInput
+        <CustomTextInput
           label={mode === 'edit' ? strings.OVERRIDE_IP : strings.IP}
           value={overrideIP}
           onChangeText={setOverrideIP}
           style={styles.input}
           mode="outlined"
+          theme="light"
         />
 
-        <TextInput
+        <CustomTextInput
           label={mode === 'edit' ? strings.OVERRIDE_PORT : strings.PORT}
           value={overridePort}
           onChangeText={setOverridePort}
           style={styles.input}
           mode="outlined"
+          theme="light"
         />
 
         <Text style={styles.inputLabel}>{strings.PRINT_ITEMS}</Text>
-        <SegmentedButtons
+        <CustomSegmentedButtons
           value={printLocation}
           onValueChange={handlePrintLocationChange}
           buttons={[

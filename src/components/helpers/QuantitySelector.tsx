@@ -14,6 +14,7 @@ import { colors } from '../../core/theme';
 import _ from 'lodash';
 import { useStrings } from '../../core/localization/languageContext';
 import { TrashIcon } from '../basic/Icons';
+import CustomTextInput from '../basic/CustomTextInput';
 
 interface QuantitySelectorProps {
   quantity: number;
