@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { Searchbar, Divider } from 'react-native-paper';
 import { FlashList } from '@shopify/flash-list';
 import { useStrings } from '../core/localization/languageContext';
 import { normalizeString } from '../core/utils';
 import { CatalogItemAdd } from './itemComponents/CatalogItemAdd';
 import { colors } from '../core/theme';
+import { useIsFocused } from '@react-navigation/native';
 
 interface SearchComponentProps {
   allItems: ItemReq[];
@@ -16,6 +17,8 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredItems, setFilteredItems] = useState<ItemReq[]>([]);
   const strings = useStrings();
+
+  const isFocused = useIsFocused();
 
   const handleSearchChange = useCallback(
     (query: string) => {
@@ -43,6 +46,16 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
 
     setFilteredItems(filtered);
   }, [searchQuery, allItems]);
+
+  useEffect(() => {
+    if (isFocused && searchQuery.length > 0) {
+      searchBarRef.current?.focus();
+    }
+  }, [isFocused]);
+
+  // Add ref to the Searchbar
+  const searchBarRef = useRef(null);
+
   const renderSearchItem = useCallback((item: ItemReq, index: number) => {
     return (
       <View key={index}>
@@ -54,12 +67,24 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
     <>
       <View style={styles.searchContainer}>
         <Searchbar
+          ref={searchBarRef}
           placeholder={strings.SEARCH}
           placeholderTextColor={colors.veryLighterGrey}
           onChangeText={handleSearchChange}
           value={searchQuery}
           style={styles.searchInput}
-          onClearIconPress={() => handleSearchChange('')}
+          onClearIconPress={() => {
+            handleSearchChange('');
+            Keyboard.dismiss();
+          }}
+          iconColor={colors.white}
+          inputStyle={{ color: colors.white }}
+          theme={{
+            colors: {
+              onSurfaceVariant: colors.white,
+              onSurface: colors.white,
+            },
+          }}
         />
       </View>
 
@@ -72,6 +97,7 @@ const SearchComponent = ({ allItems, onSearchQueryChange }: SearchComponentProps
               estimatedItemSize={50}
               contentContainerStyle={styles.searchResultsList}
               ItemSeparatorComponent={Divider}
+              keyboardShouldPersistTaps={'always'}
             />
           ) : (
             <View style={styles.emptyContainer}>

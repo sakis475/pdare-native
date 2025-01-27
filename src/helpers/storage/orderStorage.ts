@@ -92,7 +92,7 @@ export const addNewItemToTemp = async (item: ItemReq) => {
       newItemId,
     });
   }
-  toast('success', strings.ADDED_ITEM, '', 800);
+  toast('success', strings.ADDED_ITEM, '', 400);
   await setStorage('newOrder', tempOrder);
 };
 

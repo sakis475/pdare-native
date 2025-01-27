@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity, Keyboard } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { colors } from '../../core/theme';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { ChevronRightIcon, PlusIcon } from '../basic/Icons';
 import { catalogItemStyles } from './CatalogStyles';
+import { addNewItemToTemp } from '../../helpers/storage/orderStorage';
+import _ from 'lodash';
 
 export function CatalogItemAdd({
   item,
@@ -17,8 +19,15 @@ export function CatalogItemAdd({
 }) {
   const [isPressedIn, setIsPressedIn] = useState(false);
 
+  const itemHasNoProperties = _.isEmpty(item.itemPropertiesGrouped);
+
   const handleGoToDetails = () => {
-    navigate(ScreenNames.ItemDetailsScreen, { item });
+    if (itemHasNoProperties) {
+      addNewItemToTemp(item);
+    } else {
+      Keyboard.dismiss();
+      navigate(ScreenNames.ItemDetailsScreen, { item });
+    }
   };
 
   const handleAddBtn = () => {
@@ -43,13 +52,12 @@ export function CatalogItemAdd({
           )}
         </View>
       </View>
-
       <TouchableOpacity
         style={[styles.button, styles.smallButton]}
         onPress={handleGoToDetails}
         activeOpacity={0.6}
       >
-        <PlusIcon size={15} />
+        {itemHasNoProperties ? <PlusIcon size={15} /> : <ChevronRightIcon size={18} />}
       </TouchableOpacity>
     </View>
   );

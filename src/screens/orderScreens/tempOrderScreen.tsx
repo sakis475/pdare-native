@@ -94,7 +94,6 @@ const TempOrderScreen = ({
   const fetchItems = useCallback(async () => {
     try {
       const tempOrder = await getTempOrder();
-      console.log(tempOrder, 'tempOrder');
       setOrderState({
         table: tempOrder?.table,
         items: tempOrder?.orderItems ?? [],
