@@ -1,13 +1,4 @@
-import React, {
-  memo,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Keyboard, Text } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { getStorage } from '../../storage/store';
@@ -18,127 +9,134 @@ import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBot
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
 import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
-import {
-  addNewItemToTemp,
-  getTempOrder,
-  setTableTempOrder,
-} from '../../helpers/storage/orderStorage';
+import { addNewItemToTemp, setTableTempOrder } from '../../helpers/storage/orderStorage';
 import { useStrings } from '../../core/localization/languageContext';
 import { useIsFocused } from '@react-navigation/native';
-import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
-import { toast } from '../../core/utils';
+
+// Memoized components
+const MemoizedDivider = memo(Divider);
+const MemoizedCatalogItemAdd = memo(CatalogItemAdd);
+
 const ItemListScreen = ({ route }: any) => {
   const [tableName, setTableName] = useState(route.params.tableName);
   const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle);
   const [items, setItems] = useState<ItemReq[]>(null);
-
   const [duplicateItemIds, setDuplicateItemIds] = useState<Set<number>>(new Set());
 
   const isFocused = useIsFocused();
   const strings = useStrings();
+  const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
 
+  // Memoized handlers
+  const handleSelectTable = useCallback((table: Table) => {
+    setTableName(table.tableName);
+    setTableTempOrder(table);
+  }, []);
+
+  const handleTempOrderPress = useCallback(() => {
+    navigateToDraft();
+  }, []);
+
+  const handleOpenModal = useCallback(() => {
+    bottomSheetRef.current?.openModal();
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    bottomSheetRef.current?.closeModal();
+    Keyboard.dismiss();
+  }, []);
+
+  const handleAddNewItemPress = useCallback(async (item: ItemReq) => {
+    await addNewItemToTemp(item);
+  }, []);
+
+  // Optimized fetch function
   const fetchItems = useCallback(async () => {
     if (!categoryTitle) return;
 
-    const fetchedItems: catGroupedItems = (await getStorage('groupedItems')) || {};
-    const categoryItems = fetchedItems[categoryTitle] ?? [];
-
-    setItems(categoryItems);
+    try {
+      const fetchedItems: catGroupedItems = await getStorage('groupedItems');
+      if (fetchedItems) {
+        setItems(fetchedItems[categoryTitle] ?? []);
+      }
+    } catch (error) {
+      console.error('Error fetching items:', error);
+      setItems([]);
+    }
   }, [categoryTitle]);
 
   useEffect(() => {
     setCategoryTitle(route.params.categoryTitle);
   }, [route.params.categoryTitle]);
 
-  // Separate event listener setup
   useEffect(() => {
     if (isFocused) {
-      // Initial fetch
       fetchItems();
     }
   }, [isFocused, fetchItems]);
 
-  const handleSelectTable = (table: Table) => {
-    setTableName(table.tableName);
-    setTableTempOrder(table);
-  };
+  // Memoized render item function
+  const renderItem = useCallback(
+    ({ item, index }: { item: ItemReq; index: number }) => (
+      <MemoizedCatalogItemAdd
+        item={item}
+        handleAddNewItemPress={handleAddNewItemPress}
+        disableInstantAdd={duplicateItemIds.has(item.id)}
+      />
+    ),
+    [duplicateItemIds, handleAddNewItemPress]
+  );
 
-  const handleTempOrderPress = () => {
-    navigateToDraft();
-  };
+  // Memoized key extractor
+  const keyExtractor = useCallback((item: ItemReq) => item.id.toString(), []);
 
-  //START TABLE MODAL LOGIC
-  const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
-
-  const handleOpenModal = () => {
-    bottomSheetRef.current?.openModal();
-  };
-
-  const handleCloseModal = () => {
-    bottomSheetRef.current?.closeModal();
-    Keyboard.dismiss();
-  };
-
-  //END TABLE MODAL LOGIC
-
-  const handleSheetChanges = (index: number) => {
-    if (index === -1) {
-      handleCloseModal();
-    }
-  };
-
-  const handleItemPress = (screenName: ScreenNames, props: any = null) => {
-    navigate(screenName, props);
-  };
-
-  const handleAddNewItemPress = async (item: ItemReq) => {
-    await addNewItemToTemp(item);
-  };
-
-  const renderItems = (item: ItemReq, index: number) => {
+  if (!items) {
     return (
-      <View key={index}>
-        <CatalogItemAdd
-          item={item}
-          handleAddNewItemPress={handleAddNewItemPress}
-          disableInstantAdd={duplicateItemIds.has(item.id)}
-        />
+      <View style={styles.container}>
+        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       </View>
     );
-  };
+  }
+
+  if (items.length === 0) {
+    return (
+      <View style={[styles.container, styles.emptyContainer]}>
+        <Text style={styles.emptyText}>{strings.NO_PRODUCTS_FOUND}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {items?.length > 0 ? (
-        <>
-          <CategoryHeader title={items[0].category?.title} />
+      <CategoryHeader title={items[0].category?.title} />
 
-          <View style={styles.categoriesContainer}>
-            <FlashList
-              data={items}
-              renderItem={({ item, index }) => renderItems(item, index)}
-              estimatedItemSize={50}
-              contentContainerStyle={styles.categoryFlashListContainer}
-              ItemSeparatorComponent={Divider}
-            />
-          </View>
-          <OrderBottomOptions
-            tableName={tableName}
-            handleOpenModal={handleOpenModal}
-            handleTempOrderPress={handleTempOrderPress}
-          />
-          <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
-        </>
-      ) : items?.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>{strings.NO_PRODUCTS_FOUND}</Text>
-        </View>
-      ) : (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-      )}
+      <View style={styles.categoriesContainer}>
+        <FlashList
+          data={items}
+          renderItem={renderItem}
+          estimatedItemSize={50}
+          keyExtractor={keyExtractor}
+          contentContainerStyle={styles.categoryFlashListContainer}
+          ItemSeparatorComponent={MemoizedDivider}
+          overrideItemLayout={(layout, item) => {
+            layout.size = 50;
+          }}
+          drawDistance={100}
+          estimatedListSize={{ height: 500, width: 500 }}
+        />
+      </View>
+
+      <OrderBottomOptions
+        tableName={tableName}
+        handleOpenModal={handleOpenModal}
+        handleTempOrderPress={handleTempOrderPress}
+      />
+
+      <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -229,4 +227,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
-export default ItemListScreen;
+export default memo(ItemListScreen);

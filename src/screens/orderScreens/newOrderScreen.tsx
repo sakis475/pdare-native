@@ -90,36 +90,58 @@ const NewOrderScreen = ({ route, navigation }: any) => {
   }, []);
 
   const fetchItems = useCallback(async () => {
-    let newOrder = await getStorage('groupedItems');
-    if (!newOrder) {
-      await storageInitData();
-      newOrder = await getStorage('groupedItems');
-    }
+    try {
+      // Run storage operations in parallel
+      const [newOrder, initialCategories, existingTempOrder] = await Promise.all([
+        getStorage('groupedItems'),
+        getStorage('categories'),
+        getTempOrder(),
+      ]);
 
-    if (!newOrder) return;
+      const tempTable = existingTempOrder?.table ?? null;
 
-    // Flatten all items from all categories
-    const items = Object.values(newOrder).flat();
-    setAllItems(items);
+      // Handle initialization if needed
+      if (!newOrder) {
+        await storageInitData();
+        const [reinitOrder, reinitCategories] = await Promise.all([
+          getStorage('groupedItems'),
+          getStorage('categories'),
+        ]);
 
-    if (!tableName) {
-      const fetchTempTable = await getTableTempOrder();
-      setTableName(fetchTempTable?.tableName);
-    }
+        if (reinitOrder) {
+          const items = Object.values(reinitOrder).flat();
+          setAllItems(items);
+        }
 
-    const categories = await getStorage('categories');
-    setCategories(categories);
+        setCategories(reinitCategories);
+      } else {
+        const items = Object.values(newOrder).flat();
+        setAllItems(items);
+        setCategories(initialCategories);
+      }
 
-    const tempOrder = await getTempOrder();
+      // Set table name if not already set
+      if (!tableName) {
+        setTableName(tempTable?.tableName);
+      }
 
-    const newTitle =
-      !!tempOrder?.id || route.params?.table?.occupiedByOrder
-        ? strings.UPDATE_ORDER
-        : strings.NEW_ORDER;
-    setHeaderTitle(newTitle);
+      // Update header title
+      const newTitle =
+        !!existingTempOrder?.id || route.params?.table?.occupiedByOrder
+          ? strings.UPDATE_ORDER
+          : strings.NEW_ORDER;
+      setHeaderTitle(newTitle);
 
-    if (tempOrder?.table?.id !== route.params?.table?.id && route.params?.table?.occupiedByOrder) {
-      await setTempOrder(route.params.table.occupiedByOrder);
+      // Handle temp order update if needed
+      if (
+        existingTempOrder?.table?.id !== route.params?.table?.id &&
+        route.params?.table?.occupiedByOrder
+      ) {
+        await setTempOrder(route.params.table.occupiedByOrder);
+      }
+    } catch (error) {
+      console.error('Error fetching items:', error);
+      // Add proper error handling here
     }
   }, [route.params?.table?.id, tableName, strings]);
 
@@ -152,6 +174,8 @@ const NewOrderScreen = ({ route, navigation }: any) => {
     Keyboard.dismiss();
   }, []);
 
+  const getItemType = useCallback(() => 'category', []);
+
   const renderCategories = useCallback(
     ({ item: category }: { item: Category }) => (
       <CategoryItem category={category} tableName={tableName} onPress={handleCategoryPress} />
@@ -176,6 +200,7 @@ const NewOrderScreen = ({ route, navigation }: any) => {
                 numColumns={COLUMN_COUNT}
                 keyExtractor={keyExtractor}
                 removeClippedSubviews={true}
+                getItemType={getItemType}
               />
             )}
           </View>
