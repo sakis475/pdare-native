@@ -192,7 +192,7 @@ export const convertNewOrderToRequestObject = (newOrder: Order): CreateNewOrderR
     });
 
   const newReqOrder = {
-    couvert: newOrder.couvert ?? 1,
+    couvert: newOrder.couvert ?? 0,
     table: newOrder.table.id === -1 ? newOrder.table.tableName : newOrder.table.id,
     comment: newOrder.comment ? newOrder.comment : '',
     items: newOrderRequestItems,
@@ -235,6 +235,7 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
   };
   for (const orderItem of occupiedByOrder.orderItems) {
     try {
+      if (orderItem.removedAt) continue;
       const originalItem = _.cloneDeep(items.find((e) => e.id === orderItem?.item?.id));
       originalItem.newItemId = uuid.v4() as string;
       originalItem.quantity = orderItem.quantity;

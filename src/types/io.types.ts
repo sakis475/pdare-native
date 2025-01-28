@@ -9,6 +9,7 @@ type OrderItemIO = {
   comment: string;
   item: ItemReq;
   itemPropertyOfItem: TableItemPropertyIO[];
+  removedAt?: Date;
 };
 
 type OrderIO = {
