@@ -33,6 +33,7 @@ import { CatalogItemViewOnly } from '../../../components/itemComponents/CatalogI
 import { LinearGradientFadeOut } from '../../../components/basic/LinearGradientFadeOut';
 import MoreOptionsTempBottomSheet from '../../../components/bottomSheets/MoreOptionsTempBottomSheet';
 import { patchRequest } from '../../../helpers/requests';
+import { LoadingOverlay } from '../../../components/basic/SavingOverlay';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -42,6 +43,8 @@ const ActiveOrderScreen = ({
   const [items, setItems] = useState<ItemReq[]>();
   const [table, setTable] = useState<Table>(route.params?.tableParam);
   const [order, setOrder] = useState<Order>(table.occupiedByOrder);
+  const [isSending, setIsSending] = useState(false);
+
   const navigation = useNavigation();
 
   const strings = useStrings();
@@ -82,15 +85,20 @@ const ActiveOrderScreen = ({
   };
 
   const handleCloseOrder = async () => {
-    const orderId = order.id;
+    try {
+      setIsSending(true);
+      const orderId = order.id;
 
-    const result = await patchRequest(`/orders/close/${orderId}`);
-    if (result?.success === true) {
-      if (orderId === (await getTempOrder())?.id) {
-        await clearNewOrder();
+      const result = await patchRequest(`/orders/close/${orderId}`);
+      if (result?.success === true) {
+        if (orderId === (await getTempOrder())?.id) {
+          await clearNewOrder();
+        }
+        toast('success', strings.DELETED, '', 1000);
+        navigateToTables();
       }
-      toast('success', strings.DELETED, '', 1000);
-      navigateToTables();
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -248,6 +256,7 @@ const ActiveOrderScreen = ({
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      {isSending && <LoadingOverlay />}
       <View style={styles.container}>
         {items && items.length > 0 ? (
           <>

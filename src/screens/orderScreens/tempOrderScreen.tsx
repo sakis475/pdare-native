@@ -211,13 +211,18 @@ const TempOrderScreen = ({
   const handleCloseOrder = async () => {
     const orderId = orderState.order.id;
 
-    const result = await patchRequest(`/orders/close/${orderId}`);
-    if (result?.success === true) {
-      if (orderId === (await getTempOrder())?.id) {
-        await clearNewOrder();
+    try {
+      setIsSending(true);
+      const result = await patchRequest(`/orders/close/${orderId}`);
+      if (result?.success === true) {
+        if (orderId === (await getTempOrder())?.id) {
+          await clearNewOrder();
+        }
+        toast('success', strings.DELETED, '', 1000);
+        navigateToTables();
       }
-      toast('success', strings.DELETED, '', 1000);
-      navigateToTables();
+    } finally {
+      setIsSending(false);
     }
   };
 
