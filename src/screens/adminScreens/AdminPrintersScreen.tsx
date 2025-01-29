@@ -22,7 +22,6 @@ import dayjs from '../../core/dayjs';
 import { CharacterSet } from '../../types/exportable.types';
 import { EditIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
-import CustomButton from '../../components/basic/CustomButton';
 import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 
@@ -80,35 +79,37 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
 
   useEffect(() => {
     if (visible) {
-      // If we have a printer, use its values, otherwise use defaults
       setNickname(printer?.printerNickname ?? '');
       setOverrideIP(printer?.overrideIP ?? '');
       setOverridePort(printer?.overridePort ?? '');
       setCharacterSet((printer?.characterSet as CharacterSet) ?? ('' as any));
       setPrintLocation(printer?.printLocation ?? PrintLocation.ALL);
-      setActive(printer?.active);
+      setActive(printer?.active ?? true);
+      setEditModalVisible(true);
+      setCharSetPickerVisible(false);
     }
   }, [printer, visible]);
 
-  // Update editModalVisible when parent visible prop changes
-  useEffect(() => {
-    setEditModalVisible(visible);
-  }, [visible]);
-
   const handleCharSetPress = () => {
-    setEditModalVisible(false); // Hide edit modal
-    setCharSetPickerVisible(true);
+    setEditModalVisible(false);
+    setTimeout(() => {
+      setCharSetPickerVisible(true);
+    }, 300); // Add small delay to ensure smooth transition
   };
 
   const handleCharSetSelect = (value: CharacterSet) => {
     setCharacterSet(value);
     setCharSetPickerVisible(false);
-    setEditModalVisible(true); // Show edit modal again
+    setTimeout(() => {
+      setEditModalVisible(true);
+    }, 300); // Add small delay to ensure smooth transition
   };
 
   const handleCharSetDismiss = () => {
     setCharSetPickerVisible(false);
-    setEditModalVisible(true); // Show edit modal again
+    setTimeout(() => {
+      setEditModalVisible(true);
+    }, 300); // Add small delay to ensure smooth transition
   };
 
   // CharSet Picker Modal Component
@@ -153,8 +154,11 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
     <>
       <BaseModal
         title={mode === 'edit' ? strings.EDIT_PRINTER : strings.NEW_PRINTER}
-        visible={visible}
-        onClose={onDismiss}
+        visible={editModalVisible && visible}
+        onClose={() => {
+          setEditModalVisible(false);
+          onDismiss();
+        }}
         onConfirm={handleSave}
         testID="item-list-edit-modal"
       >
