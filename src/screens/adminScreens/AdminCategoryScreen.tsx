@@ -34,6 +34,7 @@ import CustomTextInput from '../../components/basic/CustomTextInput';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
+import { Category } from '../../types/basic.types';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;

@@ -4,6 +4,19 @@ import { getStorage, setStorage } from '../../storage/store';
 import uuid from 'react-native-uuid';
 import { toast } from '../../core/utils';
 import { strings } from '../../core/localization/strings';
+import {
+  Category,
+  catGroupedItems,
+  CreateNewOrderRequest,
+  ItemPropertiesGrouped,
+  ItemProperty,
+  ItemReq,
+  NewOrderRequestItem,
+  Order,
+  PropertyPattern,
+  Table,
+} from '../../types/basic.types';
+import { TableIO } from '../../types/io.types';
 
 export const getGroupedItems = async () => {
   const groupedByCategory: catGroupedItems | null = await getStorage('groupedItems');

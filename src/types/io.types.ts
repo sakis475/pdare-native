@@ -1,9 +1,11 @@
-type TableItemPropertyIO = {
+import { ItemProperty, ItemReq, User } from './basic.types';
+
+export type TableItemPropertyIO = {
   id: number;
   itemProperty: ItemProperty;
 };
 
-type OrderItemIO = {
+export type OrderItemIO = {
   id: number;
   quantity: number;
   comment: string;
@@ -12,10 +14,10 @@ type OrderItemIO = {
   removedAt?: Date;
 };
 
-type OrderIO = {
+export type OrderIO = {
   id: number;
   uniqueId?: string;
-  table: Table;
+  table: TableIO;
   orderItems: OrderItemIO[];
   couvert: number;
   comment: string;
@@ -26,7 +28,7 @@ type OrderIO = {
   finalCost: number;
 };
 
-type TableIO = {
+export type TableIO = {
   id: number;
   tableName: string;
   isEnabled: boolean;

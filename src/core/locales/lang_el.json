@@ -278,7 +278,7 @@
   "PORT": "Θύρα",
   "OVERRIDE_IP": "Παράκαμψη IP (προαιρετικό)",
   "OVERRIDE_PORT": "Παράκαμψη Θύρας (προαιρετικό)",
-  "PRINT_ITEMS": "Εκτύπωση Στοιχείων",
+  "PRINT_LOCATION": "Τοποθεσία Εκτύπωσης",
   "CHARACTER_SET": "Σετ Χαρακτήρων",
   "SELECT_CHARACTER_SET": "Επιλογή Σετ Χαρακτήρων",
   "CURRENT_IP": "Τρέχον IP",

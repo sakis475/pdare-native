@@ -7,6 +7,7 @@ import { ChevronRightIcon, PlusIcon } from '../basic/Icons';
 import { catalogItemStyles } from './CatalogStyles';
 import { addNewItemToTemp } from '../../helpers/storage/orderStorage';
 import _ from 'lodash';
+import { ItemReq } from '../../types/basic.types';
 
 export function CatalogItemAdd({
   item,

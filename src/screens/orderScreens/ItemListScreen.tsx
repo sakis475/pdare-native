@@ -12,7 +12,8 @@ import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
 import { addNewItemToTemp, setTableTempOrder } from '../../helpers/storage/orderStorage';
 import { useStrings } from '../../core/localization/languageContext';
 import { useIsFocused } from '@react-navigation/native';
-
+import { ItemReq, Table, catGroupedItems } from '../../types/basic.types';
+import { TableIO } from '../../types/io.types';
 // Memoized components
 const MemoizedDivider = memo(Divider);
 const MemoizedCatalogItemAdd = memo(CatalogItemAdd);

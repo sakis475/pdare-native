@@ -22,11 +22,12 @@ import dayjs from '../../core/dayjs';
 import { DoubleDownIcon } from '../basic/Icons';
 import CustomSegmentedButtons from '../basic/CustomSegmentedButtons';
 import CustomButton from '../basic/CustomButton';
+import { Order, PrintLocation } from '../../types/basic.types';
 
 interface MoreOptionsTempBottomSheet {
   onChangeTable?: () => void;
   onChangeCouvert?: (quantity: number) => void;
-  onPrint?: (destination: 'all' | 'bar' | 'kitchen') => void;
+  onPrint?: (printLocation: PrintLocation) => void;
   onCustomerAnalysis?: () => void;
   onCloseOrder?: () => void;
   order: Order;
@@ -35,9 +36,8 @@ interface MoreOptionsTempBottomSheet {
 const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
   ({ onChangeTable, onChangeCouvert, onPrint, onCustomerAnalysis, onCloseOrder, order }, ref) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
-    const [isPrintEnabled, setIsPrintEnabled] = useState(false);
-    const [printDestination, setPrintDestination] = useState('all');
-    const snapPoints = useMemo(() => ['80%', '80%'], []);
+    const [printDestination, setPrintDestination] = useState<PrintLocation>(PrintLocation.ALL);
+    const snapPoints = useMemo(() => ['90%', '90%'], []);
     const strings = useStrings();
     const [openCouvertModal, setOpenCouvertModal] = useState(false);
 
@@ -56,13 +56,6 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
       openModal: handleOpenModal,
       closeModal: handleCloseModal,
     }));
-
-    const handlePrintToggle = (value: boolean) => {
-      setIsPrintEnabled(value);
-      if (value) {
-        onPrint?.(printDestination as 'all' | 'bar' | 'kitchen');
-      }
-    };
 
     const CloseModalBtn = () => (
       <View>
@@ -177,23 +170,27 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                         style={styles.listItem}
                       />
 
-                      <View style={styles.printControls}>
-                        <CustomSegmentedButtons
-                          value={printDestination}
-                          onValueChange={setPrintDestination}
-                          buttons={[
-                            { value: 'all', label: strings.ALL },
-                            { value: 'bar', label: strings.BAR },
-                            { value: 'kitchen', label: strings.KITCHEN },
-                          ]}
-                          style={styles.segmentedButtons}
-                          variant="dark"
-                        />
-                        <CustomButton
-                          onPress={() => onPrint?.(printDestination as 'all' | 'bar' | 'kitchen')}
-                        >
-                          <Text>{strings.PRINT}</Text>
-                        </CustomButton>
+                      <View style={styles.printLocationContainer}>
+                        <Text style={styles.printLocationLabel}>{strings.PRINT_LOCATION}</Text>
+                        <View style={styles.printControls}>
+                          <CustomSegmentedButtons
+                            value={printDestination}
+                            onValueChange={(e) => {
+                              console.log('New value:', e);
+                              setPrintDestination(e as PrintLocation);
+                            }}
+                            buttons={[
+                              { value: PrintLocation.ALL, label: strings.ALL },
+                              { value: PrintLocation.BAR, label: strings.BAR },
+                              { value: PrintLocation.KITCHEN, label: strings.KITCHEN },
+                            ]}
+                            style={styles.segmentedButtons}
+                            variant="dark"
+                          />
+                          <CustomButton onPress={() => onPrint?.(printDestination)}>
+                            <Text>{strings.PRINT}</Text>
+                          </CustomButton>
+                        </View>
                       </View>
                     </View>
                   ) : null}
@@ -270,6 +267,16 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     gap: 3,
+  },
+  printLocationContainer: {
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  printLocationLabel: {
+    color: colors.veryLighterGrey,
+    fontSize: 13,
+    fontWeight: 'bold',
   },
   closeButton: {
     padding: 20,

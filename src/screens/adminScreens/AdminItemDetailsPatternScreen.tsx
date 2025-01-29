@@ -30,6 +30,7 @@ import {
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import { PropertyPattern, Category } from '../../types/basic.types';
 
 interface EditPatternModalProps {
   visible: boolean;

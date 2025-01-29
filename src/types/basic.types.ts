@@ -1,4 +1,4 @@
-interface ItemProperty {
+export interface ItemProperty {
   id?: number;
   propertyName: string;
   propertyValue: string;
@@ -17,11 +17,11 @@ interface ItemProperty {
 }
 
 // example [Milk: [], Sugar: []]
-interface ItemPropertiesGrouped {
+export interface ItemPropertiesGrouped {
   [key: string]: ItemProperty[];
 }
 
-interface Category {
+export interface Category {
   id?: number;
   title: string;
   orderCategory?: number;
@@ -30,7 +30,7 @@ interface Category {
   color?: string;
 }
 
-interface PropertyPattern {
+export interface PropertyPattern {
   id?: number;
   propertyPatternTitle: string;
   itemProperties: ItemProperty[];
@@ -39,7 +39,7 @@ interface PropertyPattern {
   category: Category;
 }
 
-interface Restaurant {
+export interface Restaurant {
   active: boolean;
   id: number;
   restaurantName: string;
@@ -47,7 +47,7 @@ interface Restaurant {
   currencySymbol: string;
 }
 
-interface Item {
+export interface Item {
   categoryCurrentId?: number;
   categoryTitle?: string;
   id: number;
@@ -59,7 +59,7 @@ interface Item {
   itemPropertiesGrouped: ItemPropertiesGrouped;
 }
 
-interface ItemReq {
+export interface ItemReq {
   id?: number;
   category: Category;
   cost: number;
@@ -77,11 +77,11 @@ interface ItemReq {
   markForDelete?: boolean;
   orderItemReady?: boolean;
 }
-interface catGroupedItems {
+export interface catGroupedItems {
   [key: string]: ItemReq[];
 }
 
-interface Table {
+export interface Table {
   id: number;
   tableName: string;
   isEnabled: boolean;
@@ -89,7 +89,7 @@ interface Table {
   occupiedByOrder?: Order;
 }
 
-interface Order {
+export interface Order {
   id?: number;
   uniqueId?: string;
   table: Table;
@@ -104,25 +104,25 @@ interface Order {
   user?: User;
 }
 
-interface SendOrderItem {
+export interface SendOrderItem {
   id: number;
   itemProperties: number[];
   quantity: number;
   comment?: string;
 }
 
-interface OrderNavigationState {
+export interface OrderNavigationState {
   screenName: any;
   params: any;
 }
 
-interface CreateNewOrderRequest {
+export interface CreateNewOrderRequest {
   orderId?: number;
   table: number | string;
   comment: string;
   items: NewOrderRequestItem[];
 }
-interface NewOrderRequestItem {
+export interface NewOrderRequestItem {
   id: number;
   oItemId: number;
   delete: boolean;
@@ -131,7 +131,7 @@ interface NewOrderRequestItem {
   comment: string;
 }
 
-interface User {
+export interface User {
   id?: number;
   active?: boolean;
   username: string;
@@ -145,12 +145,12 @@ interface User {
   markForDelete?: boolean;
 }
 
-interface LastCredentialsStorage {
+export interface LastCredentialsStorage {
   email: string;
   password: string;
 }
 
-interface InvitationRequest {
+export interface InvitationRequest {
   id?: number;
   inviteFrom: User;
   inviteTo: User;
@@ -159,18 +159,22 @@ interface InvitationRequest {
   createdAt: Date;
 }
 
-enum InvitationRequestStatus {
+export enum InvitationRequestStatus {
   ACCEPTED = 'accepted',
   CANCELLED = 'cancelled',
   AWAITING = 'awaiting',
 }
-enum PrintLocation {
+export enum PrintLocation {
   KITCHEN = 'kitchen',
   BAR = 'bar',
   ALL = 'all',
 }
 
-interface Printer {
+export enum PrintType {
+  PERSONEL = 'personel',
+  FINAL = 'final',
+}
+export interface Printer {
   id?: number;
   printerNickname: string;
   printerMac: string;

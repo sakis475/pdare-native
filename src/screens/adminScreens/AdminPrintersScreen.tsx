@@ -24,6 +24,7 @@ import { EditIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import { Printer } from '../../types/basic.types';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -189,7 +190,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
           theme="light"
         />
 
-        <Text style={styles.inputLabel}>{strings.PRINT_ITEMS}</Text>
+        <Text style={styles.inputLabel}>{strings.PRINT_LOCATION}</Text>
         <CustomSegmentedButtons
           value={printLocation}
           onValueChange={handlePrintLocationChange}

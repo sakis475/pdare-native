@@ -22,6 +22,7 @@ import { EventEmitter, USERS_UPDATED } from '../../helpers/Sockets/EventEmitter'
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import { User, InvitationRequest } from '../../types/basic.types';
 
 interface SearchUserModalProps {
   visible: boolean;

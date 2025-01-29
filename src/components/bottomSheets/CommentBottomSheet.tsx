@@ -15,6 +15,7 @@ import { TextInput } from 'react-native-paper';
 import { CategoryHeader } from '../helpers/CategoryHeader';
 import { useStrings } from '../../core/localization/languageContext';
 import { DoubleDownIcon } from '../basic/Icons';
+import { ItemReq } from '../../types/basic.types';
 
 interface CommentBottomSheetProps {
   item: ItemReq;

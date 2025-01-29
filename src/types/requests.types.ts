@@ -1,4 +1,6 @@
-type JWTUser = {
+import { User } from './basic.types';
+
+export type JWTUser = {
   username: string;
   firstName: string;
   role: string;

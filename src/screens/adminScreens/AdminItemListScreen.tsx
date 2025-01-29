@@ -22,6 +22,7 @@ import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import { ItemReq, catGroupedItems, Category } from '../../types/basic.types';
 
 interface EditItemModalProps {
   visible: boolean;

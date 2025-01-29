@@ -26,6 +26,7 @@ import { storageInitData } from '../../helpers/storage/storageInit';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomNavigationScreenHeaderTitle from '../../components/basic/CustomNavigationScreenHeaderTitle';
 import SearchItemsScreen from '../../components/SearchItemsComponent';
+import { Category, ItemReq, Table } from '../../types/basic.types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const COLUMN_COUNT = 4;
@@ -109,13 +110,13 @@ const NewOrderScreen = ({ route, navigation }: any) => {
         ]);
 
         if (reinitOrder) {
-          const items = Object.values(reinitOrder).flat();
+          const items = Object.values(reinitOrder).flat() as ItemReq[];
           setAllItems(items);
         }
 
         setCategories(reinitCategories);
       } else {
-        const items = Object.values(newOrder).flat();
+        const items = Object.values(newOrder).flat() as ItemReq[];
         setAllItems(items);
         setCategories(initialCategories);
       }

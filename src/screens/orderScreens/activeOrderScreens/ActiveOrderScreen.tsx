@@ -32,8 +32,9 @@ import { OrderInfoBar } from '../../../components/helpers/OrderInfoBar';
 import { CatalogItemViewOnly } from '../../../components/itemComponents/CatalogItemViewOnly';
 import { LinearGradientFadeOut } from '../../../components/basic/LinearGradientFadeOut';
 import MoreOptionsTempBottomSheet from '../../../components/bottomSheets/MoreOptionsTempBottomSheet';
-import { patchRequest } from '../../../helpers/requests';
+import { patchRequest, postRequest } from '../../../helpers/requests';
 import { LoadingOverlay } from '../../../components/basic/SavingOverlay';
+import { ItemReq, Table, Order, PrintLocation, PrintType } from '../../../types/basic.types';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -254,6 +255,18 @@ const ActiveOrderScreen = ({
     scrollToBottom();
   }, [scrollToBottom]);
 
+  const handleRePrintOrder = async (printLocation: PrintLocation) => {
+    console.log(printLocation, 'printLocation');
+    const orderId = order.id;
+    try {
+      setIsSending(true);
+      const data = { printType: PrintType.PERSONEL, printLocation: printLocation };
+      const result = await postRequest(`/orders/orderPrint/${orderId}`, data);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       {isSending && <LoadingOverlay />}
@@ -324,6 +337,7 @@ const ActiveOrderScreen = ({
                 onChangeTable={handleOpenSelectTableModal}
                 onChangeCouvert={handleChangeCouvert}
                 onCloseOrder={handleCloseOrder}
+                onPrint={handleRePrintOrder}
               ></MoreOptionsTempBottomSheet>
             </Portal>
           </View>

@@ -277,7 +277,7 @@
   "PORT": "Port",
   "OVERRIDE_IP": "Override IP (optional)",
   "OVERRIDE_PORT": "Override Port (optional)",
-  "PRINT_ITEMS": "Print Items",
+  "PRINT_LOCATION": "Print Location",
   "CHARACTER_SET": "Character Set",
   "SELECT_CHARACTER_SET": "Select Character Set",
   "CURRENT_IP": "Current IP",

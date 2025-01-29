@@ -25,8 +25,9 @@ import { LinearGradientFadeOut } from '../../components/basic/LinearGradientFade
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../../helpers/Sockets/EventEmitter';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import MoreOptionsTempBottomSheet from '../../components/bottomSheets/MoreOptionsTempBottomSheet';
-import { patchRequest } from '../../helpers/requests';
+import { patchRequest, postRequest } from '../../helpers/requests';
 import CustomButton from '../../components/basic/CustomButton';
+import { ItemReq, Table, PrintLocation, PrintType } from '../../types/basic.types';
 
 // Memoized Item renderer components
 const DisabledItem = memo(({ item, onDelete }: { item: ItemReq; onDelete: any }) => (
@@ -225,6 +226,17 @@ const TempOrderScreen = ({
       setIsSending(false);
     }
   };
+  const handleRePrintOrder = async (printLocation: PrintLocation) => {
+    console.log(printLocation, 'printLocation');
+    const orderId = orderState.order.id;
+    try {
+      setIsSending(true);
+      const data = { printType: PrintType.PERSONEL, printLocation: printLocation };
+      const result = await postRequest(`/orders/orderPrint/${orderId}`, data);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const renderItem = useCallback(
     ({ item }: { item: ItemReq }) => (
@@ -314,6 +326,7 @@ const TempOrderScreen = ({
               onChangeTable={handleOpenSelectTableModal}
               onChangeCouvert={handleChangeCouvert}
               onCloseOrder={handleCloseOrder}
+              onPrint={handleRePrintOrder}
             ></MoreOptionsTempBottomSheet>
           </Portal>
         </>

@@ -7,6 +7,7 @@ import { normalizeString } from '../core/utils';
 import { CatalogItemAdd } from './itemComponents/CatalogItemAdd';
 import { colors } from '../core/theme';
 import { useIsFocused } from '@react-navigation/native';
+import { ItemReq } from '../types/basic.types';
 
 interface SearchComponentProps {
   allItems: ItemReq[];

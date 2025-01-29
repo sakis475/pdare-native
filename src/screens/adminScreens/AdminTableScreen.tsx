@@ -28,6 +28,7 @@ import { BarsIcon, EditIcon, SortIcon, TrashIcon } from '../../components/basic/
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import { Table } from '../../types/basic.types';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
