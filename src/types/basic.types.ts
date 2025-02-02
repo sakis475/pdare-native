@@ -189,4 +189,5 @@ export interface Printer {
   createdAt?: Date;
   updatedAt?: Date;
   lastDiscovered?: Date;
+  analysisPrinter: boolean;
 }

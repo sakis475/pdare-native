@@ -259,7 +259,7 @@
   "PRINT": "PRINT",
   "NO_PRINTERS": "No Printers Found",
   "MORE_OPTIONS": "More Options",
-  "ALL": "All",
+  "ALL": "Both",
   "BAR": "Bar",
   "KITCHEN": "Kitchen",
   "CHANGE_TABLE_DESCRIPTION": "Move the current order to a different table",
@@ -271,6 +271,7 @@
   "REOPEN_ORDER_DESCRIPTION": "Re-open the order",
   "PRINT_ANALYSIS": "Print Analysis",
   "PRINT_ANALYSIS_DESCRIPTION": "Print final order analysis",
+  "ANALYSIS_PRINTER": "Analysis Printer",
   "EDIT_PRINTER": "Edit Printer",
   "NICKNAME": "Nickname",
   "IP": "IP",
@@ -294,5 +295,13 @@
   "EMPTY_NICKNAME_ERROR": "Printer nickname cannot be empty",
   "IP_REQUIRED_ERROR": "IP address is required for custom printers",
   "FOUND": "Found",
-  "NEW_PRINTER": "New Printer"
+  "NEW_PRINTER": "New Printer",
+  "NO_PRINTER_APP": "You have not installed the printer discovery application",
+  "PRINTER_APP_REQUIRES_ETHERNET": "This application requires ethernet connected thermal printers to print orders. Follow these steps to get started:",
+  "CONNECT_PRINTER_TO_ROUTER": "Connect your thermal printer to your network router",
+  "ENSURE_SAME_NETWORK": "Ensure your computer is on the same network",
+  "INTERNET_REQUIRED": "Internet connection is required",
+  "DOWNLOAD_START_APP": "Download and start the printer discovery app (no installation Required):",
+  "LOGIN_TO_APP": "Login into the printer discovery app on your computer",
+  "KEEP_APP_RUNNING": "Keep the app running to enable printer discovery and print functionality."
 }

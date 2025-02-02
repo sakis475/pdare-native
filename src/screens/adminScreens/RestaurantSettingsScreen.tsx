@@ -78,7 +78,7 @@ const RestaurantSettingsScreen = ({ route }: any) => {
   useEffect(() => {
     const loadUserOptions = async () => {
       try {
-        const user = (await getStorage('currentUser')) as User;
+        const user = await getStorage('currentUser');
         const filter = user ? user.role : 'guest';
         const userOptions = settingsOptions.filter((option) =>
           option.allowedRoles.includes(filter)

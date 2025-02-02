@@ -187,7 +187,12 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                             style={styles.segmentedButtons}
                             variant="dark"
                           />
-                          <CustomButton onPress={() => onPrint?.(printDestination)}>
+                          <CustomButton
+                            onPress={() => {
+                              onPrint?.(printDestination);
+                              handleCloseModal();
+                            }}
+                          >
                             <Text>{strings.PRINT}</Text>
                           </CustomButton>
                         </View>
@@ -196,7 +201,12 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                   ) : null}
 
                   {showPrintAnalysis ? (
-                    <TouchableOpacity onPress={onCustomerAnalysis}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        onCustomerAnalysis();
+                        handleCloseModal();
+                      }}
+                    >
                       <List.Item
                         title={strings.PRINT_ANALYSIS}
                         description={strings.PRINT_ANALYSIS_DESCRIPTION}
@@ -211,13 +221,20 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                   ) : null}
 
                   {showCloseOrder ? (
-                    <TouchableOpacity onPress={onCloseOrder}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        onCloseOrder();
+                        handleCloseModal();
+                      }}
+                    >
                       <List.Item
                         title={strings.CLOSE_ORDER}
                         description={strings.CLOSE_ORDER_DESCRIPTION}
                         descriptionStyle={styles.listItemDescription}
-                        left={(props) => <List.Icon {...props} icon="close" color={colors.white} />}
-                        titleStyle={styles.listItemTitle}
+                        left={(props) => (
+                          <List.Icon {...props} icon="close" color={colors.danger} />
+                        )}
+                        titleStyle={[styles.listItemTitle, { color: colors.danger }]}
                         style={styles.listItem}
                       />
                     </TouchableOpacity>
@@ -262,24 +279,25 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
 const styles = StyleSheet.create({
   tableChangeContainer: {
     flex: 1,
-    paddingTop: 20,
+    paddingTop: 16,
   },
   contentContainer: {
     flex: 1,
-    gap: 3,
+    gap: 2,
   },
   printLocationContainer: {
-    marginTop: 12,
-    marginBottom: 8,
+    marginTop: 8,
+    marginBottom: 6,
     paddingHorizontal: 4,
   },
   printLocationLabel: {
     color: colors.veryLighterGrey,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: 'bold',
+    marginBottom: 4,
   },
   closeButton: {
-    padding: 20,
+    padding: 16,
     backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -290,39 +308,46 @@ const styles = StyleSheet.create({
   },
   listSection: {
     backgroundColor: 'transparent',
+    paddingVertical: 4,
   },
   listItem: {
-    paddingVertical: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   listItemTitle: {
     color: colors.white,
-    fontSize: 16,
+    fontSize: 14,
+    lineHeight: 18,
   },
   listItemDescription: {
     color: colors.slightlyLighterGrey,
-    fontSize: 12,
-    marginTop: 2,
+    fontSize: 11,
+    marginTop: 1,
+    lineHeight: 14,
   },
   printSection: {
     borderWidth: 1,
     borderColor: colors.slightlyLighterGrey,
     borderRadius: 8,
     marginHorizontal: 16,
-    marginVertical: 8,
-    padding: 8,
+    marginVertical: 4,
+    padding: 6,
   },
   printControls: {
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 4,
+    gap: 8,
   },
   segmentedButtons: {
     flex: 1,
     backgroundColor: 'transparent',
+    marginBottom: 4,
   },
   printButtonText: {
     color: colors.white,
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 13,
   },
 });
 

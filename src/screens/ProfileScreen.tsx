@@ -23,6 +23,7 @@ const ProfileScreen = ({ route }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState<AppLanguage>('lang_el');
+
   const [formData, setFormData] = useState({
     username: '',
     firstName: '',
@@ -32,6 +33,7 @@ const ProfileScreen = ({ route }: any) => {
     displayName: '',
     couvertCost: 0,
     currencySymbol: '€',
+    restaurantLanguage: '',
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -74,6 +76,8 @@ const ProfileScreen = ({ route }: any) => {
             displayName: currentUser.displayName || '',
             couvertCost: currentUser?.restaurant?.couvertCost || 0,
             currencySymbol: currentUser?.restaurant?.currencySymbol || '',
+            restaurantLanguage:
+              currentUser?.restaurant.restaurantLanguage || savedLanguage || 'lang_en',
           });
         }
 
@@ -203,6 +207,7 @@ const ProfileScreen = ({ route }: any) => {
         restaurantDisplayName: formData.restaurantName.trim(),
         currencySymbol: formData.currencySymbol.trim(),
         couvertCost: formData.couvertCost,
+        restaurantLanguage: formData.restaurantLanguage.trim(),
       });
       if (response) {
         await setStorage('currentUser', response.user);
@@ -407,6 +412,28 @@ const ProfileScreen = ({ route }: any) => {
                 step={0.1}
                 max={1000}
               />
+
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>{strings.LANGUAGE_SETTINGS}</Text>
+
+                {languageOptions.map((option) => (
+                  <View key={option.id} style={styles.languageOption}>
+                    <RadioButton.Android
+                      value={option.value}
+                      status={
+                        formData.restaurantLanguage === option.value ? 'checked' : 'unchecked'
+                      }
+                      color={colors.primary}
+                      uncheckedColor={colors.white}
+                      onPress={() => {
+                        updateFormField('restaurantLanguage')(option.value);
+                      }}
+                    />
+                    <Text style={styles.languageLabel}>{option.label}</Text>
+                  </View>
+                ))}
+              </View>
+
               <CustomButton mode="contained" onPress={handleUpdateRestaurant} loading={isLoading}>
                 {strings.UPDATE}
               </CustomButton>

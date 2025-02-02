@@ -24,7 +24,12 @@ import { EditIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
-import { Printer } from '../../types/basic.types';
+import { Printer, User } from '../../types/basic.types';
+import { getStorage } from '../../storage/store';
+import {
+  LINUX_PRINTER_APP_DOWNLOAD_URL,
+  WINDOWS_PRINTER_APP_DOWNLOAD_URL,
+} from '../../storage/env';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -49,6 +54,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
   const [characterSet, setCharacterSet] = useState<CharacterSet | null>(null);
   const [printLocation, setPrintLocation] = useState<PrintLocation>(PrintLocation.ALL);
   const [active, setActive] = useState<boolean>(!!printer?.active);
+  const [printAnalysis, setPrintAnalysis] = useState<boolean>(!!printer?.active);
   const [charSetPickerVisible, setCharSetPickerVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
 
@@ -74,6 +80,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
       characterSet: characterSet?.trim(),
       active: active,
       printLocation,
+      analysisPrinter: printAnalysis,
     });
     onDismiss();
   };
@@ -86,6 +93,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
       setCharacterSet((printer?.characterSet as CharacterSet) ?? ('' as any));
       setPrintLocation(printer?.printLocation ?? PrintLocation.ALL);
       setActive(printer?.active ?? true);
+      setPrintAnalysis(printer?.analysisPrinter ?? true);
       setEditModalVisible(true);
       setCharSetPickerVisible(false);
     }
@@ -202,6 +210,11 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
           style={styles.segmentedButtons}
         />
 
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>{strings.ANALYSIS_PRINTER}</Text>
+          <Switch value={printAnalysis} onValueChange={setPrintAnalysis} />
+        </View>
+
         <Text style={styles.inputLabel}>{strings.CHARACTER_SET}</Text>
         <TouchableOpacity style={styles.charsetButton} onPress={handleCharSetPress}>
           <Text style={styles.charsetButtonText}>
@@ -255,6 +268,7 @@ const AdminPrintersScreen = () => {
   const [selectedPrinter, setSelectedPrinter] = useState<Printer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User>(null);
 
   const [mode, setMode] = useState<'edit' | 'create'>('edit');
 
@@ -282,6 +296,7 @@ const AdminPrintersScreen = () => {
       printerPort: newPrinter.overridePort,
       printLocation: newPrinter.printLocation,
       characterSet: newPrinter.characterSet,
+      analysisPrinter: newPrinter.analysisPrinter,
     };
 
     try {
@@ -304,7 +319,9 @@ const AdminPrintersScreen = () => {
   const fetchPrinters = async () => {
     try {
       const response = await getRequest('/printers');
+      const currentUser = await getStorage('currentUser');
       setPrinters(response);
+      setCurrentUser(currentUser);
     } catch (error) {
       toast('error', strings.ERROR, strings.PRINTER_FETCH_FAILED);
     }
@@ -437,23 +454,38 @@ const AdminPrintersScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View>
-        {printers === null ? (
-          <ActivityIndicator size="large" color={colors.primary} />
-        ) : printers?.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>{strings.NO_PRINTERS}</Text>
-            <Text style={styles.emptyText}>{strings.TAP_TO_SCAN}</Text>
+      {printers === null ? (
+        <ActivityIndicator size="large" color={colors.primary} />
+      ) : !printers?.find((e) => e.printerMac) ? (
+        <ScrollView style={styles.noAppContainer}>
+          <Text style={styles.noAppTitle}>{strings.NO_PRINTER_APP}</Text>
+          <View style={styles.noAppInstructionsContainer}>
+            <Text style={styles.noAppText}>{strings.PRINTER_APP_REQUIRES_ETHERNET}</Text>
+            <Text style={styles.noAppStep}>1. {strings.CONNECT_PRINTER_TO_ROUTER}</Text>
+            <Text style={styles.noAppIndent}>• {strings.ENSURE_SAME_NETWORK}</Text>
+            <Text style={styles.noAppIndent}>• {strings.INTERNET_REQUIRED}</Text>
+            <Text style={styles.noAppStep}>2. {strings.DOWNLOAD_START_APP}</Text>
+            <Text style={styles.noAppIndent}>• Windows: {WINDOWS_PRINTER_APP_DOWNLOAD_URL}</Text>
+            <Text style={styles.noAppIndent}>• Linux: {LINUX_PRINTER_APP_DOWNLOAD_URL}</Text>
+            <Text style={styles.noAppStep}>3. {strings.LOGIN_TO_APP}</Text>
+            <Text style={styles.noAppStep}>4. {strings.KEEP_APP_RUNNING}</Text>
           </View>
-        ) : (
-          <FlatList
-            data={printers}
-            keyExtractor={(item) => `printer-${item.id}`}
-            renderItem={({ item }) => <PrinterItem printer={item} onEdit={handleEditPress} />}
-            contentContainerStyle={styles.listContent}
-          />
-        )}
-      </View>
+        </ScrollView>
+      ) : (
+        <FlatList
+          style={styles.list}
+          data={printers}
+          keyExtractor={(item) => `printer-${item.id}`}
+          renderItem={({ item }) => <PrinterItem printer={item} onEdit={handleEditPress} />}
+          contentContainerStyle={[styles.listContent]}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>{strings.NO_PRINTERS}</Text>
+              <Text style={styles.emptyText}>{strings.TAP_TO_SCAN}</Text>
+            </View>
+          }
+        />
+      )}
 
       <View style={styles.fabContainer}>
         <FAB
@@ -494,7 +526,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#2F2F2F',
   },
+  list: {
+    flex: 1,
+  },
   listContent: {
+    flex: 1,
     padding: 16,
   },
   modalOverlay: {
@@ -581,6 +617,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    maxHeight: '100%',
   },
   emptyText: {
     color: colors.white,
@@ -680,6 +717,37 @@ const styles = StyleSheet.create({
   },
   fab: {
     backgroundColor: colors.primary,
+  },
+  noAppContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  noAppTitle: {
+    color: colors.white,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 50,
+    textAlign: 'center',
+  },
+  noAppInstructionsContainer: {
+    width: '100%',
+    maxWidth: 500,
+  },
+  noAppText: {
+    color: colors.white,
+    marginBottom: 16,
+    textAlign: 'left',
+  },
+  noAppStep: {
+    color: colors.white,
+    marginBottom: 12,
+    textAlign: 'left',
+  },
+  noAppIndent: {
+    color: colors.white,
+    marginLeft: 20,
+    marginBottom: 8,
+    textAlign: 'left',
   },
 });
 

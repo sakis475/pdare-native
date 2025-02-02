@@ -255,13 +255,17 @@ const ActiveOrderScreen = ({
     scrollToBottom();
   }, [scrollToBottom]);
 
-  const handleRePrintOrder = async (printLocation: PrintLocation) => {
-    console.log(printLocation, 'printLocation');
+  const handleRePrintOrder = async (
+    printLocation = PrintLocation.ALL,
+    printType = PrintType.PERSONEL,
+    isAnalysis = false
+  ) => {
     const orderId = order.id;
     try {
       setIsSending(true);
-      const data = { printType: PrintType.PERSONEL, printLocation: printLocation };
+      const data = { printType: printType, printLocation: printLocation, isAnalysis };
       const result = await postRequest(`/orders/orderPrint/${orderId}`, data);
+      toast('success', strings.SUCCESS, '', 1000);
     } finally {
       setIsSending(false);
     }
@@ -338,6 +342,7 @@ const ActiveOrderScreen = ({
                 onChangeCouvert={handleChangeCouvert}
                 onCloseOrder={handleCloseOrder}
                 onPrint={handleRePrintOrder}
+                onCustomerAnalysis={() => handleRePrintOrder(undefined, PrintType.FINAL, true)}
               ></MoreOptionsTempBottomSheet>
             </Portal>
           </View>
