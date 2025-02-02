@@ -1,10 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { Text, TextInput, Button, Divider, Portal, Dialog, Checkbox } from 'react-native-paper';
-import { ScrollView, State } from 'react-native-gesture-handler';
+import { Text, Button, Portal, Dialog, Checkbox } from 'react-native-paper';
+import { ScrollView } from 'react-native-gesture-handler';
 import { colors } from '../../core/theme';
-import { postRequest, setBearer } from '../../helpers/requests';
-import { clearRestaurantStorageRelatedKeys } from '../../storage/store';
 import { register, RegisterData } from '../../helpers/storage/tokenRequests';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomTextInput from '../../components/basic/CustomTextInput';

@@ -107,7 +107,7 @@ export async function postRequest(url: string, body?: any, timeout = REQ_TIMEOUT
       timeoutErrorMessage: 'Το αίτημα έληξε. Παρακαλώ δοκιμάστε ξανά.',
     };
 
-    if (!['/login', '/login/session'].includes(url)) {
+    if (!['/login', '/login/session', '/register'].includes(url)) {
       const auth = await getBearer();
       if (auth) {
         options.headers = {
