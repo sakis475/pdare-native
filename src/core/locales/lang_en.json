@@ -302,5 +302,6 @@
   "INTERNET_REQUIRED": "Internet connection is required",
   "DOWNLOAD_START_APP": "Download and start the printer discovery app (no installation Required):",
   "LOGIN_TO_APP": "Login into the printer discovery app on your computer",
-  "KEEP_APP_RUNNING": "Keep the app running to enable printer discovery and print functionality."
+  "KEEP_APP_RUNNING": "Keep the app running to enable printer discovery and print functionality.",
+  "NO_CATEGORIES_FOUND": "Νο Available Categories Found"
 }

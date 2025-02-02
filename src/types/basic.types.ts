@@ -1,3 +1,5 @@
+import { AppLanguage } from '../core/localization/strings';
+
 export interface ItemProperty {
   id?: number;
   propertyName: string;
@@ -43,6 +45,7 @@ export interface Restaurant {
   active: boolean;
   id: number;
   restaurantName: string;
+  restaurantLanguage: AppLanguage;
   couvertCost: number;
   currencySymbol: string;
   isPrinterAppInstalled?: boolean;

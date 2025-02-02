@@ -126,6 +126,7 @@ const EditModal: React.FC<EditModalProps> = ({
         style={styles.input}
         mode="outlined"
         maxLength={15}
+        theme={'light'}
       />
       {mode === 'edit' && onDelete && (
         <View style={{ marginBottom: 10 }}>
@@ -143,7 +144,7 @@ const TableBox: React.FC<Table & { onEdit?: () => void }> = (table) => {
     <View style={styles.buttonContainer}>
       <View style={[styles.tableBox]}>
         <TouchableOpacity style={styles.editButton} onPress={table.onEdit}>
-          <EditIcon size={16} color={colors.white} />
+          <EditIcon size={20} color={colors.white} />
         </TouchableOpacity>
         <View style={{ backgroundColor: '#333', borderRadius: 4, paddingHorizontal: 3 }}>
           <Text style={styles.tableText}>{table.tableName}</Text>

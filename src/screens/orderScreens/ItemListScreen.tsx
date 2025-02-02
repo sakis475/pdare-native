@@ -4,7 +4,12 @@ import { Divider } from 'react-native-paper';
 import { getStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate, navigateToDraft } from '../../navigation/navigationUtils';
+import {
+  ScreenNames,
+  navigate,
+  navigateToDraft,
+  navigateWithReset,
+} from '../../navigation/navigationUtils';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import { CategoryHeader } from '../../components/helpers/CategoryHeader';
@@ -12,8 +17,10 @@ import { CatalogItemAdd } from '../../components/itemComponents/CatalogItemAdd';
 import { addNewItemToTemp, setTableTempOrder } from '../../helpers/storage/orderStorage';
 import { useStrings } from '../../core/localization/languageContext';
 import { useIsFocused } from '@react-navigation/native';
-import { ItemReq, Table, catGroupedItems } from '../../types/basic.types';
+import { ItemReq, Table, User, catGroupedItems } from '../../types/basic.types';
 import { TableIO } from '../../types/io.types';
+import GlobalStore from '../../storage/GlobalStore';
+import CustomButton from '../../components/basic/CustomButton';
 // Memoized components
 const MemoizedDivider = memo(Divider);
 const MemoizedCatalogItemAdd = memo(CatalogItemAdd);
@@ -27,6 +34,8 @@ const ItemListScreen = ({ route }: any) => {
   const isFocused = useIsFocused();
   const strings = useStrings();
   const bottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
+
+  const [currentUser, setCurrentUser] = useState<User>(null);
 
   // Memoized handlers
   const handleSelectTable = useCallback((table: Table) => {
@@ -64,6 +73,11 @@ const ItemListScreen = ({ route }: any) => {
       console.error('Error fetching items:', error);
       setItems([]);
     }
+
+    try {
+      const currentUser = JSON.parse(GlobalStore?.getInstance()?.getValue('currentUser'));
+      setCurrentUser(currentUser);
+    } catch {}
   }, [categoryTitle]);
 
   useEffect(() => {
@@ -102,7 +116,30 @@ const ItemListScreen = ({ route }: any) => {
   if (items.length === 0) {
     return (
       <View style={[styles.container, styles.emptyContainer]}>
-        <Text style={styles.emptyText}>{strings.NO_PRODUCTS_FOUND}</Text>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Text
+            style={{
+              color: colors.white,
+              textAlign: 'center',
+            }}
+          >
+            {strings.NO_PRODUCTS_FOUND}
+          </Text>
+
+          {currentUser?.role === 'owner' && (
+            <CustomButton
+              onPress={() => {
+                navigateWithReset([
+                  ScreenNames.MainTabs,
+                  { name: ScreenNames.ManageItemsScreen, params: { categoryTitle: categoryTitle } },
+                ]);
+              }}
+              style={{ width: '60%' }}
+            >
+              <Text>{strings.CREATE_PRODUCT}</Text>
+            </CustomButton>
+          )}
+        </View>
       </View>
     );
   }

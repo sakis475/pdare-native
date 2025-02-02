@@ -116,6 +116,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
         onChangeText={setTitle}
         style={styles.input}
         mode="outlined"
+        theme={'light'}
       />
 
       <CustomTextInput
@@ -125,6 +126,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
         style={styles.input}
         mode="outlined"
         keyboardType="numeric"
+        theme={'light'}
       />
 
       {mode === 'edit' && onDelete && (

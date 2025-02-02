@@ -11,7 +11,13 @@ import {
 } from 'react-native';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
-import { ScreenNames, navigate, navigateToDraft } from '../../navigation/navigationUtils';
+import {
+  ScreenNames,
+  navigate,
+  navigateReset,
+  navigateToDraft,
+  navigateWithReset,
+} from '../../navigation/navigationUtils';
 import TableSelectBottomSheet from '../../components/bottomSheets/TableSelectBottomSheet';
 import OrderBottomOptions from '../../components/helpers/OrderBottomOptions';
 import {
@@ -26,7 +32,9 @@ import { storageInitData } from '../../helpers/storage/storageInit';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomNavigationScreenHeaderTitle from '../../components/basic/CustomNavigationScreenHeaderTitle';
 import SearchItemsScreen from '../../components/SearchItemsComponent';
-import { Category, ItemReq, Table } from '../../types/basic.types';
+import { Category, ItemReq, Table, User } from '../../types/basic.types';
+import CustomButton from '../../components/basic/CustomButton';
+import GlobalStore from '../../storage/GlobalStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const COLUMN_COUNT = 4;
@@ -70,11 +78,13 @@ const CategoryItem = memo(
 
 const NewOrderScreen = ({ route, navigation }: any) => {
   const [tableName, setTableName] = useState(route.params?.table?.tableName);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>(null);
   const [headerTitle, setHeaderTitle] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [allItems, setAllItems] = useState<ItemReq[]>([]);
   const strings = useStrings();
+
+  const [currentUser, setCurrentUser] = useState<User>(null);
 
   // Memoized callbacks
   const handleSelectTable = useCallback((table: Table) => {
@@ -113,7 +123,6 @@ const NewOrderScreen = ({ route, navigation }: any) => {
           const items = Object.values(reinitOrder).flat() as ItemReq[];
           setAllItems(items);
         }
-
         setCategories(reinitCategories);
       } else {
         const items = Object.values(newOrder).flat() as ItemReq[];
@@ -148,6 +157,10 @@ const NewOrderScreen = ({ route, navigation }: any) => {
 
   useEffect(() => {
     fetchItems();
+    try {
+      const currentUser = JSON.parse(GlobalStore?.getInstance()?.getValue('currentUser'));
+      setCurrentUser(currentUser);
+    } catch {}
   }, [fetchItems]);
 
   const handleSearchQueryChange = useCallback((query: string) => {
@@ -188,7 +201,9 @@ const NewOrderScreen = ({ route, navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      {categories && Object.keys(categories)?.length ? (
+      {categories === null ? (
+        <ActivityIndicator size="large" animating={true} color={colors.primary} />
+      ) : categories && Object.keys(categories)?.length ? (
         <>
           <View style={styles.contentContainer}>
             <SearchItemsScreen allItems={allItems} onSearchQueryChange={handleSearchQueryChange} />
@@ -214,7 +229,27 @@ const NewOrderScreen = ({ route, navigation }: any) => {
           <TableSelectBottomSheet ref={bottomSheetRef} handleSelectTable={handleSelectTable} />
         </>
       ) : (
-        <ActivityIndicator size="large" animating={true} color={colors.primary} />
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Text
+            style={{
+              color: colors.white,
+              textAlign: 'center',
+            }}
+          >
+            {strings.NO_CATEGORIES_FOUND}
+          </Text>
+
+          {currentUser?.role === 'owner' && (
+            <CustomButton
+              onPress={() => {
+                navigateWithReset([ScreenNames.MainTabs, ScreenNames.ManageCategoriesScreen]);
+              }}
+              style={{ width: '60%' }}
+            >
+              <Text>{strings.CREATE_CATEGORY}</Text>
+            </CustomButton>
+          )}
+        </View>
       )}
     </View>
   );
@@ -225,6 +260,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flex: 1,
     backgroundColor: '#2F2F2F',
+    justifyContent: 'center',
   },
   searchContainer: {
     paddingHorizontal: 16,

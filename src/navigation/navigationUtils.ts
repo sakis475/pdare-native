@@ -1,5 +1,10 @@
 import { navigationRef } from './AppNavigator';
 
+type NavigationRoute = {
+  name: ScreenNames;
+  params?: object;
+};
+
 export enum ScreenNames {
   MainTabs = 'MainTabs',
   NewOrderScreen = 'newOrderScreen',
@@ -31,6 +36,33 @@ export function navigate(name: ScreenNames, params?: {}) {
 
   if (navigationRef.current) {
     navigationRef.current.navigate(name, params);
+  }
+}
+
+//Last screen is the screen to navigate to.
+export function navigateWithReset(
+  screens: (ScreenNames | NavigationRoute)[],
+  activeScreenIndex: number = screens.length - 1
+) {
+  if (navigationRef.current) {
+    // Get the target screen info
+    const targetScreen = screens[activeScreenIndex];
+    const targetName = typeof targetScreen === 'string' ? targetScreen : targetScreen.name;
+    const targetParams = typeof targetScreen === 'string' ? undefined : targetScreen.params;
+
+    // First navigate to the target screen
+    navigationRef.current.navigate(targetName, targetParams);
+
+    // Then reset the navigation stack
+    navigationRef.current.reset({
+      index: activeScreenIndex,
+      routes: screens.map((screen) => {
+        if (typeof screen === 'string') {
+          return { name: screen };
+        }
+        return { name: screen.name, params: screen.params };
+      }),
+    });
   }
 }
 
