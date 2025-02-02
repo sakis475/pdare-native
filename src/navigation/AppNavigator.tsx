@@ -24,14 +24,14 @@ import AdminItemListScreen from '../screens/adminScreens/AdminItemListScreen';
 import AdminItemDetailsScreen from '../screens/adminScreens/AdminItemDetailsScreen';
 import AdminItemDetailsPatternScreen from '../screens/adminScreens/AdminItemDetailsPatternScreen';
 import AdminItemDetailsPatternEditScreen from '../screens/adminScreens/AdminItemDetailsPatternEditScreen';
-import ExpoScreen from '../screens/ExpoScreen';
 import AdminTableScreen from '../screens/adminScreens/AdminTableScreen';
 import { navigateBack, ScreenNames } from './navigationUtils';
 import AdminPersonelScreen from '../screens/adminScreens/AdminPersonelScreen';
 import NewUserSetupScreen from '../screens/authenticationScreens/NewUserSetupScreen';
-import { useStrings } from '../core/localization/languageContext';
 import AdminPrintersScreen from '../screens/adminScreens/AdminPrintersScreen';
-import { BackIcon, InfoIcon } from '../components/basic/Icons';
+import { BackIcon } from '../components/basic/Icons';
+import MainTabs from './MainTabs';
+
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
@@ -401,64 +401,6 @@ const AppNavigator = () => {
         })}
       />
     </Stack.Navigator>
-  );
-};
-
-const MainTabs = ({ route }: any) => {
-  const strings = useStrings(); // Make sure you have this
-  const [index, setIndex] = useState(route?.params?.screenIndex ?? 1);
-
-  useEffect(() => {
-    if (typeof route.params?.screenIndex === 'number') {
-      setIndex(route.params.screenIndex);
-    }
-  }, [route]);
-
-  // Move routes to useMemo to update when strings change
-  const routes = useMemo(
-    () => [
-      {
-        key: 'tables',
-        title: strings.TABLES,
-        focusedIcon: 'apps',
-      },
-      {
-        key: 'draft',
-        title: strings.DRAFT,
-        focusedIcon: 'clipboard-outline',
-      },
-      {
-        key: 'expo',
-        title: strings.EXPO,
-        focusedIcon: 'clipboard-multiple-outline',
-      },
-    ],
-    [strings]
-  ); // Depend on strings to update when language changes
-
-  const renderScene = ({ route }: any) => {
-    switch (route.key) {
-      case 'tables':
-        return <TablesScreen currentIndex={index} />;
-      case 'draft':
-        return <TempOrderScreen currentIndex={index} />;
-      case 'expo':
-        return <ExpoScreen currentIndex={index} />;
-      default:
-        return <TempOrderScreen currentIndex={index} />;
-    }
-  };
-
-  return (
-    <BottomNavigation
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-      barStyle={{ backgroundColor: colors.darkerGrey, height: 70 }}
-      activeColor="#147eb8"
-      inactiveColor="#FFFFFF"
-      sceneAnimationEnabled={false}
-    />
   );
 };
 function navigateBackBtn() {
