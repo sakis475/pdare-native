@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, FlatList, TouchableOpacity, StyleSheet, View, Text } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
 import { colors } from '../../../core/theme';
 import { ActivityIndicator, Button } from 'react-native-paper';
 import { useEffect, useState } from 'react';
@@ -8,20 +8,22 @@ import { getItemPropertyPatterns } from '../../../helpers/storage/orderStorage';
 import { useNavigation } from '@react-navigation/native';
 import { navigate, ScreenNames } from '../../../navigation/navigationUtils';
 import { useStrings } from '../../../core/localization/languageContext';
-import { CloseIcon } from '../../../components/basic/Icons';
 import BaseModal from '../../../components/basic/BaseModal';
 import { FlashList } from '@shopify/flash-list';
+import { Category, PropertyPattern } from '../../../types/basic.types';
 
 interface SelectPatternModalProps {
   visible: boolean;
   onDismiss: () => void;
   onSelect: (pattern: PropertyPattern) => void;
+  category: Category;
 }
 
 export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
   visible,
   onDismiss,
   onSelect,
+  category,
 }) => {
   const navigation = useNavigation();
 
@@ -39,7 +41,8 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
     setLoading(true);
     try {
       const fetchedPatterns = (await getItemPropertyPatterns()) || [];
-      setPatterns(fetchedPatterns);
+      const categoryPattern = fetchedPatterns.filter((e) => e.category.id === category.id);
+      setPatterns(categoryPattern);
     } catch (error) {
       console.error('Error loading patterns:', error);
       toast('error', strings.ERROR, strings.FAILED_TO_LOAD_PATTERNS);
@@ -74,16 +77,10 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
       onClose={onDismiss}
       onConfirm={handleCreatePattern}
       testID="select-pattern-edit-modal"
-      backgroundColor={colors.darkGrey}
       showButtons={false}
+      title={strings.SELECT_PATTERN}
+      theme="dark"
     >
-      <View style={styles.modalHeader}>
-        <Text style={styles.modalTitle}>{strings.SELECT_PATTERN}</Text>
-        <TouchableOpacity onPress={onDismiss}>
-          <CloseIcon size={24} color={colors.white} />
-        </TouchableOpacity>
-      </View>
-
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} />
       ) : (
@@ -174,7 +171,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: colors.grey,
-    backgroundColor: colors.darkGrey,
   },
 
   createButton: {

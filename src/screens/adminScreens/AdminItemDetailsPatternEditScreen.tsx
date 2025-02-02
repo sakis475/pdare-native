@@ -32,6 +32,7 @@ import {
   TickBoxIcon,
   TrashIcon,
 } from '../../components/basic/Icons';
+import { ItemPropertiesGrouped, ItemProperty, PropertyPattern } from '../../types/basic.types';
 
 const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
   const [propertyGroups, setPropertyGroups] = useState<[string, ItemProperty[]][]>([]);
@@ -234,6 +235,10 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
     };
 
     setPropertyGroups((prevGroups) => [...prevGroups, [newGroupName, [newProperty]]]);
+
+    // Set editing state for the new property group
+    setEditingPropertyName(newGroupName);
+    setEditedName(newGroupName);
 
     // Schedule scroll and animation for next frame
     requestAnimationFrame(() => {

@@ -29,6 +29,7 @@ import {
   TickBoxIcon,
   TrashIcon,
 } from '../../components/basic/Icons';
+import { ItemProperty, ItemReq, PropertyPattern } from '../../types/basic.types';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
   const [item, setItem] = useState<ItemReq>();
@@ -547,31 +548,22 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               keyExtractor={(item, index) => `group-${item[0]}-${index}`}
               contentContainerStyle={{ paddingBottom: 50 }}
             />
-            {Object.keys(item.itemPropertiesGrouped).length > 0 ? (
+            <>
               <FAB
                 icon="plus"
                 style={styles.fab}
-                onPress={handleAddPropertyGroup}
+                onPress={() => setIsPatternModalVisible(true)}
                 color={colors.white}
                 animated={false}
               />
-            ) : (
-              <>
-                <FAB
-                  icon="plus"
-                  style={styles.fab}
-                  onPress={() => setIsPatternModalVisible(true)}
-                  color={colors.white}
-                  animated={false}
-                />
 
-                <SelectPatternModal
-                  visible={isPatternModalVisible}
-                  onDismiss={() => setIsPatternModalVisible(false)}
-                  onSelect={handlePatternSelect}
-                />
-              </>
-            )}
+              <SelectPatternModal
+                visible={isPatternModalVisible}
+                onDismiss={() => setIsPatternModalVisible(false)}
+                onSelect={handlePatternSelect}
+                category={item.category}
+              />
+            </>
           </View>
 
           <View style={styles.addItemContainer}>
@@ -696,8 +688,9 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
       newPropertyValue = `${baseName} ${counter}`;
     }
 
+    const newId = generateUniqueId();
     const newProperty: ItemProperty = {
-      id: generateUniqueId(), // Use unique negative ID
+      id: newId,
       propertyName: itemPropertiesGrouped?.[0]?.propertyName ?? 'multiselect',
       propertyValue: newPropertyValue,
       propertyType: itemPropertiesGrouped?.[0]?.propertyType ?? 'singleselect',
@@ -712,6 +705,10 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
     // Create a new array with the new property
     const updatedProperties = [...itemPropertiesGrouped, newProperty];
     onSelectChange(updatedProperties);
+
+    // Set editing state for the new property
+    setEditingId(newId);
+    setEditingValue(newPropertyValue);
   };
 
   const handleDelete = (id: number) => {

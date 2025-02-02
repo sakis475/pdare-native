@@ -1,13 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  Modal,
-  TouchableOpacity,
-  Pressable,
-} from 'react-native';
-import { Button, Divider, FAB, Text, TextInput } from 'react-native-paper';
+import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Pressable } from 'react-native';
+import { Divider, FAB, Text } from 'react-native-paper';
 import { getStorage, setStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
@@ -16,7 +9,6 @@ import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { useIsFocused } from '@react-navigation/native';
 import { CategoryBottomSheet } from '../../components/bottomSheets/PatternCategorySelectBottomSheet';
-import { Portal } from 'react-native-paper';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
@@ -25,7 +17,6 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   EditIcon,
-  TrashIcon,
 } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
@@ -310,6 +301,9 @@ const AdminItemDetailsPatternScreen = () => {
             <Text style={{ color: colors.white, fontSize: 12 }}>
               {new Set(pattern.itemProperties.map((prop) => prop.propertyName)).size}{' '}
               {strings.PROPERTIES}
+            </Text>
+            <Text style={{ color: colors.white, fontSize: 12 }}>
+              {strings.CATEGORY}: {pattern.category.title}
             </Text>
           </View>
           <ChevronRightIcon size={20} color="#fff" style={{ marginRight: 10 }}></ChevronRightIcon>
