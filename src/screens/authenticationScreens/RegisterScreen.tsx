@@ -6,6 +6,7 @@ import { colors } from '../../core/theme';
 import { register, RegisterData } from '../../helpers/storage/tokenRequests';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import CustomButton from '../../components/basic/CustomButton';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -123,9 +124,7 @@ const RegisterScreen: React.FC = () => {
           </ScrollView>
         </Dialog.ScrollArea>
         <Dialog.Actions>
-          <Button onPress={onDismiss} textColor={colors.white}>
-            {strings.CLOSE}
-          </Button>
+          <CustomButton onPress={onDismiss}>{strings.CLOSE}</CustomButton>
         </Dialog.Actions>
       </Dialog>
     </Portal>
@@ -267,9 +266,9 @@ const RegisterScreen: React.FC = () => {
       </View>
 
       <View style={styles.bottomContainer}>
-        <TouchableOpacity onPress={handleSubmit} style={styles.button} disabled={isSubmitting}>
+        <CustomButton loading={isSubmitting} onPress={handleSubmit}>
           <Text style={styles.buttonText}>{strings.REGISTER}</Text>
-        </TouchableOpacity>
+        </CustomButton>
       </View>
 
       <PrivacyPolicyDialog

@@ -37,7 +37,7 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
   ({ onChangeTable, onChangeCouvert, onPrint, onCustomerAnalysis, onCloseOrder, order }, ref) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const [printDestination, setPrintDestination] = useState<PrintLocation>(PrintLocation.ALL);
-    const snapPoints = useMemo(() => ['90%', '90%'], []);
+    const snapPoints = useMemo(() => ['95%', '95%'], []);
     const strings = useStrings();
     const [openCouvertModal, setOpenCouvertModal] = useState(false);
 
@@ -118,45 +118,6 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                 <CategoryHeader title={strings.MORE_OPTIONS} />
 
                 <List.Section style={styles.listSection}>
-                  {showChangeTable ? (
-                    <TouchableOpacity
-                      onPress={() => {
-                        onChangeTable();
-                        handleCloseModal();
-                      }}
-                    >
-                      <List.Item
-                        title={strings.CHANGE_TABLE}
-                        description={strings.CHANGE_TABLE_DESCRIPTION}
-                        descriptionStyle={styles.listItemDescription}
-                        left={(props) => (
-                          <List.Icon {...props} icon="table-furniture" color={colors.white} />
-                        )}
-                        titleStyle={styles.listItemTitle}
-                        style={styles.listItem}
-                      />
-                    </TouchableOpacity>
-                  ) : null}
-                  {showChangeCouvert ? (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setOpenCouvertModal(true);
-                        handleCloseModal();
-                      }}
-                    >
-                      <List.Item
-                        title={strings.CHANGE_COUVERT}
-                        description={strings.CHANGE_COUVERT_DESCRIPTION}
-                        descriptionStyle={styles.listItemDescription}
-                        left={(props) => (
-                          <List.Icon {...props} icon="silverware" color={colors.white} />
-                        )}
-                        titleStyle={styles.listItemTitle}
-                        style={styles.listItem}
-                      />
-                    </TouchableOpacity>
-                  ) : null}
-
                   {showReprintOrder ? (
                     <View style={styles.printSection}>
                       <List.Item
@@ -248,6 +209,42 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                         descriptionStyle={styles.listItemDescription}
                         left={(props) => (
                           <List.Icon {...props} icon="refresh" color={colors.white} />
+                        )}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
+                  {showChangeTable ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        onChangeTable();
+                        handleCloseModal();
+                      }}
+                    >
+                      <List.Item
+                        title={strings.CHANGE_TABLE}
+                        description={strings.CHANGE_TABLE_DESCRIPTION}
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => <List.Icon {...props} icon="apps" color={colors.white} />}
+                        titleStyle={styles.listItemTitle}
+                        style={styles.listItem}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
+                  {showChangeCouvert ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setOpenCouvertModal(true);
+                        handleCloseModal();
+                      }}
+                    >
+                      <List.Item
+                        title={strings.CHANGE_COUVERT}
+                        description={strings.CHANGE_COUVERT_DESCRIPTION}
+                        descriptionStyle={styles.listItemDescription}
+                        left={(props) => (
+                          <List.Icon {...props} icon="silverware" color={colors.white} />
                         )}
                         titleStyle={styles.listItemTitle}
                         style={styles.listItem}

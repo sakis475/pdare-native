@@ -45,6 +45,7 @@ export interface Restaurant {
   restaurantName: string;
   couvertCost: number;
   currencySymbol: string;
+  isPrinterAppInstalled?: boolean;
 }
 
 export interface Item {
@@ -190,4 +191,5 @@ export interface Printer {
   updatedAt?: Date;
   lastDiscovered?: Date;
   analysisPrinter: boolean;
+  isDeleted?: boolean;
 }

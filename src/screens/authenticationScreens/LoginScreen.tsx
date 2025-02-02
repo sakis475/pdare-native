@@ -18,6 +18,7 @@ import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import CustomButton from '../../components/basic/CustomButton';
 
 const { width, height } = Dimensions.get('window');
 const logoImage = require('../../../assets/mywaitericon.png');
@@ -202,17 +203,9 @@ const LoginScreen: React.FC = () => {
                 <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={_onLoginPressed}
-                style={[styles.button, isLoading && styles.buttonDisabled]}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color={colors.white} size="small" />
-                ) : (
-                  <Text style={styles.buttonText}>{strings.LOGIN}</Text>
-                )}
-              </TouchableOpacity>
+              <CustomButton onPress={_onLoginPressed} loading={isLoading}>
+                <Text style={styles.buttonText}>{strings.LOGIN}</Text>
+              </CustomButton>
             </View>
 
             <TouchableOpacity style={styles.registerButton} onPress={handlePressRegister}>

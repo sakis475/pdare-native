@@ -6,10 +6,12 @@ import { colors } from '../../core/theme';
 import { toast } from '../../core/utils';
 import { handleUserLogin } from '../../helpers/storage/tokenRequests';
 import { SessionBearer } from '../../types/requests.types';
-import { clearRestaurantStorageRelatedKeys } from '../../storage/store';
+import { clearRestaurantStorageRelatedKeys, getStorage } from '../../storage/store';
 import { LogoutFAB } from '../../components/LogoutFab';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomTextInput from '../../components/basic/CustomTextInput';
+import { InvitationRequest, User } from '../../types/basic.types';
+import { getLanguage } from '../../core/localization/strings';
 
 const NewUserSetupScreen = () => {
   const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
@@ -26,7 +28,6 @@ const NewUserSetupScreen = () => {
     setIsRefreshing(true);
     try {
       await fetchData();
-      toast('success', strings.SUCCESS);
     } catch (error) {
       console.error('Error refreshing data:', error);
       toast('error', strings.ERROR);
@@ -39,7 +40,13 @@ const NewUserSetupScreen = () => {
     const fetchUserWithInvitations: User = await getRequest('/user/invite');
 
     if (!fetchUserWithInvitations?.id) {
+      toast('error', strings.ERROR);
       return;
+    }
+    if (!fetchUserWithInvitations?.invitations?.length) {
+      toast('info', strings.NO_INVITATIONS);
+    } else {
+      toast('success', strings.PENDING_INVITATION);
     }
 
     setCurrentUser(fetchUserWithInvitations);
@@ -56,8 +63,11 @@ const NewUserSetupScreen = () => {
 
     setIsLoading(true);
     try {
+      const restaurantLanguage = await getLanguage();
+
       const sessionBearer: SessionBearer = await postRequest('/user/restaurant/create', {
         restaurantName: restaurantName.trim(),
+        restaurantLanguage,
       });
       if (!sessionBearer?.user?.restaurant) {
         throw Error('No restaurant Created Error');

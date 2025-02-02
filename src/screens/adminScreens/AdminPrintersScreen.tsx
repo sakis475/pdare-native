@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  Modal,
-  FlatList,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, FlatList, ScrollView } from 'react-native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
 import { TextInput, Button, Switch, SegmentedButtons, Portal, Dialog } from 'react-native-paper';
@@ -30,6 +20,7 @@ import {
   LINUX_PRINTER_APP_DOWNLOAD_URL,
   WINDOWS_PRINTER_APP_DOWNLOAD_URL,
 } from '../../storage/env';
+import CustomButton from '../../components/basic/CustomButton';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -235,7 +226,6 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
               printer.printerPort ? `:${printer.printerPort}` : ''
             }`}
         </Text>
-
         <View style={{ height: 20 }} />
       </BaseModal>
       <CharSetPicker />
@@ -328,6 +318,7 @@ const AdminPrintersScreen = () => {
   };
 
   const handlePrinterDiscovered = useCallback((freshPrinters: Printer[]) => {
+    console.log(freshPrinters, 'freshPrinters');
     // Early return if freshPrinters is null/undefined
     if (!freshPrinters) {
       toast('error', strings.NO_PRINTERS);
@@ -342,13 +333,12 @@ const AdminPrintersScreen = () => {
         (freshPrinter) =>
           !currentPrinters?.some((printer) => freshPrinter.printerMac === printer.printerMac)
       );
-
       if (freshPrinters.length === 0) {
         // No printers found at all
         toast('error', strings.NO_PRINTERS);
       } else if (printersDiff.length > 0) {
         // Found new printers
-        toast('success', `${strings.FOUND} ${printersDiff.length} ${strings.NEW_PRINTER} }!`);
+        toast('success', `${strings.FOUND} ${printersDiff.length} ${strings.NEW_PRINTER}!`);
       } else {
         // Found printers, but all were already known
         toast('info', strings.ALL_PRINTERS_REGISTERED);
@@ -391,7 +381,7 @@ const AdminPrintersScreen = () => {
               setIsScanning(false);
               toast('error', strings.NO_PRINTERS);
               resolve();
-            }, 2000); // Give 2 seconds for printer discovery
+            }, 20000); // Give 5 seconds for printer discovery
 
             // If printers are discovered, this listener will handle it
             const discoverySubscription = EventEmitter.addListener(
@@ -456,7 +446,7 @@ const AdminPrintersScreen = () => {
     <View style={styles.container}>
       {printers === null ? (
         <ActivityIndicator size="large" color={colors.primary} />
-      ) : !printers?.find((e) => e.printerMac) ? (
+      ) : !currentUser?.restaurant?.isPrinterAppInstalled ? (
         <ScrollView style={styles.noAppContainer}>
           <Text style={styles.noAppTitle}>{strings.NO_PRINTER_APP}</Text>
           <View style={styles.noAppInstructionsContainer}>

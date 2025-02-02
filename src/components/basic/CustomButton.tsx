@@ -73,6 +73,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       mode={mode}
       onPress={onPress}
       loading={loading}
+      disabled={loading}
       style={getButtonStyle()}
       textColor={textColor || (variant === 'delete' ? colors.white : undefined)}
       contentStyle={[styles.contentStyle, contentStyle]}
