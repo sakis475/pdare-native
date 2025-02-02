@@ -406,7 +406,7 @@ const AppNavigator = () => {
 
 const MainTabs = ({ route }: any) => {
   const strings = useStrings(); // Make sure you have this
-  const [index, setIndex] = useState(route?.params?.screenIndex ?? 0);
+  const [index, setIndex] = useState(route?.params?.screenIndex ?? 1);
 
   useEffect(() => {
     if (typeof route.params?.screenIndex === 'number') {
@@ -445,7 +445,7 @@ const MainTabs = ({ route }: any) => {
       case 'expo':
         return <ExpoScreen currentIndex={index} />;
       default:
-        return null;
+        return <TempOrderScreen currentIndex={index} />;
     }
   };
 
