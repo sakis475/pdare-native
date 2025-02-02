@@ -21,6 +21,7 @@ interface CustomTextInputProps {
   disabled?: boolean;
   mode?: 'outlined' | 'flat';
   theme?: 'light' | 'dark';
+  onFocus?: () => void;
 }
 
 const CustomTextInput: React.FC<CustomTextInputProps> = ({
@@ -39,6 +40,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   disabled = false,
   mode = 'outlined',
   theme = 'dark',
+  onFocus,
   ...props
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -111,6 +113,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
             />
           ) : null
         }
+        onFocus={onFocus}
         {...props}
       />
     </View>

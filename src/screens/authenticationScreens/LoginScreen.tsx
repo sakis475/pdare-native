@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  Dimensions,
 } from 'react-native';
 import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
@@ -15,9 +17,9 @@ import { login } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 import { useStrings } from '../../core/localization/languageContext';
-import { EyeOff, EyeOn } from '../../components/basic/Icons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 
+const { width, height } = Dimensions.get('window');
 const logoImage = require('../../../assets/mywaitericon.png');
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -29,6 +31,19 @@ const LoginScreen: React.FC = () => {
 
   const strings = useStrings();
 
+  // Add ref for ScrollView
+  const scrollViewRef = useRef(null);
+
+  // Function to handle input focus
+  const handleInputFocus = (yPosition: any) => {
+    // Wait for keyboard to show up before scrolling
+    setTimeout(() => {
+      scrollViewRef.current?.scrollTo({
+        y: yPosition,
+        animated: true,
+      });
+    }, 100);
+  };
   const emailValidator = (email: string) => {
     if (!email) return strings.EMAIL_REQUIRED;
 
@@ -122,149 +137,165 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-    >
-      <ScrollView
-        style={{ flex: 1, height: '100%', paddingTop: 10, backgroundColor: colors.lightBlack }}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
       >
-        <View style={styles.container}>
-          <LongPressGestureHandler
-            onHandlerStateChange={({ nativeEvent }) => {
-              if (nativeEvent.state === State.ACTIVE) {
-                handleLongPress();
-              }
-            }}
-          >
-            <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
-          </LongPressGestureHandler>
-          <Text style={styles.appTitle}>OrderPOS</Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
-              {strings.APP_DESCRIPTION}
-            </Text>
-          </View>
-          <Divider style={styles.divider} />
-
-          <View
-            style={{
-              backgroundColor: '#383838',
-              paddingHorizontal: 25,
-              paddingTop: 15,
-              paddingBottom: 35,
-              borderRadius: 10,
-              borderColor: colors.black,
-            }}
-          >
-            <Text style={styles.header}>{strings.LOGIN}</Text>
-
-            <View style={{ gap: 15 }}>
-              <View>
-                <CustomTextInput
-                  label={strings.EMAIL}
-                  value={email}
-                  onChangeText={setEmail}
-                  error={!!emailError}
-                  keyboardType="email-address"
-                  textContentType="emailAddress"
-                  disabled={isLoading}
-                />
-                {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
-              </View>
-              <View>
-                <CustomTextInput
-                  label={strings.PASSWORD}
-                  value={password}
-                  onChangeText={(text) => setPassword(text)}
-                  error={!!passwordError}
-                  secureTextEntry={true}
-                  disabled={isLoading}
-                />
-
-                {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
-              </View>
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.scrollViewContent}
+          bounces={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <View style={styles.logoContainer}>
+              <LongPressGestureHandler
+                onHandlerStateChange={({ nativeEvent }) => {
+                  if (nativeEvent.state === State.ACTIVE) {
+                    handleLongPress();
+                  }
+                }}
+              >
+                <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
+              </LongPressGestureHandler>
+              <Text style={styles.appTitle}>OrderPOS</Text>
+              <Text style={styles.appDescription}>{strings.APP_DESCRIPTION}</Text>
             </View>
-            <TouchableOpacity style={{ marginTop: 2 }}>
-              <Text style={{ textAlign: 'right', fontSize: 12, color: colors.veryLighterGrey }}>
-                {strings.RESET_PASSWORD}
-              </Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={_onLoginPressed}
-              style={[styles.button, isLoading && styles.buttonDisabled]}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color={colors.white} size="small" />
-              ) : (
-                <Text style={styles.text}>{strings.LOGIN}</Text>
-              )}
+            <Divider style={styles.divider} />
+
+            <View style={styles.formContainer}>
+              <Text style={styles.header}>{strings.LOGIN}</Text>
+
+              <View style={styles.inputsContainer}>
+                <View style={styles.inputWrapper}>
+                  <CustomTextInput
+                    label={strings.EMAIL}
+                    value={email}
+                    onChangeText={setEmail}
+                    error={!!emailError}
+                    keyboardType="email-address"
+                    textContentType="emailAddress"
+                    disabled={isLoading}
+                    onFocus={() => handleInputFocus(200)}
+                  />
+                  {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
+                </View>
+
+                <View style={styles.inputWrapper}>
+                  <CustomTextInput
+                    label={strings.PASSWORD}
+                    value={password}
+                    onChangeText={(text) => setPassword(text)}
+                    error={!!passwordError}
+                    secureTextEntry={true}
+                    disabled={isLoading}
+                    onFocus={() => handleInputFocus(200)}
+                  />
+                  {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.forgotPassword}>
+                <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={_onLoginPressed}
+                style={[styles.button, isLoading && styles.buttonDisabled]}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color={colors.white} size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>{strings.LOGIN}</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.registerButton} onPress={handlePressRegister}>
+              <Text style={styles.registerText}>{strings.CREATE_NEW_ACCOUNT}</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={{ marginTop: 10 }} onPress={handlePressRegister}>
-            <Text style={{ textAlign: 'center', fontSize: 14, color: colors.veryLighterGrey }}>
-              {strings.CREATE_NEW_ACCOUNT}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
+  safeArea: {
+    flex: 1,
     backgroundColor: colors.lightBlack,
   },
-  text: {
-    fontSize: 16,
-    color: colors.white,
+  keyboardView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    minHeight: '100%',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: width * 0.05, // 5% of screen width
+    paddingVertical: height * 0.02, // 2% of screen height
+  },
+  logoContainer: {
+    alignItems: 'center',
+    paddingTop: height * 0.02,
   },
   logo: {
-    width: 150,
-    height: 150,
-    alignSelf: 'center',
-    marginBottom: 10,
+    width: Math.min(width * 0.3, 150), // 30% of screen width, max 150
+    height: Math.min(width * 0.3, 150),
+    marginBottom: height * 0.01,
   },
   appTitle: {
-    fontSize: 42,
+    fontSize: Math.min(width * 0.1, 42), // Responsive font size
     letterSpacing: 6,
     fontWeight: 'bold',
     fontFamily: 'monospace',
     textAlign: 'center',
-    marginBottom: 3,
+    marginBottom: height * 0.005,
     color: colors.white,
+  },
+  appDescription: {
+    width: '70%',
+    textAlign: 'center',
+    color: colors.veryLighterGrey,
+    fontSize: Math.min(width * 0.04, 16),
   },
   divider: {
     height: 1,
     backgroundColor: colors.white,
-    marginVertical: 20,
+    marginVertical: height * 0.02,
+  },
+  formContainer: {
+    backgroundColor: '#383838',
+    padding: width * 0.05,
+    borderRadius: 10,
+    borderColor: colors.black,
   },
   header: {
-    fontSize: 24,
+    fontSize: Math.min(width * 0.06, 24),
     fontWeight: 'bold',
-    paddingVertical: 14,
-    textAlign: 'left',
+    paddingVertical: height * 0.01,
     color: colors.white,
   },
-  input: {
-    backgroundColor: colors.darkerGrey,
+  inputsContainer: {
+    gap: height * 0.015,
   },
-  passwordInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 4,
-    backgroundColor: colors.darkerGrey,
+  inputWrapper: {
+    marginBottom: height * 0.01,
   },
-  eyeIcon: {
-    position: 'absolute',
-    right: 10,
-    top: '50%',
-    transform: [{ translateY: -12 }], // Centering the icon vertically (half of icon size)
+  forgotPassword: {
+    marginTop: height * 0.01,
+  },
+  forgotPasswordText: {
+    textAlign: 'right',
+    fontSize: Math.min(width * 0.03, 12),
+    color: colors.veryLighterGrey,
   },
   button: {
     backgroundColor: colors.slightlyLighterGrey,
@@ -272,19 +303,31 @@ const styles = StyleSheet.create({
     borderColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 4,
+    padding: height * 0.01,
     borderRadius: 6,
-    height: 60,
-    marginTop: 16,
+    height: height * 0.07,
+    marginTop: height * 0.02,
   },
   buttonDisabled: {
     opacity: 0.7,
     backgroundColor: colors.grey,
   },
+  buttonText: {
+    fontSize: Math.min(width * 0.04, 16),
+    color: colors.white,
+  },
   error: {
-    fontSize: 14,
+    fontSize: Math.min(width * 0.035, 14),
     color: colors.lightRed,
     paddingVertical: 4,
+  },
+  registerButton: {
+    marginTop: height * 0.02,
+  },
+  registerText: {
+    textAlign: 'center',
+    fontSize: Math.min(width * 0.035, 14),
+    color: colors.veryLighterGrey,
   },
 });
 
