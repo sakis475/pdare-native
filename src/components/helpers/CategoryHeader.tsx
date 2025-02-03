@@ -15,6 +15,7 @@ export const CategoryHeader = ({ title }: any) => (
         marginLeft: 16,
         flexDirection: 'row',
         alignItems: 'center',
+        gap: 6,
       }}
     >
       <DoubleRightIcon />

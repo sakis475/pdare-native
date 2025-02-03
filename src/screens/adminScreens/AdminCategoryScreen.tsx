@@ -29,7 +29,7 @@ import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
-import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
+import { BarsIcon, EditIcon } from '../../components/basic/Icons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
@@ -247,7 +247,7 @@ const CategoryBox: React.FC<Category & { onEdit?: () => void }> = (category) => 
         activeOpacity={0.7}
       >
         <TouchableOpacity style={styles.editButton} onPress={category.onEdit}>
-          <EditIcon size={16} color={textColor}></EditIcon>
+          <EditIcon size={20} color={textColor}></EditIcon>
         </TouchableOpacity>
         <Text style={{ color: textColor, fontWeight: 'bold', padding: 3 }}>{category.title}</Text>
       </TouchableOpacity>

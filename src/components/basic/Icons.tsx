@@ -199,3 +199,9 @@ export const EyeOff = ({ size = 24, color = colors.white, style }: IconProps = {
 export const EyeOn = ({ size = 24, color = colors.white, style }: IconProps = {}) => {
   return <MaterialCommunityIcons name="eye" size={size} color={color} style={style} />;
 };
+
+export const HelpIcon = ({ size = 24, color = colors.white, style }: IconProps = {}) => {
+  return (
+    <MaterialCommunityIcons name="help-circle-outline" size={size} color={color} style={style} />
+  );
+};

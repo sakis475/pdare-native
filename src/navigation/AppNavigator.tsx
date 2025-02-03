@@ -31,6 +31,9 @@ import NewUserSetupScreen from '../screens/authenticationScreens/NewUserSetupScr
 import AdminPrintersScreen from '../screens/adminScreens/AdminPrintersScreen';
 import { BackIcon } from '../components/basic/Icons';
 import MainTabs from './MainTabs';
+import { HelpPressable } from '../components/guides/HelpPressable';
+import { useHelpModal } from '../providers/HelpContext';
+import PatternGuide from '../components/guides/guides/PatternGuide';
 
 const Stack = createNativeStackNavigator();
 
@@ -301,6 +304,14 @@ const AppNavigator = () => {
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
+          headerRight: () => {
+            const { openHelpModal } = useHelpModal();
+            return (
+              <HelpPressable
+                onPress={() => openHelpModal(<PatternGuide></PatternGuide>, strings.MORE_INFO)}
+              />
+            );
+          },
         })}
       />
       <Stack.Screen

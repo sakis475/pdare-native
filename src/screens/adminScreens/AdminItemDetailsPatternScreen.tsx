@@ -22,6 +22,9 @@ import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import { PropertyPattern, Category } from '../../types/basic.types';
+import PatternGuide from '../../components/guides/guides/PatternGuide';
+import { HelpModal } from '../../components/guides/HelpModal';
+import { useHelpModal } from '../../providers/HelpContext';
 
 interface EditPatternModalProps {
   visible: boolean;
@@ -141,6 +144,8 @@ const AdminItemDetailsPatternScreen = () => {
   const [tempSelectedCategory, setTempSelectedCategory] = useState<Category | null>(null);
   const categoryBottomSheetRef = useRef<{ openModal: () => void; closeModal: () => void }>(null);
   const [patternTitle, setPatternTitle] = useState('');
+
+  const { showHelpModal, helpContent, helpTitle, closeHelpModal } = useHelpModal();
 
   const strings = useStrings();
   const handleSheetClose = () => {
@@ -338,10 +343,8 @@ const AdminItemDetailsPatternScreen = () => {
         ) : patterns === null ? (
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
         ) : (
-          <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 20 }}>
-            <Text style={{ textAlign: 'center', color: colors.white }}>
-              {strings.PATTERNS_WILL_APPEAR}
-            </Text>
+          <View style={{ padding: 20, flex: 1 }}>
+            <PatternGuide></PatternGuide>
           </View>
         )}
 
@@ -374,6 +377,12 @@ const AdminItemDetailsPatternScreen = () => {
         />
 
         {isLoading && <LoadingOverlay />}
+        <HelpModal
+          visible={showHelpModal}
+          onClose={closeHelpModal}
+          helpContent={helpContent}
+          title={helpTitle}
+        />
       </View>
     </BottomSheetModalProvider>
   );

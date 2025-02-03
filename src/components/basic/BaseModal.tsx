@@ -22,6 +22,7 @@ interface BaseModalProps {
   showButtons?: boolean;
   title: string;
   theme?: 'light' | 'dark';
+  buttonVariant?: 'default' | 'okOnly';
 }
 
 const BaseModal: React.FC<BaseModalProps> = ({
@@ -33,6 +34,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   showButtons = true,
   title = '',
   theme = 'light',
+  buttonVariant = 'default',
 }) => {
   const strings = useStrings();
   if (!visible) return null;
@@ -58,6 +60,69 @@ const BaseModal: React.FC<BaseModalProps> = ({
   };
 
   const themeColors = getThemeColors();
+
+  const renderButtons = () => {
+    if (!showButtons) return null;
+
+    if (buttonVariant === 'okOnly') {
+      return (
+        <View
+          style={[
+            styles.buttonContainer,
+            styles.okOnlyContainer,
+            {
+              borderTopColor: themeColors.buttonBorder,
+              backgroundColor: themeColors.buttonBackground,
+            },
+          ]}
+        >
+          <Button
+            mode="outlined"
+            style={[styles.button, styles.confirmButton]}
+            onPress={onClose}
+            textColor={colors.white}
+            labelStyle={styles.buttonLabel}
+            contentStyle={styles.buttonContent}
+          >
+            {strings.OK}
+          </Button>
+        </View>
+      );
+    }
+
+    return (
+      <View
+        style={[
+          styles.buttonContainer,
+          {
+            borderTopColor: themeColors.buttonBorder,
+            backgroundColor: themeColors.buttonBackground,
+          },
+        ]}
+      >
+        <Button
+          mode="outlined"
+          onPress={onClose}
+          style={styles.button}
+          textColor={colors.lightRed}
+          labelStyle={styles.buttonLabel}
+          contentStyle={styles.buttonContent}
+        >
+          {strings.CANCEL}
+        </Button>
+        <Button
+          mode="contained"
+          style={[styles.button, styles.confirmButton]}
+          onPress={onConfirm}
+          textColor={colors.white}
+          labelStyle={styles.buttonLabel}
+          contentStyle={styles.buttonContent}
+        >
+          {strings.SAVE}
+        </Button>
+      </View>
+    );
+  };
 
   return (
     <Modal
@@ -103,38 +168,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
                     >
                       {children}
                     </ScrollView>
-                    {showButtons && (
-                      <View
-                        style={[
-                          styles.buttonContainer,
-                          {
-                            borderTopColor: themeColors.buttonBorder,
-                            backgroundColor: themeColors.buttonBackground,
-                          },
-                        ]}
-                      >
-                        <Button
-                          mode="outlined"
-                          onPress={onClose}
-                          style={styles.button}
-                          textColor={colors.lightRed}
-                          labelStyle={styles.buttonLabel}
-                          contentStyle={styles.buttonContent}
-                        >
-                          {strings.CANCEL}
-                        </Button>
-                        <Button
-                          mode="contained"
-                          style={[styles.button, styles.confirmButton]}
-                          onPress={onConfirm}
-                          textColor={colors.white}
-                          labelStyle={styles.buttonLabel}
-                          contentStyle={styles.buttonContent}
-                        >
-                          {strings.SAVE}
-                        </Button>
-                      </View>
-                    )}
+                    {renderButtons()}
                   </View>
                 </View>
               </TouchableWithoutFeedback>
@@ -198,6 +232,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },
+  okOnlyContainer: {
+    justifyContent: 'flex-end',
+  },
   button: {
     flex: 1,
     borderRadius: 5,
@@ -212,7 +249,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   confirmButton: {
-    backgroundColor: colors.green,
+    flex: 0,
+    minWidth: 100,
   },
 });
 

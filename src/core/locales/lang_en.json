@@ -303,5 +303,17 @@
   "DOWNLOAD_START_APP": "Download and start the printer discovery app (no installation Required):",
   "LOGIN_TO_APP": "Login into the printer discovery app on your computer",
   "KEEP_APP_RUNNING": "Keep the app running to enable printer discovery and print functionality.",
-  "NO_CATEGORIES_FOUND": "Νο Available Categories Found"
+  "NO_CATEGORIES_FOUND": "Νο Available Categories Found",
+  "NO_PATTERNS_YET": "No Detail Patterns Yet",
+  "PATTERNS_DESCRIPTION": "Detail Patterns help you define customizable properties for your items. Create patterns to manage common variations and specifications.",
+  "PATTERN_EXAMPLES": "Examples of Detail Patterns",
+  "TAP_PLUS_TO_CREATE_PATTERN": "Tap the + button below to create your first pattern",
+  "COFFEE_PATTERN": "Coffee Pattern",
+  "COFFEE_TYPE": "Type (Cold, Hot)",
+  "COFFEE_BEANS": "Beans (Arabica, Robusta)",
+  "PIZZA_PATTERN": "Pizza Pattern",
+  "PIZZA_CRUST": "Crust Type (Thin, Thick)",
+  "PIZZA_CHEESE": "Cheese (Mozzarella, Cheddar, Parmesan)",
+  "PIZZA_TOPPINGS": "Extra Toppings (Pepperoni, Mushrooms)",
+  "MORE_INFO": "More Info"
 }

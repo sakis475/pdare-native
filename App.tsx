@@ -17,6 +17,7 @@ import AppNavigator, { navigationRef } from './src/navigation/AppNavigator';
 import { LanguageProvider } from './src/core/localization/languageContext';
 import { ErrorBoundary } from './src/errorHandler/ErrorBoundary';
 import GlobalStore from './src/storage/GlobalStore';
+import { HelpProvider } from './src/providers/HelpContext';
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
 
@@ -63,7 +64,9 @@ const App = () => {
                 <PaperProvider>
                   <PortalProvider>
                     <LanguageProvider>
-                      <AppNavigator />
+                      <HelpProvider>
+                        <AppNavigator />
+                      </HelpProvider>
                     </LanguageProvider>
                   </PortalProvider>
                   <Toast />
