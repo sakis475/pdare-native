@@ -1,9 +1,9 @@
 import { setJSExceptionHandler, setNativeExceptionHandler } from 'react-native-exception-handler';
 import { errorHandler } from './src/errorHandler/error-handler';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, DefaultTheme, PaperProvider } from 'react-native-paper';
+import { ActivityIndicator, DefaultTheme, PaperProvider, Text } from 'react-native-paper';
 import { NavigationContainer, Theme } from '@react-navigation/native';
-import Toast from 'react-native-toast-message';
+
 import { setLocalizedStrings } from './src/core/localization/strings';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -18,6 +18,9 @@ import { LanguageProvider } from './src/core/localization/languageContext';
 import { ErrorBoundary } from './src/errorHandler/ErrorBoundary';
 import GlobalStore from './src/storage/GlobalStore';
 import { HelpProvider } from './src/providers/HelpContext';
+import Toast from 'react-native-toast-message';
+import { toastConfig } from './src/helpers/config/toastConfig';
+
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
 
@@ -69,9 +72,9 @@ const App = () => {
                       </HelpProvider>
                     </LanguageProvider>
                   </PortalProvider>
-                  <Toast />
                 </PaperProvider>
               </NavigationContainer>
+              <Toast config={toastConfig} />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
         </SafeAreaView>

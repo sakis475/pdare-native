@@ -301,6 +301,7 @@
   "ENSURE_SAME_NETWORK": "Ensure your computer is on the same network",
   "INTERNET_REQUIRED": "Internet connection is required",
   "DOWNLOAD_START_APP": "Download and start the printer discovery app (no installation Required):",
+  "PRESS_SEARCH_BUTTON": "Press the printer search button at the bottom right.",
   "LOGIN_TO_APP": "Login into the printer discovery app on your computer",
   "KEEP_APP_RUNNING": "Keep the app running to enable printer discovery and print functionality.",
   "NO_CATEGORIES_FOUND": "Νο Available Categories Found",
@@ -315,5 +316,6 @@
   "PIZZA_CRUST": "Crust Type (Thin, Thick)",
   "PIZZA_CHEESE": "Cheese (Mozzarella, Cheddar, Parmesan)",
   "PIZZA_TOPPINGS": "Extra Toppings (Pepperoni, Mushrooms)",
-  "MORE_INFO": "More Info"
+  "MORE_INFO": "More Info",
+  "NO_PATTERNS_ACTIONS": "Add properties to the product by clicking on the + button at the bottom right"
 }

@@ -1,5 +1,5 @@
 import { Alert } from 'react-native';
-import Toast, { ToastType } from 'react-native-toast-message';
+import Toast, { ToastType, BaseToast, ErrorToast, ToastProps } from 'react-native-toast-message';
 import NetInfo from '@react-native-community/netinfo';
 import { colors } from './theme';
 import { strings as defaultStrings } from './localization/strings';

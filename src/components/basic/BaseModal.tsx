@@ -78,7 +78,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
         >
           <Button
             mode="outlined"
-            style={[styles.button, styles.confirmButton]}
+            style={[styles.button]}
             onPress={onClose}
             textColor={colors.white}
             labelStyle={styles.buttonLabel}
@@ -112,7 +112,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
         </Button>
         <Button
           mode="contained"
-          style={[styles.button, styles.confirmButton]}
+          style={[styles.button]}
           onPress={onConfirm}
           textColor={colors.white}
           labelStyle={styles.buttonLabel}
@@ -247,10 +247,6 @@ const styles = StyleSheet.create({
   buttonContent: {
     height: 40,
     paddingHorizontal: 8,
-  },
-  confirmButton: {
-    flex: 0,
-    minWidth: 100,
   },
 });
 

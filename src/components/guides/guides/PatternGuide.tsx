@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { colors } from '../../../core/theme';
 import { useStrings } from '../../../core/localization/languageContext';
@@ -8,29 +8,34 @@ const PatternGuide = () => {
   const strings = useStrings();
 
   return (
-    <View style={styles.emptyStateContainer}>
-      <Text style={styles.emptyStateTitle}>{strings.NO_PATTERNS_YET}</Text>
-      <Text style={styles.emptyStateDescription}>{strings.PATTERNS_DESCRIPTION}</Text>
-      <View style={styles.examplesContainer}>
-        <Text style={styles.exampleTitle}>{strings.PATTERN_EXAMPLES}</Text>
-        <View style={styles.example}>
-          <Text style={styles.exampleHeading}>{strings.COFFEE_PATTERN}:</Text>
-          <Text style={styles.exampleText}>• {strings.COFFEE_TYPE}</Text>
-          <Text style={styles.exampleText}>• {strings.COFFEE_BEANS}</Text>
+    <ScrollView style={styles.noAppContainer} bounces={false} persistentScrollbar={true}>
+      <View style={styles.emptyStateContainer}>
+        <Text style={styles.emptyStateTitle}>{strings.NO_PATTERNS_YET}</Text>
+        <Text style={styles.emptyStateDescription}>{strings.PATTERNS_DESCRIPTION}</Text>
+        <View style={styles.examplesContainer}>
+          <Text style={styles.exampleTitle}>{strings.PATTERN_EXAMPLES}</Text>
+          <View style={styles.example}>
+            <Text style={styles.exampleHeading}>{strings.COFFEE_PATTERN}:</Text>
+            <Text style={styles.exampleText}>• {strings.COFFEE_TYPE}</Text>
+            <Text style={styles.exampleText}>• {strings.COFFEE_BEANS}</Text>
+          </View>
+          <View style={styles.example}>
+            <Text style={styles.exampleHeading}>{strings.PIZZA_PATTERN}:</Text>
+            <Text style={styles.exampleText}>• {strings.PIZZA_CRUST}</Text>
+            <Text style={styles.exampleText}>• {strings.PIZZA_CHEESE}</Text>
+            <Text style={styles.exampleText}>• {strings.PIZZA_TOPPINGS}</Text>
+          </View>
         </View>
-        <View style={styles.example}>
-          <Text style={styles.exampleHeading}>{strings.PIZZA_PATTERN}:</Text>
-          <Text style={styles.exampleText}>• {strings.PIZZA_CRUST}</Text>
-          <Text style={styles.exampleText}>• {strings.PIZZA_CHEESE}</Text>
-          <Text style={styles.exampleText}>• {strings.PIZZA_TOPPINGS}</Text>
-        </View>
+        <Text style={styles.instructionText}>{strings.TAP_PLUS_TO_CREATE_PATTERN}</Text>
       </View>
-      <Text style={styles.instructionText}>{strings.TAP_PLUS_TO_CREATE_PATTERN}</Text>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  noAppContainer: {
+    flex: 1,
+  },
   emptyStateContainer: {
     flex: 1,
   },

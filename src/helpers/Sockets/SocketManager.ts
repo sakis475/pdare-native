@@ -5,6 +5,7 @@ import { EventEmitter, HEALTH_CHECK_RECEIVE } from './EventEmitter';
 import { EmitterSubscription } from 'react-native';
 import { SessionBearer } from '../../types/requests.types';
 import { BASE_DOMAIN } from '../../storage/env';
+import { User } from '../../types/basic.types';
 
 type EventCallback = (data: any) => void;
 
@@ -353,7 +354,7 @@ class SocketManager {
 
   public async on(eventId: EventId, callback: EventCallback): Promise<void> {
     const eventString = this.generateEventString(eventId);
-
+    if (!eventString) return;
     if (!this.eventListeners.has(eventId)) {
       this.eventListeners.set(eventId, new Set());
     }
@@ -475,6 +476,7 @@ class SocketManager {
   public generateEventString(eventId: EventId): EventString<number> {
     if (!this.isValidUser(this.user)) {
       console.warn('User or restaurant ID not available');
+      return null;
     }
     return `${eventId}:${this.user.restaurant.id}`;
   }

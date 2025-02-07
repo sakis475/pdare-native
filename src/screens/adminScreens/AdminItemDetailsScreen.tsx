@@ -30,9 +30,10 @@ import {
   TrashIcon,
 } from '../../components/basic/Icons';
 import { ItemProperty, ItemReq, PropertyPattern } from '../../types/basic.types';
+import _ from 'lodash';
 
 const AdminItemDetailsScreen = ({ route }: any) => {
-  const [item, setItem] = useState<ItemReq>();
+  const [item, setItem] = useState<ItemReq>(null);
   const [editingPropertyName, setEditingPropertyName] = useState<string | null>(null);
   const [editedName, setEditedName] = useState<string>('');
   const [originalPropertyNames, setOriginalPropertyNames] = useState<{ [key: string]: string }>({});
@@ -536,17 +537,28 @@ const AdminItemDetailsScreen = ({ route }: any) => {
     }
   };
 
+  const ListEmptyComponent = () => {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>{strings.NO_PATTERNS_ACTIONS}</Text>
+      </View>
+    );
+  };
+
   // Modify the return statement to include the loading overlay
   return (
     <View style={styles.container}>
-      {item ? (
+      {item === null ? (
+        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+      ) : (
         <>
           <View style={{ flex: 1 }}>
             <FlatList
               data={item.itemPropertiesGrouped as any}
               renderItem={renderPropertyGroup}
               keyExtractor={(item, index) => `group-${item[0]}-${index}`}
-              contentContainerStyle={{ paddingBottom: 50 }}
+              contentContainerStyle={{ paddingBottom: 50, flex: 1 }}
+              ListEmptyComponent={ListEmptyComponent}
             />
             <>
               <FAB
@@ -580,8 +592,6 @@ const AdminItemDetailsScreen = ({ route }: any) => {
           {/* Add the loading overlay */}
           {isSaving && <LoadingOverlay />}
         </>
-      ) : (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
       )}
     </View>
   );
@@ -1003,6 +1013,18 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: colors.primary,
+  },
+
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: colors.white,
+    textAlign: 'center',
+    fontSize: 14,
+    padding: 20,
   },
 });
 

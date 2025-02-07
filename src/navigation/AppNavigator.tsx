@@ -34,6 +34,7 @@ import MainTabs from './MainTabs';
 import { HelpPressable } from '../components/guides/HelpPressable';
 import { useHelpModal } from '../providers/HelpContext';
 import PatternGuide from '../components/guides/guides/PatternGuide';
+import PrinterGuide from '../components/guides/guides/PrintersGuide';
 
 const Stack = createNativeStackNavigator();
 
@@ -391,6 +392,14 @@ const AppNavigator = () => {
           headerTintColor: 'white',
           headerLeft: navigateBackBtn,
           headerBackVisible: false,
+          headerRight: () => {
+            const { openHelpModal } = useHelpModal();
+            return (
+              <HelpPressable
+                onPress={() => openHelpModal(<PrinterGuide></PrinterGuide>, strings.MORE_INFO)}
+              />
+            );
+          },
         })}
       />
 

@@ -11,7 +11,7 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { Portal } from '@gorhom/portal';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '../../core/theme';
-import { List, SegmentedButtons } from 'react-native-paper';
+import { List } from 'react-native-paper';
 import { CategoryHeader } from '../helpers/CategoryHeader';
 import { useStrings } from '../../core/localization/languageContext';
 import CouvertModal from '../popupModals/CouvertModal';

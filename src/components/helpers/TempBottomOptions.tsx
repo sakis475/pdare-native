@@ -12,6 +12,7 @@ import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
 import { MoreIconHorizontal, PlusIcon, SendIcon } from '../basic/Icons';
+import { Order, Table } from '../../types/basic.types';
 
 interface TempBottomOptionsProps {
   table: Table;
@@ -126,7 +127,12 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
     <View style={styles.container}>
       <View style={styles.actionsContainer}>
         <TouchableOpacity
-          style={[styles.button, styles.moreButton]}
+          style={[
+            styles.button,
+            styles.moreButton,
+            noTable || isSending ? styles.noTableOtherBtns : null,
+          ]}
+          disabled={noTable || isSending}
           onPress={handleOpenMoreOptionsModal}
         >
           <MoreIconHorizontal size={24} color={colors.white} />

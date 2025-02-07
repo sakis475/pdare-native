@@ -21,6 +21,9 @@ import {
   WINDOWS_PRINTER_APP_DOWNLOAD_URL,
 } from '../../storage/env';
 import CustomButton from '../../components/basic/CustomButton';
+import PrinterGuide from '../../components/guides/guides/PrintersGuide';
+import { useHelpModal } from '../../providers/HelpContext';
+import { HelpModal } from '../../components/guides/HelpModal';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -264,6 +267,8 @@ const AdminPrintersScreen = () => {
 
   const strings = useStrings();
 
+  const { showHelpModal, helpContent, helpTitle, closeHelpModal } = useHelpModal();
+
   const handleAddCustomPrinter = () => {
     setSelectedPrinter(null);
     setMode('create');
@@ -447,20 +452,12 @@ const AdminPrintersScreen = () => {
       {printers === null ? (
         <ActivityIndicator size="large" color={colors.primary} />
       ) : !currentUser?.restaurant?.isPrinterAppInstalled ? (
-        <ScrollView style={styles.noAppContainer}>
+        <View style={{ flex: 1, padding: 10 }}>
           <Text style={styles.noAppTitle}>{strings.NO_PRINTER_APP}</Text>
-          <View style={styles.noAppInstructionsContainer}>
-            <Text style={styles.noAppText}>{strings.PRINTER_APP_REQUIRES_ETHERNET}</Text>
-            <Text style={styles.noAppStep}>1. {strings.CONNECT_PRINTER_TO_ROUTER}</Text>
-            <Text style={styles.noAppIndent}>• {strings.ENSURE_SAME_NETWORK}</Text>
-            <Text style={styles.noAppIndent}>• {strings.INTERNET_REQUIRED}</Text>
-            <Text style={styles.noAppStep}>2. {strings.DOWNLOAD_START_APP}</Text>
-            <Text style={styles.noAppIndent}>• Windows: {WINDOWS_PRINTER_APP_DOWNLOAD_URL}</Text>
-            <Text style={styles.noAppIndent}>• Linux: {LINUX_PRINTER_APP_DOWNLOAD_URL}</Text>
-            <Text style={styles.noAppStep}>3. {strings.LOGIN_TO_APP}</Text>
-            <Text style={styles.noAppStep}>4. {strings.KEEP_APP_RUNNING}</Text>
+          <View style={{ flex: 1, maxHeight: '75%' }}>
+            <PrinterGuide />
           </View>
-        </ScrollView>
+        </View>
       ) : (
         <FlatList
           style={styles.list}
@@ -507,6 +504,13 @@ const AdminPrintersScreen = () => {
       />
 
       {isLoading && <LoadingOverlay />}
+
+      <HelpModal
+        visible={showHelpModal}
+        onClose={closeHelpModal}
+        helpContent={helpContent}
+        title={helpTitle}
+      />
     </View>
   );
 };
@@ -716,8 +720,8 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 50,
-    textAlign: 'center',
+    marginVertical: 10,
+    textAlign: 'left',
   },
   noAppInstructionsContainer: {
     width: '100%',

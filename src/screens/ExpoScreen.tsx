@@ -28,6 +28,8 @@ import { TableIcon } from '../components/basic/Icons';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
 import { OrderInfoBar } from '../components/helpers/OrderInfoBar';
 import { LinearGradientFadeOut } from '../components/basic/LinearGradientFadeOut';
+import { ItemReq, Table } from '../types/basic.types';
+import { TableIO } from '../types/io.types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 

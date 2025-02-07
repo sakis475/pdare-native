@@ -20,6 +20,8 @@ import { navigate, ScreenNames } from '../navigation/navigationUtils';
 import { processTables } from '../helpers/storage/tablesStorage';
 import _ from 'lodash';
 import { UsersIcon } from '../components/basic/Icons';
+import { Order, Table } from '../types/basic.types';
+import { TableIO } from '../types/io.types';
 
 const FONT_SIZES = {
   header: 12, // For column headers
@@ -284,7 +286,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   emptyText: {
-    color: colors.veryLightRed,
+    color: colors.white,
   },
 });
 

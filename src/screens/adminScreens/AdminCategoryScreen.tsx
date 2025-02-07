@@ -7,9 +7,6 @@ import {
   Text,
   ScrollView,
   StyleProp,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -21,7 +18,6 @@ import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-g
 import { AlertWithOptions, getTextColorBasedOnLuminance, toast } from '../../core/utils';
 import { colors, getRandomColor } from '../../core/theme';
 import { getStorage, setStorage } from '../../storage/store';
-import { TextInput, Button, SegmentedButtons } from 'react-native-paper';
 import ColorPicker from 'react-native-wheel-color-picker';
 import { getItemsOfCategory } from '../../helpers/storage/orderStorage';
 import { ActivityIndicator, FAB } from 'react-native-paper';
@@ -166,9 +162,9 @@ const EditModal: React.FC<EditModalProps> = ({
   };
 
   const printLocationOptions = [
-    { value: PrintLocation.ALL, label: 'All' },
-    { value: PrintLocation.KITCHEN, label: 'Kitchen' },
-    { value: PrintLocation.BAR, label: 'Bar' },
+    { value: PrintLocation.ALL, label: strings.ALL },
+    { value: PrintLocation.BAR, label: strings.BAR },
+    { value: PrintLocation.KITCHEN, label: strings.KITCHEN },
   ];
 
   return (
@@ -210,7 +206,7 @@ const EditModal: React.FC<EditModalProps> = ({
         </View>
       )}
 
-      <Text style={styles.sectionLabel}>Print Location</Text>
+      <Text style={styles.sectionLabel}>{strings.PRINT_LOCATION}</Text>
       <CustomSegmentedButtons
         value={printLocation}
         onValueChange={handlePrintLocationChange}
