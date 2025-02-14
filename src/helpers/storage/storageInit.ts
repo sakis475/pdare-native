@@ -1,4 +1,13 @@
 import { getStorage, setStorage } from '../../storage/store';
+import {
+  Category,
+  catGroupedItems,
+  InvitationRequest,
+  ItemReq,
+  PropertyPattern,
+  User,
+} from '../../types/basic.types';
+import { TableIO } from '../../types/io.types';
 import * as Requests from '../requests';
 import { processTables } from './tablesStorage';
 

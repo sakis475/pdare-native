@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, FlatList, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, FlatList } from 'react-native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
-import { TextInput, Button, Switch, SegmentedButtons, Portal, Dialog } from 'react-native-paper';
+import { Button, Switch, Portal, Dialog } from 'react-native-paper';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { getRequest, patchRequest, postRequest } from '../../helpers/requests';
@@ -16,11 +16,6 @@ import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButton
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import { Printer, User } from '../../types/basic.types';
 import { getStorage } from '../../storage/store';
-import {
-  LINUX_PRINTER_APP_DOWNLOAD_URL,
-  WINDOWS_PRINTER_APP_DOWNLOAD_URL,
-} from '../../storage/env';
-import CustomButton from '../../components/basic/CustomButton';
 import PrinterGuide from '../../components/guides/guides/PrintersGuide';
 import { useHelpModal } from '../../providers/HelpContext';
 import { HelpModal } from '../../components/guides/HelpModal';

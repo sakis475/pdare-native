@@ -64,8 +64,11 @@ const LoginScreen: React.FC = () => {
   const handleGetLastCredentials = async () => {
     const credentials = await getStorageLastCredentials();
     if (!credentials) return;
+
     setEmail(credentials.email);
-    setPassword(credentials.password);
+    if (credentials.email) {
+      setPassword(credentials.password);
+    }
   };
 
   useEffect(() => {
