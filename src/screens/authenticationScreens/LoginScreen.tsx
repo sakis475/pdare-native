@@ -21,13 +21,12 @@ import CustomTextInput from '../../components/basic/CustomTextInput';
 import CustomButton from '../../components/basic/CustomButton';
 
 const { width, height } = Dimensions.get('window');
-const logoImage = require('../../../assets/mywaitericon.png');
+const logoImage = require('../../../assets/servetablogowhite.png');
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const strings = useStrings();
@@ -164,11 +163,8 @@ const LoginScreen: React.FC = () => {
               >
                 <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
               </LongPressGestureHandler>
-              <Text style={styles.appTitle}>OrderPOS</Text>
               <Text style={styles.appDescription}>{strings.APP_DESCRIPTION}</Text>
             </View>
-
-            <Divider style={styles.divider} />
 
             <View style={styles.formContainer}>
               <Text style={styles.header}>{strings.LOGIN}</Text>
@@ -243,8 +239,8 @@ const styles = StyleSheet.create({
     paddingTop: height * 0.02,
   },
   logo: {
-    width: Math.min(width * 0.3, 150), // 30% of screen width, max 150
-    height: Math.min(width * 0.3, 150),
+    width: Math.min(width * 0.7, 400), // 30% of screen width, max 150
+    height: Math.min(width * 0.7, 400),
     marginBottom: height * 0.01,
   },
   appTitle: {
@@ -257,7 +253,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   appDescription: {
-    width: '70%',
+    width: '90%',
     textAlign: 'center',
     color: colors.veryLighterGrey,
     fontSize: Math.min(width * 0.04, 16),
@@ -272,6 +268,7 @@ const styles = StyleSheet.create({
     padding: width * 0.05,
     borderRadius: 10,
     borderColor: colors.black,
+    marginTop: 20,
   },
   header: {
     fontSize: Math.min(width * 0.06, 24),

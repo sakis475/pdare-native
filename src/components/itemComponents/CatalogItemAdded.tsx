@@ -7,6 +7,7 @@ import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import _ from 'lodash';
 import { catalogItemStyles } from './CatalogStyles';
 import { CommentIcon, EditIcon } from '../basic/Icons';
+import { ItemPropertiesGrouped, ItemProperty, ItemReq } from '../../types/basic.types';
 
 export function CatalogItemAdded({
   item,

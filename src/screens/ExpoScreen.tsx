@@ -24,7 +24,7 @@ import { EventEmitter, ORDERS_UPDATED } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
 import { useStrings } from '../core/localization/languageContext';
 import { CatalogItemViewOnly } from '../components/itemComponents/CatalogItemViewOnly';
-import { AddIcon, TableIcon } from '../components/basic/Icons';
+import { AddIcon, RefreshIcon, TableIcon } from '../components/basic/Icons';
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
 import { OrderInfoBar } from '../components/helpers/OrderInfoBar';
 import { LinearGradientFadeOut } from '../components/basic/LinearGradientFadeOut';
@@ -256,10 +256,11 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
   const ListEmptyComponent = () => {
     return (
       <View style={styles.emptyContainer}>
-        <TouchableOpacity onPress={onRefresh}>
-          <AddIcon />
-        </TouchableOpacity>
         <Text style={styles.emptyText}>{strings.NO_ACTIVE_EXPO_TABLES}</Text>
+
+        <CustomButton onPress={onRefresh} loading={refreshing} style={{ width: 100 }}>
+          <RefreshIcon />
+        </CustomButton>
       </View>
     );
   };

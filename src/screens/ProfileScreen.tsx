@@ -172,7 +172,6 @@ const ProfileScreen = ({ route }: any) => {
 
     setIsLoading(true);
     try {
-      console.log(newPassword, 'handleupadtehanasnd');
       const response: SessionBearer = await patchRequest('/user/password', {
         currentPassword,
         newPassword: newPassword,

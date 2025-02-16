@@ -49,6 +49,7 @@ export interface Restaurant {
   couvertCost: number;
   currencySymbol: string;
   isPrinterAppInstalled?: boolean;
+  orderDailyLimit?: number;
 }
 
 export interface Item {
@@ -195,4 +196,12 @@ export interface Printer {
   lastDiscovered?: Date;
   analysisPrinter: boolean;
   isDeleted?: boolean;
+}
+
+export interface Inventory {
+  orderCount: number;
+  currentLimitCount?: number;
+  currentLimitStart?: Date;
+  currentLimitEnd?: Date;
+  restaurant: Restaurant;
 }

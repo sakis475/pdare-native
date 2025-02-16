@@ -7,6 +7,11 @@ import { ActivityIndicator } from 'react-native-paper';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
 import { LogoutFAB } from '../../components/LogoutFab';
+import { HelpIcon } from '../../components/basic/Icons';
+import { getRequest } from '../../helpers/requests';
+import dayjs from '../../core/dayjs';
+import OrderLimitModal from '../../components/popupModals/OrderLimitModal';
+import { Inventory } from '../../types/basic.types';
 
 interface SettingOption {
   id: string;
@@ -19,6 +24,9 @@ interface SettingOption {
 const RestaurantSettingsScreen = ({ route }: any) => {
   const [filteredOptions, setFilteredOptions] = useState<SettingOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [inventory, setInventory] = useState<Inventory>(null);
+
+  const [isDailyOrdersModalVisible, setDailyOrdersModalVisible] = useState(false);
 
   const strings = useStrings();
   const settingsOptions = useMemo(
@@ -75,6 +83,14 @@ const RestaurantSettingsScreen = ({ route }: any) => {
     ],
     [strings]
   );
+
+  const getInventory = async () => {
+    const inventory: Inventory = await getRequest('/inventory');
+    if (inventory) {
+      setInventory(inventory);
+    }
+  };
+
   useEffect(() => {
     const loadUserOptions = async () => {
       try {
@@ -84,6 +100,8 @@ const RestaurantSettingsScreen = ({ route }: any) => {
           option.allowedRoles.includes(filter)
         );
         setFilteredOptions(userOptions);
+
+        await getInventory();
       } catch (error) {
         console.error('Error loading user options:', error);
       } finally {
@@ -116,6 +134,48 @@ const RestaurantSettingsScreen = ({ route }: any) => {
     );
   }
 
+  const RateLimitDisplay = () => {
+    const currentLimitCount = inventory?.currentLimitCount ?? '?';
+    const restaurantLimit = inventory?.restaurant.orderDailyLimit ?? '?';
+    const currentLimitStart = inventory?.currentLimitStart ?? '?';
+    const currentLimitEnd = inventory?.currentLimitEnd ?? dayjs().add(1, 'day');
+
+    return (
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          left: 16,
+          bottom: 16,
+          flexDirection: 'row',
+          gap: 10,
+          alignItems: 'center',
+          borderColor: colors.lighterGrey,
+          borderWidth: 1,
+          borderRadius: 15,
+          paddingVertical: 8,
+          paddingHorizontal: 8,
+        }}
+        onPress={() => {
+          setDailyOrdersModalVisible(true);
+        }}
+      >
+        <HelpIcon />
+        <View>
+          <Text style={{ color: colors.white, fontSize: 12 }}>
+            {currentLimitCount}/{restaurantLimit} {strings.DAILY_ORDER_LIMIT}
+          </Text>
+          <Text style={{ color: colors.white, fontSize: 12 }}>
+            {strings.RESETS_ON}: {dayjs(currentLimitEnd).format('DD/MM - HH:mm')}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const dismissDailyOrderModal = () => {
+    setDailyOrdersModalVisible(false);
+  };
+
   return (
     <View style={styles.mainContainer}>
       <FlatList
@@ -126,6 +186,13 @@ const RestaurantSettingsScreen = ({ route }: any) => {
         contentContainerStyle={styles.container}
       />
       <LogoutFAB />
+      {typeof inventory?.restaurant?.orderDailyLimit === 'number' && <RateLimitDisplay />}
+
+      <OrderLimitModal
+        isModalVisible={isDailyOrdersModalVisible}
+        onDismiss={dismissDailyOrderModal}
+        inventory={inventory}
+      />
     </View>
   );
 };

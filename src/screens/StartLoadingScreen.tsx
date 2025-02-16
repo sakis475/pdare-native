@@ -8,7 +8,7 @@ import { handleNoRestaurantUser, logout } from '../helpers/storage/tokenRequests
 import { getStorage } from '../storage/store';
 import { useStrings } from '../core/localization/languageContext';
 
-const logoImage = require('../../assets/mywaitericon.png');
+const logoImage = require('../../assets/servetablogo.svg');
 
 const StartLoadingScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(1)).current; // Start with full opacity
@@ -83,7 +83,7 @@ const StartLoadingScreen: React.FC = () => {
       <Animated.View style={{ opacity: fadeAnim }}>
         <Image source={logoImage} style={styles.logo} />
 
-        <Text style={styles.appTitle}>OrderPOS</Text>
+        <Text style={styles.appTitle}>ServeTab</Text>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
             {strings.APP_DESCRIPTION}

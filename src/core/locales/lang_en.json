@@ -317,5 +317,18 @@
   "PIZZA_CHEESE": "Cheese (Mozzarella, Cheddar, Parmesan)",
   "PIZZA_TOPPINGS": "Extra Toppings (Pepperoni, Mushrooms)",
   "MORE_INFO": "More Info",
-  "NO_PATTERNS_ACTIONS": "Add properties to the product by clicking on the + button at the bottom right"
+  "NO_PATTERNS_ACTIONS": "Add properties to the product by clicking on the + button at the bottom right",
+  "DAILY_ORDER_LIMIT": "Daily Orders",
+  "RESETS_ON": "Resets at",
+  "DAILY_ORDER_LIMIT_TITLE": "Daily Order Limit",
+  "APP_FREE_NO_ADS": "This app is completely free to use and has no ads.",
+  "DAILY_LIMIT_EXPLANATION": "To keep things running smoothly, we’ve set a daily order limit for now.",
+  "LIMIT_REMOVAL_PLAN": "Don’t worry—we’re working on removing this limit in the future!",
+  "DAILY_LIMIT_PART_A": "The limit allows up to",
+  "DAILY_LIMIT_PART_B": "orders every 24 hours.",
+  "LIMIT_START_EXPLANATION": "The 24-hour period starts when you place your first order after a reset.",
+  "CURRENT_LIMIT_PART_A": "You’ve used",
+  "CURRENT_LIMIT_PART_B": "out of",
+  "CURRENT_LIMIT_PART_C": "orders in the current 24-hour window.",
+  "LIMIT_RESET_PART_A": "Your limit will reset on"
 }

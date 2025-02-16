@@ -12,7 +12,8 @@ import { patchRequest, postRequest } from '../../helpers/requests';
 import { navigateToTables } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
 import { MoreIconHorizontal, PlusIcon, SendIcon } from '../basic/Icons';
-import { Order, Table } from '../../types/basic.types';
+import { Inventory, Order, Table } from '../../types/basic.types';
+import OrderLimitReachedModal from '../popupModals/OrderLimitReachedModal';
 
 interface TempBottomOptionsProps {
   table: Table;
@@ -42,6 +43,13 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   const [isOrderView, setIsOrderView] = useState(true);
   const [tableChanged, setTableChanged] = useState(false);
   const strings = useStrings();
+
+  const [inventory, setInventory] = useState<Inventory>(null);
+  const [isOrderLimitReachedModalVisible, setOrderLimitReachedModalVisible] = useState(false);
+
+  const handleCloseOrderLimitReachedModal = () => {
+    setOrderLimitReachedModalVisible(false);
+  };
 
   const fetchOrder = async () => {
     let currentOrder = table?.occupiedByOrder;
@@ -112,7 +120,12 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
         }
       } else {
         result = await postRequest('/orders', convertedServerOrder);
-        handleOrderSendSuccess(result);
+        if (result?.limitReached === true && result?.inventory) {
+          setInventory(result.inventory);
+          setOrderLimitReachedModalVisible(true);
+        } else {
+          handleOrderSendSuccess(result);
+        }
       }
     } catch (error) {
       toast('error', 'Failed to send order', '', 1000);
@@ -135,7 +148,10 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           disabled={noTable || isSending}
           onPress={handleOpenMoreOptionsModal}
         >
-          <MoreIconHorizontal size={24} color={colors.white} />
+          <MoreIconHorizontal
+            size={24}
+            color={noTable || isSending ? colors.slightlyLighterGrey : colors.white}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -169,6 +185,11 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
           />
         </TouchableOpacity>
       </View>
+      <OrderLimitReachedModal
+        isModalVisible={isOrderLimitReachedModalVisible}
+        inventory={inventory}
+        onDismiss={handleCloseOrderLimitReachedModal}
+      ></OrderLimitReachedModal>
     </View>
   );
 };
