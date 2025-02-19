@@ -355,27 +355,9 @@ const AdminItemDetailsScreen = ({ route }: any) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 8,
+                  marginLeft: 15,
                 }}
               >
-                <TouchableOpacity
-                  onPress={() => startEditing(propertyName)}
-                  style={styles.editButton}
-                  disabled={isDeleted}
-                >
-                  <EditIcon size={20}></EditIcon>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => handleDeletePropertyGroup(propertyName)}
-                  style={[styles.deleteButton, { marginLeft: 0 }]}
-                >
-                  {isDeleted ? (
-                    <RestoreIcon size={20} color={colors.green}></RestoreIcon>
-                  ) : (
-                    <TrashIcon size={20} color={colors.lightRed}></TrashIcon>
-                  )}
-                </TouchableOpacity>
-
                 <Text
                   style={[
                     styles.header,
@@ -391,18 +373,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
             </View>
           )}
           <View style={styles.reorderButtons}>
-            <TouchableOpacity
-              onPress={() => {
-                setEditingPropertyType(propertyName);
-                propertyTypeBottomSheetRef.current?.openModal();
-              }}
-              style={styles.propertyTypeButton}
-              disabled={isDeleted}
-            >
-              <Text style={styles.propertyTypeText}>
-                <TypeSelect propertyType={properties?.[0]?.propertyType}></TypeSelect>
-              </Text>
-            </TouchableOpacity>
+            <TypeSelect propertyType={properties?.[0]?.propertyType}></TypeSelect>
             <TouchableOpacity
               onPress={() => movePropertyGroup(index, 'up')}
               disabled={index === 0 || isDeleted}
@@ -430,6 +401,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               handleSelectChange(propertyName, updatedProperties)
             }
             disabled={isDeleted}
+            viewOnly={true}
           />
         </View>
       </View>
@@ -557,7 +529,7 @@ const AdminItemDetailsScreen = ({ route }: any) => {
               data={item.itemPropertiesGrouped as any}
               renderItem={renderPropertyGroup}
               keyExtractor={(item, index) => `group-${item[0]}-${index}`}
-              contentContainerStyle={{ paddingBottom: 50, flex: 1 }}
+              contentContainerStyle={{ paddingBottom: 50 }}
               ListEmptyComponent={ListEmptyComponent}
             />
             <>
@@ -600,12 +572,14 @@ interface UnifiedSelectProps {
   itemPropertiesGrouped: ItemProperty[];
   onSelectChange: (updatedProperties: ItemProperty[]) => void;
   disabled: boolean;
+  viewOnly?: boolean;
 }
 
 export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
   itemPropertiesGrouped,
   onSelectChange,
   disabled,
+  viewOnly = false,
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
@@ -788,31 +762,36 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
             </>
           ) : (
             <>
-              {item.propertyType === 'singleselect' ? (
-                <RadioButton.Android
-                  value={item.propertyValue}
-                  status={item.selected ? 'checked' : 'unchecked'}
-                  color={'#6495ED'}
-                  uncheckedColor={'#ffffff'}
-                  onPress={() => handleSelectionChange(item)}
-                  disabled={isDeleted}
-                />
-              ) : (
-                <Checkbox.Android
-                  status={item.selected ? 'checked' : 'unchecked'}
-                  color={'#6495ED'}
-                  uncheckedColor={'#ffffff'}
-                  onPress={() => handleSelectionChange(item)}
-                  disabled={isDeleted}
-                />
+              {!viewOnly && (
+                <>
+                  {item.propertyType === 'singleselect' ? (
+                    <RadioButton.Android
+                      value={item.propertyValue}
+                      status={item.selected ? 'checked' : 'unchecked'}
+                      color={'#6495ED'}
+                      uncheckedColor={'#ffffff'}
+                      onPress={() => handleSelectionChange(item)}
+                      disabled={isDeleted}
+                    />
+                  ) : (
+                    <Checkbox.Android
+                      status={item.selected ? 'checked' : 'unchecked'}
+                      color={'#6495ED'}
+                      uncheckedColor={'#ffffff'}
+                      onPress={() => handleSelectionChange(item)}
+                      disabled={isDeleted}
+                    />
+                  )}
+                  <TouchableOpacity
+                    onPress={() => handleEdit(item)}
+                    style={styles.editButton}
+                    disabled={isDeleted}
+                  >
+                    <EditIcon size={20} color="#fff" />
+                  </TouchableOpacity>
+                </>
               )}
-              <TouchableOpacity
-                onPress={() => handleEdit(item)}
-                style={styles.editButton}
-                disabled={isDeleted}
-              >
-                <EditIcon size={20} color="#fff" />
-              </TouchableOpacity>
+
               <Text
                 style={[
                   styles.input,
@@ -823,7 +802,7 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
                 {item.propertyValue}
               </Text>
               {/* Only show delete button if group is not deleted */}
-              {!item.isDeletedGroup && (
+              {!viewOnly && !item.isDeletedGroup && (
                 <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
                   {item.isDeleted ? (
                     <RestoreIcon size={20} color={colors.green}></RestoreIcon>
@@ -862,9 +841,11 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
           return `property-${id}-${item?.propertyValue}`;
         }}
       />
-      <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
-        <Text style={styles.addButtonText}>{strings.ADD_NEW}</Text>
-      </TouchableOpacity>
+      {!viewOnly && (
+        <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
+          <Text style={styles.addButtonText}>{strings.ADD_NEW}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -1016,9 +997,7 @@ const styles = StyleSheet.create({
   },
 
   emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: '70%',
   },
   emptyText: {
     color: colors.white,
