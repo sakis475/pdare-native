@@ -5,6 +5,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IoniconsIcons from 'react-native-vector-icons/Ionicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 import { colors } from '../../core/theme';
 import { StyleProp, ViewStyle } from 'react-native';
@@ -15,6 +16,14 @@ interface IconProps {
   color?: string;
   style?: StyleProp<ViewStyle>;
 }
+
+export const WaitingIcon = ({
+  size = 13,
+  color = colors.veryLighterGrey,
+  style,
+}: IconProps = {}) => {
+  return <Entypo name="hour-glass" size={size} color={color} style={style} />;
+};
 
 export const CommentIcon = ({
   size = 13,

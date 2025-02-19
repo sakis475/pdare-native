@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
-import { WarningIcon } from './Icons';
+import { WaitingIcon, WarningIcon } from './Icons';
 import { Text } from 'react-native-paper';
 import { colors } from '../../core/theme';
 
@@ -34,7 +34,6 @@ const CustomButton: React.FC<CustomButtonProps> = ({
           styles.deleteButton,
           mode === 'outlined' && { borderColor: colors.lightRed },
           mode === 'contained' && { backgroundColor: colors.lightRed },
-
           style,
         ];
       case 'warning':
@@ -72,14 +71,13 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     <Button
       mode={mode}
       onPress={onPress}
-      loading={loading}
       disabled={loading}
       style={getButtonStyle()}
       textColor={textColor || (variant === 'delete' ? colors.white : undefined)}
       contentStyle={[styles.contentStyle, contentStyle]}
       labelStyle={styles.labelStyle}
     >
-      {renderContent()}
+      {loading ? <WaitingIcon /> : renderContent()}
     </Button>
   );
 };
@@ -105,8 +103,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   contentStyle: {
-    height: 40,
     width: '100%',
+    height: 40,
     flexDirection: 'row',
     alignItems: 'center',
   },

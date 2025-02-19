@@ -12,6 +12,7 @@ import { colors } from '../../core/theme';
 import { SelectTable } from '../tableSelect/SelectTable';
 import { Portal } from '@gorhom/portal';
 import { reqFetchTables } from '../../helpers/storage/tablesStorage';
+import { Table } from '../../types/basic.types';
 
 interface TableSelectBottomSheetProps {
   handleSelectTable: (table: Table) => void;
@@ -38,15 +39,14 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
 
     const handleCloseModal = useCallback(() => {
       bottomSheetRef.current?.close();
-      Keyboard.dismiss();
       setAvailableTables([]);
-      setRenderKey((prevKey) => prevKey + 1); // Update the key to force re-render
+      setRenderKey((prevKey) => prevKey + 1);
     }, [setAvailableTables]);
 
     const handleSheetChanges = (index: number) => {
-      if (index === -1) {
-        handleCloseModal();
-      }
+      // if (index === -1) {
+      //   Keyboard.dismiss();
+      // }
     };
 
     useImperativeHandle(ref, () => ({
