@@ -15,6 +15,7 @@ import { addNewItemToTemp, updateItemOfTempItem } from '../../helpers/storage/or
 import CommentBottomSheet from '../../components/bottomSheets/CommentBottomSheet';
 import { navigateBack } from '../../navigation/navigationUtils';
 import { useStrings } from '../../core/localization/languageContext';
+import { ItemPropertiesGrouped, ItemProperty, ItemReq } from '../../types/basic.types';
 
 const UnifiedSelect = ({
   itemPropertiesGrouped,

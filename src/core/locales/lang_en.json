@@ -135,7 +135,7 @@
   "LOAD_ERROR": "Failed to load property patterns",
   "DUPLICATE_PATTERN_ERROR": "A pattern with this name already exists",
   "PATTERNS_WILL_APPEAR": "Patterns that are added will appear here.",
-  "CHOICE": "Choice",
+  "CHOICE": "Option",
   "TRY_AGAIN_LATER": "Please try again later",
   "ADD_NEW": "Add New",
   "SELECT_PROPERTY": "Select Property",

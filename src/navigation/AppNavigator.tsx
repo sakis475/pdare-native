@@ -274,7 +274,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={route.params?.item?.title}
+              title={`${strings.UPDATE}: ${route.params?.item?.title}`}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),

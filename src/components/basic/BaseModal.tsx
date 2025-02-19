@@ -112,7 +112,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
         </Button>
         <Button
           mode="contained"
-          style={[styles.button]}
+          style={[styles.button, { backgroundColor: colors.purpleIris }]}
           onPress={onConfirm}
           textColor={colors.white}
           labelStyle={styles.buttonLabel}
