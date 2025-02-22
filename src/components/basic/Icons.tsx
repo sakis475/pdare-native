@@ -75,8 +75,13 @@ export const TrashIcon = ({ size = 24, color = '#ffc4c4', style }: IconProps = {
 export const WarningIcon = ({ size = 24, color = '#ffc4c4', style }: IconProps = {}) => {
   return <Ionicons name="warning" size={size} color={color} style={style} />;
 };
+
 export const RefreshIcon = ({ size = 24, color = '#fff', style }: IconProps = {}) => {
   return <Ionicons name="refresh" size={size} color={color} style={style} />;
+};
+
+export const LanguageIcon = ({ size = 24, color = '#fff', style }: IconProps = {}) => {
+  return <Ionicons name="globe-outline" size={size} color={color} style={style} />;
 };
 
 export const ChevronUpIcon = ({ size = 24, color = '#fff', style }: IconProps = {}) => {

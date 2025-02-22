@@ -95,7 +95,7 @@ const ActiveOrderScreen = ({
         if (orderId === (await getTempOrder())?.id) {
           await clearNewOrder();
         }
-        toast('success', strings.DELETED, '', 1000);
+        toast('success', strings.CLOSED_AT, '', 1000);
         navigateToTables();
       }
     } finally {

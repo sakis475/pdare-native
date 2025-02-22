@@ -18,7 +18,6 @@ import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-g
 import { AlertWithOptions, getTextColorBasedOnLuminance, toast } from '../../core/utils';
 import { colors, getRandomColor } from '../../core/theme';
 import { getStorage, setStorage } from '../../storage/store';
-import ColorPicker from 'react-native-wheel-color-picker';
 import { getItemsOfCategory } from '../../helpers/storage/orderStorage';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { patchRequest } from '../../helpers/requests';
@@ -31,6 +30,7 @@ import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
 import { Category } from '../../types/basic.types';
+import { FlashList } from '@shopify/flash-list';
 
 const GRID_SIZE = 4;
 const MARGIN = 4;
@@ -167,6 +167,29 @@ const EditModal: React.FC<EditModalProps> = ({
     { value: PrintLocation.KITCHEN, label: strings.KITCHEN },
   ];
 
+  const predefinedColors = [
+    '#FF5733',
+    '#33FF57',
+    '#3357FF',
+    '#FF33A1',
+    '#33FFF5',
+    '#F5FF33',
+    '#A133FF',
+    '#FF3333',
+    '#33FFA1',
+    '#5733FF',
+    '#33FF33',
+    '#FFC300',
+    '#C70039',
+    '#900C3F',
+    '#581845',
+    '#1A5276',
+    '#2E86C1',
+    '#AED6F1',
+    '#F7DC6F',
+    '#D35400',
+  ];
+
   return (
     <BaseModal
       title={mode === 'create' ? strings.CREATE_CATEGORY : strings.UPDATE_CATEGORY}
@@ -194,14 +217,18 @@ const EditModal: React.FC<EditModalProps> = ({
       </TouchableOpacity>
 
       {showColorPicker && (
-        <View style={styles.colorPickerContainer}>
-          <ColorPicker
-            color={color}
-            onColorChange={setColor}
-            thumbSize={30}
-            sliderSize={30}
-            noSnap={true}
-            row={true}
+        <View style={styles.colorGrid}>
+          <FlashList
+            data={predefinedColors}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[styles.colorButton, { backgroundColor: item }]}
+                onPress={() => setColor(item)}
+              />
+            )}
+            keyExtractor={(item) => `colorbox-${item}`}
+            estimatedItemSize={20}
+            numColumns={5} // Fixed 5 columns
           />
         </View>
       )}
@@ -663,6 +690,19 @@ const styles = StyleSheet.create({
   },
   segmentButton: {
     flex: 1,
+  },
+  colorGrid: {
+    flex: 1, // Ensure the grid takes up available space
+    width: '100%', // Ensure the grid spans the full width
+    marginBottom: 20, // Add some spacing below the grid
+  },
+  colorButton: {
+    flex: 1, // Ensure buttons take up equal space
+    aspectRatio: 1, // Ensure buttons are square
+    margin: 4, // Add spacing between buttons
+    borderRadius: 10, // Rounded corners
+    borderWidth: 2, // Add a border
+    borderColor: '#000', // Border color
   },
 });
 

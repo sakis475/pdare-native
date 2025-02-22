@@ -47,7 +47,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         return [
           styles.button,
           {
-            backgroundColor: colors.blue,
+            backgroundColor: mode === 'outlined' ? null : colors.blue,
           },
           style,
         ];
@@ -72,12 +72,12 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       mode={mode}
       onPress={onPress}
       disabled={loading}
-      style={getButtonStyle()}
+      style={[getButtonStyle(), loading && { backgroundColor: 'grey' }]} // Directly applying condition here
       textColor={textColor || (variant === 'delete' ? colors.white : undefined)}
       contentStyle={[styles.contentStyle, contentStyle]}
       labelStyle={styles.labelStyle}
     >
-      {loading ? <WaitingIcon /> : renderContent()}
+      {renderContent()}
     </Button>
   );
 };

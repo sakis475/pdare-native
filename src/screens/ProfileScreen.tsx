@@ -17,11 +17,17 @@ import CustomNavigationScreenHeaderTitle from '../components/basic/CustomNavigat
 import { LoadingOverlay } from '../components/basic/SavingOverlay';
 import CustomNumberInput from '../components/basic/CustomNumberInput';
 import CustomButton from '../components/basic/CustomButton';
+import LanguageSelectorModal, {
+  languageOptions,
+} from '../components/popupModals/LanguageSelectorModal';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const ProfileScreen = ({ route }: any) => {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [isModalUserLangVisible, setModalUserLangVisible] = useState(false);
+  const [isModalRestLangVisible, setModalRestLangVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<AppLanguage>('lang_el');
 
   const [formData, setFormData] = useState({
@@ -41,11 +47,6 @@ const ProfileScreen = ({ route }: any) => {
     newPassword: '',
     confirmPassword: '',
   });
-
-  const languageOptions: { id: number; value: AppLanguage; label: string }[] = [
-    { id: 1, value: 'lang_en', label: 'English' },
-    { id: 2, value: 'lang_el', label: 'Ελληνικά' },
-  ];
 
   const strings = useStrings();
   const navigation = useNavigation();
@@ -314,21 +315,20 @@ const ProfileScreen = ({ route }: any) => {
         <View style={styles.content}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{strings.LANGUAGE_SETTINGS}</Text>
-
-            {languageOptions.map((option) => (
-              <View key={option.id} style={styles.languageOption}>
-                <RadioButton.Android
-                  value={option.value}
-                  status={selectedLanguage === option.value ? 'checked' : 'unchecked'}
-                  color={colors.primary}
-                  uncheckedColor={colors.white}
-                  onPress={() => {
-                    handleLanguageChange(option.value);
-                  }}
-                />
-                <Text style={styles.languageLabel}>{option.label}</Text>
-              </View>
-            ))}
+            <CustomButton
+              onPress={() => setModalUserLangVisible(true)}
+              style={{ backgroundColor: colors.purpleIris }}
+            >
+              <Text style={{ color: colors.white }}>
+                {languageOptions.find((e) => e.value === selectedLanguage).label}
+              </Text>
+            </CustomButton>
+            <LanguageSelectorModal
+              isModalVisible={isModalUserLangVisible}
+              selectedLanguage={selectedLanguage}
+              onDismiss={() => setModalUserLangVisible(false)}
+              onLanguageChange={handleLanguageChange}
+            />
           </View>
 
           <View style={styles.section}>
@@ -415,22 +415,20 @@ const ProfileScreen = ({ route }: any) => {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>{strings.LANGUAGE_SETTINGS}</Text>
 
-                {languageOptions.map((option) => (
-                  <View key={option.id} style={styles.languageOption}>
-                    <RadioButton.Android
-                      value={option.value}
-                      status={
-                        formData.restaurantLanguage === option.value ? 'checked' : 'unchecked'
-                      }
-                      color={colors.primary}
-                      uncheckedColor={colors.white}
-                      onPress={() => {
-                        updateFormField('restaurantLanguage')(option.value);
-                      }}
-                    />
-                    <Text style={styles.languageLabel}>{option.label}</Text>
-                  </View>
-                ))}
+                <CustomButton
+                  onPress={() => setModalRestLangVisible(true)}
+                  style={{ backgroundColor: colors.purpleIris }}
+                >
+                  <Text style={{ color: colors.white }}>
+                    {languageOptions.find((e) => e.value === formData.restaurantLanguage).label}
+                  </Text>
+                </CustomButton>
+                <LanguageSelectorModal
+                  isModalVisible={isModalRestLangVisible}
+                  selectedLanguage={formData.restaurantLanguage}
+                  onDismiss={() => setModalRestLangVisible(false)}
+                  onLanguageChange={(lang) => updateFormField('restaurantLanguage')(lang)}
+                />
               </View>
 
               <CustomButton mode="contained" onPress={handleUpdateRestaurant} loading={isLoading}>

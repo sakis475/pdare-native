@@ -191,6 +191,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
         onChangeText={handleSearchChange}
         value={searchQuery}
         style={styles.searchBar}
+        autoCapitalize="none"
       />
 
       {isSearching ? (

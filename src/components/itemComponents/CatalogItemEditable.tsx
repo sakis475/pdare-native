@@ -4,6 +4,7 @@ import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { catalogItemStyles } from './CatalogStyles';
 import { ChevronRightIcon } from '../basic/Icons';
+import { ItemReq } from '../../types/basic.types';
 
 export function CatalogItemEditable({ item }: { item: ItemReq }) {
   const [isPressedIn, setIsPressedIn] = useState(false);

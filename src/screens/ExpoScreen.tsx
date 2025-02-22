@@ -31,6 +31,8 @@ import { LinearGradientFadeOut } from '../components/basic/LinearGradientFadeOut
 import { ItemReq, Table } from '../types/basic.types';
 import { TableIO } from '../types/io.types';
 import CustomButton from '../components/basic/CustomButton';
+import { storageInitTableOrders } from '../helpers/storage/storageInit';
+import { toast } from '../core/utils';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -51,7 +53,7 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchInitialTables();
+    await handleTableUpdates(true);
     setRefreshing(false);
   };
 
@@ -63,31 +65,19 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
     );
   };
 
-  const fetchInitialTables = async (): Promise<void> => {
-    try {
-      const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
-      console.log(allTablesIO, 'allTablesIO');
-      if (!allTablesIO) {
-        return;
-      }
-      const allTables = await processTables(allTablesIO);
-      await setStorage('tableOrders', allTables);
-
-      handleTableUpdates();
-    } catch (error) {
-      console.error('Error fetching initial table data:', error);
-    }
-  };
-
-  const handleTableUpdates = async (): Promise<void> => {
+  const handleTableUpdates = async (isRefresh = false): Promise<void> => {
     console.log('expo screen ORDERS_UPDATED');
+    await storageInitTableOrders();
     const updatedTables = await getStorage('tableOrders');
+    if (isRefresh && updatedTables?.length === 0) {
+      toast('info', strings.NO_ACTIVE_EXPO_TABLES, '', 1300);
+    }
     updateActiveTables(updatedTables);
   };
 
   useEffect(() => {
     if (isFocused) {
-      fetchInitialTables();
+      handleTableUpdates();
     }
   }, [isFocused]);
 
@@ -123,7 +113,7 @@ const ExpoScreen: React.FC<ExpoScreenProps> = ({ currentIndex }) => {
         throw new Error('No response from server');
       }
 
-      await fetchInitialTables();
+      await handleTableUpdates();
     } catch (error) {
       console.error('Error marking order as done:', error);
     } finally {

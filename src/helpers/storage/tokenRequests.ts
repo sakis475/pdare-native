@@ -75,9 +75,9 @@ export async function register(registerData: RegisterData) {
   const sessionBearer: SessionBearer = await postRequest('/register', registerData);
   setStorageLastCredentials({ email: registerData.username, password: registerData.password });
 
-  if (sessionBearer.user.restaurant) {
+  if (sessionBearer?.user?.restaurant) {
     await setBearer(sessionBearer);
-  } else if (sessionBearer.user) {
+  } else if (sessionBearer?.user) {
     handleNoRestaurantUser(sessionBearer);
   }
 }

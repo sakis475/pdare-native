@@ -2,13 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Image, Text, Animated } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { colors } from '../core/theme';
-import { getBearer } from '../helpers/requests';
+import { getBearer, refreshToken } from '../helpers/requests';
 import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUtils';
 import { handleNoRestaurantUser, logout } from '../helpers/storage/tokenRequests';
 import { getStorage } from '../storage/store';
 import { useStrings } from '../core/localization/languageContext';
 
-const logoImage = require('../../assets/servetablogo.svg');
+const logoImage = require('../../assets/servetablogowhite.png');
 
 const StartLoadingScreen: React.FC = () => {
   const fadeAnim = useRef(new Animated.Value(1)).current; // Start with full opacity
@@ -52,6 +52,8 @@ const StartLoadingScreen: React.FC = () => {
         (async () => {
           const currentUser = await getStorage('currentUser');
           const sessionBearer = await getStorage('session_bearer');
+
+          await refreshToken();
           if (currentUser?.restaurant?.id) {
             const newToken = await getBearer();
             if (newToken?.user?.restaurant) {
@@ -82,8 +84,6 @@ const StartLoadingScreen: React.FC = () => {
     <View style={styles.container}>
       <Animated.View style={{ opacity: fadeAnim }}>
         <Image source={logoImage} style={styles.logo} />
-
-        <Text style={styles.appTitle}>ServeTab</Text>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ width: 250, textAlign: 'center', color: colors.veryLighterGrey }}>
             {strings.APP_DESCRIPTION}

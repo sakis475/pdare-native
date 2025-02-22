@@ -23,35 +23,24 @@ import { ORDERS_UPDATED, EventEmitter } from '../helpers/Sockets/EventEmitter';
 import { processTables } from '../helpers/storage/tablesStorage';
 import { SCREEN_HEIGHT } from '@gorhom/bottom-sheet';
 import { useStrings } from '../core/localization/languageContext';
+import { Table } from '../types/basic.types';
+import { storageInitTableOrders } from '../helpers/storage/storageInit';
 
 const TablesScreen = ({ currentIndex }: any) => {
   const [activeTables, setActiveTables] = useState<Table[]>(undefined);
   const [refreshing, setRefreshing] = useState(false);
   const strings = useStrings();
 
-  const fetchInitialTables = async (): Promise<void> => {
-    try {
-      const allTablesIO: TableIO[] = await Requests.getRequest('/tables');
-      if (!allTablesIO) {
-        return;
-      }
-      const allTables = await processTables(allTablesIO);
-      await setStorage('tableOrders', allTables);
-      setActiveTables(allTables);
-    } catch (error) {
-      console.error('Error fetching initial table data:', error);
-    }
-  };
-
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchInitialTables();
+    await handleTableUpdates();
     setRefreshing(false);
   };
 
   // Function to handle updates from socket
   const handleTableUpdates = async (): Promise<void> => {
     console.log('tables screen: ORDERS_UPDATED');
+    await storageInitTableOrders();
     const updatedTables = await getStorage('tableOrders');
     setActiveTables(updatedTables);
   };
@@ -132,6 +121,7 @@ const TablesScreen = ({ currentIndex }: any) => {
                     tintColor={colors.primary}
                   />
                 }
+                showsVerticalScrollIndicator={false}
               />
             </View>
 

@@ -18,11 +18,12 @@ import { patchRequest } from '../../helpers/requests';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
 import { findCategoryByTitle } from '../../helpers/storage/orderStorage';
 import { useStrings } from '../../core/localization/languageContext';
-import { BarsIcon, EditIcon, TrashIcon } from '../../components/basic/Icons';
+import { BarsIcon, EditIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomButton from '../../components/basic/CustomButton';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import { ItemReq, catGroupedItems, Category } from '../../types/basic.types';
+import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 
 interface EditItemModalProps {
   visible: boolean;
@@ -102,6 +103,10 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
     );
   };
 
+  const handleAddNewItemPress = () => {
+    navigate(ScreenNames.ManageItemDetailsScreen, { item });
+  };
+
   return (
     <BaseModal
       title={mode === 'create' ? `${strings.CREATE_PRODUCT}` : `${strings.UPDATE_PRODUCT}`}
@@ -130,10 +135,29 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       />
 
       {mode === 'edit' && onDelete && (
-        <View style={{ marginBottom: 5 }}>
-          <CustomButton onPress={handleDelete} variant={'delete'}>
-            <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
-          </CustomButton>
+        <View>
+          <View style={{ marginBottom: 5 }}>
+            <CustomButton
+              onPress={() => {
+                handleAddNewItemPress();
+                onDismiss();
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.white,
+                }}
+              >
+                {strings.PRODUCT_PROPERTIES}
+              </Text>
+            </CustomButton>
+          </View>
+
+          <View style={{ marginBottom: 5 }}>
+            <CustomButton onPress={handleDelete} variant={'delete'}>
+              <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+            </CustomButton>
+          </View>
         </View>
       )}
     </BaseModal>

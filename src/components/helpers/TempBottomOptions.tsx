@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     width: 60,
   },
   sendOrderButton: {
-    width: 100,
+    flex: 1,
     backgroundColor: colors.green,
   },
   actionsContainer: {
