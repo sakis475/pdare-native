@@ -30,6 +30,7 @@ import { toast } from '../../core/utils';
 
 const { width, height } = Dimensions.get('window');
 const logoImage = require('../../../assets/servetablogowhite.png');
+
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -147,96 +148,78 @@ const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-      >
-        <View style={styles.container}>
-          <View style={[styles.logoContainer]}>
-            <LongPressGestureHandler
-              onHandlerStateChange={({ nativeEvent }) => {
-                if (nativeEvent.state === State.ACTIVE) {
-                  handleLongPress();
-                }
-              }}
-            >
-              <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
-            </LongPressGestureHandler>
-            <Text style={styles.appDescription}>{strings.APP_DESCRIPTION}</Text>
-            <TouchableOpacity
-              onPress={() => setModalUserLangVisible(true)}
-              style={{
-                position: 'absolute',
-                right: 8,
-                top: 8,
-                flexDirection: 'row',
-                gap: 10,
-                alignItems: 'center',
-                borderColor: colors.lighterGrey,
-                borderWidth: 1,
-                borderRadius: 15,
-                paddingVertical: 8,
-                paddingHorizontal: 8,
-              }}
-            >
-              <LanguageIcon size={16}></LanguageIcon>
-              <Text style={{ color: colors.white, fontSize: 12 }}>
-                {languageOptions.find((e) => e.value === selectedLanguage).label}
-              </Text>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.container}>
+        <TouchableOpacity
+          onPress={() => setModalUserLangVisible(true)}
+          style={styles.languageButton}
+        >
+          <LanguageIcon size={16}></LanguageIcon>
+          <Text style={styles.languageText}>
+            {languageOptions.find((e) => e.value === selectedLanguage).label}
+          </Text>
+        </TouchableOpacity>
+        <View style={styles.logoContainer}>
+          <LongPressGestureHandler
+            onHandlerStateChange={({ nativeEvent }) => {
+              if (nativeEvent.state === State.ACTIVE) {
+                handleLongPress();
+              }
+            }}
+          >
+            <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
+          </LongPressGestureHandler>
+          <Text style={styles.appDescription}>{strings.APP_DESCRIPTION}</Text>
+        </View>
 
-          <Animated.View style={[styles.formContainer, animatedFormStyle]}>
-            <Text style={styles.header}>{strings.LOGIN}</Text>
+        <Animated.View style={[styles.formContainer, animatedFormStyle]}>
+          <Text style={styles.header}>{strings.LOGIN}</Text>
 
-            <View style={styles.inputsContainer}>
-              <View style={styles.inputWrapper}>
-                <CustomTextInput
-                  label={strings.EMAIL}
-                  value={email}
-                  onChangeText={setEmail}
-                  error={!!emailError}
-                  keyboardType="email-address"
-                  textContentType="emailAddress"
-                  disabled={isLoading}
-                />
-                {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
-              </View>
-
-              <View style={styles.inputWrapper}>
-                <CustomTextInput
-                  label={strings.PASSWORD}
-                  value={password}
-                  onChangeText={(text) => setPassword(text)}
-                  error={!!passwordError}
-                  secureTextEntry={true}
-                  disabled={isLoading}
-                />
-                {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
-              </View>
+          <View style={styles.inputsContainer}>
+            <View style={styles.inputWrapper}>
+              <CustomTextInput
+                label={strings.EMAIL}
+                value={email}
+                onChangeText={setEmail}
+                error={!!emailError}
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                disabled={isLoading}
+              />
+              {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
             </View>
 
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>
-            </TouchableOpacity>
+            <View style={styles.inputWrapper}>
+              <CustomTextInput
+                label={strings.PASSWORD}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+                error={!!passwordError}
+                secureTextEntry={true}
+                disabled={isLoading}
+              />
+              {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
+            </View>
+          </View>
 
-            <CustomButton onPress={_onLoginPressed} loading={isLoading}>
-              <Text style={styles.buttonText}>{strings.LOGIN}</Text>
-            </CustomButton>
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>
+          </TouchableOpacity>
 
-            <CustomButton onPress={handlePressRegister} loading={isLoading} mode={'outlined'}>
-              <Text style={styles.buttonText}>{strings.CREATE_NEW_ACCOUNT}</Text>
-            </CustomButton>
-          </Animated.View>
-        </View>
-        <LanguageSelectorModal
-          isModalVisible={isModalUserLangVisible}
-          selectedLanguage={selectedLanguage}
-          onDismiss={() => setModalUserLangVisible(false)}
-          onLanguageChange={handleLanguageChange}
-        />
-      </KeyboardAvoidingView>
+          <CustomButton onPress={_onLoginPressed} loading={isLoading}>
+            <Text style={styles.buttonText}>{strings.LOGIN}</Text>
+          </CustomButton>
+
+          <CustomButton onPress={handlePressRegister} loading={isLoading} mode={'outlined'}>
+            <Text style={styles.buttonText}>{strings.CREATE_NEW_ACCOUNT}</Text>
+          </CustomButton>
+        </Animated.View>
+      </View>
+      <LanguageSelectorModal
+        isModalVisible={isModalUserLangVisible}
+        selectedLanguage={selectedLanguage}
+        onDismiss={() => setModalUserLangVisible(false)}
+        onLanguageChange={handleLanguageChange}
+      />
     </SafeAreaView>
   );
 };
@@ -251,26 +234,17 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingHorizontal: width * 0.05, // 5% of screen width
-    paddingVertical: height * 0.02, // 2% of screen height
+    justifyContent: 'center',
+    paddingHorizontal: width * 0.05,
   },
   logoContainer: {
     alignItems: 'center',
-    paddingTop: height * 0.02,
+    marginBottom: height * 0.05,
   },
   logo: {
-    width: Math.min(width * 0.7, 400), // 30% of screen width, max 150
-    height: Math.min(width * 0.7, 400),
-    marginBottom: height * 0.01,
-  },
-  appTitle: {
-    fontSize: Math.min(width * 0.1, 42), // Responsive font size
-    letterSpacing: 6,
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
-    textAlign: 'center',
-    marginBottom: height * 0.005,
-    color: colors.white,
+    width: width * 0.5,
+    height: width * 0.5,
+    marginBottom: height * 0.02,
   },
   appDescription: {
     width: '90%',
@@ -278,20 +252,31 @@ const styles = StyleSheet.create({
     color: colors.veryLighterGrey,
     fontSize: Math.min(width * 0.04, 16),
   },
-  divider: {
-    height: 1,
-    backgroundColor: colors.white,
-    marginVertical: height * 0.02,
+  languageButton: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+    borderColor: colors.lighterGrey,
+    borderWidth: 1,
+    borderRadius: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+  },
+  languageText: {
+    color: colors.white,
+    fontSize: 12,
   },
   formContainer: {
     backgroundColor: '#383838',
     padding: width * 0.05,
     borderRadius: 10,
     borderColor: colors.black,
-    marginTop: 20,
   },
   header: {
-    fontSize: Math.min(width * 0.06, 24),
+    fontSize: Math.min(width * 0.06, 20),
     fontWeight: 'bold',
     paddingVertical: height * 0.01,
     color: colors.white,
@@ -310,21 +295,6 @@ const styles = StyleSheet.create({
     fontSize: Math.min(width * 0.03, 12),
     color: colors.veryLighterGrey,
   },
-  button: {
-    backgroundColor: colors.slightlyLighterGrey,
-    borderWidth: 1,
-    borderColor: colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: height * 0.01,
-    borderRadius: 6,
-    height: height * 0.07,
-    marginTop: height * 0.02,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-    backgroundColor: colors.grey,
-  },
   buttonText: {
     fontSize: Math.min(width * 0.04, 16),
     color: colors.white,
@@ -333,13 +303,6 @@ const styles = StyleSheet.create({
     fontSize: Math.min(width * 0.035, 14),
     color: colors.lightRed,
     paddingVertical: 4,
-  },
-  registerButton: {
-    marginTop: height * 0.02,
-  },
-  registerText: {
-    textAlign: 'center',
-    fontSize: Math.min(width * 0.035, 14),
   },
 });
 
