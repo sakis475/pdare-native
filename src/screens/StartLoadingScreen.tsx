@@ -58,6 +58,7 @@ const StartLoadingScreen: React.FC = () => {
           }
           if (currentUser?.emailVerified === false) {
             //email otp process is required
+            navigateReset(ScreenNames.VerifyEmailScreen);
             navigate(ScreenNames.VerifyEmailScreen);
           } else if (currentUser?.restaurant?.id) {
             const newToken = await getBearer();

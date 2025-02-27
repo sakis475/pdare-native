@@ -17,7 +17,12 @@ export type RegisterData = {
 export async function handleUserLogin(sessionBearer: SessionBearer) {
   console.log(sessionBearer, 'handleUserLogin');
   try {
-    if (sessionBearer?.user?.restaurant?.active === true && sessionBearer?.user?.active === true) {
+    if (sessionBearer?.user?.emailVerified === false) {
+      handleNoOTP(sessionBearer);
+    } else if (
+      sessionBearer?.user?.restaurant?.active === true &&
+      sessionBearer?.user?.active === true
+    ) {
       await setBearer(sessionBearer);
       navigateReset(ScreenNames.MainTabs);
       navigate(ScreenNames.MainTabs);
@@ -88,4 +93,12 @@ export async function handleNoRestaurantUser(sessionBearer: SessionBearer) {
   await setStorage('currentUser', sessionBearer?.user);
   navigateReset(ScreenNames.NewUserSetupScreen);
   navigate(ScreenNames.NewUserSetupScreen);
+}
+
+export async function handleNoOTP(sessionBearer: SessionBearer) {
+  console.log('Handle No USER RESTAURANT USER!!!!!!!!!!!!!!!!!!!!!!!!!11');
+  await setStorage('session_bearer', sessionBearer);
+  await setStorage('currentUser', sessionBearer?.user);
+  navigateReset(ScreenNames.VerifyEmailScreen);
+  navigate(ScreenNames.VerifyEmailScreen);
 }

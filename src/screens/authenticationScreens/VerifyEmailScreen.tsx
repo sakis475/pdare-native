@@ -6,10 +6,13 @@ import { useStrings } from '../../core/localization/languageContext';
 import CustomButton from '../../components/basic/CustomButton';
 import { getStorage } from '../../storage/store';
 import { User } from '../../types/basic.types';
-import { getRequest, postRequest } from '../../helpers/requests';
+import { postRequest, refreshToken } from '../../helpers/requests';
+import { toast } from '../../core/utils';
+import { navigate, navigateReset, ScreenNames } from '../../navigation/navigationUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const OTP_LENGTH = 6;
+const RESEND_THRESHOLD = 240; // 4 minutes in seconds
 
 const VerifyEmailScreen = () => {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
@@ -18,34 +21,52 @@ const VerifyEmailScreen = () => {
   const [isResending, setIsResending] = useState<boolean>(false);
   const [timerSeconds, setTimerSeconds] = useState<number>(0);
   const [canResend, setCanResend] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [otpExists, setOtpExists] = useState<boolean>(false);
 
   const strings = useStrings();
   const inputRefs = useRef<Array<TextInput | null>>(Array(OTP_LENGTH).fill(null));
   const [user, setUser] = useState<User>(null);
 
   const initVerify = async () => {
-    const currentUser = await getStorage('currentUser');
-    setUser(currentUser);
-    await createInitialOtp();
-  };
-
-  const createInitialOtp = async () => {
     try {
-      setIsResending(true);
-      const ttl = await resendOtp();
-      setTimerSeconds(ttl);
-      setCanResend(false);
+      setIsLoading(true);
+      const currentUser = await getStorage('currentUser');
+      setUser(currentUser);
+
+      // Check if OTP already exists
+      const remainingTime = await checkOtpExists();
+
+      if (remainingTime > 0) {
+        // OTP exists, set timer
+        setOtpExists(true);
+        setTimerSeconds(remainingTime);
+        setCanResend(remainingTime < RESEND_THRESHOLD);
+      } else {
+        // No OTP exists
+        setOtpExists(false);
+        setCanResend(true);
+      }
     } catch (error) {
-      setError(strings.OTP_CREATION_FAILED);
     } finally {
-      setIsResending(false);
+      setIsLoading(false);
     }
   };
 
-  const verifyOtp = async (email: string, otp: string) => {};
+  const verifyOtp = async (otp: string) => {
+    const response = await postRequest('/user/verifyOTP', { otp });
+    return response.success;
+  };
 
-  const resendOtp = async () => {
+  const createOtp = async () => {
     const response = await postRequest('/user/createOTP');
+    console.log(response.ttl, 'user/createOTP');
+    return response.ttl;
+  };
+
+  const checkOtpExists = async () => {
+    const response = await postRequest('/user/existsOTP');
+    console.log(response.ttl, 'user/existsOTP');
     return response.ttl;
   };
 
@@ -55,18 +76,30 @@ const VerifyEmailScreen = () => {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (timerSeconds > 0 && !canResend) {
+    if (timerSeconds > 0) {
       interval = setInterval(() => {
-        setTimerSeconds((prevTimer) => prevTimer - 1);
+        setTimerSeconds((prevTimer) => {
+          const newTime = prevTimer - 1;
+          if (newTime <= 0) {
+            setCanResend(true);
+            return 0;
+          }
+          // Enable resend when under threshold
+          if (newTime < RESEND_THRESHOLD) {
+            setCanResend(true);
+          }
+
+          return newTime;
+        });
       }, 1000);
-    } else if (timerSeconds === 0) {
-      setCanResend(true);
+    } else {
+      setOtpExists(false);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerSeconds, canResend]);
+  }, [timerSeconds]);
 
   const formatTimeRemaining = (totalSeconds: number): string => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -145,7 +178,13 @@ const VerifyEmailScreen = () => {
 
       if (isValid) {
         const otpString = otp.join('');
-        await verifyOtp(user?.email, otpString);
+        const response = await verifyOtp(otpString);
+
+        if (response === true) {
+          await refreshToken();
+          navigateReset(ScreenNames.MainTabs);
+          navigate(ScreenNames.MainTabs);
+        }
         // Navigation to next screen would happen here
       }
     } catch (error) {
@@ -156,75 +195,117 @@ const VerifyEmailScreen = () => {
   }, [otp, user?.email, validateOtp, isSubmitting, strings]);
 
   const handleResendOtp = useCallback(async () => {
-    if (!canResend || isResending) return;
-
-    setIsResending(true);
+    if (!canResend) return;
 
     try {
-      const ttl = await resendOtp();
       setCanResend(false);
+      setIsResending(true);
+      const ttl = await createOtp();
       setTimerSeconds(ttl);
       setOtp(Array(OTP_LENGTH).fill(''));
       setError('');
+      setOtpExists(true);
     } catch (error) {
       setError(strings.OTP_RESEND_FAILED);
+      setCanResend(true);
     } finally {
       setIsResending(false);
     }
   }, [canResend, isResending, strings]);
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
+      </View>
+    );
+  }
+
+  // Welcome/Instructions screen (no OTP exists yet)
+  if (!otpExists) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.mainContent}>
+          <Text style={styles.header}>{strings.VERIFY_EMAIL}</Text>
+
+          <Text style={styles.instructionText}>
+            {strings.OTP_INITIAL_INSTRUCTION.replace('{email}', user?.email || '')}
+          </Text>
+
+          <CustomButton loading={isResending} onPress={handleResendOtp}>
+            <Text style={styles.buttonText}>{strings.SEND_EMAIL}</Text>
+          </CustomButton>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+        </View>
+      </View>
+    );
+  }
+
+  // OTP Verification screen (OTP exists)
   return (
     <View style={styles.container}>
-      {user?.email ? (
-        <>
-          <View style={styles.mainContent}>
-            <Text style={styles.header}>{strings.VERIFY_EMAIL}</Text>
-
-            <Text style={styles.instructionText}>
-              {strings.OTP_INSTRUCTION.replace('{email}', user.email)}
-            </Text>
-
-            <View style={styles.otpContainer}>
-              {otp.map((digit, index) => (
-                <TextInput
-                  key={index}
-                  ref={(ref) => (inputRefs.current[index] = ref)}
-                  style={styles.otpInput}
-                  value={digit}
-                  onChangeText={(text) => handleOtpChange(text, index)}
-                  onKeyPress={(e) => handleKeyPress(e, index)}
-                  keyboardType="numeric"
-                  maxLength={OTP_LENGTH}
-                  selectTextOnFocus
-                  autoFocus={index === 0}
-                />
-              ))}
-            </View>
-
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-
-            <View style={styles.resendContainer}>
-              {canResend ? (
-                <Text style={styles.resendLink} onPress={handleResendOtp}>
-                  {isResending ? strings.RESENDING_OTP : strings.RESEND_OTP}
-                </Text>
-              ) : (
-                <Text style={styles.timerText}>
-                  {strings.RESEND_OTP_TIMER.replace('{seconds}', formatTimeRemaining(timerSeconds))}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          <View style={styles.bottomContainer}>
-            <CustomButton loading={isSubmitting} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>{strings.VERIFY}</Text>
+      <View style={styles.mainContent}>
+        <Text style={styles.header}>{strings.VERIFY_EMAIL}</Text>
+        <Text style={styles.instructionText}>
+          {strings.OTP_INSTRUCTION.replace('{email}', user?.email || '')}
+        </Text>
+        <View style={styles.otpContainer}>
+          {otp.map((digit, index) => (
+            <TextInput
+              key={index}
+              ref={(ref) => (inputRefs.current[index] = ref)}
+              style={styles.otpInput}
+              value={digit}
+              onChangeText={(text) => handleOtpChange(text, index)}
+              onKeyPress={(e) => handleKeyPress(e, index)}
+              keyboardType="numeric"
+              maxLength={OTP_LENGTH}
+              selectTextOnFocus
+              autoFocus={index === 0}
+            />
+          ))}
+        </View>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <View style={styles.resendContainer}>
+          {canResend ? (
+            <CustomButton onPress={handleResendOtp} mode="outlined">
+              <Text style={[styles.resendLink, isResending && styles.disabled]}>
+                {isResending ? strings.RESENDING_OTP : strings.RESEND_EMAIL}
+              </Text>
             </CustomButton>
-          </View>
-        </>
-      ) : (
-        <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
-      )}
+          ) : (
+            <CustomButton
+              onPress={() => {
+                const timeUntilResendAvailable =
+                  timerSeconds > RESEND_THRESHOLD ? timerSeconds - RESEND_THRESHOLD : 0;
+                if (timeUntilResendAvailable > 0) {
+                  toast(
+                    'info',
+                    strings.RESEND_EMAIL_TIMER.replace('{seconds}', `${timeUntilResendAvailable}`)
+                  );
+                } else {
+                  handleResendOtp();
+                }
+              }}
+              disabled={isSubmitting}
+            >
+              <Text style={styles.timerText}>{strings.RESEND_EMAIL}</Text>
+            </CustomButton>
+          )}
+        </View>
+        <View style={styles.timerInfoContainer}>
+          <Text style={styles.timerInfo}>
+            {strings.OTP_EXPIRY_INFO.replace('{seconds}', formatTimeRemaining(timerSeconds))}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.bottomContainer}>
+        <CustomButton loading={isSubmitting} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>{strings.VERIFY}</Text>
+        </CustomButton>
+      </View>
     </View>
   );
 };
@@ -234,6 +315,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.lightBlack,
     justifyContent: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: colors.lightBlack,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mainContent: {
     flex: 1,
@@ -282,25 +369,33 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   resendLink: {
-    color: colors.primary,
+    color: colors.white,
     fontSize: 16,
-    textDecorationLine: 'underline',
   },
   timerText: {
     color: colors.white,
     fontSize: 16,
   },
+  timerInfoContainer: {
+    marginTop: 15,
+  },
+  timerInfo: {
+    color: colors.white,
+    fontSize: 14,
+    opacity: 0.7,
+  },
   bottomContainer: {
     backgroundColor: colors.darkerGrey,
     paddingVertical: 16,
     paddingHorizontal: 20,
-    borderTopWidth: 1,
-    borderTopColor: colors.slightlyLighterGrey,
   },
   buttonText: {
     fontSize: 16,
     color: colors.white,
     fontWeight: '600',
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });
 

@@ -54,25 +54,25 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}
         component={StartLoadingScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
 
       <Stack.Screen
         name={ScreenNames.NewUserSetupScreen}
         component={NewUserSetupScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
 
       <Stack.Screen
         name={ScreenNames.VerifyEmailScreen}
         component={VerifyEmailScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
 
       <Stack.Screen
         name={ScreenNames.LoginScreen}
         component={LoginScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
 
       <Stack.Screen
