@@ -11,6 +11,7 @@ import { useStrings } from '../../../core/localization/languageContext';
 import BaseModal from '../../../components/basic/BaseModal';
 import { FlashList } from '@shopify/flash-list';
 import { Category, PropertyPattern } from '../../../types/basic.types';
+import CustomButton from '../../../components/basic/CustomButton';
 
 interface SelectPatternModalProps {
   visible: boolean;
@@ -97,14 +98,13 @@ export const SelectPatternModal: React.FC<SelectPatternModalProps> = ({
           />
 
           <View style={styles.footer}>
-            <Button
+            <CustomButton
               mode="contained"
               onPress={handleCreatePattern}
               style={styles.createButton}
-              icon="plus"
             >
-              {strings.CREATE_NEW_PATTERN}
-            </Button>
+              <Text style={{ color: colors.white }}> {strings.CREATE_NEW_PATTERN}</Text>
+            </CustomButton>
           </View>
         </>
       )}

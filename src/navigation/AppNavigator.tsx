@@ -1,8 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { BottomNavigation } from 'react-native-paper';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import TablesScreen from '../screens/TablesScreen';
 import LoginScreen from '../screens/authenticationScreens/LoginScreen';
 import { strings } from '../core/localization/strings';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -35,6 +32,7 @@ import { HelpPressable } from '../components/guides/HelpPressable';
 import { useHelpModal } from '../providers/HelpContext';
 import PatternGuide from '../components/guides/guides/PatternGuide';
 import PrinterGuide from '../components/guides/guides/PrintersGuide';
+import VerifyEmailScreen from '../screens/authenticationScreens/VerifyEmailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +43,7 @@ const AppNavigator = () => {
     <Stack.Navigator
       screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}
       initialRouteName={ScreenNames.StartLoadingScreen}
+      // initialRouteName={ScreenNames.VerifyEmailScreen}
     >
       <Stack.Screen
         name="MainTabs"
@@ -61,6 +60,12 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ScreenNames.NewUserSetupScreen}
         component={NewUserSetupScreen}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name={ScreenNames.VerifyEmailScreen}
+        component={VerifyEmailScreen}
         options={{ headerShown: false }}
       />
 
@@ -425,8 +430,8 @@ const AppNavigator = () => {
 };
 function navigateBackBtn() {
   return (
-    <TouchableOpacity onPress={() => navigateBack()}>
-      <BackIcon></BackIcon>
+    <TouchableOpacity onPress={() => navigateBack()} style={{ minWidth: 50 }}>
+      <BackIcon size={30}></BackIcon>
     </TouchableOpacity>
   );
 }

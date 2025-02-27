@@ -9,6 +9,7 @@ interface CustomButtonProps {
   mode?: 'text' | 'outlined' | 'contained';
   onPress: (e: any) => any;
   loading?: boolean;
+  disabled?: boolean;
   style?: any;
   contentStyle?: any;
   textColor?: string;
@@ -20,6 +21,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   mode = 'contained',
   onPress,
   loading = false,
+  disabled = false,
   style,
   contentStyle,
   textColor = colors.white,
@@ -71,7 +73,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     <Button
       mode={mode}
       onPress={onPress}
-      disabled={loading}
+      disabled={disabled || loading}
       style={[getButtonStyle(), loading && { backgroundColor: 'grey' }]} // Directly applying condition here
       textColor={textColor || (variant === 'delete' ? colors.white : undefined)}
       contentStyle={[styles.contentStyle, contentStyle]}

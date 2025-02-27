@@ -20,6 +20,7 @@ import GlobalStore from './src/storage/GlobalStore';
 import { HelpProvider } from './src/providers/HelpContext';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/helpers/config/toastConfig';
+import KeepAwake from '@sayem314/react-native-keep-awake';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -40,10 +41,10 @@ const App = () => {
         console.log(await getStorage('session_bearer'), 'session_bearer');
       }
 
-      await socketManager.updateUserInstance();
+      // await socketManager.updateUserInstance();
 
-      socketManager.connect();
-      socketEventSubscriber.initialize();
+      // socketManager.connect();
+      // socketEventSubscriber.initialize();
 
       const user = await getStorage('currentUser');
       const currencySymbol = user?.restaurant?.currencySymbol;
@@ -64,6 +65,7 @@ const App = () => {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <BottomSheetModalProvider>
               <NavigationContainer ref={navigationRef}>
+                <KeepAwake />
                 <PaperProvider>
                   <PortalProvider>
                     <LanguageProvider>

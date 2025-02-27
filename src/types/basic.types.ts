@@ -147,6 +147,7 @@ export interface User {
   role: 'owner' | 'waiter' | 'guest';
   restaurant?: Restaurant;
   invitations?: InvitationRequest[];
+  emailVerified?: boolean;
   markForDelete?: boolean;
 }
 

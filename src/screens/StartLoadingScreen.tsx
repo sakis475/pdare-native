@@ -51,10 +51,15 @@ const StartLoadingScreen: React.FC = () => {
       await Promise.race([
         (async () => {
           const currentUser = await getStorage('currentUser');
-          const sessionBearer = await getStorage('session_bearer');
 
-          await refreshToken();
-          if (currentUser?.restaurant?.id) {
+          const sessionBearer = await refreshToken();
+          if (!sessionBearer) {
+            return;
+          }
+          if (currentUser?.emailVerified === false) {
+            //email otp process is required
+            navigate(ScreenNames.VerifyEmailScreen);
+          } else if (currentUser?.restaurant?.id) {
             const newToken = await getBearer();
             if (newToken?.user?.restaurant) {
               navigateReset(ScreenNames.MainTabs);

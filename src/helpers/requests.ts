@@ -42,6 +42,7 @@ export async function refreshToken() {
       toast('error', 'Something bad happened...');
     }
     navigate(ScreenNames.LoginScreen);
+    return;
   }
 }
 

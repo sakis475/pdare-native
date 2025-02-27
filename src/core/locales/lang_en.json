@@ -331,5 +331,18 @@
   "CURRENT_LIMIT_PART_A": "You’ve used",
   "CURRENT_LIMIT_PART_B": "out of",
   "CURRENT_LIMIT_PART_C": "orders in the current 24-hour window.",
-  "LIMIT_RESET_PART_A": "Your limit will reset on"
+  "LIMIT_RESET_PART_A": "Your limit will reset on",
+  "VERIFY_EMAIL": "Verify Email",
+  "OTP_INSTRUCTION": "We've sent a verification code to {email}. Enter the 6-digit code below.",
+  "OTP_INCOMPLETE": "Please enter the complete 6-digit code",
+  "OTP_DIGITS_ONLY": "The verification code must contain only digits",
+  "OTP_VERIFICATION_FAILED": "Verification failed. Please check your code and try again.",
+  "RESEND_OTP": "Resend code",
+  "RESENDING_OTP": "Resending...",
+  "RESEND_OTP_TIMER": "Resend code in {seconds}s",
+  "VERIFY": "Verify",
+  "OTP_RESEND_FAILED": "Failed to resend code. Please try again.",
+  "OTP_CREATION_FAILED": "OTP Creation Failed. Please try again later.",
+  "TRY_AGAIN_IN": "Try again in {seconds}δ",
+  "OTP_EXPIRES_IN": "OTP Expires in {seconds}δ"
 }

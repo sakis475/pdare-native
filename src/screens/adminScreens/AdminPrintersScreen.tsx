@@ -19,6 +19,7 @@ import { getStorage } from '../../storage/store';
 import PrinterGuide from '../../components/guides/guides/PrintersGuide';
 import { useHelpModal } from '../../providers/HelpContext';
 import { HelpModal } from '../../components/guides/HelpModal';
+import CustomButton from '../../components/basic/CustomButton';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -138,7 +139,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
           />
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={handleCharSetDismiss}>{strings.CANCEL}</Button>
+          <CustomButton onPress={handleCharSetDismiss}>{strings.CANCEL}</CustomButton>
         </Dialog.Actions>
       </Dialog>
     </Portal>

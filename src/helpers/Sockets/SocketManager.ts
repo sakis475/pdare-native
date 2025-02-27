@@ -266,11 +266,12 @@ class SocketManager {
           nextAttempt: this.reconnectionAttempts,
           maxAttempts: this.maxReconnectionAttempts,
         });
-        attemptReconnection();
+
+        if (!this.periodicReconnectTimer) {
+          attemptReconnection();
+        }
       }
     };
-
-    attemptReconnection();
   }
 
   private reinitializeConnection(): void {
@@ -303,12 +304,7 @@ class SocketManager {
     }
 
     // Clean up existing connection if any
-    if (this.socket) {
-      this.leaveRestaurantRoom();
-      this.socket.removeAllListeners();
-      this.socket.close();
-      this.socket = null;
-    }
+    this.disconnect();
 
     if (this.reconnectionTimer) {
       clearTimeout(this.reconnectionTimer);
@@ -404,14 +400,7 @@ class SocketManager {
     }
 
     this.periodicReconnectTimer = setInterval(async () => {
-      const isConnected = this.socket?.connected;
-
-      if (!isConnected) {
-        console.log('Socket disconnected, triggering reconnection...');
-        this.handleReconnection();
-      } else {
-        await this.performHealthCheck();
-      }
+      await this.performHealthCheck();
     }, this.periodicReconnectInterval);
 
     console.log(`Periodic health check started - interval: ${this.periodicReconnectInterval}ms`);

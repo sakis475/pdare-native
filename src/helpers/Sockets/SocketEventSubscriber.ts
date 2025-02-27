@@ -1,4 +1,14 @@
 import { getStorage, setStorage } from '../../storage/store';
+import {
+  ItemReq,
+  Category,
+  PropertyPattern,
+  Table,
+  User,
+  InvitationRequest,
+  Printer,
+} from '../../types/basic.types';
+import { TableIO } from '../../types/io.types';
 import { convertOccupiedOrderToOrder } from '../storage/orderStorage';
 import { storageInitGroupedItems } from '../storage/storageInit';
 import { processTables } from '../storage/tablesStorage';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Modal, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
-import { Button, Text, TextInput, FAB, IconButton } from 'react-native-paper';
+import { Text, IconButton } from 'react-native-paper';
 import { getRequest, postRequest } from '../../helpers/requests';
 import { colors } from '../../core/theme';
 import { toast } from '../../core/utils';
@@ -12,6 +12,7 @@ import { useStrings } from '../../core/localization/languageContext';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import { InvitationRequest, User } from '../../types/basic.types';
 import { getLanguage } from '../../core/localization/strings';
+import CustomButton from '../../components/basic/CustomButton';
 
 const NewUserSetupScreen = () => {
   const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
@@ -93,7 +94,7 @@ const NewUserSetupScreen = () => {
       return (
         <View style={styles.optionsContainer}>
           <Text style={styles.welcomeText}>{strings.WELCOME_MESSAGE}</Text>
-          <Button
+          <CustomButton
             mode="contained"
             onPress={() => {
               setSelectedOption('create');
@@ -102,15 +103,15 @@ const NewUserSetupScreen = () => {
             style={styles.optionButton}
           >
             {strings.CREATE_RESTAURANT}
-          </Button>
+          </CustomButton>
           <View style={styles.buttonWithBadge}>
-            <Button
+            <CustomButton
               mode="contained"
               onPress={() => setSelectedOption('join')}
               style={styles.optionButton}
             >
               {strings.JOIN_RESTAURANT}
-            </Button>
+            </CustomButton>
             {currentUser?.invitations?.length > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{currentUser.invitations.length}</Text>
@@ -134,7 +135,7 @@ const NewUserSetupScreen = () => {
           </View>
 
           <View style={styles.invitationActions}>
-            <Button
+            <CustomButton
               mode="contained"
               onPress={async () => {
                 setIsLoading(true);
@@ -160,9 +161,9 @@ const NewUserSetupScreen = () => {
               style={styles.acceptButton}
             >
               {strings.ACCEPT}
-            </Button>
+            </CustomButton>
 
-            <Button
+            <CustomButton
               mode="outlined"
               onPress={async () => {
                 setIsLoading(true);
@@ -181,7 +182,7 @@ const NewUserSetupScreen = () => {
               textColor={colors.lightRed}
             >
               {strings.DENY}
-            </Button>
+            </CustomButton>
           </View>
         </View>
       );
@@ -208,14 +209,14 @@ const NewUserSetupScreen = () => {
               }
             />
 
-            <Button
+            <CustomButton
               mode="outlined"
               onPress={() => setSelectedOption(null)}
               style={styles.backButton}
               textColor={colors.white}
             >
               {strings.BACK}
-            </Button>
+            </CustomButton>
           </View>
         );
       }
@@ -231,9 +232,13 @@ const NewUserSetupScreen = () => {
             style={styles.refreshButton}
           />
           <Text style={styles.waitingText}>{strings.NO_INVITATIONS}</Text>
-          <Button mode="outlined" onPress={() => setSelectedOption(null)} style={styles.backButton}>
+          <CustomButton
+            mode="outlined"
+            onPress={() => setSelectedOption(null)}
+            style={styles.backButton}
+          >
             {strings.BACK}
-          </Button>
+          </CustomButton>
         </View>
       );
     }
@@ -270,7 +275,7 @@ const NewUserSetupScreen = () => {
             </View>
 
             <View style={styles.buttonContainer}>
-              <Button
+              <CustomButton
                 mode="outlined"
                 onPress={() => {
                   setCreateModalVisible(false);
@@ -280,8 +285,8 @@ const NewUserSetupScreen = () => {
                 style={styles.cancelButton}
               >
                 {strings.CANCEL}
-              </Button>
-              <Button
+              </CustomButton>
+              <CustomButton
                 mode="contained"
                 onPress={handleCreateRestaurant}
                 style={styles.saveButton}
@@ -289,7 +294,7 @@ const NewUserSetupScreen = () => {
                 disabled={isLoading}
               >
                 {strings.CREATE}
-              </Button>
+              </CustomButton>
             </View>
           </View>
         </View>

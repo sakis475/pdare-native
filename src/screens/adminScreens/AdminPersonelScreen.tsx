@@ -161,7 +161,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
               )}
             </View>
           </View>
-          <Button
+          <CustomButton
             mode="contained"
             onPress={() => handleInvite(searchResult.email)}
             disabled={searchResult.isInvited}
@@ -169,7 +169,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
             <Text style={{ color: colors.white }}>
               {searchResult.isInvited ? strings.INVITED : strings.INVITE}
             </Text>
-          </Button>
+          </CustomButton>
         </View>
       );
     }
@@ -201,9 +201,9 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
       )}
 
       <View style={styles.buttonContainer}>
-        <Button mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
+        <CustomButton mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
           {strings.CANCEL}
-        </Button>
+        </CustomButton>
       </View>
     </BaseModal>
   );
@@ -379,14 +379,14 @@ const AdminPersonelScreen = () => {
           {strings.SENT_ON} {dayjs(invitation.createdAt).format('DD/MM/YY HH:mm:ss')}
         </Text>
       </View>
-      <Button
+      <CustomButton
         mode="outlined"
         onPress={() => handleCancelInvitation(invitation)}
         style={styles.deleteButton}
         textColor={colors.lightRed}
       >
         <TrashIcon size={15} color={colors.lightRed} />
-      </Button>
+      </CustomButton>
     </View>
   );
 
@@ -588,6 +588,9 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     marginBottom: 20,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.black,
   },
   searchResults: {},
   searchResultItem: {
