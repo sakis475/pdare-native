@@ -10,6 +10,7 @@ import { socketManager } from './Sockets/SocketManager';
 import { storageInitData } from './storage/storageInit';
 import { navigate, ScreenNames } from '../navigation/navigationUtils';
 import { socketEventSubscriber } from './Sockets/SocketEventSubscriber';
+import { strings } from '../core/localization/strings';
 
 export async function refreshToken() {
   const bearer: SessionBearer | null = await getStorage('session_bearer');
@@ -105,7 +106,7 @@ export async function postRequest(url: string, body?: any, timeout = REQ_TIMEOUT
   try {
     const options: AxiosRequestConfig = {
       timeout: timeout,
-      timeoutErrorMessage: 'Το αίτημα έληξε. Παρακαλώ δοκιμάστε ξανά.',
+      timeoutErrorMessage: strings.ERROR,
     };
 
     if (!['/login', '/login/session', '/register', '/resetPassword'].includes(url)) {

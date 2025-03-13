@@ -99,7 +99,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
         onDismiss();
       },
       undefined,
-      'Διαγραφή'
+      strings.DELETE
     );
   };
 

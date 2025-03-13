@@ -91,7 +91,7 @@ const EditPatternModal: React.FC<EditPatternModalProps> = ({
         onDismiss();
       },
       undefined,
-      'Διαγραφή'
+      strings.DELETE
     );
   };
   return (

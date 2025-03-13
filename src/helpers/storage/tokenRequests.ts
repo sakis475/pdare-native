@@ -67,8 +67,7 @@ export async function logout(options?: { skipNavigate?: boolean }) {
 
     return false;
   } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message ?? 'Κάτι πήγε λάθος, δεν μπορέσατε να αποσυνδεθείτε.';
+    const errorMessage = error.response?.data?.message ?? strings.ERROR;
     console.log(error.response?.data);
     toast('error', `${errorMessage}`);
   }
