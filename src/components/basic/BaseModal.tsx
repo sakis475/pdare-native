@@ -12,6 +12,7 @@ import {
 import { Button } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
+import { strings } from '../../core/localization/strings';
 
 interface BaseModalProps {
   visible: boolean;
@@ -23,6 +24,7 @@ interface BaseModalProps {
   title: string;
   theme?: 'light' | 'dark';
   buttonVariant?: 'default' | 'okOnly';
+  buttonSaveText?: string;
 }
 
 const BaseModal: React.FC<BaseModalProps> = ({
@@ -35,6 +37,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   title = '',
   theme = 'light',
   buttonVariant = 'default',
+  buttonSaveText = strings.SAVE,
 }) => {
   const strings = useStrings();
   if (!visible) return null;
@@ -118,7 +121,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
           labelStyle={styles.buttonLabel}
           contentStyle={styles.buttonContent}
         >
-          {strings.SAVE}
+          {buttonSaveText}
         </Button>
       </View>
     );

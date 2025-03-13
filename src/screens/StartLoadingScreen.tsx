@@ -59,12 +59,10 @@ const StartLoadingScreen: React.FC = () => {
           if (currentUser?.emailVerified === false) {
             //email otp process is required
             navigateReset(ScreenNames.VerifyEmailScreen);
-            navigate(ScreenNames.VerifyEmailScreen);
           } else if (currentUser?.restaurant?.id) {
             const newToken = await getBearer();
             if (newToken?.user?.restaurant) {
               navigateReset(ScreenNames.MainTabs);
-              navigate(ScreenNames.MainTabs);
             }
           } else if (currentUser) {
             await handleNoRestaurantUser(sessionBearer);
@@ -78,7 +76,6 @@ const StartLoadingScreen: React.FC = () => {
       console.log(error);
       await logout();
       navigateReset(ScreenNames.LoginScreen);
-      navigate(ScreenNames.LoginScreen);
     }
   };
 

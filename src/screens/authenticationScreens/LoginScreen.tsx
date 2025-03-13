@@ -13,7 +13,7 @@ import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { colors } from '../../core/theme';
-import { login } from '../../helpers/storage/tokenRequests';
+import { login, resetPassword } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 import { useStrings } from '../../core/localization/languageContext';
@@ -27,6 +27,7 @@ import LanguageSelectorModal, {
 import { setStorage } from '../../storage/store';
 import { EventEmitter } from '../../helpers/Sockets/EventEmitter';
 import { toast } from '../../core/utils';
+import PasswordResetModal from '../../components/popupModals/PasswordResetModal';
 
 const { width, height } = Dimensions.get('window');
 const logoImage = require('../../../assets/servetablogowhite.png');
@@ -40,6 +41,7 @@ const LoginScreen: React.FC = () => {
 
   const [isModalUserLangVisible, setModalUserLangVisible] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<AppLanguage>('lang_el');
+  const [isModalPasswordResetVisible, setModalPasswordResetVisible] = useState(false);
 
   const strings = useStrings();
 
@@ -201,7 +203,10 @@ const LoginScreen: React.FC = () => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.forgotPassword}>
+          <TouchableOpacity
+            style={styles.forgotPassword}
+            onPress={() => setModalPasswordResetVisible(true)}
+          >
             <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>
           </TouchableOpacity>
 
@@ -219,6 +224,14 @@ const LoginScreen: React.FC = () => {
         selectedLanguage={selectedLanguage}
         onDismiss={() => setModalUserLangVisible(false)}
         onLanguageChange={handleLanguageChange}
+      />
+      <PasswordResetModal
+        isModalVisible={isModalPasswordResetVisible}
+        onDismiss={() => setModalPasswordResetVisible(false)}
+        onConfirm={async () => {
+          setModalPasswordResetVisible(false);
+          await resetPassword(email);
+        }}
       />
     </SafeAreaView>
   );

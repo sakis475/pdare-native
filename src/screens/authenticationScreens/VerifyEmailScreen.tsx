@@ -183,7 +183,6 @@ const VerifyEmailScreen = () => {
         if (response === true) {
           await refreshToken();
           navigateReset(ScreenNames.MainTabs);
-          navigate(ScreenNames.MainTabs);
         }
         // Navigation to next screen would happen here
       }

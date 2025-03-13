@@ -184,7 +184,9 @@
   "SORT_ERROR": "An error occurred while sorting",
   "LOGIN": "Login",
   "PASSWORD": "Password",
+  "RESET": "Reset",
   "RESET_PASSWORD": "Reset password",
+  "RESET_PASSWORD_MESSAGE": "A new password will be sent to your email. Your old one will no longer be valid—use the new one to log in.",
   "CREATE_NEW_ACCOUNT": "Create Account",
   "APP_DESCRIPTION": "Advanced Ordering App for Food and Beverages Services",
   "LOADING": "Loading",
@@ -346,5 +348,6 @@
   "OTP_RESEND_FAILED": "Failed to resend verification code. Please try again.",
   "OTP_CHECK_FAILED": "Could not check verification status. Please try again.",
   "RESEND_EMAIL_TIMER": "Resend available in {seconds} seconds",
-  "OTP_EXPIRY_INFO": "Code expires in {seconds}"
+  "OTP_EXPIRY_INFO": "Code expires in {seconds}",
+  "RESET_EMAIL_SUCCESS": "Password Reset Successfully"
 }

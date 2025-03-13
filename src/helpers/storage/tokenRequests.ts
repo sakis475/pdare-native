@@ -1,3 +1,4 @@
+import { strings } from '../../core/localization/strings';
 import { toast } from '../../core/utils';
 import { navigate, navigateReset, ScreenNames } from '../../navigation/navigationUtils';
 import { FormState } from '../../screens/authenticationScreens/RegisterScreen';
@@ -25,7 +26,6 @@ export async function handleUserLogin(sessionBearer: SessionBearer) {
     ) {
       await setBearer(sessionBearer);
       navigateReset(ScreenNames.MainTabs);
-      navigate(ScreenNames.MainTabs);
     } else if (sessionBearer.user) {
       handleNoRestaurantUser(sessionBearer);
     } else {
@@ -64,7 +64,6 @@ export async function logout(options?: { skipNavigate?: boolean }) {
 
     if (options?.skipNavigate) return false;
     navigateReset(ScreenNames.LoginScreen);
-    navigate(ScreenNames.LoginScreen);
 
     return false;
   } catch (error: any) {
@@ -92,7 +91,6 @@ export async function handleNoRestaurantUser(sessionBearer: SessionBearer) {
   await setStorage('session_bearer', sessionBearer);
   await setStorage('currentUser', sessionBearer?.user);
   navigateReset(ScreenNames.NewUserSetupScreen);
-  navigate(ScreenNames.NewUserSetupScreen);
 }
 
 export async function handleNoOTP(sessionBearer: SessionBearer) {
@@ -100,5 +98,21 @@ export async function handleNoOTP(sessionBearer: SessionBearer) {
   await setStorage('session_bearer', sessionBearer);
   await setStorage('currentUser', sessionBearer?.user);
   navigateReset(ScreenNames.VerifyEmailScreen);
-  navigate(ScreenNames.VerifyEmailScreen);
+}
+
+export async function resetPassword(email: string) {
+  try {
+    const res: any = await postRequest('/resetPassword', { email });
+    if (!res) {
+      return;
+    }
+
+    if (res?.ttl) {
+      toast('info', strings.RESEND_EMAIL_TIMER.replace('{seconds}', `${res?.ttl}`));
+    } else if (res?.success) {
+      toast('success', strings.RESET_EMAIL_SUCCESS);
+    }
+  } catch (error: any) {
+    console.log(error.response?.data);
+  }
 }
