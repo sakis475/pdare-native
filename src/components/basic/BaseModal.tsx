@@ -6,8 +6,9 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
-  TouchableWithoutFeedback,
   Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { Button } from 'react-native-paper';
 import { colors } from '../../core/theme';
@@ -25,6 +26,7 @@ interface BaseModalProps {
   theme?: 'light' | 'dark';
   buttonVariant?: 'default' | 'okOnly';
   buttonSaveText?: string;
+  closeOnOutsideTouch?: boolean;
 }
 
 const BaseModal: React.FC<BaseModalProps> = ({
@@ -38,6 +40,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   theme = 'light',
   buttonVariant = 'default',
   buttonSaveText = strings.SAVE,
+  closeOnOutsideTouch = true,
 }) => {
   const strings = useStrings();
   if (!visible) return null;
@@ -135,16 +138,19 @@ const BaseModal: React.FC<BaseModalProps> = ({
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <View style={[styles.container, { backgroundColor: themeColors.overlay }]}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardView}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-        >
-          <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback
+        onPress={closeOnOutsideTouch ? onClose : undefined}
+        testID={`${testID}-overlay`}
+      >
+        <View style={[styles.container, { backgroundColor: themeColors.overlay }]}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.keyboardView}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+          >
             <View style={styles.overlay}>
-              <TouchableWithoutFeedback>
-                <View style={styles.modalContainer}>
+              <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+                <View style={[styles.modalContainer]}>
                   <View
                     style={[styles.contentContainer, { backgroundColor: themeColors.background }]}
                   >
@@ -169,16 +175,16 @@ const BaseModal: React.FC<BaseModalProps> = ({
                       showsVerticalScrollIndicator={false}
                       contentContainerStyle={styles.scrollContent}
                     >
-                      {children}
+                      <TouchableOpacity activeOpacity={1}>{children}</TouchableOpacity>
                     </ScrollView>
                     {renderButtons()}
                   </View>
                 </View>
               </TouchableWithoutFeedback>
             </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </View>
+          </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
