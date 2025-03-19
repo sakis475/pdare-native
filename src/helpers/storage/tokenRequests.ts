@@ -77,8 +77,9 @@ export async function register(registerData: RegisterData) {
   clearRestaurantStorageRelatedKeys();
   const sessionBearer: SessionBearer = await postRequest('/register', registerData);
   setStorageLastCredentials({ email: registerData.username, password: registerData.password });
-
-  if (sessionBearer?.user?.restaurant) {
+  if (sessionBearer?.user?.emailVerified === false) {
+    handleNoOTP(sessionBearer);
+  } else if (sessionBearer?.user?.restaurant) {
     await setBearer(sessionBearer);
   } else if (sessionBearer?.user) {
     handleNoRestaurantUser(sessionBearer);
@@ -93,7 +94,7 @@ export async function handleNoRestaurantUser(sessionBearer: SessionBearer) {
 }
 
 export async function handleNoOTP(sessionBearer: SessionBearer) {
-  console.log('Handle No USER RESTAURANT USER!!!!!!!!!!!!!!!!!!!!!!!!!11');
+  console.log('Handle No Verified email user');
   await setStorage('session_bearer', sessionBearer);
   await setStorage('currentUser', sessionBearer?.user);
   navigateReset(ScreenNames.VerifyEmailScreen);

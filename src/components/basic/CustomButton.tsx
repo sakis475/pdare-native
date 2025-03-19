@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
 import { WaitingIcon, WarningIcon } from './Icons';
@@ -15,6 +15,7 @@ interface CustomButtonProps {
   textColor?: string;
   children: React.ReactNode;
   variant?: 'normal' | 'delete' | 'warning';
+  debounce?: number; // New optional parameter with default value of 0 seconds
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -27,7 +28,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   textColor = colors.white,
   children,
   variant = 'normal',
+  debounce = 0, // Default is 0 (no limit)
 }) => {
+  const [isTapLimited, setIsTapLimited] = useState(false);
+
   const getButtonStyle = () => {
     switch (variant) {
       case 'delete':
@@ -69,12 +73,27 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     return children;
   };
 
+  const handlePress = (e: any) => {
+    if (debounce > 0 && !isTapLimited) {
+      setIsTapLimited(true);
+      onPress(e);
+
+      // Set a timeout to re-enable the button after the specified time
+      setTimeout(() => {
+        setIsTapLimited(false);
+      }, debounce * 1000); // Convert seconds to milliseconds
+    } else if (debounce === 0) {
+      // If no tap limit is set, just call onPress directly
+      onPress(e);
+    }
+  };
+
   return (
     <Button
       mode={mode}
-      onPress={onPress}
-      disabled={disabled || loading}
-      style={[getButtonStyle(), loading && { backgroundColor: 'grey' }]} // Directly applying condition here
+      onPress={handlePress}
+      disabled={disabled || loading || isTapLimited}
+      style={[getButtonStyle(), (loading || isTapLimited) && { backgroundColor: 'grey' }]}
       textColor={textColor || (variant === 'delete' ? colors.white : undefined)}
       contentStyle={[styles.contentStyle, contentStyle]}
       labelStyle={styles.labelStyle}

@@ -71,9 +71,11 @@ export async function setBearer(sessionBearer: SessionBearer) {
       await setStorage('session_bearer', sessionBearer);
       await setStorage('currentUser', sessionBearer.user);
       await socketManager.updateUserInstance();
-      socketManager.connect();
+      const connectedSocket = socketManager.connect();
       socketEventSubscriber.initialize();
-      await storageInitData();
+      if (connectedSocket) {
+        await storageInitData();
+      }
     } catch (error) {
       console.log(error, 'setBearer');
       toast('error', 'Something bad happened...');

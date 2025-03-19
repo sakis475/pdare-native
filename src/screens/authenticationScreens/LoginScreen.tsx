@@ -13,7 +13,7 @@ import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
 import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { colors } from '../../core/theme';
-import { login, resetPassword } from '../../helpers/storage/tokenRequests';
+import { login, logout, resetPassword } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
 import { getStorageLastCredentials } from '../../helpers/storage/otherStorage';
 import { useStrings } from '../../core/localization/languageContext';
@@ -80,6 +80,8 @@ const LoginScreen: React.FC = () => {
   useEffect(() => {
     handleGetLastCredentials();
     handleGetCurrentLanguage();
+
+    logout({ skipNavigate: true });
   }, []);
 
   useEffect(() => {

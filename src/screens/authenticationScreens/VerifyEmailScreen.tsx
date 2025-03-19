@@ -9,6 +9,10 @@ import { User } from '../../types/basic.types';
 import { postRequest, refreshToken } from '../../helpers/requests';
 import { toast } from '../../core/utils';
 import { navigate, navigateReset, ScreenNames } from '../../navigation/navigationUtils';
+import { LogoutFAB } from '../../components/LogoutFab';
+import { InfoIcon } from '../../components/basic/Icons';
+import { handleUserLogin } from '../../helpers/storage/tokenRequests';
+import { SessionBearer } from '../../types/requests.types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const OTP_LENGTH = 6;
@@ -55,7 +59,7 @@ const VerifyEmailScreen = () => {
 
   const verifyOtp = async (otp: string) => {
     const response = await postRequest('/user/verifyOTP', { otp });
-    return response.success;
+    return response;
   };
 
   const createOtp = async () => {
@@ -80,12 +84,9 @@ const VerifyEmailScreen = () => {
       interval = setInterval(() => {
         setTimerSeconds((prevTimer) => {
           const newTime = prevTimer - 1;
-          if (newTime <= 0) {
-            setCanResend(true);
-            return 0;
-          }
-          // Enable resend when under threshold
-          if (newTime < RESEND_THRESHOLD) {
+
+          // Enable resend when under threshold (but only if not resending)
+          if (newTime < RESEND_THRESHOLD && !isResending) {
             setCanResend(true);
           }
 
@@ -99,7 +100,13 @@ const VerifyEmailScreen = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerSeconds]);
+  }, [timerSeconds, isResending]); // Add isResending to dependency array
+
+  useEffect(() => {
+    if (otp?.[5]) {
+      handleSubmit();
+    }
+  }, [otp]);
 
   const formatTimeRemaining = (totalSeconds: number): string => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -178,11 +185,10 @@ const VerifyEmailScreen = () => {
 
       if (isValid) {
         const otpString = otp.join('');
-        const response = await verifyOtp(otpString);
+        const response: SessionBearer = await verifyOtp(otpString);
 
-        if (response === true) {
-          await refreshToken();
-          navigateReset(ScreenNames.MainTabs);
+        if (response) {
+          handleUserLogin(response);
         }
         // Navigation to next screen would happen here
       }
@@ -204,6 +210,7 @@ const VerifyEmailScreen = () => {
       setOtp(Array(OTP_LENGTH).fill(''));
       setError('');
       setOtpExists(true);
+      toast('success', strings.RESENDED_EMAIL);
     } catch (error) {
       setError(strings.OTP_RESEND_FAILED);
       setCanResend(true);
@@ -237,6 +244,7 @@ const VerifyEmailScreen = () => {
           </CustomButton>
           {error ? <Text style={styles.error}>{error}</Text> : null}
         </View>
+        <LogoutFAB variant="upperRightSmall" />
       </View>
     );
   }
@@ -265,6 +273,16 @@ const VerifyEmailScreen = () => {
             />
           ))}
         </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            width: '70%',
+          }}
+        >
+          <InfoIcon size={18}></InfoIcon>
+          <Text style={styles.spamInfo}>{strings.CHECK_YOUR_SPAM_FOLDER}</Text>
+        </View>
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <View style={styles.resendContainer}>
           {canResend ? (
@@ -276,6 +294,9 @@ const VerifyEmailScreen = () => {
           ) : (
             <CustomButton
               onPress={() => {
+                if (isSubmitting) {
+                  return;
+                }
                 const timeUntilResendAvailable =
                   timerSeconds > RESEND_THRESHOLD ? timerSeconds - RESEND_THRESHOLD : 0;
                 if (timeUntilResendAvailable > 0) {
@@ -287,6 +308,7 @@ const VerifyEmailScreen = () => {
                   handleResendOtp();
                 }
               }}
+              debounce={1.5}
               disabled={isSubmitting}
             >
               <Text style={styles.timerText}>{strings.RESEND_EMAIL}</Text>
@@ -305,6 +327,7 @@ const VerifyEmailScreen = () => {
           <Text style={styles.buttonText}>{strings.VERIFY}</Text>
         </CustomButton>
       </View>
+      <LogoutFAB variant="upperRightSmall" />
     </View>
   );
 };
@@ -382,6 +405,12 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 14,
     opacity: 0.7,
+  },
+  spamInfo: {
+    justifyContent: 'center',
+    textAlign: 'center',
+    color: colors.white,
+    fontSize: 12,
   },
   bottomContainer: {
     backgroundColor: colors.darkerGrey,

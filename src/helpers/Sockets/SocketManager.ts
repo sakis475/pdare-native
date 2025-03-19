@@ -291,16 +291,16 @@ class SocketManager {
     }, 5000); // Wait 5 seconds before attempting reinitialization
   }
 
-  public connect(): void {
+  public connect(): boolean {
     if (!this.user) {
       console.warn('Cannot connect: No user authenticated');
-      return;
+      return false;
     }
 
     // Don't attempt connection if we're in the middle of reconnecting
     if (this.isReconnecting) {
       console.warn('Connection attempt blocked - reconnection in progress');
-      return;
+      return false;
     }
 
     // Clean up existing connection if any
@@ -330,6 +330,8 @@ class SocketManager {
 
     this.attachCoreSocketListeners();
     this.startPeriodicReconnectCheck();
+
+    return true;
   }
 
   public disconnect(): void {

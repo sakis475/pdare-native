@@ -348,6 +348,11 @@
   "OTP_RESEND_FAILED": "Failed to resend verification code. Please try again.",
   "OTP_CHECK_FAILED": "Could not check verification status. Please try again.",
   "RESEND_EMAIL_TIMER": "Resend available in {seconds} seconds",
+  "RESENDED_EMAIL": "We have send you a new OTP in your email.",
   "OTP_EXPIRY_INFO": "Code expires in {seconds}",
-  "RESET_EMAIL_SUCCESS": "Password Reset Successfully"
+  "RESET_EMAIL_SUCCESS": "Password Reset Successfully",
+  "EXIT_APP": "Exit App",
+  "EXIT": "Exit",
+  "EXIT_CONFIRMATION": "Are you sure you want to exit ServeTab?",
+  "CHECK_YOUR_SPAM_FOLDER": "Please check your spam folder"
 }

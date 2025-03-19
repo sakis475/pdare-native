@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, DefaultTheme, PaperProvider, Text } from 'react-native-paper';
 import { NavigationContainer, Theme } from '@react-navigation/native';
 
-import { setLocalizedStrings } from './src/core/localization/strings';
+import { setLocalizedStrings, strings } from './src/core/localization/strings';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +21,8 @@ import { HelpProvider } from './src/providers/HelpContext';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/helpers/config/toastConfig';
 import KeepAwake from '@sayem314/react-native-keep-awake';
+import { Alert, BackHandler } from 'react-native';
+import { toast } from './src/core/utils';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
@@ -50,7 +52,32 @@ const App = () => {
       const currencySymbol = user?.restaurant?.currencySymbol;
       GlobalStore.getInstance().setValue('currencySymbol', currencySymbol);
     };
+
+    const onBackPress = () => {
+      Alert.alert(
+        strings.EXIT_APP,
+        strings.EXIT_CONFIRMATION,
+        [
+          {
+            text: strings.CANCEL,
+            onPress: () => {
+              // Do nothing
+            },
+            style: 'cancel',
+          },
+          { text: strings.EXIT, onPress: () => BackHandler.exitApp() },
+        ],
+        { cancelable: false }
+      );
+
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
     initializeApp();
+
+    return () => backHandler.remove();
   }, []);
 
   if (!localizedStringsLoaded) {
