@@ -26,7 +26,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'pdare' do
+target 'ServeTab' do
   config = use_native_modules!
 
   use_react_native!(
@@ -40,7 +40,7 @@ target 'pdare' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'pdareTests' do
+  target 'ServeTabTests' do
     inherit! :complete
     # Pods for testing
   end

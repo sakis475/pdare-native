@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "pdare.app"
-               BlueprintName = "pdare"
-               ReferencedContainer = "container:pdare.xcodeproj">
+               BuildableName = "ServeTab.app"
+               BlueprintName = "ServeTab"
+               ReferencedContainer = "container:ServeTab.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "pdareTests.xctest"
-               BlueprintName = "pdareTests"
-               ReferencedContainer = "container:pdare.xcodeproj">
+               BuildableName = "ServeTabTests.xctest"
+               BlueprintName = "ServeTabTests"
+               ReferencedContainer = "container:ServeTab.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "pdare.app"
-            BlueprintName = "pdare"
-            ReferencedContainer = "container:pdare.xcodeproj">
+            BuildableName = "ServeTab.app"
+            BlueprintName = "ServeTab"
+            ReferencedContainer = "container:ServeTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "pdare.app"
-            BlueprintName = "pdare"
-            ReferencedContainer = "container:pdare.xcodeproj">
+            BuildableName = "ServeTab.app"
+            BlueprintName = "ServeTab"
+            ReferencedContainer = "container:ServeTab.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00E356F31AD99517003FC87E /* pdareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* pdareTests.m */; };
+		00E356F31AD99517003FC87E /* ServeTabTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* ServeTabTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		4D9F60A169F21CFD4AA5EECA /* libPods-pdare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C96089605639F6061FCC7DE /* libPods-pdare.a */; };
-		50A67514549167B09E79F248 /* libPods-pdare-pdareTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6299F1903EB6860BC42E3D02 /* libPods-pdare-pdareTests.a */; };
+		4D9F60A169F21CFD4AA5EECA /* libPods-ServeTab.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C96089605639F6061FCC7DE /* libPods-ServeTab.a */; };
+		50A67514549167B09E79F248 /* libPods-ServeTab-ServeTabTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6299F1903EB6860BC42E3D02 /* libPods-ServeTab-ServeTabTests.a */; };
 		6124515C2C53057E0079CF19 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 612451492C53057D0079CF19 /* MaterialIcons.ttf */; };
 		6124515D2C53057E0079CF19 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6124514A2C53057D0079CF19 /* Feather.ttf */; };
 		6124515E2C53057E0079CF19 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6124514B2C53057D0079CF19 /* FontAwesome5_Brands.ttf */; };
@@ -41,23 +41,23 @@
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
-			remoteInfo = pdare;
+			remoteInfo = "ServeTab";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00E356EE1AD99517003FC87E /* pdareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pdareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E356EE1AD99517003FC87E /* ServeTabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ServeTabTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		00E356F21AD99517003FC87E /* pdareTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = pdareTests.m; sourceTree = "<group>"; };
-		079E704BAEDB1CD7AC56EC91 /* Pods-pdare.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare.release.xcconfig"; path = "Target Support Files/Pods-pdare/Pods-pdare.release.xcconfig"; sourceTree = "<group>"; };
-		0C96089605639F6061FCC7DE /* libPods-pdare.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pdare.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07F961A680F5B00A75B9A /* pdare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pdare.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = pdare/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = pdare/AppDelegate.mm; sourceTree = "<group>"; };
-		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = pdare/Images.xcassets; sourceTree = "<group>"; };
-		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = pdare/Info.plist; sourceTree = "<group>"; };
-		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = pdare/main.m; sourceTree = "<group>"; };
-		2D549DE4A28F489BF9EBEB4E /* Pods-pdare.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare.debug.xcconfig"; path = "Target Support Files/Pods-pdare/Pods-pdare.debug.xcconfig"; sourceTree = "<group>"; };
+		00E356F21AD99517003FC87E /* ServeTabTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ServeTabTests.m"; sourceTree = "<group>"; };
+		079E704BAEDB1CD7AC56EC91 /* Pods-ServeTab.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ServeTab.release.xcconfig"; path = "Target Support Files/Pods-ServeTab/Pods-ServeTab.release.xcconfig"; sourceTree = "<group>"; };
+		0C96089605639F6061FCC7DE /* libPods-ServeTab.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ServeTab.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* ServeTab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ServeTab.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = "ServeTab/AppDelegate.h"; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = "ServeTab/AppDelegate.mm"; sourceTree = "<group>"; };
+		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "ServeTab/Images.xcassets"; sourceTree = "<group>"; };
+		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "ServeTab/Info.plist"; sourceTree = "<group>"; };
+		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "ServeTab/main.m"; sourceTree = "<group>"; };
+		2D549DE4A28F489BF9EBEB4E /* Pods-ServeTab.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ServeTab.debug.xcconfig"; path = "Target Support Files/Pods-ServeTab/Pods-ServeTab.debug.xcconfig"; sourceTree = "<group>"; };
 		612451492C53057D0079CF19 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
 		6124514A2C53057D0079CF19 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
 		6124514B2C53057D0079CF19 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Brands.ttf; sourceTree = "<group>"; };
@@ -77,10 +77,10 @@
 		612451592C53057E0079CF19 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
 		6124515A2C53057E0079CF19 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
 		6124515B2C53057E0079CF19 /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Regular.ttf; sourceTree = "<group>"; };
-		6299F1903EB6860BC42E3D02 /* libPods-pdare-pdareTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pdare-pdareTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = pdare/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9DF6E1F318FCEDEC2266A111 /* Pods-pdare-pdareTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare-pdareTests.debug.xcconfig"; path = "Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests.debug.xcconfig"; sourceTree = "<group>"; };
-		AE3C65E400914F343ECF155C /* Pods-pdare-pdareTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pdare-pdareTests.release.xcconfig"; path = "Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests.release.xcconfig"; sourceTree = "<group>"; };
+		6299F1903EB6860BC42E3D02 /* libPods-ServeTab-ServeTabTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ServeTab-ServeTabTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = "ServeTab/LaunchScreen.storyboard"; sourceTree = "<group>"; };
+		9DF6E1F318FCEDEC2266A111 /* Pods-ServeTab-ServeTabTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ServeTab-ServeTabTests.debug.xcconfig"; path = "Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests.debug.xcconfig"; sourceTree = "<group>"; };
+		AE3C65E400914F343ECF155C /* Pods-ServeTab-ServeTabTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ServeTab-ServeTabTests.release.xcconfig"; path = "Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -89,7 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50A67514549167B09E79F248 /* libPods-pdare-pdareTests.a in Frameworks */,
+				50A67514549167B09E79F248 /* libPods-ServeTab-ServeTabTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,20 +97,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D9F60A169F21CFD4AA5EECA /* libPods-pdare.a in Frameworks */,
+				4D9F60A169F21CFD4AA5EECA /* libPods-ServeTab.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		00E356EF1AD99517003FC87E /* pdareTests */ = {
+		00E356EF1AD99517003FC87E /* ServeTabTests */ = {
 			isa = PBXGroup;
 			children = (
-				00E356F21AD99517003FC87E /* pdareTests.m */,
+				00E356F21AD99517003FC87E /* ServeTabTests.m */,
 				00E356F01AD99517003FC87E /* Supporting Files */,
 			);
-			path = pdareTests;
+			path = "ServeTabTests";
 			sourceTree = "<group>";
 		};
 		00E356F01AD99517003FC87E /* Supporting Files */ = {
@@ -121,7 +121,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		13B07FAE1A68108700A75B9A /* pdare */ = {
+		13B07FAE1A68108700A75B9A /* ServeTab */ = {
 			isa = PBXGroup;
 			children = (
 				5CFD399D2C51B016009C4F04 /* Fonts */,
@@ -132,15 +132,15 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
-			name = pdare;
+			name = "ServeTab";
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				0C96089605639F6061FCC7DE /* libPods-pdare.a */,
-				6299F1903EB6860BC42E3D02 /* libPods-pdare-pdareTests.a */,
+				0C96089605639F6061FCC7DE /* libPods-ServeTab.a */,
+				6299F1903EB6860BC42E3D02 /* libPods-ServeTab-ServeTabTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -182,9 +182,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				13B07FAE1A68108700A75B9A /* pdare */,
+				13B07FAE1A68108700A75B9A /* ServeTab */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
-				00E356EF1AD99517003FC87E /* pdareTests */,
+				00E356EF1AD99517003FC87E /* ServeTabTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -197,8 +197,8 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* pdare.app */,
-				00E356EE1AD99517003FC87E /* pdareTests.xctest */,
+				13B07F961A680F5B00A75B9A /* ServeTab.app */,
+				00E356EE1AD99517003FC87E /* ServeTabTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -206,10 +206,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				2D549DE4A28F489BF9EBEB4E /* Pods-pdare.debug.xcconfig */,
-				079E704BAEDB1CD7AC56EC91 /* Pods-pdare.release.xcconfig */,
-				9DF6E1F318FCEDEC2266A111 /* Pods-pdare-pdareTests.debug.xcconfig */,
-				AE3C65E400914F343ECF155C /* Pods-pdare-pdareTests.release.xcconfig */,
+				2D549DE4A28F489BF9EBEB4E /* Pods-ServeTab.debug.xcconfig */,
+				079E704BAEDB1CD7AC56EC91 /* Pods-ServeTab.release.xcconfig */,
+				9DF6E1F318FCEDEC2266A111 /* Pods-ServeTab-ServeTabTests.debug.xcconfig */,
+				AE3C65E400914F343ECF155C /* Pods-ServeTab-ServeTabTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -217,9 +217,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		00E356ED1AD99517003FC87E /* pdareTests */ = {
+		00E356ED1AD99517003FC87E /* ServeTabTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "pdareTests" */;
+			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ServeTabTests" */;
 			buildPhases = (
 				1D86B6E47F4F36B716EDE4E4 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
@@ -233,14 +233,14 @@
 			dependencies = (
 				00E356F51AD99517003FC87E /* PBXTargetDependency */,
 			);
-			name = pdareTests;
-			productName = pdareTests;
-			productReference = 00E356EE1AD99517003FC87E /* pdareTests.xctest */;
+			name = "ServeTabTests";
+			productname = "ServeTabTests";
+			productReference = 00E356EE1AD99517003FC87E /* ServeTabTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		13B07F861A680F5B00A75B9A /* pdare */ = {
+		13B07F861A680F5B00A75B9A /* ServeTab */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "pdare" */;
+			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ServeTab" */;
 			buildPhases = (
 				762977F8A9189CD082315DD4 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -254,9 +254,9 @@
 			);
 			dependencies = (
 			);
-			name = pdare;
-			productName = pdare;
-			productReference = 13B07F961A680F5B00A75B9A /* pdare.app */;
+			name = "ServeTab";
+			productName = "ServeTab";
+			productReference = 13B07F961A680F5B00A75B9A /* ServeTab.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -276,7 +276,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "pdare" */;
+			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ServeTab" */;
 			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -289,8 +289,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				13B07F861A680F5B00A75B9A /* pdare */,
-				00E356ED1AD99517003FC87E /* pdareTests */,
+				13B07F861A680F5B00A75B9A /* ServeTab */,
+				00E356ED1AD99517003FC87E /* ServeTabTests */,
 			);
 		};
 /* End PBXProject section */
@@ -365,7 +365,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-pdare-pdareTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ServeTab-ServeTabTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -378,15 +378,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		2F411D19AE8F4D7E34230452 /* [CP] Embed Pods Frameworks */ = {
@@ -395,15 +395,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab/Pods-ServeTab-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab/Pods-ServeTab-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ServeTab/Pods-ServeTab-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		609198F1DE674FBE2556E6D9 /* [CP] Copy Pods Resources */ = {
@@ -412,15 +412,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab/Pods-ServeTab-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab/Pods-ServeTab-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare/Pods-pdare-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ServeTab/Pods-ServeTab-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		762977F8A9189CD082315DD4 /* [CP] Check Pods Manifest.lock */ = {
@@ -438,7 +438,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-pdare-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ServeTab-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -451,15 +451,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-pdare-pdareTests/Pods-pdare-pdareTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ServeTab-ServeTabTests/Pods-ServeTab-ServeTabTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -469,7 +469,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00E356F31AD99517003FC87E /* pdareTests.m in Sources */,
+				00E356F31AD99517003FC87E /* ServeTabTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -487,7 +487,7 @@
 /* Begin PBXTargetDependency section */
 		00E356F51AD99517003FC87E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 13B07F861A680F5B00A75B9A /* pdare */;
+			target = 13B07F861A680F5B00A75B9A /* ServeTab */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -495,14 +495,14 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9DF6E1F318FCEDEC2266A111 /* Pods-pdare-pdareTests.debug.xcconfig */;
+			baseConfigurationReference = 9DF6E1F318FCEDEC2266A111 /* Pods-ServeTab-ServeTabTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = pdareTests/Info.plist;
+				INFOPLIST_FILE = "ServeTabTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -516,17 +516,17 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/pdare.app/pdare";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ServeTab.app/ServeTab";
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AE3C65E400914F343ECF155C /* Pods-pdare-pdareTests.release.xcconfig */;
+			baseConfigurationReference = AE3C65E400914F343ECF155C /* Pods-ServeTab-ServeTabTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
-				INFOPLIST_FILE = pdareTests/Info.plist;
+				INFOPLIST_FILE = "ServeTabTests/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -540,19 +540,20 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/pdare.app/pdare";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ServeTab.app/ServeTab";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2D549DE4A28F489BF9EBEB4E /* Pods-pdare.debug.xcconfig */;
+			baseConfigurationReference = 2D549DE4A28F489BF9EBEB4E /* Pods-ServeTab.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = pdare/Info.plist;
+				INFOPLIST_FILE = "ServeTab/Info.plist";
+             INFOPLIST_KEY_CFBundleDisplayName = "ServeTab";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -565,7 +566,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = pdare;
+				PRODUCT_NAME = "ServeTab";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -579,12 +580,13 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 079E704BAEDB1CD7AC56EC91 /* Pods-pdare.release.xcconfig */;
+			baseConfigurationReference = 079E704BAEDB1CD7AC56EC91 /* Pods-ServeTab.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				INFOPLIST_FILE = pdare/Info.plist;
+				INFOPLIST_FILE = "ServeTab/Info.plist";
+             INFOPLIST_KEY_CFBundleDisplayName = "ServeTab";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -597,7 +599,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = pdare;
+				PRODUCT_NAME = "ServeTab";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -762,7 +764,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "pdareTests" */ = {
+		00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ServeTabTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				00E356F61AD99517003FC87E /* Debug */,
@@ -771,7 +773,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "pdare" */ = {
+		13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ServeTab" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
@@ -780,7 +782,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "pdare" */ = {
+		83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "ServeTab" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
