@@ -1,4 +1,4 @@
-package com.pdare
+package com.servetab
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
