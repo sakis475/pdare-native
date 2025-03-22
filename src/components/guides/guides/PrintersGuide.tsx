@@ -3,10 +3,7 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { colors } from '../../../core/theme';
 import { useStrings } from '../../../core/localization/languageContext';
-import {
-  LINUX_PRINTER_APP_DOWNLOAD_URL,
-  WINDOWS_PRINTER_APP_DOWNLOAD_URL,
-} from '../../../storage/env';
+import { WINDOWS_PRINTER_APP_DOWNLOAD_URL } from '../../../storage/env';
 
 const PrinterGuide = () => {
   const strings = useStrings();
@@ -21,7 +18,7 @@ const PrinterGuide = () => {
 
         <Text style={styles.noAppStep}>2. {strings.DOWNLOAD_START_APP}</Text>
         <Text style={styles.noAppIndent}>• Windows: {WINDOWS_PRINTER_APP_DOWNLOAD_URL}</Text>
-        <Text style={styles.noAppIndent}>• Linux: {LINUX_PRINTER_APP_DOWNLOAD_URL}</Text>
+        {/* <Text style={styles.noAppIndent}>• Linux: {LINUX_PRINTER_APP_DOWNLOAD_URL}</Text> */}
 
         <Text style={styles.noAppStep}>3. {strings.LOGIN_TO_APP}</Text>
         <Text style={styles.noAppStep}>4. {strings.PRESS_SEARCH_BUTTON}</Text>

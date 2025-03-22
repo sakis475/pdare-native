@@ -33,6 +33,7 @@ import { useHelpModal } from '../providers/HelpContext';
 import PatternGuide from '../components/guides/guides/PatternGuide';
 import PrinterGuide from '../components/guides/guides/PrintersGuide';
 import VerifyEmailScreen from '../screens/authenticationScreens/VerifyEmailScreen';
+import AboutScreen from '../screens/AboutScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,7 +44,6 @@ const AppNavigator = () => {
     <Stack.Navigator
       screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}
       initialRouteName={ScreenNames.StartLoadingScreen}
-      // initialRouteName={ScreenNames.VerifyEmailScreen}
     >
       <Stack.Screen
         name="MainTabs"
@@ -181,7 +181,7 @@ const AppNavigator = () => {
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
-              title={strings.ACCOUNT}
+              title={strings.SETTINGS}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
@@ -202,6 +202,26 @@ const AppNavigator = () => {
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
               title={strings.PROFILE}
+              bold={true}
+            ></CustomNavigationScreenHeaderTitle>
+          ),
+          animation: 'none',
+          headerStyle: {
+            backgroundColor: colors.darkerGrey,
+          },
+          headerTintColor: 'white',
+          headerLeft: navigateBackBtn,
+          headerBackVisible: false,
+        })}
+      />
+
+      <Stack.Screen
+        name={ScreenNames.AboutScreen}
+        component={AboutScreen}
+        options={({ route }: any) => ({
+          headerTitle: () => (
+            <CustomNavigationScreenHeaderTitle
+              title={strings.ABOUT_APP}
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),

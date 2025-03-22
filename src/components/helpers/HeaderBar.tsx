@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import { colors } from '../../core/theme';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
-import { UserIcon } from '../basic/Icons';
+import { SettingsIcon, UserIcon } from '../basic/Icons';
 
 export const sharedStyles = {
   HEADER_HEIGHT: 60,
@@ -41,7 +41,7 @@ export function HeaderBar({
         onPress={() => navigate(ScreenNames.RestaurantSettingsScreen)}
       >
         <Text style={styles.profileIcon}>
-          <UserIcon />
+          <SettingsIcon />
         </Text>
       </TouchableOpacity>
     </View>

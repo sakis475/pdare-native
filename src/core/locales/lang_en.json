@@ -1,6 +1,6 @@
 {
   "PRIVACY_POLICY": "Privacy Policy",
-  "PRIVACY_POLICY_TEXT": "\n1. Information Collection\nWe collect personal information that you provide directly, such as:\n- Name and surname\n- Email address\n- Username\n- Password\n\n2. Use of Information\nWe use your information for:\n- Managing your account\n- Providing our services\n- Communicating with you\n- Improving our services\n\n3. Information Protection\nWe take appropriate security measures to protect your personal data.\n\n4. Information Sharing\nWe do not sell or rent your personal information to third parties.\n\n5. User Rights\nYou have the right to:\n- Access your data\n- Correct your data\n- Delete your data\n- Withdraw your consent\n\n6. Contact\nFor any questions about the privacy policy, please contact us.",
+  "PRIVACY_POLICY_TEXT": "Date: March 22, 2025\n\nThis Privacy Policy explains how we collect, use, and protect your personal data when you use our application.\n\n1. What data do we collect?\n\nWe collect the following data when you use our application:\n\nAccount data: email, password, (First Name, Last Name only if you fill them in your profile).\n\nActions within the application: To ensure the functionality of our application, we record necessary actions, such as tracking which user created an order.\nOrders, Products, Tables created and all their details are stored into the server.\nIf you use Printers then their local ip is stored too.\n\n2. Why do we collect your data?\n\nYour data is used to:\n\nProvide you with the services of the application.\n\nEnsure the security of the application.\n\n3. How do we protect your data?\n\nWe use encryption technologies and secure servers to protect your data.\n\n4. With whom do we share your data?\n\nWe do not share your data with anyone.\nWe do not sell or rent your data to third parties for commercial purposes.\n\n5. Your rights\n\nYou have the following rights:\n\nAccess: Request your data.\n\nCorrection: Correct inaccurate data.\n\nDeletion: Request the deletion of your data. There is an option to delete your account or restaurant in the application settings.\n\n6. Changes to the Privacy Policy\n\nWe may update this policy from time to time. Changes will be published here.\n\n7. Contact\n\nFor questions regarding the privacy policy, contact us at:\ninfo@servetab.app",
   "LANGUAGE_SETTINGS": "Language Settings",
   "PROFILE": "Profile",
   "NO_ACTIVE_TABLE": "No active tables found.",
@@ -354,5 +354,10 @@
   "EXIT_APP": "Exit App",
   "EXIT": "Exit",
   "EXIT_CONFIRMATION": "Are you sure you want to exit ServeTab?",
-  "CHECK_YOUR_SPAM_FOLDER": "Please check your spam folder"
+  "CHECK_YOUR_SPAM_FOLDER": "Please check your spam folder",
+  "ABOUT_APP": "About App",
+  "APP_DESCRIPTION_1": "A fast and efficient food and beverage ordering service for Bars, Coffee Shops, Restaurants & more",
+  "APP_DESCRIPTION_2": "It empowers waiters to manage orders seamlessly from their phones while giving restaurant owners full control over operations with ease.",
+  "CONTACT_EMAIL": "Contact Email:",
+  "VERSION": "Version:"
 }

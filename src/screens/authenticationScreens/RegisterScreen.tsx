@@ -7,6 +7,7 @@ import { register, RegisterData } from '../../helpers/storage/tokenRequests';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import CustomButton from '../../components/basic/CustomButton';
+import PrivacyModel from '../../components/popupModals/PrivacyModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -113,22 +114,6 @@ const RegisterScreen: React.FC = () => {
       fieldName: 'passwordRepeat',
     },
   };
-
-  const PrivacyPolicyDialog: React.FC<PrivacyPolicyDialogProps> = ({ visible, onDismiss }) => (
-    <Portal>
-      <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
-        <Dialog.Title style={styles.dialogTitle}>{strings.PRIVACY_POLICY}</Dialog.Title>
-        <Dialog.ScrollArea style={styles.dialogScrollArea}>
-          <ScrollView>
-            <Text style={styles.policyText}>{strings.PRIVACY_POLICY_TEXT}</Text>
-          </ScrollView>
-        </Dialog.ScrollArea>
-        <Dialog.Actions>
-          <CustomButton onPress={onDismiss}>{strings.CLOSE}</CustomButton>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
-  );
 
   const handleFieldChange = useCallback((fieldName: keyof FormState, value: string) => {
     setFormState((prev) => ({
@@ -271,8 +256,8 @@ const RegisterScreen: React.FC = () => {
         </CustomButton>
       </View>
 
-      <PrivacyPolicyDialog
-        visible={policyDialogVisible}
+      <PrivacyModel
+        isModalVisible={policyDialogVisible}
         onDismiss={() => setPolicyDialogVisible(false)}
       />
     </View>

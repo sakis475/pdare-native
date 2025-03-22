@@ -7,5 +7,4 @@ export const DEFAULT_APP_LANGUAGE: AppLanguage = 'lang_en';
 export const REQ_TIMEOUT = 60000;
 export const DEFAULT_SOCKET_CONNECTIONS = ['testio'];
 
-export const WINDOWS_PRINTER_APP_DOWNLOAD_URL = 'https://google.com';
-export const LINUX_PRINTER_APP_DOWNLOAD_URL = 'https://google.com';
+export const WINDOWS_PRINTER_APP_DOWNLOAD_URL = 'https://servetab.app/servetab-printer-app';

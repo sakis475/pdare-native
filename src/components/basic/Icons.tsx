@@ -164,6 +164,10 @@ export const ClipboardIcon = ({ size = 24, color = colors.white, style }: IconPr
   return <IoniconsIcons name="clipboard-outline" size={size} color={color} style={style} />;
 };
 
+export const SettingsIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
+  return <IoniconsIcons name="settings-sharp" size={size} color={color} style={style} />;
+};
+
 export const ClipboardMultipleIcon = ({ size = 24, color = colors.white, style }: IconProps) => {
   return (
     <MaterialCommunityIcons
