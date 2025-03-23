@@ -1,5 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { logout } from '../helpers/storage/tokenRequests';
+import { navigate, ScreenNames } from '../navigation/navigationUtils';
+import { colors } from '../core/theme';
 // import * as Sentry from '@sentry/react-native';
 
 interface Props {
@@ -31,8 +34,9 @@ export class ErrorBoundary extends Component<Props, State> {
     // });
   }
 
-  resetError = () => {
+  resetError = async () => {
     this.setState({ hasError: false, error: null });
+    await logout();
   };
 
   render() {
@@ -43,6 +47,13 @@ export class ErrorBoundary extends Component<Props, State> {
           <TouchableOpacity style={styles.button} onPress={this.resetError}>
             <Text style={styles.buttonText}>Try Again</Text>
           </TouchableOpacity>
+          {this.state.error && (
+            <Text style={[styles.message, styles.errorMessage]}>
+              {this.state.error?.message.length > 500
+                ? this.state.error.message.substring(0, 500) + '...'
+                : this.state.error?.message}
+            </Text>
+          )}
         </View>
       );
     }
@@ -67,6 +78,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 20,
+  },
+  errorMessage: {
+    color: colors.danger,
   },
   button: {
     backgroundColor: '#007AFF',

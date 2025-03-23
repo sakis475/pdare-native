@@ -73,7 +73,8 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
   }, [table]);
 
   const handleOrderSendSuccess = async (request: any) => {
-    if (request?.id) {
+    //Either returned updated order, or success === true on close order no orderItems
+    if (request?.id || request.success === true) {
       toast('success', strings.SUCCESS, '', 1000);
       await clearNewOrder();
       setIsSending(false);
@@ -101,10 +102,7 @@ const TempBottomOptions: React.FC<TempBottomOptionsProps> = ({
             strings.CLOSE_ORDER,
             strings.CLOSE_ORDER_NO_ITEMS,
             async () => {
-              result = await patchRequest(
-                `/orders/${convertedServerOrder?.orderId}`,
-                convertedServerOrder
-              );
+              result = await patchRequest(`/orders/close/${convertedServerOrder?.orderId}`);
               handleOrderSendSuccess(result);
             },
             () => {

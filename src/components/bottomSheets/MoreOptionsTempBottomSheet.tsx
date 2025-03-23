@@ -69,10 +69,13 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
 
     const showChangeTable = order && !order?.closedAt;
     const showChangeCouvert = order?.table && !order.closedAt;
-    const showReprintOrder = order?.createdAt && !order?.closedAt;
-    const showPrintAnalysis = order?.createdAt;
+    const showReprintOrder = order?.createdAt && !order?.closedAt && order.orderItems.length > 0;
+    const showPrintAnalysis = order?.createdAt && order.orderItems.length > 0;
     const showCloseOrder = order?.createdAt && !order?.closedAt;
-    const showReOpenOrder = order?.closedAt && dayjs().diff(dayjs(order.closedAt), 'minute') < 15;
+    const showReOpenOrder =
+      order?.closedAt &&
+      dayjs().diff(dayjs(order.closedAt), 'minute') < 15 &&
+      order.orderItems.length > 0;
 
     const onReopenOrder = () => {
       if (order.closedAt) {

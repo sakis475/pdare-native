@@ -4,6 +4,7 @@ import { colors } from '../../core/theme';
 import dayjs from '../../core/dayjs';
 import { useStrings } from '../../core/localization/languageContext';
 import { CurrencyFormat } from './CurrencyFormat';
+import { Order } from '../../types/basic.types';
 
 export const OrderInfoBar = ({
   order,
