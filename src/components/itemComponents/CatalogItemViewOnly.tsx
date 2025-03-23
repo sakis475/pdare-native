@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { catalogItemStyles } from './CatalogStyles';
+import { CommentIcon } from '../basic/Icons';
+import { ItemReq, ItemProperty, ItemPropertiesGrouped } from '../../types/basic.types';
 
 export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
   if (!item.quantity) {
@@ -49,9 +51,11 @@ export function CatalogItemViewOnly({ item }: { item: ItemReq }) {
                 <Text
                   style={[
                     markAsDelete ? styles.itemsDetailsDeleted : styles.itemDetails,
-                    { fontStyle: 'italic' },
+                    { fontStyle: 'italic', justifyContent: 'center', alignItems: 'center' },
                   ]}
                 >
+                  <CommentIcon></CommentIcon>
+                  {' ' + item.comment}
                   {item.comment}
                 </Text>
               ) : null}

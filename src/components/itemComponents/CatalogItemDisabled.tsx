@@ -3,7 +3,8 @@ import { Text, View, TouchableOpacity } from 'react-native';
 import { CurrencyFormat } from '../helpers/CurrencyFormat';
 import { colors } from '../../core/theme';
 import { catalogItemStyles } from './CatalogStyles';
-import { TrashIcon, ULeftArrowIcon } from '../basic/Icons';
+import { CommentIcon, TrashIcon, ULeftArrowIcon } from '../basic/Icons';
+import { ItemReq, ItemProperty, ItemPropertiesGrouped } from '../../types/basic.types';
 export function CatalogItemDisabled({
   item,
   onItemDelete,
@@ -52,10 +53,11 @@ export function CatalogItemDisabled({
               <Text
                 style={[
                   markAsDelete ? styles.itemsDetailsDeleted : styles.itemDetails,
-                  { fontStyle: 'italic' },
+                  { fontStyle: 'italic', justifyContent: 'center', alignItems: 'center' },
                 ]}
               >
-                {item.comment}
+                <CommentIcon></CommentIcon>
+                {' ' + item.comment}
               </Text>
             ) : null}
             <CurrencyFormat

@@ -2,6 +2,8 @@ import _ from 'lodash';
 import * as Requests from '../requests';
 import { getStorage, setStorage } from '../../storage/store';
 import { convertOccupiedOrderToOrder } from './orderStorage';
+import { ItemReq, Order, Table } from '../../types/basic.types';
+import { TableIO } from '../../types/io.types';
 
 export const reqFetchTables = async () => {
   const fetchTables: Table[] = await Requests.getRequest('/tables?availableOnly=true');
