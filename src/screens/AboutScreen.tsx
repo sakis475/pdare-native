@@ -4,9 +4,9 @@ import { colors } from '../core/theme';
 import PrivacyModel from '../components/popupModals/PrivacyModal';
 import CustomButton from '../components/basic/CustomButton';
 import { useStrings } from '../core/localization/languageContext';
-
+import packageJson from '../../package.json';
 const APP_NAME = 'ServeTab';
-const APP_VERSION = '1.0.0';
+const APP_VERSION = packageJson.version;
 const CONTACT_EMAIL = 'info@servetab.app';
 
 const AboutScreen = () => {
