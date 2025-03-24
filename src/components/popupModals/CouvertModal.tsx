@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Modal, TouchableOpacity, Text } from 'react-native';
-import { Portal, Button } from 'react-native-paper';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { Portal } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
 import CustomNumberInput from '../basic/CustomNumberInput';

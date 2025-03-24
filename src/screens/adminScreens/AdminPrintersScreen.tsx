@@ -111,7 +111,7 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
     }, 300); // Add small delay to ensure smooth transition
   };
 
-  // CharSet Picker Modal Component
+  // CharSet Picker Component
   const CharSetPicker = () => (
     <Portal>
       <Dialog visible={charSetPickerVisible} onDismiss={handleCharSetDismiss}>

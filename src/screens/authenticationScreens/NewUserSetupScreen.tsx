@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Modal, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, FlatList, RefreshControl } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 import { getRequest, postRequest } from '../../helpers/requests';
 import { colors } from '../../core/theme';
@@ -13,6 +13,7 @@ import CustomTextInput from '../../components/basic/CustomTextInput';
 import { InvitationRequest, User } from '../../types/basic.types';
 import { getLanguage } from '../../core/localization/strings';
 import CustomButton from '../../components/basic/CustomButton';
+import BaseModal from '../../components/basic/BaseModal';
 
 const NewUserSetupScreen = () => {
   const [selectedOption, setSelectedOption] = useState<'join' | 'create' | null>(null);
@@ -253,52 +254,26 @@ const NewUserSetupScreen = () => {
       ) : (
         renderContent()
       )}
-      <Modal
+
+      <BaseModal
+        title={strings.CREATE_RESTAURANT}
         visible={createModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setCreateModalVisible(false)}
+        onClose={() => {
+          setCreateModalVisible(false);
+          setSelectedOption(null);
+          setRestaurantName('');
+        }}
+        onConfirm={handleCreateRestaurant}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{strings.CREATE_RESTAURANT}</Text>
-
-            <View style={styles.inputContainer}>
-              <CustomTextInput
-                label={strings.RESTAURANT_NAME}
-                mode="outlined"
-                value={restaurantName}
-                onChangeText={setRestaurantName}
-                placeholder={strings.ENTER_RESTAURANT_NAME_PLACEHOLDER}
-                theme="light"
-              />
-            </View>
-
-            <View style={styles.buttonContainer}>
-              <CustomButton
-                mode="outlined"
-                onPress={() => {
-                  setCreateModalVisible(false);
-                  setSelectedOption(null);
-                  setRestaurantName(''); // Clear the restaurant name on cancel
-                }}
-                style={styles.cancelButton}
-              >
-                {strings.CANCEL}
-              </CustomButton>
-              <CustomButton
-                mode="contained"
-                onPress={handleCreateRestaurant}
-                style={styles.saveButton}
-                loading={isLoading}
-                disabled={isLoading}
-              >
-                {strings.CREATE}
-              </CustomButton>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        <CustomTextInput
+          label={strings.RESTAURANT_NAME}
+          mode="outlined"
+          value={restaurantName}
+          onChangeText={setRestaurantName}
+          placeholder={strings.ENTER_RESTAURANT_NAME_PLACEHOLDER}
+          theme="light"
+        />
+      </BaseModal>
     </View>
   );
 };

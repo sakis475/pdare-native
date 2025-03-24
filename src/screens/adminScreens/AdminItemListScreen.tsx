@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  Pressable,
-  Modal,
-  TouchableOpacity,
-} from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Pressable, TouchableOpacity } from 'react-native';
 import { Button, Divider, FAB, Text, TextInput } from 'react-native-paper';
 import { getStorage, setStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
