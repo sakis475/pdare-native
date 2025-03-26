@@ -584,7 +584,6 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [newItemCounter, setNewItemCounter] = useState(0); // Add counter for generating unique IDs
-  const inputRef = useRef<TextInput>(null);
 
   const strings = useStrings();
 
@@ -752,7 +751,6 @@ export const UnifiedSelect: React.FC<UnifiedSelectProps> = ({
                 <TickBoxIcon size={20} color="#fff" />
               </TouchableOpacity>
               <TextInput
-                ref={inputRef}
                 style={[styles.input, styles.editingInput]}
                 value={editingValue}
                 onChangeText={setEditingValue}

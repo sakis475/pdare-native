@@ -19,9 +19,11 @@ import { useStrings } from '../core/localization/languageContext';
 import { navigate, ScreenNames } from '../navigation/navigationUtils';
 import { processTables } from '../helpers/storage/tablesStorage';
 import _ from 'lodash';
-import { UsersIcon } from '../components/basic/Icons';
+import { DoubleDownIcon, PlusIcon, UsersIcon } from '../components/basic/Icons';
 import { Order, Table } from '../types/basic.types';
 import { TableIO } from '../types/io.types';
+import CustomButton from '../components/basic/CustomButton';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const FONT_SIZES = {
   header: 12, // For column headers
@@ -115,13 +117,25 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
   };
 
   const renderFooter = () => {
-    if (!loading) return null;
-
-    return (
-      <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color={colors.primary} />
-      </View>
-    );
+    if (loading) {
+      return (
+        <View style={styles.footerLoader}>
+          <ActivityIndicator size="small" color={colors.primary} />
+        </View>
+      );
+    } else {
+      return (
+        <View style={{ alignItems: 'center' }}>
+          <TouchableOpacity
+            onPress={() => {
+              loadMore();
+            }}
+          >
+            <DoubleDownIcon size={30}></DoubleDownIcon>
+          </TouchableOpacity>
+        </View>
+      );
+    }
   };
 
   const renderOrderItem = (order: Order, index: number) => {

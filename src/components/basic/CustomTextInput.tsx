@@ -6,7 +6,7 @@ import { colors } from '../../core/theme';
 import { EyeOff, EyeOn } from './Icons';
 
 interface CustomTextInputProps {
-  label: string;
+  label?: string;
   value: string;
   placeholder?: string;
   onChangeText: (text: string) => void;
@@ -22,10 +22,11 @@ interface CustomTextInputProps {
   mode?: 'outlined' | 'flat';
   theme?: 'light' | 'dark';
   onFocus?: () => void;
+  autoFocus?: boolean;
 }
 
 const CustomTextInput: React.FC<CustomTextInputProps> = ({
-  label,
+  label = '',
   value,
   placeholder,
   onChangeText,
@@ -41,6 +42,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   mode = 'outlined',
   theme = 'dark',
   onFocus,
+  autoFocus = false,
   ...props
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -114,6 +116,7 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
           ) : null
         }
         onFocus={onFocus}
+        autoFocus={autoFocus}
         {...props}
       />
     </View>

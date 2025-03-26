@@ -21,18 +21,19 @@ export const setTable = async (table: Table) => {
 
 export const processTables = async (tablesIO: TableIO[]): Promise<Table[]> => {
   const items: ItemReq[] = await getStorage('items');
+  const tables: Table[] = [];
+  for (const tableIO of tablesIO) {
+    if (tableIO.occupiedByOrder) {
+      const occupiedByOrder = convertOccupiedOrderToOrder(tableIO, items);
 
-  return tablesIO.reduce((acc: Table[], table: TableIO) => {
-    if (table.occupiedByOrder) {
-      const occupiedByOrder = convertOccupiedOrderToOrder(table, items);
-      acc.push({
-        id: table.id,
-        tableName: table.tableName,
-        isEnabled: table.isEnabled,
-        tableOrder: table.tableOrder,
+      tables.push({
+        id: tableIO.id,
+        tableName: tableIO.tableName,
+        isEnabled: tableIO.isEnabled,
+        tableOrder: tableIO.tableOrder,
         occupiedByOrder: occupiedByOrder,
       });
     }
-    return acc;
-  }, []);
+  }
+  return tables;
 };

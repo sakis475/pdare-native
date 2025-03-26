@@ -10,7 +10,7 @@ import {
 } from '../../types/basic.types';
 import { TableIO } from '../../types/io.types';
 import { convertOccupiedOrderToOrder } from '../storage/orderStorage';
-import { storageInitGroupedItems } from '../storage/storageInit';
+import { storageInitData, storageInitGroupedItems, storageInitItems } from '../storage/storageInit';
 import { processTables } from '../storage/tablesStorage';
 import {
   CATEGORIES_UPDATED,
@@ -57,7 +57,9 @@ class SocketEventSubscriber {
 
   static async handleCategoriesUpdated(categories: Category[]): Promise<void> {
     console.log('Socket Event: categoriesUpdated');
-    setStorage('categories', categories);
+    await setStorage('categories', categories);
+    await storageInitItems();
+    await storageInitGroupedItems();
     EventEmitter.emit(CATEGORIES_UPDATED, []);
   }
 

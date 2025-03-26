@@ -1,6 +1,6 @@
 {
   "name": "servetab",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "buildAndroid": "cd android && ./gradlew assembleRelease"
+    "buildAndroid": "cd android && ./gradlew assembleRelease",
+    "buildAndroidRelease": "npx react-native build-android --mode=release"
   },
   "dependencies": {
     "@callstack/react-theme-provider": "^3.0.9",

@@ -132,7 +132,10 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
   };
 
   const handlePropertyNameEdit = () => {
-    if (!editingPropertyName) return;
+    if (!editedName) {
+      AlertWithOptions(strings.ERROR, strings.ERROR_NAME, ...[, , ,], '');
+      return;
+    }
 
     setPropertyGroups((prevGroups) => {
       // Add explicit type annotation for updatedGroups
@@ -417,7 +420,7 @@ const AdminItemDetailsPatternEditScreen = ({ route }: any) => {
             data={propertyGroups}
             renderItem={renderPropertyGroup}
             keyExtractor={(item, index) => `group-${item[0]}-${index}`}
-            contentContainerStyle={{ paddingBottom: 50 }}
+            contentContainerStyle={{ paddingBottom: 400 }}
             onScrollToIndexFailed={(info) => {
               // Handle scroll failure by trying again after a delay
               setTimeout(() => {

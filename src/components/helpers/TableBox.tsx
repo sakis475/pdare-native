@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, StyleSheet, View, Dimensions } from 'react-nati
 import { colors } from '../../core/theme';
 import dayjs, { datetimeDiff } from '../../core/dayjs';
 import { CouvertIcon } from '../basic/Icons';
+import { Table } from '../../types/basic.types';
 
 // Dynamic size calculations
 const GRID_SIZE = 4; // Number of columns
