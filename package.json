@@ -9,7 +9,8 @@
     "start": "react-native start",
     "test": "jest",
     "buildAndroid": "cd android && ./gradlew assembleRelease",
-    "buildAndroidRelease": "npx react-native build-android --mode=release"
+    "buildAndroidRelease": "npx react-native build-android --mode=release",
+    "runRelease": "npm run android -- --mode='release'"
   },
   "dependencies": {
     "@callstack/react-theme-provider": "^3.0.9",
