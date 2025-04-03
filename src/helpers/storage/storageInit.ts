@@ -46,7 +46,9 @@ export async function storageInitGroupedItems() {
     if (!acc[categoryTitle]) {
       acc[categoryTitle] = [];
     }
-    acc[categoryTitle].push(item);
+    if (item?.isEnabled) {
+      acc[categoryTitle].push(item);
+    }
     return acc;
   }, {});
 
