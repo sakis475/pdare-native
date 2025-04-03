@@ -269,7 +269,7 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
       }
       order.orderItems.push(originalItem);
     } catch (error) {
-      console.log(error, 'convertOccupiedOrderToOrder');
+      console.log(error, 'convertOccupiedOrderToOrder', 'table', table.tableName);
     }
   }
   return order;
