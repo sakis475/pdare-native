@@ -7,6 +7,7 @@ import { navigateReset, ScreenNames } from '../navigation/navigationUtils';
 import { handleNoRestaurantUser, logout } from '../helpers/storage/tokenRequests';
 import { getStorage } from '../storage/store';
 import { useStrings } from '../core/localization/languageContext';
+import { delay } from '../core/utils';
 
 const logoImage = require('../../assets/servetablogowhite.png');
 
@@ -51,7 +52,7 @@ const StartLoadingScreen: React.FC = () => {
       await Promise.race([
         (async () => {
           const currentUser = await getStorage('currentUser');
-
+          await delay(1000);
           const sessionBearer = await refreshToken();
           if (!sessionBearer) {
             return;

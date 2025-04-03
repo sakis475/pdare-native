@@ -42,7 +42,10 @@ export const navigationRef = React.createRef<NavigationContainerRef<any>>();
 const AppNavigator = () => {
   return (
     <Stack.Navigator
-      screenOptions={{ headerTitleAlign: 'center', orientation: 'portrait' }}
+      screenOptions={{
+        headerTitleAlign: 'center',
+        orientation: 'portrait',
+      }}
       initialRouteName={ScreenNames.StartLoadingScreen}
     >
       <Stack.Screen
@@ -54,7 +57,7 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}
         component={StartLoadingScreen}
-        options={{ headerShown: false, gestureEnabled: false }}
+        options={{ headerShown: false, gestureEnabled: false, animation: 'none' }}
       />
 
       <Stack.Screen

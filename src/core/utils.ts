@@ -131,3 +131,5 @@ export const getTextColorBasedOnLuminance = (hexColor: string) => {
 
   return luminance > 128 ? colors.black : colors.white;
 };
+
+export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
