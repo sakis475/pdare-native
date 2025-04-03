@@ -38,23 +38,26 @@ const NewUserSetupScreen = () => {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (skipToast = false, skipToastOnFail = false) => {
     const fetchUserWithInvitations: User = await getRequest('/user/invite');
 
     if (!fetchUserWithInvitations?.id) {
       toast('error', strings.ERROR);
       return;
     }
+
     if (!fetchUserWithInvitations?.invitations?.length) {
-      toast('info', strings.NO_INVITATIONS);
+      !skipToast || (!skipToastOnFail && toast('info', strings.NO_INVITATIONS));
     } else {
-      toast('success', strings.PENDING_INVITATION);
+      !skipToast && toast('success', strings.PENDING_INVITATION);
     }
 
     setCurrentUser(fetchUserWithInvitations);
   };
   useEffect(() => {
-    fetchData();
+    fetchData(true);
+    const interval = setInterval(() => fetchData(false, true), 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleCreateRestaurant = async () => {
@@ -434,9 +437,9 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    right: -10,
-    top: -10,
-    backgroundColor: colors.primary,
+    right: 0,
+    top: 0,
+    backgroundColor: colors.green,
     borderRadius: 12,
     minWidth: 24,
     height: 24,
