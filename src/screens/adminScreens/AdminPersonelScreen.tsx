@@ -202,7 +202,7 @@ const SearchUserModal: React.FC<SearchUserModalProps> = ({
 
       <View style={styles.buttonContainer}>
         <CustomButton mode="outlined" onPress={onDismiss} style={styles.cancelButton}>
-          {strings.CANCEL}
+          <Text style={{ color: colors.lightRed }}>{strings.CANCEL}</Text>
         </CustomButton>
       </View>
     </BaseModal>
