@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, Text, Animated } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { colors } from '../core/theme';
 import { getBearer, refreshToken } from '../helpers/requests';
-import { navigate, navigateReset, ScreenNames } from '../navigation/navigationUtils';
+import { navigateReset, ScreenNames } from '../navigation/navigationUtils';
 import { handleNoRestaurantUser, logout } from '../helpers/storage/tokenRequests';
 import { getStorage } from '../storage/store';
 import { useStrings } from '../core/localization/languageContext';

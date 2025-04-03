@@ -34,9 +34,7 @@ export enum ScreenNames {
 export function navigate(name: ScreenNames, params?: {}) {
   if (name === ScreenNames.LoginScreen) {
     navigateReset(ScreenNames.LoginScreen);
-  }
-
-  if (navigationRef.current) {
+  } else if (navigationRef.current) {
     navigationRef.current.navigate(name, params);
   }
 }

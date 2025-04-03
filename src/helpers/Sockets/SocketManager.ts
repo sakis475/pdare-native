@@ -58,7 +58,7 @@ class SocketManager {
   private async reloadCurrentUser(): Promise<void> {
     try {
       const user = await getStorage('currentUser');
-      const sessionBearer = await getBearer();
+      const sessionBearer = await getBearer({ skipNavigation: true });
       this.user = user;
       this.sessionBearer = sessionBearer;
     } catch (error) {

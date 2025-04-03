@@ -47,11 +47,11 @@ export async function refreshToken() {
   }
 }
 
-export async function getBearer() {
+export async function getBearer(options?: { skipNavigation?: boolean }) {
   const bearer: SessionBearer | null = await getStorage('session_bearer');
   if (!bearer?.info) {
     //go to login page
-    navigate(ScreenNames.LoginScreen);
+    if (options?.skipNavigation !== true) navigate(ScreenNames.LoginScreen);
     return;
   }
 
