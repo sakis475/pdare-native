@@ -259,6 +259,7 @@ const RegisterScreen: React.FC = () => {
       <PrivacyModel
         isModalVisible={policyDialogVisible}
         onDismiss={() => setPolicyDialogVisible(false)}
+        customBottomLift={-60}
       />
     </View>
   );

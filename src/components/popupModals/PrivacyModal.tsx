@@ -8,9 +8,14 @@ import { colors } from '../../core/theme';
 interface PrivacyModelProps {
   isModalVisible: boolean;
   onDismiss: () => void;
+  customBottomLift?: number;
 }
 
-const PrivacyModel: React.FC<PrivacyModelProps> = ({ isModalVisible, onDismiss }) => {
+const PrivacyModel: React.FC<PrivacyModelProps> = ({
+  isModalVisible,
+  onDismiss,
+  customBottomLift = -20,
+}) => {
   const strings = useStrings();
 
   return (
@@ -22,6 +27,7 @@ const PrivacyModel: React.FC<PrivacyModelProps> = ({ isModalVisible, onDismiss }
         onConfirm={() => {}}
         theme={'dark'}
         buttonVariant={'okOnly'}
+        customBottomLift={customBottomLift}
       >
         <View style={styles.contentContainer}>
           <Text style={styles.policyText}>{strings.PRIVACY_POLICY_TEXT}</Text>

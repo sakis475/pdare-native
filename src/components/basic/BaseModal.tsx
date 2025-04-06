@@ -27,6 +27,7 @@ interface BaseModalProps {
   buttonVariant?: 'default' | 'okOnly';
   buttonSaveText?: string;
   closeOnOutsideTouch?: boolean;
+  customBottomLift?: number;
 }
 
 const BaseModal: React.FC<BaseModalProps> = ({
@@ -41,6 +42,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   buttonVariant = 'default',
   buttonSaveText = strings.SAVE,
   closeOnOutsideTouch = true,
+  customBottomLift = -20,
 }) => {
   const strings = useStrings();
   if (!visible) return null;
@@ -150,7 +152,14 @@ const BaseModal: React.FC<BaseModalProps> = ({
           >
             <View style={styles.overlay}>
               <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-                <View style={[styles.modalContainer]}>
+                <View
+                  style={[
+                    styles.modalContainer,
+                    {
+                      transform: [{ translateY: customBottomLift }],
+                    },
+                  ]}
+                >
                   <View
                     style={[styles.contentContainer, { backgroundColor: themeColors.background }]}
                   >
@@ -211,7 +220,6 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 400,
     maxHeight: Platform.OS === 'ios' ? '90%' : '90%',
-    transform: [{ translateY: -20 }],
   },
   contentContainer: {
     borderRadius: 10,
