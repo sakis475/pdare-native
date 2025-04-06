@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, memo } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Keyboard, Platform } from 'react-native';
 import { Button, Divider, Portal } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { FlashList } from '@shopify/flash-list';
@@ -297,7 +297,7 @@ const TempOrderScreen = ({
             ) : (
               <CustomButton
                 onPress={() => handleOpenSelectTableModal()}
-                style={{ paddingHorizontal: 50 }}
+                style={Platform.OS === 'ios' ? { paddingHorizontal: 50 } : { width: '50%' }}
               >
                 <Text>{strings.SELECT_TABLE}</Text>
               </CustomButton>

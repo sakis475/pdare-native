@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    maxHeight: '88%',
+    maxHeight: Platform.OS === 'ios' ? '88%' : '100%',
   },
   keyboardView: {
     flex: 1,
