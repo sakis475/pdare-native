@@ -10,6 +10,7 @@
     "test": "jest",
     "buildAndroid": "cd android && ./gradlew assembleRelease",
     "buildAndroidRelease": "npx react-native build-android --mode=release",
+    "buildIosRelease": "npm run ios -- --mode=release",
     "runRelease": "npm run android -- --mode='release'",
     "postversion": "react-native-version"
   },
