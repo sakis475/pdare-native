@@ -101,7 +101,6 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
                 style={{ backgroundColor: colors.white, minHeight: 100, fontSize: 20 }}
                 textColor={colors.black}
                 ref={textInputRef}
-                multiline={true}
               />
               {Platform.OS === 'ios' ? <CloseModalBtn></CloseModalBtn> : null}
             </View>
