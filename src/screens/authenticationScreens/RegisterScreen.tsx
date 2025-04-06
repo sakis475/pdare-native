@@ -315,6 +315,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.white,
     fontWeight: '600',
+    textAlign: 'center',
   },
   error: {
     fontSize: 14,

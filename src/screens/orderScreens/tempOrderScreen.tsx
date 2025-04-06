@@ -297,7 +297,7 @@ const TempOrderScreen = ({
             ) : (
               <CustomButton
                 onPress={() => handleOpenSelectTableModal()}
-                contentStyle={{ width: '50%' }}
+                style={{ paddingHorizontal: 50 }}
               >
                 <Text>{strings.SELECT_TABLE}</Text>
               </CustomButton>

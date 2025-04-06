@@ -393,10 +393,12 @@ const styles = StyleSheet.create({
   resendLink: {
     color: colors.white,
     fontSize: 16,
+    textAlign: 'center',
   },
   timerText: {
     color: colors.white,
     fontSize: 16,
+    textAlign: 'center',
   },
   timerInfoContainer: {
     marginTop: 15,
@@ -421,9 +423,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.white,
     fontWeight: '600',
+    textAlign: 'center',
   },
   disabled: {
     opacity: 0.5,
+    textAlign: 'center',
   },
 });
 

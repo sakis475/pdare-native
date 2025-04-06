@@ -248,7 +248,7 @@ const EditModal: React.FC<EditModalProps> = ({
       {mode === 'edit' && onDelete && (
         <View style={{ marginBottom: 5 }}>
           <CustomButton onPress={handleDelete} variant={'delete'}>
-            <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+            <Text style={{ color: colors.white, textAlign: 'center' }}>{strings.DELETE}</Text>
           </CustomButton>
         </View>
       )}

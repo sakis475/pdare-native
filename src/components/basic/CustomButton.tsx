@@ -63,14 +63,15 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   const renderContent = () => {
     if (variant === 'warning') {
       return (
-        <View style={styles.buttonInner}>
-          <WarningIcon size={20} color={colors.veryLighterRed} />
+        <>
+          <WarningIcon size={20} color={colors.danger} />
           <Text style={styles.warningButtonText}>{children}</Text>
-          <WarningIcon size={20} color={colors.veryLighterRed} />
-        </View>
+          <WarningIcon size={20} color={colors.danger} />
+        </>
       );
+    } else {
+      return <Text style={{ color: colors.white, textAlign: 'center' }}>{children}</Text>;
     }
-    return children;
   };
 
   const handlePress = (e: any) => {
@@ -117,11 +118,14 @@ const styles = StyleSheet.create({
   buttonInner: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
     gap: 8,
   },
   warningButtonText: {
     color: colors.lightRed,
     fontSize: 16,
+    textAlign: 'center',
   },
   contentStyle: {
     width: '100%',

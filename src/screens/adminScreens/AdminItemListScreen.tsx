@@ -139,6 +139,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
               <Text
                 style={{
                   color: colors.white,
+                  textAlign: 'center',
                 }}
               >
                 {strings.PRODUCT_PROPERTIES}
@@ -148,7 +149,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
           <View style={{ marginBottom: 5 }}>
             <CustomButton onPress={handleDelete} variant={'delete'}>
-              <Text style={{ color: colors.white }}>{strings.DELETE}</Text>
+              <Text style={{ color: colors.white, textAlign: 'center' }}>{strings.DELETE}</Text>
             </CustomButton>
           </View>
         </View>

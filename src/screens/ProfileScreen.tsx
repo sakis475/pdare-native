@@ -319,7 +319,7 @@ const ProfileScreen = ({ route }: any) => {
               onPress={() => setModalUserLangVisible(true)}
               style={{ backgroundColor: colors.purpleIris }}
             >
-              <Text style={{ color: colors.white }}>
+              <Text style={{ color: colors.white, textAlign: 'center' }}>
                 {languageOptions.find((e) => e.value === selectedLanguage).label}
               </Text>
             </CustomButton>
@@ -419,7 +419,7 @@ const ProfileScreen = ({ route }: any) => {
                   onPress={() => setModalRestLangVisible(true)}
                   style={{ backgroundColor: colors.purpleIris }}
                 >
-                  <Text style={{ color: colors.white }}>
+                  <Text style={{ color: colors.white, textAlign: 'center' }}>
                     {languageOptions.find((e) => e.value === formData.restaurantLanguage).label}
                   </Text>
                 </CustomButton>

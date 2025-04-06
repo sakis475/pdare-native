@@ -156,6 +156,7 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                               onPrint?.(printDestination);
                               handleCloseModal();
                             }}
+                            style={{ width: '100%' }}
                           >
                             <Text>{strings.PRINT}</Text>
                           </CustomButton>
@@ -255,10 +256,8 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                     </TouchableOpacity>
                   ) : null}
                 </List.Section>
-
-                {Platform.OS === 'ios' ? <CloseModalBtn /> : null}
               </ScrollView>
-              {Platform.OS === 'android' ? <CloseModalBtn /> : null}
+              <CloseModalBtn />
             </BottomSheetView>
           </BottomSheet>
         </Portal>

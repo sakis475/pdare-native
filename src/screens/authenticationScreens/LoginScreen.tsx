@@ -313,6 +313,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: Math.min(width * 0.04, 16),
     color: colors.white,
+    textAlign: 'center',
   },
   error: {
     fontSize: Math.min(width * 0.035, 14),

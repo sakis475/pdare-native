@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   },
   optionButton: {
     width: '100%',
-    maxWidth: 300,
+    textAlign: 'center',
   },
   waitingContainer: {
     flex: 1,
