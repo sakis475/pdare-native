@@ -7,7 +7,7 @@ import { SessionBearer } from '../../types/requests.types';
 import { BASE_DOMAIN } from '../../storage/env';
 import { User } from '../../types/basic.types';
 
-type EventCallback = (data: any) => void;
+type EventCallback = (data: any) => any;
 
 interface EventListener {
   eventString: string;
@@ -425,7 +425,8 @@ class SocketManager {
         subscription?.remove();
         subscription = null;
       };
-
+      console.log(this.isReconnecting, 'this.isReconnecting');
+      console.log(healthCheckReceived, 'this.healthCheckReceived');
       const healthCheckTimeout = setTimeout(() => {
         if (!healthCheckReceived && !this.isReconnecting) {
           this.debugLog('⚠️ Health check timeout - initiating reconnection');
@@ -464,10 +465,14 @@ class SocketManager {
     }
   }
 
-  public generateEventString(eventId: EventId): EventString<number> {
+  public generateEventString(eventId: EventId) {
     if (!this.isValidUser(this.user)) {
       console.warn('User or restaurant ID not available');
       return null;
+    }
+
+    if (eventId === EventId.printOrder) {
+      return EventId.printOrder;
     }
     return `${eventId}:${this.user.restaurant.id}`;
   }
@@ -499,6 +504,7 @@ export enum EventId {
   usersUpdated = 'usersUpdated',
   healthCheck = 'healthCheck',
   printersDiscovered = 'printersDiscovered',
+  printOrder = 'printOrder',
 }
 
 export type EventString<ID extends string | number> = `${EventId}:${ID}`;

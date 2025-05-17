@@ -1,3 +1,4 @@
+import { printToHprt } from '../../core/printers/Print';
 import { getStorage, setStorage } from '../../storage/store';
 import {
   ItemReq,
@@ -39,6 +40,7 @@ class SocketEventSubscriber {
     socketManager.on(EventId.tableOrdersUpdated, SocketEventSubscriber.handleTableOrdersUpdates);
     socketManager.on(EventId.healthCheck, SocketEventSubscriber.healthCheck);
     socketManager.on(EventId.printersDiscovered, SocketEventSubscriber.printersDiscovered);
+    socketManager.on(EventId.printOrder, SocketEventSubscriber.printOrder);
   }
 
   static async handleTableOrdersUpdates(tables: TableIO[]): Promise<void> {
@@ -94,8 +96,19 @@ class SocketEventSubscriber {
   static async printersDiscovered(printers: Printer[]): Promise<void> {
     EventEmitter.emit(PRINTERS_DISCOVERED_UPDATE, printers);
   }
+
+  static async printOrder(printBuffers: PrintBuffer[]) {
+    for (const printBuffer of printBuffers) {
+      const [ip, port] = printBuffer.printerAddress.split(':');
+
+      await printToHprt(ip, +port, printBuffer.buffer);
+      console.log('printOrder data');
+    }
+  }
 }
 
 export const socketEventSubscriber = new SocketEventSubscriber();
 
 export default SocketEventSubscriber;
+
+export type PrintBuffer = { printerAddress: string; buffer: string };

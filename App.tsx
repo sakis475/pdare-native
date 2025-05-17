@@ -22,7 +22,6 @@ import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/helpers/config/toastConfig';
 import KeepAwake from '@sayem314/react-native-keep-awake';
 import { Alert, BackHandler } from 'react-native';
-import { toast } from './src/core/utils';
 
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
