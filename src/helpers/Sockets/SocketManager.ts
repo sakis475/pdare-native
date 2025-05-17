@@ -367,9 +367,24 @@ class SocketManager {
 
     const listener: EventListener = { eventString, callback };
     listeners.add(listener);
-    this.socket.on(eventString, callback);
 
-    console.log(`Event listener added for ${eventString}`);
+    // Register the event with the socket
+    this.socket?.on(eventString, async (data: any, ack?: (response: any) => void) => {
+      try {
+        await callback(data); // Call the provided callback with the event data
+        if (ack) {
+          ack({ status: 'success' }); // Send acknowledgment back to the emitter
+        }
+      } catch (error) {
+        console.error('Error in event callback:', error);
+        if (ack) {
+          ack({
+            status: 'error',
+            message: error instanceof Error ? error.message : 'Unknown error',
+          }); // Send error acknowledgment
+        }
+      }
+    });
   }
 
   public async off(eventId: EventId, callback?: EventCallback): Promise<void> {
