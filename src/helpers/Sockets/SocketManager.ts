@@ -440,8 +440,6 @@ class SocketManager {
         subscription?.remove();
         subscription = null;
       };
-      console.log(this.isReconnecting, 'this.isReconnecting');
-      console.log(healthCheckReceived, 'this.healthCheckReceived');
       const healthCheckTimeout = setTimeout(() => {
         if (!healthCheckReceived && !this.isReconnecting) {
           this.debugLog('⚠️ Health check timeout - initiating reconnection');

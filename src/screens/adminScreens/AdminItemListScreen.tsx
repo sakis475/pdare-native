@@ -17,7 +17,6 @@ import CustomButton from '../../components/basic/CustomButton';
 import CustomTextInput from '../../components/basic/CustomTextInput';
 import { ItemReq, catGroupedItems, Category } from '../../types/basic.types';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
-
 interface EditItemModalProps {
   visible: boolean;
   item?: ItemReq | null;
@@ -120,7 +119,9 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       <CustomTextInput
         label={strings.PRICE}
         value={cost}
-        onChangeText={setCost}
+        onChangeText={(cost) => {
+          setCost(cost?.replace(',', '.'));
+        }}
         style={styles.input}
         mode="outlined"
         keyboardType="numeric"

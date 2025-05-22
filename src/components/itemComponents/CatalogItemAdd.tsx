@@ -8,7 +8,6 @@ import { catalogItemStyles } from './CatalogStyles';
 import { addNewItemToTemp } from '../../helpers/storage/orderStorage';
 import _ from 'lodash';
 import { ItemReq } from '../../types/basic.types';
-
 export function CatalogItemAdd({
   item,
   handleAddNewItemPress = () => {},
@@ -38,7 +37,11 @@ export function CatalogItemAdd({
   };
 
   return (
-    <View style={[styles.container, item.quantity > 0 && { backgroundColor: colors.blue }]}>
+    <TouchableOpacity
+      style={[styles.container, item.quantity > 0 && { backgroundColor: colors.blue }]}
+      onPress={handleGoToDetails}
+      activeOpacity={0.6}
+    >
       <View style={styles.textContainer}>
         <Text style={[styles.itemTitle, isPressedIn ? styles.textPressed : null]}>
           {item.title}
@@ -53,14 +56,10 @@ export function CatalogItemAdd({
           )}
         </View>
       </View>
-      <TouchableOpacity
-        style={[styles.button, styles.smallButton]}
-        onPress={handleGoToDetails}
-        activeOpacity={0.6}
-      >
+      <View style={[styles.button, styles.smallButton]}>
         {itemHasNoProperties ? <PlusIcon size={15} /> : <ChevronRightIcon size={18} />}
-      </TouchableOpacity>
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 }
 

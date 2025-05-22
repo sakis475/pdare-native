@@ -17,10 +17,8 @@ export function CatalogItemDisabled({
   if (!item.quantity) {
     item.quantity = 1;
   }
-
   const [totalCost, setTotalCost] = useState(item.cost * item.quantity);
   const [markAsDelete, setMarkAsDelete] = useState(!!item.markForDelete);
-
   let allProperties: ItemProperty[] = [];
   for (const propertyName of Object.keys(item.itemPropertiesGrouped)) {
     const propertyGroupSelected = (item.itemPropertiesGrouped as ItemPropertiesGrouped)[

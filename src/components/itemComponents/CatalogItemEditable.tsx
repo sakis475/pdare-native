@@ -14,24 +14,30 @@ export function CatalogItemEditable({ item }: { item: ItemReq }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.textContainer}>
-        <Text style={[styles.itemTitle, isPressedIn ? styles.textPressed : null]}>
-          {item.title}
-        </Text>
-        <CurrencyFormat value={item.cost} currency={'€'} />
-      </View>
+    <TouchableOpacity
+      style={[styles.container]}
+      onPress={handleAddNewItemPress}
+      activeOpacity={0.6}
+    >
+      <View style={styles.container}>
+        <View style={styles.textContainer}>
+          <Text style={[styles.itemTitle, isPressedIn ? styles.textPressed : null]}>
+            {item.title}
+          </Text>
+          <CurrencyFormat value={item.cost} currency={'€'} />
+        </View>
 
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.smallButton]}
-          onPress={handleAddNewItemPress}
-          activeOpacity={0.6}
-        >
-          <ChevronRightIcon size={20}></ChevronRightIcon>
-        </TouchableOpacity>
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.smallButton]}
+            onPress={handleAddNewItemPress}
+            activeOpacity={0.6}
+          >
+            <ChevronRightIcon size={20}></ChevronRightIcon>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 const styles = catalogItemStyles;

@@ -207,6 +207,7 @@ const LoginScreen: React.FC = () => {
 
           <TouchableOpacity
             style={styles.forgotPassword}
+            disabled={isLoading}
             onPress={() => setModalPasswordResetVisible(true)}
           >
             <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>

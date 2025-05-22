@@ -23,7 +23,6 @@ export function CatalogItemAdded({
   const [quantity, setQuantity] = useState(item.quantity || 1);
   const [totalCost, setTotalCost] = useState(item.cost * item.quantity);
   const updateInProgress = useRef(false);
-
   useEffect(() => {
     setQuantity(item.quantity || 1);
     setTotalCost(item.cost * (item.quantity || 1));

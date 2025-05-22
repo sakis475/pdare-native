@@ -5,6 +5,8 @@ import dayjs from '../../core/dayjs';
 import { useStrings } from '../../core/localization/languageContext';
 import { CurrencyFormat } from './CurrencyFormat';
 import { Order } from '../../types/basic.types';
+import { useEffect, useState } from 'react';
+import { getStorage } from '../../storage/store';
 
 export const OrderInfoBar = ({
   order,
@@ -16,6 +18,37 @@ export const OrderInfoBar = ({
   hideTableName?: boolean;
 }) => {
   const strings = useStrings();
+
+  const [tempFinalCost, setTempFinalCost] = useState(0);
+
+  const calculateTempCost = async () => {
+    const user = await getStorage('currentUser');
+
+    const couvertCost = Number(user?.restaurant?.couvertCost) || 0;
+    const couvertCount = Number(order?.couvert) || 0;
+    const couvertCalc = couvertCount * couvertCost;
+
+    const itemsTotal =
+      order?.orderItems
+        ?.filter((item) => !item.markForDelete)
+        ?.reduce((total, item) => {
+          const itemCost = Number(item.cost) || 0;
+          const itemQty = Number(item.quantity) || 0;
+          return total + itemCost * itemQty;
+        }, 0) || 0;
+
+    let tempFinalCost = couvertCalc + itemsTotal;
+
+    // Final safeguard against NaN
+    tempFinalCost = isNaN(tempFinalCost) ? 0 : tempFinalCost;
+
+    setTempFinalCost(tempFinalCost);
+  };
+
+  useEffect(() => {
+    calculateTempCost();
+  }, [order]);
+
   return (
     <View style={[styles.orderInfoContainer, containerStyle]}>
       <View style={styles.tableInfoContainer}>
@@ -33,6 +66,24 @@ export const OrderInfoBar = ({
                 </Text>
               </View>
             )}
+            {typeof tempFinalCost === 'number' &&
+              tempFinalCost.toFixed(2) !== order?.finalCost?.toFixed(2) && (
+                <View
+                  style={[
+                    styles.infoItem,
+                    { borderColor: colors.orange, borderWidth: 1, borderRadius: 5, padding: 3 },
+                  ]}
+                >
+                  <Text style={[styles.infoText, { fontSize: 10 }]}>
+                    <CurrencyFormat
+                      value={tempFinalCost}
+                      currency="€"
+                      fontSize={10}
+                      color={colors.orange}
+                    ></CurrencyFormat>
+                  </Text>
+                </View>
+              )}
           </View>
           <View style={styles.userSection}>
             {!hideTableName && (

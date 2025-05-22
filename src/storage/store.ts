@@ -4,7 +4,6 @@ import { SessionBearer } from '../types/requests.types';
 import { toast } from '../core/utils';
 import { EventEmitter, TEMP_ORDER_UPDATED } from '../helpers/Sockets/EventEmitter';
 import GlobalStore from './GlobalStore';
-import dayjs from '../core/dayjs';
 import {
   Category,
   catGroupedItems,

@@ -256,7 +256,6 @@ export const convertOccupiedOrderToOrder = (tableio: TableIO, items: ItemReq[]):
       originalItem.alreadySend = true;
       originalItem.oItemId = orderItem.id;
       const propertiesIds = orderItem.itemPropertyOfItem.map((e) => e.itemProperty.id);
-
       for (const group of Object.values(originalItem.itemPropertiesGrouped)) {
         for (const property of group) {
           if (propertiesIds.includes(property.id)) {

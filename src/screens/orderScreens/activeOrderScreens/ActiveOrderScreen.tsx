@@ -44,6 +44,7 @@ const ActiveOrderScreen = ({
   const [items, setItems] = useState<ItemReq[]>();
   const [table, setTable] = useState<Table>(route.params?.tableParam);
   const [order, setOrder] = useState<Order>(table.occupiedByOrder);
+
   const [isSending, setIsSending] = useState(false);
 
   const navigation = useNavigation();
@@ -174,7 +175,7 @@ const ActiveOrderScreen = ({
   const handleChangeCouvert = async (newQuantity: number) => {
     const tempOrder: Order = await getTempOrder();
 
-    if (table.occupiedByOrder.id === tempOrder.id) {
+    if (table?.occupiedByOrder?.id === tempOrder?.id) {
       await setTempOrder({ ...tempOrder, couvert: newQuantity });
     }
 

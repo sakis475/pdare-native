@@ -36,7 +36,14 @@ interface EditModalProps {
   mode: 'edit' | 'create';
 }
 
-const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSave, mode }) => {
+const EditModal: React.FC<EditModalProps> = ({
+  visible,
+  printer,
+  onDismiss,
+  onSave,
+  onDelete,
+  mode,
+}) => {
   const strings = useStrings();
   const [nickname, setNickname] = useState('');
   const [overrideIP, setOverrideIP] = useState('');
@@ -226,6 +233,17 @@ const EditModal: React.FC<EditModalProps> = ({ visible, printer, onDismiss, onSa
             }`}
         </Text>
         <View style={{ height: 20 }} />
+        {mode === 'edit' && (
+          <CustomButton
+            onPress={async () => {
+              onDelete(printer?.id);
+              onDismiss();
+            }}
+            variant="delete"
+          >
+            {strings.DELETE}
+          </CustomButton>
+        )}
       </BaseModal>
       <CharSetPicker />
     </>
@@ -285,6 +303,8 @@ const AdminPrintersScreen = () => {
       printerMac: '',
       printerIp: newPrinter.overrideIP,
       printerPort: newPrinter.overridePort,
+      overrideIP: newPrinter.overrideIP,
+      overridePort: newPrinter.overridePort,
       printLocation: newPrinter.printLocation,
       characterSet: newPrinter.characterSet,
       analysisPrinter: newPrinter.analysisPrinter,
@@ -417,7 +437,7 @@ const AdminPrintersScreen = () => {
 
       if (Array.isArray(response)) {
         setPrinters(response);
-        toast('success', strings.SUCCESS, strings.PRINTER_ADDED);
+        toast('success', strings.SUCCESS);
       } else {
         throw new Error('No valid printer entity Response');
       }
@@ -431,8 +451,8 @@ const AdminPrintersScreen = () => {
   const handleDeletePrinter = async (printerId: number) => {
     setIsLoading(true);
     try {
-      await patchRequest(`/printers/${printerId}`, {
-        printer: { active: false },
+      await patchRequest(`/printers`, {
+        printer: { id: printerId, active: false, isDeleted: true },
       });
       setPrinters((prev) => prev.filter((printer) => printer.id !== printerId));
       toast('success', strings.SUCCESS, strings.PRINTER_DELETED);
@@ -447,7 +467,7 @@ const AdminPrintersScreen = () => {
     <View style={styles.container}>
       {printers === null ? (
         <ActivityIndicator size="large" color={colors.primary} />
-      ) : !currentUser?.restaurant?.isPrinterAppInstalled ? (
+      ) : !currentUser?.restaurant?.isPrinterAppInstalled && !printers?.length ? (
         <View style={{ flex: 1, padding: 10 }}>
           <Text style={styles.noAppTitle}>{strings.NO_PRINTER_APP}</Text>
           <View style={{ flex: 1, maxHeight: '75%' }}>
@@ -477,14 +497,16 @@ const AdminPrintersScreen = () => {
           onPress={handleAddCustomPrinter}
           color={colors.white}
         />
-        <FAB
-          icon="magnify"
-          style={[styles.fab, styles.scanFab]}
-          onPress={handleScanPrinters}
-          loading={isScanning}
-          disabled={isScanning}
-          color={colors.white}
-        />
+        {currentUser?.restaurant?.isPrinterAppInstalled && (
+          <FAB
+            icon="magnify"
+            style={[styles.fab, styles.scanFab]}
+            onPress={handleScanPrinters}
+            loading={isScanning}
+            disabled={isScanning}
+            color={colors.white}
+          />
+        )}
       </View>
 
       <EditModal

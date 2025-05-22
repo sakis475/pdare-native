@@ -17,7 +17,7 @@ const PrinterGuide = () => {
         <Text style={styles.noAppIndent}>• {strings.INTERNET_REQUIRED}</Text>
 
         <Text style={styles.noAppStep}>2. {strings.DOWNLOAD_START_APP}</Text>
-        <Text style={styles.noAppIndent}>• Windows: {WINDOWS_PRINTER_APP_DOWNLOAD_URL}</Text>
+        <Text style={styles.noAppIndent}>• Windows 10/11: {WINDOWS_PRINTER_APP_DOWNLOAD_URL}</Text>
         {/* <Text style={styles.noAppIndent}>• Linux: {LINUX_PRINTER_APP_DOWNLOAD_URL}</Text> */}
 
         <Text style={styles.noAppStep}>3. {strings.LOGIN_TO_APP}</Text>
