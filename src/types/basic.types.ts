@@ -49,6 +49,7 @@ export interface Restaurant {
   couvertCost: number;
   currencySymbol: string;
   isPrinterAppInstalled?: boolean;
+  printersConnectionMethod: PrintersConnectionMethod;
   orderDailyLimit?: number;
 }
 
@@ -206,3 +207,5 @@ export interface Inventory {
   currentLimitEnd?: Date;
   restaurant: Restaurant;
 }
+
+export type PrintersConnectionMethod = 'DesktopApp' | 'SmartphoneClient';

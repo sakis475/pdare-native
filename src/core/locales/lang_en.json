@@ -302,11 +302,17 @@
   "PRINTER_APP_REQUIRES_ETHERNET": "This application requires ethernet connected thermal printers to print orders. Follow these steps to get started:",
   "CONNECT_PRINTER_TO_ROUTER": "Connect your thermal printer to your network router",
   "ENSURE_SAME_NETWORK": "Ensure your computer is on the same network",
+  "ENSURE_THERMAL_SAME_NETWORK": "Ensure the thermal printers is on the same network",
   "INTERNET_REQUIRED": "Internet connection is required",
   "DOWNLOAD_START_APP": "Download and start the printer discovery app (no installation Required):",
   "PRESS_SEARCH_BUTTON": "Press the printer search button at the bottom right.",
   "LOGIN_TO_APP": "Login into the printer discovery app on your computer",
   "KEEP_APP_RUNNING": "Keep the app running to enable printer discovery and print functionality.",
+  "ALTERNATIVE_NO_COMPUTER": "Alternatively, you can connect all phones to the same network as the thermal printer:",
+  "NETWORK_CONNECTION_PRIMARY": "To use thermal printers, connect all phones to the same network as the thermal printer:",
+  "ALTERNATIVE_COMPUTER_OPTION": "Alternatively, you can use a computer to connect to the thermal printer:",
+  "CONNECT_ALL_PHONES_TO_ROUTER": "Connect all phones to the same router as the thermal printer",
+  "THERMAL_PRINTER_CONNECTED": "Ensure the thermal printer is connected to the router",
   "NO_CATEGORIES_FOUND": "Νο Available Categories Found",
   "NO_PATTERNS_YET": "No Detail Patterns Yet",
   "PATTERNS_DESCRIPTION": "Detail Patterns help you define customizable properties for your items. Create patterns to manage common variations and specifications.",
@@ -359,5 +365,9 @@
   "APP_DESCRIPTION_1": "A fast and efficient food and beverage ordering service for Bars, Coffee Shops, Restaurants & more",
   "APP_DESCRIPTION_2": "It empowers waiters to manage orders seamlessly from their phones while giving restaurant owners full control over operations with ease.",
   "CONTACT_EMAIL": "Contact Email:",
-  "VERSION": "Version:"
+  "VERSION": "Version:",
+  "ADD_NEW_PRINTER": "Add New Printer",
+  "SEARCH_PRINTERS": "Search Printers",
+  "PRINT_SERVER": "App Print Server",
+  "NETWORK": "Network Wi-Fi"
 }

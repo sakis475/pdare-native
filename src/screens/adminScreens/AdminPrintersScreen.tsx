@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, FlatList } from 'react-native';
 import { AlertWithOptions, toast } from '../../core/utils';
 import { colors } from '../../core/theme';
 import { Button, Switch, Portal, Dialog } from 'react-native-paper';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { LoadingOverlay } from '../../components/basic/SavingOverlay';
-import { getRequest, patchRequest, postRequest } from '../../helpers/requests';
+import { getRequest, patchRequest, postRequest, setBearer } from '../../helpers/requests';
 import { useStrings } from '../../core/localization/languageContext';
 import { EventEmitter, PRINTERS_DISCOVERED_UPDATE } from '../../helpers/Sockets/EventEmitter';
 import dayjs from '../../core/dayjs';
@@ -14,12 +14,14 @@ import { EditIcon } from '../../components/basic/Icons';
 import BaseModal from '../../components/basic/BaseModal';
 import CustomSegmentedButtons from '../../components/basic/CustomSegmentedButtons';
 import CustomTextInput from '../../components/basic/CustomTextInput';
-import { Printer, User } from '../../types/basic.types';
-import { getStorage } from '../../storage/store';
+import { Printer, PrintersConnectionMethod, User } from '../../types/basic.types';
+import { getStorage, setStorage } from '../../storage/store';
 import PrinterGuide from '../../components/guides/guides/PrintersGuide';
 import { useHelpModal } from '../../providers/HelpContext';
 import { HelpModal } from '../../components/guides/HelpModal';
 import CustomButton from '../../components/basic/CustomButton';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import PrinterSettingsBottomSheet from '../../components/bottomSheets/PrinterSettingsBottomSheet';
 
 enum PrintLocation {
   KITCHEN = 'kitchen',
@@ -276,14 +278,35 @@ const AdminPrintersScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [currentUser, setCurrentUser] = useState<User>(null);
-
   const [mode, setMode] = useState<'edit' | 'create'>('edit');
-
-  const strings = useStrings();
 
   const { showHelpModal, helpContent, helpTitle, closeHelpModal } = useHelpModal();
 
+  const bottomSheetRef = useRef<any>(null);
+  const strings = useStrings();
+
+  const updatePrinterConnectionMethod = async (
+    printersConnectionMethod: PrintersConnectionMethod
+  ) => {
+    setIsLoading(true);
+    try {
+      const response = await patchRequest('/user/restaurant/update', {
+        printersConnectionMethod,
+      });
+      if (response) {
+        await setStorage('currentUser', response.user);
+        await setBearer(response);
+        toast('success', strings.SUCCESS);
+      }
+    } catch (error) {
+      toast('error', strings.ERROR);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleAddCustomPrinter = () => {
+    bottomSheetRef.current?.close();
     setSelectedPrinter(null);
     setMode('create');
     setModalVisible(true);
@@ -383,6 +406,7 @@ const AdminPrintersScreen = () => {
   }, []);
 
   const handleScanPrinters = async () => {
+    bottomSheetRef.current?.close();
     setIsScanning(true);
 
     const timeoutPromise = new Promise((_, reject) => {
@@ -464,72 +488,73 @@ const AdminPrintersScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {printers === null ? (
-        <ActivityIndicator size="large" color={colors.primary} />
-      ) : !currentUser?.restaurant?.isPrinterAppInstalled && !printers?.length ? (
-        <View style={{ flex: 1, padding: 10 }}>
-          <Text style={styles.noAppTitle}>{strings.NO_PRINTER_APP}</Text>
-          <View style={{ flex: 1, maxHeight: '75%' }}>
-            <PrinterGuide />
-          </View>
-        </View>
-      ) : (
-        <FlatList
-          style={styles.list}
-          data={printers}
-          keyExtractor={(item) => `printer-${item.id}`}
-          renderItem={({ item }) => <PrinterItem printer={item} onEdit={handleEditPress} />}
-          contentContainerStyle={[styles.listContent]}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>{strings.NO_PRINTERS}</Text>
-              <Text style={styles.emptyText}>{strings.TAP_TO_SCAN}</Text>
+    <BottomSheetModalProvider>
+      <View style={styles.container}>
+        {printers === null ? (
+          <ActivityIndicator size="large" color={colors.primary} />
+        ) : !currentUser?.restaurant?.isPrinterAppInstalled && !printers?.length ? (
+          <View style={{ flex: 1, padding: 10 }}>
+            <Text style={styles.noAppTitle}>{strings.NO_PRINTER_APP}</Text>
+            <View style={{ flex: 1, maxHeight: '75%' }}>
+              <PrinterGuide />
             </View>
-          }
-        />
-      )}
-
-      <View style={styles.fabContainer}>
-        <FAB
-          icon="plus"
-          style={[styles.fab, styles.addFab]}
-          onPress={handleAddCustomPrinter}
-          color={colors.white}
-        />
-        {currentUser?.restaurant?.isPrinterAppInstalled && (
-          <FAB
-            icon="magnify"
-            style={[styles.fab, styles.scanFab]}
-            onPress={handleScanPrinters}
-            loading={isScanning}
-            disabled={isScanning}
-            color={colors.white}
+          </View>
+        ) : (
+          <FlatList
+            style={styles.list}
+            data={printers}
+            keyExtractor={(item) => `printer-${item.id}`}
+            renderItem={({ item }) => <PrinterItem printer={item} onEdit={handleEditPress} />}
+            contentContainerStyle={[styles.listContent]}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>{strings.NO_PRINTERS}</Text>
+                <Text style={styles.emptyText}>{strings.TAP_TO_SCAN}</Text>
+              </View>
+            }
           />
         )}
+
+        <View style={styles.fabContainer}>
+          <FAB
+            icon="cog"
+            style={[styles.fab, styles.settingsFab]}
+            onPress={() => bottomSheetRef.current?.open()}
+            color={colors.white}
+          />
+        </View>
+
+        <PrinterSettingsBottomSheet
+          ref={bottomSheetRef}
+          onAddPrinter={handleAddCustomPrinter}
+          onSearchPrinters={handleScanPrinters}
+          isScanning={isScanning}
+          isAppInstalled={!!currentUser?.restaurant?.isPrinterAppInstalled}
+          updatePrinterConnectionMethod={updatePrinterConnectionMethod}
+        />
+
+        <EditModal
+          visible={modalVisible}
+          printer={selectedPrinter}
+          onDismiss={() => {
+            setModalVisible(false);
+            setSelectedPrinter(null);
+          }}
+          onSave={mode === 'create' ? handleCreatePrinter : handleEditPrinter}
+          onDelete={handleDeletePrinter}
+          mode={mode}
+        />
+
+        {isLoading && <LoadingOverlay />}
+
+        <HelpModal
+          visible={showHelpModal}
+          onClose={closeHelpModal}
+          helpContent={helpContent}
+          title={helpTitle}
+        />
       </View>
-
-      <EditModal
-        visible={modalVisible}
-        printer={selectedPrinter}
-        onDismiss={() => {
-          setModalVisible(false);
-          setSelectedPrinter(null);
-        }}
-        onSave={mode === 'create' ? handleCreatePrinter : handleEditPrinter}
-        onDelete={handleDeletePrinter}
-        mode={mode}
-      />
-
-      {isLoading && <LoadingOverlay />}
-
-      <HelpModal
-        visible={showHelpModal}
-        onClose={closeHelpModal}
-        helpContent={helpContent}
-        title={helpTitle}
-      />
-    </View>
+    </BottomSheetModalProvider>
   );
 };
 
@@ -729,6 +754,19 @@ const styles = StyleSheet.create({
   },
   fab: {
     backgroundColor: colors.primary,
+  },
+  settingsFab: {
+    position: 'absolute',
+    margin: 8,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.primary,
+  },
+  bottomSheetContent: {
+    padding: 16,
+  },
+  bottomSheetButton: {
+    marginBottom: 16,
   },
   noAppContainer: {
     flex: 1,
