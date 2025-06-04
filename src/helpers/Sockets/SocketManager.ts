@@ -298,10 +298,10 @@ class SocketManager {
     }
 
     // Don't attempt connection if we're in the middle of reconnecting
-    if (this.isReconnecting) {
-      console.warn('Connection attempt blocked - reconnection in progress');
-      return false;
-    }
+    // if (this.isReconnecting) {
+    //   console.warn('Connection attempt blocked - reconnection in progress');
+    //   return false;
+    // }
 
     // Clean up existing connection if any
     this.disconnect();

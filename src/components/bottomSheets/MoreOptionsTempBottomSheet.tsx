@@ -140,7 +140,6 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
                           <CustomSegmentedButtons
                             value={printDestination}
                             onValueChange={(e) => {
-                              console.log('New value:', e);
                               setPrintDestination(e as PrintLocation);
                             }}
                             buttons={[

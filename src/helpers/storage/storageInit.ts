@@ -59,7 +59,6 @@ export async function storageInitGroupedItems() {
 // active order tables
 export async function storageInitTableOrders() {
   const tables: TableIO[] = await Requests.getRequest('/tables');
-  console.log(JSON.stringify(tables, null, 2));
   const updatedTables = await processTables(tables);
   await setStorage('tableOrders', updatedTables);
 }

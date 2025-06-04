@@ -18,6 +18,7 @@ const PrinterGuide = () => {
         <Text style={styles.noAppStep}>{strings.CONNECT_ALL_PHONES_TO_ROUTER}</Text>
         <Text style={styles.noAppIndent}>• {strings.ENSURE_THERMAL_SAME_NETWORK}</Text>
         <Text style={styles.noAppIndent}>• {strings.THERMAL_PRINTER_CONNECTED}</Text>
+        <Text style={styles.noAppIndent}>• {strings.UNIQUE_IP_ADRESS_SETTING}</Text>
       </View>
 
       <View style={styles.noAppInstructionsContainer}>

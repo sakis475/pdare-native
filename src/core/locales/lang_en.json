@@ -313,6 +313,7 @@
   "ALTERNATIVE_COMPUTER_OPTION": "Alternatively, you can use a computer to connect to the thermal printer:",
   "CONNECT_ALL_PHONES_TO_ROUTER": "Connect all phones to the same router as the thermal printer",
   "THERMAL_PRINTER_CONNECTED": "Ensure the thermal printer is connected to the router",
+  "UNIQUE_IP_ADRESS_SETTING": "Ensure the thermal printers have static ips both on printers and router settings",
   "NO_CATEGORIES_FOUND": "Νο Available Categories Found",
   "NO_PATTERNS_YET": "No Detail Patterns Yet",
   "PATTERNS_DESCRIPTION": "Detail Patterns help you define customizable properties for your items. Create patterns to manage common variations and specifications.",

@@ -73,7 +73,6 @@ export const getTempOrder = async (): Promise<Order | null> => {
 };
 
 export const setTempOrder = async (order: Order): Promise<Order | null> => {
-  console.log(order, 'in setTempOrder');
   await setStorage('newOrder', order);
 
   return order;
