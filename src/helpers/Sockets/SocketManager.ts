@@ -164,11 +164,6 @@ class SocketManager {
       return;
     }
 
-    const handleError = (error: any) => {
-      this.debugLog('🚨 Socket error occurred', { error });
-      this.handleReconnection();
-    };
-
     this.socket
       .on('connect', () => {
         this.debugLog('✅ Socket connected successfully', {
@@ -186,17 +181,19 @@ class SocketManager {
       })
       .on('connect_error', (error) => {
         this.debugLog('🚨 Connection error', { error });
-        handleError(error);
+        this.handleReconnection();
       })
       .on('ping_timeout', () => {
         this.debugLog('⚠️ Ping timeout occurred');
-        handleError('Ping timeout');
+        this.handleReconnection();
       })
-      .on('error', handleError);
+      .on('error', (error) => {
+        this.debugLog('? Socket General Error', { error });
+      });
   }
 
-  private handleReconnection(): void {
-    if (this.isReconnecting) {
+  private handleReconnection(force = false): void {
+    if (this.isReconnecting && !force) {
       this.debugLog('⚠️ Reconnection already in progress, skipping...');
       return;
     }
@@ -211,8 +208,8 @@ class SocketManager {
       if (this.reconnectionAttempts >= this.maxReconnectionAttempts) {
         this.debugLog('❌ Max reconnection attempts reached, reinitializing connection');
         this.reconnectionAttempts = 0;
-        this.isReconnecting = false;
-        return this.reinitializeConnection();
+        this.connect(true);
+        return;
       }
 
       try {
@@ -228,17 +225,7 @@ class SocketManager {
         await new Promise((resolve) => setTimeout(resolve, backoffDelay));
 
         this.debugLog('🔌 Creating new socket connection');
-        const socket = io(BASE_DOMAIN, {
-          forceNew: true,
-          timeout: 5000,
-          reconnection: true,
-          reconnectionDelay: this.reconnectionDelay,
-          reconnectionDelayMax: 5000,
-          reconnectionAttempts: this.maxReconnectionAttempts,
-          auth: {
-            token: this.sessionBearer?.token,
-          },
-        });
+        const socket = this.createIoConnection();
 
         this.debugLog('⏳ Waiting for connection confirmation');
         await new Promise((resolve, reject) => {
@@ -255,7 +242,11 @@ class SocketManager {
         this.reconnectionAttempts = 0;
         this.isReconnecting = false;
 
-        this.debugLog('✅ Reconnection successful');
+        this.debugLog('✅ !Reconnection successful', {
+          socketId: this.socket?.id,
+          user: this.user?.email,
+        });
+
         this.attachCoreSocketListeners();
         this.joinRestaurantRoom();
         await this.resubscribeAllListeners();
@@ -272,36 +263,34 @@ class SocketManager {
         }
       }
     };
+    attemptReconnection();
   }
 
-  private reinitializeConnection(): void {
-    // Clean up existing connection
-    if (this.socket) {
-      this.socket.removeAllListeners();
-      this.socket.close();
-      this.socket = null;
-    }
-
-    // Attempt to establish a fresh connection
-    setTimeout(() => {
-      if (this.user) {
-        console.log('Reinitializing socket connection...');
-        this.connect();
-      }
-    }, 5000); // Wait 5 seconds before attempting reinitialization
+  private createIoConnection(): Socket | null {
+    return io(BASE_DOMAIN, {
+      forceNew: true,
+      timeout: 5000,
+      reconnection: true,
+      reconnectionDelay: this.reconnectionDelay,
+      reconnectionDelayMax: 2000,
+      reconnectionAttempts: Infinity,
+      auth: {
+        token: this.sessionBearer?.token,
+      },
+    });
   }
 
-  public connect(): boolean {
+  public connect(force = false): boolean {
     if (!this.user) {
       console.warn('Cannot connect: No user authenticated');
       return false;
     }
 
     // Don't attempt connection if we're in the middle of reconnecting
-    // if (this.isReconnecting) {
-    //   console.warn('Connection attempt blocked - reconnection in progress');
-    //   return false;
-    // }
+    if (this.isReconnecting && !force) {
+      console.warn('Connection attempt blocked - reconnection in progress');
+      return false;
+    }
 
     // Clean up existing connection if any
     this.disconnect();
@@ -316,17 +305,7 @@ class SocketManager {
     this.isReconnecting = false;
 
     // Create new socket with initial configuration
-    this.socket = io(BASE_DOMAIN, {
-      forceNew: true,
-      timeout: 5000,
-      reconnection: true,
-      reconnectionDelay: this.reconnectionDelay,
-      reconnectionDelayMax: 5000,
-      reconnectionAttempts: this.maxReconnectionAttempts,
-      auth: {
-        token: this.sessionBearer?.token,
-      },
-    });
+    this.socket = this.createIoConnection();
 
     this.attachCoreSocketListeners();
     this.startPeriodicReconnectCheck();
@@ -431,19 +410,20 @@ class SocketManager {
 
     this.debugLog('🏥 Starting health check');
 
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(async (resolve) => {
       let healthCheckReceived = false;
       let subscription: EmitterSubscription | null = null;
 
       const cleanup = () => {
-        this.debugLog('🧹 Cleaning up health check listeners');
         subscription?.remove();
         subscription = null;
       };
       const healthCheckTimeout = setTimeout(() => {
-        if (!healthCheckReceived && !this.isReconnecting) {
-          this.debugLog('⚠️ Health check timeout - initiating reconnection');
-          this.handleReconnection();
+        console.log(this.isReconnecting, 'this.isReconnecting');
+        console.log(healthCheckReceived, 'this.healthCheckReceived');
+        if (!healthCheckReceived) {
+          this.debugLog('⚠️ Health check response NOT received');
+          this.handleReconnection(true);
         }
         cleanup();
         resolve();
@@ -459,15 +439,17 @@ class SocketManager {
 
       subscription = EventEmitter.addListener(HEALTH_CHECK_RECEIVE, handleHealthCheck);
 
-      getRequest('/health-check').catch((error) => {
-        this.debugLog('❌ Health check HTTP request failed', { error });
+      const response = await getRequest('/health-check');
+
+      if (!response) {
+        this.debugLog('❌ Health check HTTP request failed');
         clearTimeout(healthCheckTimeout);
         if (!this.isReconnecting) {
           this.handleReconnection();
         }
         cleanup();
         resolve();
-      });
+      }
     });
   }
 
