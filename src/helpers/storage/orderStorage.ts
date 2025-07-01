@@ -300,7 +300,7 @@ export const updateItem = async (updatedItem: ItemReq) => {
 
 export const getItemsOfCategory = async (category: Category) => {
   const allItems = await getItems();
-  const items = allItems.filter((e) => e.category.id === category.id);
+  const items = allItems.filter((e) => e.category.id === category.id && e.isEnabled);
   if (!items) return [];
   return items;
 };
