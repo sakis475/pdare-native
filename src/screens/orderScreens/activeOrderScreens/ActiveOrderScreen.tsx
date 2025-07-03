@@ -276,7 +276,7 @@ const ActiveOrderScreen = ({
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2F2F2F' }}>
       {isSending && <LoadingOverlay />}
       <View style={styles.container}>
         {items && items.length > 0 ? (
