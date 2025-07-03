@@ -1,17 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   Dimensions,
+  ScrollView,
+  Image,
+  Keyboard,
 } from 'react-native';
-import { useAnimatedKeyboard } from 'react-native-reanimated';
-import { Text, Divider, TextInput, MD3LightTheme } from 'react-native-paper';
-import { LongPressGestureHandler, ScrollView, State } from 'react-native-gesture-handler';
-import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { Text } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { login, logout, resetPassword } from '../../helpers/storage/tokenRequests';
 import { navigate, ScreenNames } from '../../navigation/navigationUtils';
@@ -28,11 +27,12 @@ import { setStorage } from '../../storage/store';
 import { EventEmitter } from '../../helpers/Sockets/EventEmitter';
 import { toast } from '../../core/utils';
 import PasswordResetModal from '../../components/popupModals/PasswordResetModal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 const logoImage = require('../../../assets/servetablogowhite.png');
 
-const LoginScreen: React.FC = () => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -47,7 +47,6 @@ const LoginScreen: React.FC = () => {
 
   const emailValidator = (email: string) => {
     if (!email) return strings.EMAIL_REQUIRED;
-
     if (email.includes('@')) {
       const re = /\S+@\S+\.\S+/;
       if (!re.test(email)) return strings.ERROR_EMAIL_INVALID;
@@ -70,6 +69,7 @@ const LoginScreen: React.FC = () => {
       setPassword(credentials.password);
     }
   };
+
   const handleGetCurrentLanguage = async () => {
     const language = await getLanguage();
     if (!language) return;
@@ -77,11 +77,19 @@ const LoginScreen: React.FC = () => {
     setSelectedLanguage(language);
   };
 
+  const scrollRef = useRef<ScrollView>(null);
+
   useEffect(() => {
     handleGetLastCredentials();
     handleGetCurrentLanguage();
-
     logout({ skipNavigate: true });
+
+    const keyboardDidShow = Keyboard.addListener('keyboardDidShow', () => {
+      console.log('he');
+      scrollRef.current?.scrollTo({ y: 1000, animated: true });
+    });
+
+    return () => keyboardDidShow.remove();
   }, []);
 
   useEffect(() => {
@@ -90,51 +98,27 @@ const LoginScreen: React.FC = () => {
   }, [email, password]);
 
   const _onLoginPressed = async () => {
-    const emailError = emailValidator(email);
-    const passwordError = passwordValidator(password);
+    const emailErr = emailValidator(email);
+    const passErr = passwordValidator(password);
 
-    emailError ? setEmailError(emailError) : setEmailError('');
-    passwordError ? setPasswordError(passwordError) : setPasswordError('');
-    if (emailError || passwordError) {
-      return;
-    }
+    setEmailError(emailErr);
+    setPasswordError(passErr);
+
+    if (emailErr || passErr) return;
 
     setIsLoading(true);
     try {
       await login(email, password);
     } catch (error) {
       console.log(error);
-      // Handle error if needed
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Shared value for rotation
-  const rotateValue = useSharedValue(0);
-
-  // Animated style for rotation
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: `${rotateValue.value}deg` }],
-    };
-  });
-
-  // Handle long press event
-  const handleLongPress = () => {
-    rotateValue.value = withSpring(360, { damping: 6, stiffness: 100 }, () => {
-      rotateValue.value = 0; // Reset to 0 after the rotation
-    });
-  };
   const handlePressRegister = () => {
     navigate(ScreenNames.RegisterScreen);
   };
-
-  const keyboard = useAnimatedKeyboard();
-
-  const animatedFormStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: -keyboard.height.value }],
-  }));
 
   const handleLanguageChange = useCallback(
     async (language: AppLanguage) => {
@@ -152,82 +136,88 @@ const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <TouchableOpacity
-          onPress={() => setModalUserLangVisible(true)}
-          style={styles.languageButton}
+      <KeyboardAvoidingView
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+      >
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <LanguageIcon size={16}></LanguageIcon>
-          <Text style={styles.languageText}>
-            {languageOptions.find((e) => e.value === selectedLanguage).label}
-          </Text>
-        </TouchableOpacity>
-        <View style={styles.logoContainer}>
-          <LongPressGestureHandler
-            onHandlerStateChange={({ nativeEvent }) => {
-              if (nativeEvent.state === State.ACTIVE) {
-                handleLongPress();
-              }
-            }}
-          >
-            <Animated.Image source={logoImage} style={[styles.logo, animatedStyle]} />
-          </LongPressGestureHandler>
-          <Text style={styles.appDescription}>{strings.APP_DESCRIPTION}</Text>
-        </View>
-
-        <Animated.View style={[styles.formContainer, animatedFormStyle]}>
-          <Text style={styles.header}>{strings.LOGIN}</Text>
-
-          <View style={styles.inputsContainer}>
-            <View style={styles.inputWrapper}>
-              <CustomTextInput
-                label={strings.EMAIL}
-                value={email}
-                onChangeText={setEmail}
-                error={!!emailError}
-                keyboardType="email-address"
-                textContentType="emailAddress"
-                disabled={isLoading}
-              />
-              {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
-            </View>
-
-            <View style={styles.inputWrapper}>
-              <CustomTextInput
-                label={strings.PASSWORD}
-                value={password}
-                onChangeText={(text) => setPassword(text)}
-                error={!!passwordError}
-                secureTextEntry={true}
-                disabled={isLoading}
-              />
-              {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
-            </View>
-          </View>
-
           <TouchableOpacity
-            style={styles.forgotPassword}
-            disabled={isLoading}
-            onPress={() => setModalPasswordResetVisible(true)}
+            onPress={() => setModalUserLangVisible(true)}
+            style={styles.languageButton}
           >
-            <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>
+            <LanguageIcon size={16} />
+            <Text style={styles.languageText}>
+              {languageOptions.find((e) => e.value === selectedLanguage)?.label}
+            </Text>
           </TouchableOpacity>
 
-          <CustomButton onPress={_onLoginPressed} loading={isLoading}>
-            <Text style={styles.buttonText}>{strings.LOGIN}</Text>
-          </CustomButton>
+          <View style={styles.logoContainer}>
+            <Image source={logoImage} style={[styles.logo]} />
+            <Text style={styles.appDescription}>{strings.APP_DESCRIPTION}</Text>
+          </View>
 
-          <CustomButton onPress={handlePressRegister} loading={isLoading} mode={'outlined'}>
-            <Text style={styles.buttonText}>{strings.CREATE_NEW_ACCOUNT}</Text>
-          </CustomButton>
-        </Animated.View>
-      </View>
+          <View style={styles.formContainer}>
+            <Text style={styles.header}>{strings.LOGIN}</Text>
+
+            <View style={styles.inputsContainer}>
+              <View style={styles.inputWrapper}>
+                <CustomTextInput
+                  label={strings.EMAIL}
+                  value={email}
+                  onChangeText={setEmail}
+                  error={!!emailError}
+                  keyboardType="email-address"
+                  textContentType="emailAddress"
+                  disabled={isLoading}
+                />
+                {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <CustomTextInput
+                  label={strings.PASSWORD}
+                  value={password}
+                  onChangeText={setPassword}
+                  error={!!passwordError}
+                  secureTextEntry
+                  disabled={isLoading}
+                />
+                {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.forgotPassword}
+              disabled={isLoading}
+              onPress={() => setModalPasswordResetVisible(true)}
+            >
+              <Text style={styles.forgotPasswordText}>{strings.RESET_PASSWORD}</Text>
+            </TouchableOpacity>
+
+            <CustomButton onPress={_onLoginPressed} loading={isLoading}>
+              <Text style={styles.buttonText}>{strings.LOGIN}</Text>
+            </CustomButton>
+
+            <CustomButton onPress={handlePressRegister} loading={isLoading} mode="outlined">
+              <Text style={styles.buttonText}>{strings.CREATE_NEW_ACCOUNT}</Text>
+            </CustomButton>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
       <LanguageSelectorModal
         isModalVisible={isModalUserLangVisible}
         selectedLanguage={selectedLanguage}
         onDismiss={() => setModalUserLangVisible(false)}
         onLanguageChange={handleLanguageChange}
       />
+
       <PasswordResetModal
         isModalVisible={isModalPasswordResetVisible}
         onDismiss={() => setModalPasswordResetVisible(false)}
@@ -250,11 +240,15 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
     paddingHorizontal: width * 0.05,
+  },
+  scrollContent: {
+    paddingHorizontal: width * 0.05,
+    paddingBottom: 80,
   },
   logoContainer: {
     alignItems: 'center',
+    marginTop: 20,
     marginBottom: height * 0.05,
   },
   logo: {

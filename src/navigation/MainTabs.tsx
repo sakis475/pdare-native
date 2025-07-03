@@ -5,6 +5,7 @@ import TablesScreen from '../screens/TablesScreen';
 import TempOrderScreen from '../screens/orderScreens/tempOrderScreen';
 import ExpoScreen from '../screens/ExpoScreen';
 import { colors } from '../core/theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const MainTabs = ({ route }: any) => {
   const strings = useStrings();
@@ -53,17 +54,24 @@ const MainTabs = ({ route }: any) => {
   );
 
   return (
-    <BottomNavigation
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-      barStyle={{ backgroundColor: colors.darkerGrey, height: 70 }}
-      activeColor="#147eb8"
-      inactiveColor="#FFFFFF"
-      sceneAnimationEnabled={false}
-      shifting={false} // Add this if you want to disable the shifting animation
-      compact // Add this if you want a more compact navigation bar
-    />
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: colors.darkerGrey,
+      }}
+    >
+      <BottomNavigation
+        navigationState={{ index, routes }}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+        barStyle={{ backgroundColor: colors.darkerGrey, height: 70 }}
+        activeColor="#147eb8"
+        inactiveColor="#FFFFFF"
+        sceneAnimationEnabled={false}
+        shifting={false} // Add this if you want to disable the shifting animation
+        compact // Add this if you want a more compact navigation bar
+      />
+    </SafeAreaView>
   );
 };
 

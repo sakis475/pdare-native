@@ -87,10 +87,10 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
-        <SafeAreaView
+        <View
           style={{
             flex: 1,
-            backgroundColor: colors.slightlyLighterGrey,
+            backgroundColor: colors.darkGrey,
           }}
         >
           {/* <StatusBar barStyle="light-content" translucent={false} /> */}
@@ -111,7 +111,8 @@ const App = () => {
               <Toast config={toastConfig} />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
-        </SafeAreaView>
+          <View style={{ height: 25, backgroundColor: 'black' }}></View>
+        </View>
       </ErrorBoundary>
     </SafeAreaProvider>
   );
