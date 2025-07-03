@@ -83,7 +83,7 @@ export async function setBearer(sessionBearer: SessionBearer) {
   }
 }
 
-export async function getRequest(url: string) {
+export async function getRequest(url: string, timeout = REQ_TIMEOUT) {
   try {
     const auth = await getBearer();
     if (!auth) {
@@ -93,7 +93,7 @@ export async function getRequest(url: string) {
       headers: {
         Authorization: `Bearer ${auth?.token}`,
       },
-      timeout: REQ_TIMEOUT,
+      timeout,
     };
 
     console.log('GET ' + BASE_URL + url);

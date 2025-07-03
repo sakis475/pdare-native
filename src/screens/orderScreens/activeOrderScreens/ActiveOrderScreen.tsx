@@ -266,7 +266,10 @@ const ActiveOrderScreen = ({
       setIsSending(true);
       const data = { printType: printType, printLocation: printLocation, isAnalysis };
       const result = await postRequest(`/orders/orderPrint/${orderId}`, data);
-      toast('success', strings.SUCCESS, '', 1000);
+
+      if (result) {
+        toast('success', strings.SUCCESS, '', 1000);
+      }
     } finally {
       setIsSending(false);
     }

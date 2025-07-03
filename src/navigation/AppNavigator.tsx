@@ -45,6 +45,7 @@ const AppNavigator = () => {
       screenOptions={{
         headerTitleAlign: 'center',
         orientation: 'portrait',
+        animation: 'fade_from_bottom',
       }}
       initialRouteName={ScreenNames.StartLoadingScreen}
     >
@@ -89,7 +90,7 @@ const AppNavigator = () => {
               ></CustomNavigationScreenHeaderTitle>
             );
           },
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -111,7 +112,7 @@ const AppNavigator = () => {
               subtitle={route?.params?.table?.tableName}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -129,7 +130,7 @@ const AppNavigator = () => {
               title={route.params?.tableParam?.tableName}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -147,7 +148,7 @@ const AppNavigator = () => {
               title={strings.ADD_ITEMS}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -168,7 +169,7 @@ const AppNavigator = () => {
               }
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -188,7 +189,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -208,7 +209,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -228,7 +229,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -248,7 +249,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -268,7 +269,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -287,7 +288,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -306,7 +307,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -326,7 +327,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -353,7 +354,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -373,7 +374,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -393,7 +394,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
@@ -413,7 +414,7 @@ const AppNavigator = () => {
               bold={true}
             ></CustomNavigationScreenHeaderTitle>
           ),
-          animation: 'none',
+          animation: 'fade_from_bottom',
           headerStyle: {
             backgroundColor: colors.darkerGrey,
           },
