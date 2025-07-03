@@ -2,7 +2,7 @@ import { setJSExceptionHandler, setNativeExceptionHandler } from 'react-native-e
 import { errorHandler } from './src/errorHandler/error-handler';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, DefaultTheme, PaperProvider, Text } from 'react-native-paper';
-import { NavigationContainer, Theme } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 
 import { setLocalizedStrings, strings } from './src/core/localization/strings';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -21,8 +21,8 @@ import { HelpProvider } from './src/providers/HelpContext';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/helpers/config/toastConfig';
 import KeepAwake from '@sayem314/react-native-keep-awake';
-import { Alert, BackHandler } from 'react-native';
-
+import { Alert, BackHandler, StatusBar, View } from 'react-native';
+import { colors } from './src/core/theme';
 const App = () => {
   const [localizedStringsLoaded, setLocalizedStringsLoaded] = useState(false);
 
@@ -87,7 +87,13 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            backgroundColor: colors.slightlyLighterGrey,
+          }}
+        >
+          {/* <StatusBar barStyle="light-content" translucent={false} /> */}
           <GestureHandlerRootView style={{ flex: 1 }}>
             <BottomSheetModalProvider>
               <NavigationContainer ref={navigationRef}>
