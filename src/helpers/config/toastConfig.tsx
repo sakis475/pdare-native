@@ -15,6 +15,7 @@ export const toastConfig: ToastConfig = {
         toastProps.style,
         {
           borderLeftColor: colors.green,
+          marginTop: 60,
         },
       ]}
     />
@@ -27,6 +28,7 @@ export const toastConfig: ToastConfig = {
         toastProps.style,
         {
           borderLeftColor: colors.veryLighterBlue,
+          marginTop: 60,
         },
       ]}
     />
@@ -39,6 +41,7 @@ export const toastConfig: ToastConfig = {
         toastProps.style,
         {
           borderLeftColor: colors.danger,
+          marginTop: 60,
         },
       ]}
     />
@@ -51,6 +54,7 @@ export const toastConfig: ToastConfig = {
         toastProps.style,
         {
           borderLeftColor: colors.lightBlack,
+          marginTop: 60,
         },
       ]}
     />
