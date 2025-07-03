@@ -189,7 +189,7 @@ const HistoryOrdersScreen = ({ currentIndex }: any) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2F2F2F' }}>
       <View style={styles.container}>
         {orders ? (
           <View style={styles.categoriesContainer}>
