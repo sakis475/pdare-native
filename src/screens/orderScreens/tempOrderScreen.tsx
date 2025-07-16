@@ -28,6 +28,7 @@ import MoreOptionsTempBottomSheet from '../../components/bottomSheets/MoreOption
 import { patchRequest, postRequest } from '../../helpers/requests';
 import CustomButton from '../../components/basic/CustomButton';
 import { ItemReq, Table, PrintLocation, PrintType } from '../../types/basic.types';
+import { handleRePrintOrder } from '../../core/printers/PrintHelpers';
 
 // Memoized Item renderer components
 const DisabledItem = memo(({ item, onDelete }: { item: ItemReq; onDelete: any }) => (
@@ -226,23 +227,6 @@ const TempOrderScreen = ({
       setIsSending(false);
     }
   };
-  const handleRePrintOrder = async (
-    printLocation = PrintLocation.ALL,
-    printType = PrintType.PERSONEL,
-    isAnalysis = false
-  ) => {
-    const orderId = orderState.order.id;
-    try {
-      setIsSending(true);
-      const data = { printType: printType, printLocation: printLocation, isAnalysis };
-      const result = await postRequest(`/orders/orderPrint/${orderId}`, data);
-      if (result) {
-        toast('success', strings.SUCCESS, '', 1000);
-      }
-    } finally {
-      setIsSending(false);
-    }
-  };
 
   const renderItem = useCallback(
     ({ item }: { item: ItemReq }) => (
@@ -332,8 +316,24 @@ const TempOrderScreen = ({
               onChangeTable={handleOpenSelectTableModal}
               onChangeCouvert={handleChangeCouvert}
               onCloseOrder={handleCloseOrder}
-              onPrint={handleRePrintOrder}
-              onCustomerAnalysis={() => handleRePrintOrder(undefined, PrintType.FINAL, true)}
+              onPrint={() =>
+                handleRePrintOrder(
+                  orderState.order.id,
+                  undefined,
+                  PrintType.PERSONEL,
+                  false,
+                  setIsSending
+                )
+              }
+              onCustomerAnalysis={() =>
+                handleRePrintOrder(
+                  orderState.order.id,
+                  undefined,
+                  PrintType.FINAL,
+                  true,
+                  setIsSending
+                )
+              }
             ></MoreOptionsTempBottomSheet>
           </Portal>
         </>

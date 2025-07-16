@@ -35,6 +35,7 @@ import MoreOptionsTempBottomSheet from '../../../components/bottomSheets/MoreOpt
 import { patchRequest, postRequest } from '../../../helpers/requests';
 import { LoadingOverlay } from '../../../components/basic/SavingOverlay';
 import { ItemReq, Table, Order, PrintLocation, PrintType } from '../../../types/basic.types';
+import { handleRePrintOrder } from '../../../core/printers/PrintHelpers';
 const ActiveOrderScreen = ({
   route,
   bottomSheetMode = false,
@@ -256,25 +257,6 @@ const ActiveOrderScreen = ({
     scrollToBottom();
   }, [scrollToBottom]);
 
-  const handleRePrintOrder = async (
-    printLocation = PrintLocation.ALL,
-    printType = PrintType.PERSONEL,
-    isAnalysis = false
-  ) => {
-    const orderId = order.id;
-    try {
-      setIsSending(true);
-      const data = { printType: printType, printLocation: printLocation, isAnalysis };
-      const result = await postRequest(`/orders/orderPrint/${orderId}`, data);
-
-      if (result) {
-        toast('success', strings.SUCCESS, '', 1000);
-      }
-    } finally {
-      setIsSending(false);
-    }
-  };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#2F2F2F' }}>
       {isSending && <LoadingOverlay />}
@@ -345,8 +327,12 @@ const ActiveOrderScreen = ({
                 onChangeTable={handleOpenSelectTableModal}
                 onChangeCouvert={handleChangeCouvert}
                 onCloseOrder={handleCloseOrder}
-                onPrint={handleRePrintOrder}
-                onCustomerAnalysis={() => handleRePrintOrder(undefined, PrintType.FINAL, true)}
+                onPrint={() =>
+                  handleRePrintOrder(order.id, undefined, PrintType.PERSONEL, false, setIsSending)
+                }
+                onCustomerAnalysis={() =>
+                  handleRePrintOrder(order.id, undefined, PrintType.FINAL, true, setIsSending)
+                }
               ></MoreOptionsTempBottomSheet>
             </Portal>
           </View>
