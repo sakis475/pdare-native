@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     paddingVertical: 4,
+    paddingBottom: 15,
     backgroundColor: colors.grey,
     paddingHorizontal: 10,
     justifyContent: 'center',
