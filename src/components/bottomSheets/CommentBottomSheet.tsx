@@ -16,6 +16,7 @@ import { CategoryHeader } from '../helpers/CategoryHeader';
 import { useStrings } from '../../core/localization/languageContext';
 import { DoubleDownIcon } from '../basic/Icons';
 import { ItemReq } from '../../types/basic.types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface CommentBottomSheetProps {
   item: ItemReq;
@@ -27,7 +28,7 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
     const bottomSheetRef = useRef<BottomSheet>(null);
     const textInputRef = useRef<any>(null); // TextInput ref
     const snapPoints = useMemo(() => ['80%', '80%'], []);
-
+    const insets = useSafeAreaInsets();
     const [commentText, setCommentText] = useState(item.comment ? item.comment : '');
 
     const strings = useStrings();
@@ -87,7 +88,7 @@ const CommentBottomSheet = forwardRef<any, CommentBottomSheetProps>(
           handleIndicatorStyle={{ backgroundColor: '#fff' }}
           backgroundStyle={{ backgroundColor: colors.darkGrey }}
         >
-          <BottomSheetView style={styles.tableChangeContainer}>
+          <BottomSheetView style={[styles.tableChangeContainer, { paddingBottom: insets.bottom }]}>
             <View style={{ flex: 1, gap: 3 }}>
               <CategoryHeader title={strings.COMMENT}></CategoryHeader>
               <TextInput

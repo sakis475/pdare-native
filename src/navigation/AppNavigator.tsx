@@ -34,10 +34,24 @@ import PatternGuide from '../components/guides/guides/PatternGuide';
 import PrinterGuide from '../components/guides/guides/PrintersGuide';
 import VerifyEmailScreen from '../screens/authenticationScreens/VerifyEmailScreen';
 import AboutScreen from '../screens/AboutScreen';
+import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Stack = createNativeStackNavigator();
 
 export const navigationRef = React.createRef<NavigationContainerRef<any>>();
+
+// Helper to wrap screens with insets
+function withInsets(ScreenComponent: React.ComponentType<any>) {
+  return function ScreenWithInsets(props: any) {
+    const insets = useSafeAreaInsets();
+    return (
+      <View style={{ flex: 1, paddingBottom: insets.bottom, backgroundColor: colors.darkGrey }}>
+        <ScreenComponent {...props} />
+      </View>
+    );
+  };
+}
 
 const AppNavigator = () => {
   return (
@@ -57,31 +71,31 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.StartLoadingScreen}
-        component={StartLoadingScreen}
+        component={withInsets(StartLoadingScreen)}
         options={{ headerShown: false, gestureEnabled: false, animation: 'none' }}
       />
 
       <Stack.Screen
         name={ScreenNames.NewUserSetupScreen}
-        component={NewUserSetupScreen}
+        component={withInsets(NewUserSetupScreen)}
         options={{ headerShown: false, gestureEnabled: false }}
       />
 
       <Stack.Screen
         name={ScreenNames.VerifyEmailScreen}
-        component={VerifyEmailScreen}
+        component={withInsets(VerifyEmailScreen)}
         options={{ headerShown: false, gestureEnabled: false }}
       />
 
       <Stack.Screen
         name={ScreenNames.LoginScreen}
-        component={LoginScreen}
+        component={withInsets(LoginScreen)}
         options={{ headerShown: false, gestureEnabled: false }}
       />
 
       <Stack.Screen
         name={ScreenNames.RegisterScreen}
-        component={RegisterScreen}
+        component={withInsets(RegisterScreen)}
         options={({ route }: any) => ({
           headerTitle: () => {
             return (
@@ -102,7 +116,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.NewOrderScreen}
-        component={NewOrderScreen}
+        component={withInsets(NewOrderScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -123,7 +137,7 @@ const AppNavigator = () => {
       />
       <Stack.Screen
         name={ScreenNames.ActiveOrderScreen}
-        component={ActiveOrderScreen}
+        component={withInsets(ActiveOrderScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -141,7 +155,7 @@ const AppNavigator = () => {
       />
       <Stack.Screen
         name={ScreenNames.ItemListScreen}
-        component={ItemListScreen}
+        component={withInsets(ItemListScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -160,7 +174,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.TempOrderScreen}
-        component={TempOrderScreen}
+        component={withInsets(TempOrderScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -181,7 +195,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.RestaurantSettingsScreen}
-        component={RestaurantSettingsScreen}
+        component={withInsets(RestaurantSettingsScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -201,7 +215,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.ProfileScreen}
-        component={ProfileScreen}
+        component={withInsets(ProfileScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -221,7 +235,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.AboutScreen}
-        component={AboutScreen}
+        component={withInsets(AboutScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -241,7 +255,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.HistoryOrdersScreen}
-        component={HistoryOrdersScreen}
+        component={withInsets(HistoryOrdersScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -261,7 +275,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.ManageCategoriesScreen}
-        component={AdminCategoryScreen}
+        component={withInsets(AdminCategoryScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -280,7 +294,7 @@ const AppNavigator = () => {
       />
       <Stack.Screen
         name={ScreenNames.ManageItemsScreen}
-        component={AdminItemListScreen}
+        component={withInsets(AdminItemListScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -299,7 +313,7 @@ const AppNavigator = () => {
       />
       <Stack.Screen
         name={ScreenNames.ManageItemDetailsScreen}
-        component={AdminItemDetailsScreen}
+        component={withInsets(AdminItemDetailsScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -319,7 +333,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.ManageItemDetailsPatternScreen}
-        component={AdminItemDetailsPatternScreen}
+        component={withInsets(AdminItemDetailsPatternScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -346,7 +360,7 @@ const AppNavigator = () => {
       />
       <Stack.Screen
         name={ScreenNames.AdminPersonelScreen}
-        component={AdminPersonelScreen}
+        component={withInsets(AdminPersonelScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -366,7 +380,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.ManageItemDetailsPatternEditScreen}
-        component={AdminItemDetailsPatternEditScreen}
+        component={withInsets(AdminItemDetailsPatternEditScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -386,7 +400,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.ManageTableScreen}
-        component={AdminTableScreen}
+        component={withInsets(AdminTableScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -406,7 +420,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.ManagePrintersScreen}
-        component={AdminPrintersScreen}
+        component={withInsets(AdminPrintersScreen)}
         options={({ route }: any) => ({
           headerTitle: () => (
             <CustomNavigationScreenHeaderTitle
@@ -434,7 +448,7 @@ const AppNavigator = () => {
 
       <Stack.Screen
         name={ScreenNames.ItemDetailsScreen}
-        component={ItemDetailsScreen}
+        component={withInsets(ItemDetailsScreen)}
         options={({ route }: any) => ({
           animation: 'fade_from_bottom',
           headerTitle: () => (

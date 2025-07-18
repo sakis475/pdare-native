@@ -4,6 +4,7 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/botto
 import { Portal } from '@gorhom/portal';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface PropertyTypeBottomSheetProps {
   currentType: string;
@@ -14,7 +15,7 @@ const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
   ({ currentType, onTypeChange }, ref) => {
     const bottomSheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => [280, 340], []);
-
+    const insets = useSafeAreaInsets();
     const strings = useStrings();
 
     const handleOpenModal = useCallback(() => {
@@ -62,7 +63,7 @@ const PropertyTypeBottomSheet = forwardRef<any, PropertyTypeBottomSheetProps>(
           handleIndicatorStyle={styles.handleIndicator}
           backgroundStyle={styles.bottomSheetBackground}
         >
-          <BottomSheetView style={styles.container}>
+          <BottomSheetView style={[styles.container, { paddingBottom: insets.bottom }]}>
             <View style={styles.contentContainer}>
               <Text style={styles.title}>{strings.CHANGE_SELECTION_TYPE}</Text>
               <Text style={styles.subtitle}>{strings.SELECTION_TYPE_DESCRIPTION}</Text>

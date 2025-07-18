@@ -6,13 +6,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Keyboard, StyleSheet } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { colors } from '../../core/theme';
 import { SelectTable } from '../tableSelect/SelectTable';
 import { Portal } from '@gorhom/portal';
 import { reqFetchTables } from '../../helpers/storage/tablesStorage';
 import { Table } from '../../types/basic.types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface TableSelectBottomSheetProps {
   handleSelectTable: (table: Table) => void;
@@ -24,8 +25,8 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
     const [renderKey, setRenderKey] = useState<number>(0);
 
     const bottomSheetRef = useRef<BottomSheet>(null);
-    const snapPoints = useMemo(() => [300, 300], []);
-
+    const snapPoints = useMemo(() => ['80%', '80%'], []);
+    const insets = useSafeAreaInsets();
     const handleOpenModal = useCallback(async () => {
       bottomSheetRef.current?.expand();
       let allTables = await reqFetchTables();
@@ -76,14 +77,20 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
           backgroundStyle={{ backgroundColor: colors.darkGrey }}
         >
           <BottomSheetView style={styles.tableChangeContainer}>
-            <SelectTable
-              key={renderKey} // Add key prop to force re-render
-              allTables={availableTables}
-              onTableSelect={(table: Table) => {
-                handleCloseModal();
-                handleSelectTable(table);
-              }}
-            />
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top + 80 : 0}
+              style={{ flex: 1 }}
+            >
+              <SelectTable
+                key={renderKey} // Add key prop to force re-render
+                allTables={availableTables}
+                onTableSelect={(table: Table) => {
+                  handleCloseModal();
+                  handleSelectTable(table);
+                }}
+              />
+            </KeyboardAvoidingView>
           </BottomSheetView>
         </BottomSheet>
       </Portal>
@@ -93,10 +100,10 @@ const TableSelectBottomSheet = forwardRef<any, TableSelectBottomSheetProps>(
 
 const styles = StyleSheet.create({
   tableChangeContainer: {
+    flex: 1,
     paddingTop: 20,
     paddingHorizontal: 2,
     justifyContent: 'center',
-    height: 300,
   },
 });
 export default TableSelectBottomSheet;

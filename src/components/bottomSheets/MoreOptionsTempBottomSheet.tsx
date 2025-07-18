@@ -23,6 +23,7 @@ import { DoubleDownIcon } from '../basic/Icons';
 import CustomSegmentedButtons from '../basic/CustomSegmentedButtons';
 import CustomButton from '../basic/CustomButton';
 import { Order, PrintLocation } from '../../types/basic.types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface MoreOptionsTempBottomSheet {
   onChangeTable?: () => void;
@@ -40,7 +41,7 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
     const snapPoints = useMemo(() => ['95%', '95%'], []);
     const strings = useStrings();
     const [openCouvertModal, setOpenCouvertModal] = useState(false);
-
+    const insets = useSafeAreaInsets();
     const handleOpenModal = useCallback(async () => {
       bottomSheetRef.current?.expand();
     }, []);
@@ -116,7 +117,9 @@ const MoreOptionsTempBottomSheet = forwardRef<any, MoreOptionsTempBottomSheet>(
             handleIndicatorStyle={{ backgroundColor: '#fff' }}
             backgroundStyle={{ backgroundColor: colors.darkGrey }}
           >
-            <BottomSheetView style={styles.tableChangeContainer}>
+            <BottomSheetView
+              style={[styles.tableChangeContainer, { paddingBottom: insets.bottom }]}
+            >
               <ScrollView style={styles.contentContainer}>
                 <CategoryHeader title={strings.MORE_OPTIONS} />
 

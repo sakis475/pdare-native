@@ -1,4 +1,4 @@
-import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import React, {
   forwardRef,
   useCallback,
@@ -14,6 +14,8 @@ import { getStorage } from '../../storage/store';
 import { colors } from '../../core/theme';
 import { FlatList } from 'react-native-gesture-handler';
 import { useStrings } from '../../core/localization/languageContext';
+import { Category } from '../../types/basic.types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface CategoryBottomSheetProps {
   currentCategory?: Category | null;
@@ -35,6 +37,8 @@ export const CategoryBottomSheet = forwardRef<CategoryBottomSheetRef, CategoryBo
     const snapPoints = useMemo(() => ['55%', '55%'], []);
 
     const strings = useStrings();
+
+    const insets = useSafeAreaInsets();
 
     // Callbacks
     const handlePresentModalPress = useCallback(() => {
@@ -103,19 +107,21 @@ export const CategoryBottomSheet = forwardRef<CategoryBottomSheetRef, CategoryBo
         onDismiss={onClose}
         handleIndicatorStyle={{ backgroundColor: '#fff' }}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>{strings.CATEGORY_PATTERN_SELECT}</Text>
-        </View>
+        <BottomSheetView style={{ flex: 1, paddingBottom: insets.bottom }}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{strings.CATEGORY_PATTERN_SELECT}</Text>
+          </View>
 
-        <FlatList
-          data={categories}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          contentContainerStyle={styles.listContent}
-          bounces={false}
-          showsVerticalScrollIndicator={true}
-        />
+          <FlatList
+            data={categories}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            contentContainerStyle={styles.listContent}
+            bounces={false}
+            showsVerticalScrollIndicator={true}
+          />
+        </BottomSheetView>
       </BottomSheetModal>
     );
   }

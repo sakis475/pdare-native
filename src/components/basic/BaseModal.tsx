@@ -14,6 +14,7 @@ import { Button } from 'react-native-paper';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
 import { strings } from '../../core/localization/strings';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BaseModalProps {
   visible: boolean;
@@ -45,6 +46,7 @@ const BaseModal: React.FC<BaseModalProps> = ({
   customBottomLift = -20,
 }) => {
   const strings = useStrings();
+  const insets = useSafeAreaInsets();
   if (!visible) return null;
 
   const getThemeColors = () => {
@@ -144,7 +146,13 @@ const BaseModal: React.FC<BaseModalProps> = ({
         onPress={closeOnOutsideTouch ? onClose : undefined}
         testID={`${testID}-overlay`}
       >
-        <View style={[styles.container, { backgroundColor: themeColors.overlay }]}>
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: themeColors.overlay },
+            { paddingBottom: insets.bottom },
+          ]}
+        >
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.keyboardView}

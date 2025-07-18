@@ -19,6 +19,7 @@ import { useHelpModal } from '../../providers/HelpContext';
 import { HelpModal } from '../guides/HelpModal';
 import PrinterGuide from '../guides/guides/PrintersGuide';
 import { HelpIcon } from '../basic/Icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface PrinterSettingsBottomSheetProps {
   onAddPrinter: () => void;
@@ -72,6 +73,7 @@ const PrinterSettingsBottomSheet = forwardRef<any, PrinterSettingsBottomSheetPro
       close: handleClose,
     }));
 
+    const insets = useSafeAreaInsets();
     return (
       <BottomSheet
         ref={bottomSheetRef}
@@ -89,7 +91,7 @@ const PrinterSettingsBottomSheet = forwardRef<any, PrinterSettingsBottomSheetPro
         handleIndicatorStyle={{ backgroundColor: colors.white }}
         enablePanDownToClose={true}
       >
-        <BottomSheetView style={styles.content}>
+        <BottomSheetView style={[styles.content, { paddingBottom: insets.bottom }]}>
           <View style={styles.segmentedButtonsContainer}>
             <CustomSegmentedButtons
               value={connectionMethod}

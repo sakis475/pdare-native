@@ -15,11 +15,13 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
 import { DoubleDownIcon } from '../basic/Icons';
+import { ItemReq } from '../../types/basic.types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['93%', '93%'], []);
-
+  const insets = useSafeAreaInsets();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const strings = useStrings();
@@ -74,7 +76,7 @@ const TempOrderBottomSheet = forwardRef<any>((_, ref) => {
         handleIndicatorStyle={{ backgroundColor: '#fff' }}
         backgroundStyle={{ backgroundColor: colors.darkGrey }}
       >
-        <BottomSheetView style={styles.tableChangeContainer}>
+        <BottomSheetView style={[styles.tableChangeContainer, { paddingBottom: insets.bottom }]}>
           <TempOrderScreen
             bottomSheetMode={true}
             isSheetOpen={isSheetOpen}

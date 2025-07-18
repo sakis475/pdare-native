@@ -111,7 +111,6 @@ const App = () => {
               <Toast config={toastConfig} />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
-          <View style={{ height: 25, backgroundColor: 'black' }}></View>
         </View>
       </ErrorBoundary>
     </SafeAreaProvider>

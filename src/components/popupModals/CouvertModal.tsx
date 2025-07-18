@@ -21,7 +21,6 @@ const CouvertModal: React.FC<CouvertModalProps> = ({
 }) => {
   const [quantity, setQuantity] = useState<number>(couvertQuantity ?? 0);
   const strings = useStrings();
-
   const handleSubmit = () => {
     onSubmit(quantity);
     onModalClose();
