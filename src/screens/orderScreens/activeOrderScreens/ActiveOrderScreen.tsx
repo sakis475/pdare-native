@@ -78,6 +78,7 @@ const ActiveOrderScreen = ({
     }
 
     setTable(newTable);
+    setOrder((order) => ({ ...order, table: newTable }));
     navigation.setOptions({
       headerTitle: () => <CustomNavigationScreenHeaderTitle title={newTable.tableName} />,
     });
