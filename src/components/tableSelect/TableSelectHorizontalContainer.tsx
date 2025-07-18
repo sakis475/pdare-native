@@ -3,14 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   FlatList,
-  Dimensions,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
 import { colors } from '../../core/theme';
 import { useStrings } from '../../core/localization/languageContext';
+import { Table } from '../../types/basic.types';
 
 const boxSize = 80;
 
@@ -23,9 +22,9 @@ const TableSelectHorizontalContainer = ({
   searchWord: string;
   onTableSelect: any;
 }) => {
-  //TODO: pass search key, filter allTables by search key, sort by name
   const [allTables, setAllTables] = useState<Table[]>(tables?.length ? tables : []);
   const strings = useStrings();
+
   useEffect(() => {
     filterTable(searchWord);
   }, [searchWord]);
@@ -40,20 +39,18 @@ const TableSelectHorizontalContainer = ({
 
   const filterTable = (searchWord: string) => {
     if (searchWord) {
-      setAllTables((prevTables: Table[]) => {
-        const tablesExist = tables.filter((table) => table.tableName.includes(searchWord));
-        return tablesExist;
-      });
+      const filtered = tables.filter((table) =>
+        table.tableName.toLowerCase().includes(searchWord.toLowerCase())
+      );
+      setAllTables(filtered);
     } else {
       setAllTables(tables);
     }
   };
 
   const TableBox = ({ table, newBox }: { table: Table; newBox: boolean }) => {
-    let customStyle = styles.box;
-    if (newBox) {
-      customStyle = { ...styles.box, backgroundColor: colors.orange };
-    }
+    const customStyle = newBox ? { ...styles.box, backgroundColor: colors.orange } : styles.box;
+
     return (
       <TouchableOpacity activeOpacity={0.7} onPress={() => handleTableSelect(table)}>
         <View style={customStyle}>
@@ -63,51 +60,44 @@ const TableSelectHorizontalContainer = ({
     );
   };
 
-  const screenWidth = Dimensions.get('window').width;
-  const numColumns = allTables?.length > 0 ? Math.ceil(allTables.length / 2) : 0;
-  const contentWidth = (numColumns + 1) * boxSize;
-
-  return (
-    <View style={styles.container}>
-      {searchWord?.length && allTables.length === 0 ? (
+  const renderContent = () => {
+    if (searchWord?.length && allTables.length === 0) {
+      return (
         <View>
           <Text style={styles.boxText}>{strings.NO_TABLE_FOUND_CREATE_NEW}</Text>
           <TableBox
             table={{ id: -1, isEnabled: false, tableOrder: -1, tableName: searchWord }}
             newBox={true}
-          ></TableBox>
+          />
         </View>
-      ) : allTables.length === 0 ? (
+      );
+    }
+
+    if (allTables.length === 0) {
+      return (
         <View style={styles.emptyStateContainer}>
           <Text style={styles.noTablesText}>{strings.NO_TABLE_AVAILABLE}</Text>
         </View>
-      ) : allTables?.length ? (
-        contentWidth > screenWidth ? (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            directionalLockEnabled={true}
-            alwaysBounceVertical={false}
-          >
-            <FlatList
-              key={`flatList${numColumns}`}
-              numColumns={numColumns}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              data={allTables}
-              renderItem={({ item }) => <TableBox table={item} newBox={false} />}
-            />
-          </ScrollView>
-        ) : (
-          <FlatList
-            key={`flatList${numColumns}`}
-            numColumns={numColumns}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            data={allTables}
-            renderItem={({ item }) => <TableBox table={item} newBox={false} />}
-          />
-        )
+      );
+    }
+
+    return (
+      <FlatList
+        data={allTables}
+        key={'flatList-vertical'}
+        numColumns={4} // You can adjust this number
+        showsVerticalScrollIndicator={true}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <TableBox table={item} newBox={false} />}
+        contentContainerStyle={styles.listContent}
+      />
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      {allTables ? (
+        renderContent()
       ) : (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size={'large'} animating={true} color={colors.primary} />
@@ -122,6 +112,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     flex: 1,
   },
+  listContent: {
+    paddingBottom: 10,
+    // alignItems: 'center',
+  },
   box: {
     width: boxSize,
     height: boxSize,
@@ -133,6 +127,7 @@ const styles = StyleSheet.create({
   boxText: {
     color: colors.white,
     fontSize: 12,
+    textAlign: 'center',
   },
   noTablesText: {
     color: colors.white,
@@ -143,20 +138,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: boxSize, // Match the height of a table box
+    minHeight: boxSize,
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
-  },
-  newBox: {
-    width: boxSize,
-    height: boxSize,
-    backgroundColor: colors.orange,
-    margin: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
