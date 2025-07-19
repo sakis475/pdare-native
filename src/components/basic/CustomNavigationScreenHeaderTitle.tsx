@@ -18,8 +18,8 @@ const CustomNavigationScreenHeaderTitle = ({
 
   return (
     <View
-      style={{ minHeight: 50 }}
-      // style={[styles.headerTitleContainer, { maxWidth: width - sharedStyles.SIDE_SPACING * 2 }]}
+    // style={{ minHeight: 50 }}
+    // style={[styles.headerTitleContainer, { maxWidth: width - sharedStyles.SIDE_SPACING * 2 }]}
     >
       <Text
         style={[styles.headerTitle, styles.boldText]}
